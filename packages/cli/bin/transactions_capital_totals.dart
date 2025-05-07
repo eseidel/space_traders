@@ -7,7 +7,7 @@ String describeTransaction(Transaction t) {
 }
 
 Future<void> command(Database db, ArgResults argResults) async {
-  final transactions = await db.transactionsWithAccountingType(
+  final transactions = await db.transactions.withAccountingType(
     AccountingType.capital,
   );
 

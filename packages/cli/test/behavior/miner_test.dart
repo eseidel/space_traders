@@ -33,6 +33,8 @@ class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockShipNavRoute extends Mock implements ShipNavRoute {}
 
+class _MockTransactionStore extends Mock implements TransactionStore {}
+
 void main() {
   test('surveyWorthMining with no surveys', () async {
     final db = _MockDatabase();
@@ -595,8 +597,11 @@ void main() {
       waypointSymbol: waypointSymbol.waypoint,
       timestamp: now,
     );
+    final transactionStore = _MockTransactionStore();
+    when(() => db.transactions).thenReturn(transactionStore);
+
     registerFallbackValue(Transaction.fallbackValue());
-    when(() => db.insertTransaction(any())).thenAnswer((_) async {});
+    when(() => transactionStore.insert(any())).thenAnswer((_) async {});
 
     when(() => api.fleet).thenReturn(fleetApi);
     when(

@@ -3,7 +3,6 @@ import 'package:cli/central_command.dart';
 import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:db/db.dart';
-import 'package:db/src/stores/systems_store.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
@@ -66,9 +65,7 @@ void main() {
     final db = _MockDatabase();
     registerFallbackValue(BehaviorState.fallbackValue());
     registerFallbackValue(const ShipSymbol.fallbackValue());
-    when(() => db.upsertBehavior(any())).thenAnswer((_) async {
-      return;
-    });
+    when(() => db.upsertBehavior(any())).thenAnswer((_) async {});
     when(() => db.deleteBehavior(any())).thenAnswer((_) async {});
     final behaviors = BehaviorSnapshot([]);
     final ships = ShipSnapshot([]);

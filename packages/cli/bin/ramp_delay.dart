@@ -30,7 +30,7 @@ void printRampDelay(Iterable<Transaction> transactions) {
 }
 
 Future<void> command(Database db, ArgResults argResults) async {
-  final transactions = await db.allTransactions();
+  final transactions = await db.transactions.all();
   printRampDelay(transactions);
 }
 

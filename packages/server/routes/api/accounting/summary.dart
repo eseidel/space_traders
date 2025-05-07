@@ -9,7 +9,7 @@ Future<Response> onRequest(RequestContext context) async {
   final db = await context.readAsync<Database>();
 
   final balanceSheet = await computeBalanceSheet(db);
-  final transactions = await db.allTransactions();
+  final transactions = await db.transactions.all();
   final incomeStatement = await computeIncomeStatement(transactions);
   final response = AccountingSummaryResponse(
     balanceSheet: balanceSheet,

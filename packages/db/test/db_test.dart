@@ -38,7 +38,7 @@ void main() {
     when(() => connection.execute(any())).thenAnswer((_) async {
       return _MockPostgreSQLResult();
     });
-    db.insertTransaction(transaction);
+    db.transactions.insert(transaction);
     verify(() => connection.execute(any())).called(1);
   });
 }

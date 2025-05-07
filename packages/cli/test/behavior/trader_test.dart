@@ -13,6 +13,8 @@ class _MockApi extends Mock implements Api {}
 
 class _MockCentralCommand extends Mock implements CentralCommand {}
 
+class _MockConstructionStore extends Mock implements ConstructionStore {}
+
 class _MockContractsApi extends Mock implements ContractsApi {}
 
 class _MockDatabase extends Mock implements Database {}
@@ -39,7 +41,7 @@ class _MockShipReactor extends Mock implements ShipReactor {}
 
 class _MockSystemsApi extends Mock implements SystemsApi {}
 
-class _MockConstructionStore extends Mock implements ConstructionStore {}
+class _MockTransactionStore extends Mock implements TransactionStore {}
 
 void main() {
   setUpAll(() {
@@ -198,8 +200,12 @@ void main() {
         ),
       ),
     );
+
+    final transactionStore = _MockTransactionStore();
+    when(() => db.transactions).thenReturn(transactionStore);
+
     registerFallbackValue(Transaction.fallbackValue());
-    when(() => db.insertTransaction(any())).thenAnswer((_) async {});
+    when(() => transactionStore.insert(any())).thenAnswer((_) async {});
     when(db.allBehaviorStates).thenAnswer((_) async => []);
     registerFallbackValue(BehaviorSnapshot([]));
     registerFallbackValue(ShipSnapshot([]));
@@ -497,8 +503,12 @@ void main() {
         end: any(named: 'end'),
       ),
     ).thenReturn(routePlan);
+
+    final transactionStore = _MockTransactionStore();
+    when(() => db.transactions).thenReturn(transactionStore);
+
     registerFallbackValue(Transaction.fallbackValue());
-    when(() => db.insertTransaction(any())).thenAnswer((_) async {});
+    when(() => transactionStore.insert(any())).thenAnswer((_) async {});
     when(() => db.upsertShip(ship)).thenAnswer((_) async {});
     registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
     when(
@@ -1247,8 +1257,11 @@ void main() {
     when(() => db.upsertAgent(any())).thenAnswer((_) async {});
     when(db.getMyAgent).thenAnswer((_) async => agent);
 
+    final transactionStore = _MockTransactionStore();
+    when(() => db.transactions).thenReturn(transactionStore);
+
     registerFallbackValue(Transaction.fallbackValue());
-    when(() => db.insertTransaction(any())).thenAnswer((_) async {});
+    when(() => transactionStore.insert(any())).thenAnswer((_) async {});
     registerFallbackValue(Contract.fallbackValue());
     when(() => db.upsertContract(any())).thenAnswer((_) async {});
 
@@ -1435,8 +1448,11 @@ void main() {
       ),
     );
 
+    final transactionStore = _MockTransactionStore();
+    when(() => db.transactions).thenReturn(transactionStore);
+
     registerFallbackValue(Transaction.fallbackValue());
-    when(() => db.insertTransaction(any())).thenAnswer((_) async {});
+    when(() => transactionStore.insert(any())).thenAnswer((_) async {});
 
     final constructionStore = _MockConstructionStore();
     when(() => db.construction).thenReturn(constructionStore);

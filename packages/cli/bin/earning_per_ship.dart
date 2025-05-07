@@ -52,7 +52,8 @@ Future<void> command(Database db, ArgResults argResults) async {
   final lookback = Duration(minutes: lookbackMinutes);
 
   final shipSymbols =
-      (await db.uniqueShipSymbolsInTransactions()).toList()..sort();
+      (await db.transactions.uniqueShipSymbolsInTransactions()).toList()
+        ..sort();
 
   final ships = await ShipSnapshot.load(db);
   final behaviors = await BehaviorSnapshot.load(db);
@@ -77,7 +78,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   final frameCreditPerSecondTotals = <ShipFrameSymbolEnum, double>{};
 
   final startTime = DateTime.timestamp().subtract(lookback);
-  final transactions = (await db.transactionsAfter(startTime)).where(
+  final transactions = (await db.transactions.after(startTime)).where(
     (t) => [AccountingType.goods, AccountingType.fuel].contains(t.accounting),
   );
 
