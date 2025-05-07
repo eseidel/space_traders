@@ -138,7 +138,6 @@ Future<JobResult> _doBuyShipJob(
     result = await purchaseShipAndLog(
       api,
       db,
-      caches.agent,
       ship,
       shipyard.waypointSymbol,
       shipType,
@@ -153,8 +152,9 @@ Future<JobResult> _doBuyShipJob(
       // Was not an insufficient credits exception.
       rethrow;
     }
+    final agent = await db.getMyAgent();
     failJob(
-      'Failed to purchase ship ${caches.agent.agent.credits} < $neededCredits',
+      'Failed to purchase ship ${agent!.credits} < $neededCredits',
       const Duration(minutes: 10),
     );
   }
@@ -167,10 +167,12 @@ Future<JobResult> _doBuyShipJob(
   // we won't have a next job once this one is done.
   final shipyardListings = await ShipyardListingSnapshot.load(db);
   final ships = await ShipSnapshot.load(db);
+  final agent = await db.getMyAgent();
   await centralCommand.updateBuyShipJobIfNeeded(
     db,
     api,
     caches,
+    agent!,
     shipyardListings,
     ships,
   );

@@ -20,7 +20,6 @@ import 'package:types/types.dart';
 Future<Transaction?> purchaseTradeGoodIfPossible(
   Api api,
   Database db,
-  AgentCache agentCache,
   Ship ship,
   MarketTradeGood marketGood,
   TradeSymbol neededTradeSymbol, {
@@ -57,7 +56,6 @@ Future<Transaction?> purchaseTradeGoodIfPossible(
   final result = await purchaseCargoAndLog(
     api,
     db,
-    agentCache,
     ship,
     neededTradeSymbol,
     accountingType,
@@ -115,7 +113,6 @@ Future<JobResult> _handleAtSourceWithDeal(
     final transaction = await purchaseTradeGoodIfPossible(
       api,
       db,
-      caches.agent,
       ship,
       good,
       dealTradeSymbol,
@@ -212,7 +209,6 @@ Future<JobResult> _handleArbitrageDealAtDestination(
     api,
     db,
     caches.marketPrices,
-    caches.agent,
     currentMarket,
     ship,
     AccountingType.goods,
@@ -249,7 +245,6 @@ Future<JobResult> _handleContractDealAtDestination(
   final maybeContract = await _deliverContractGoodsIfPossible(
     api,
     db,
-    caches.agent,
     ship,
     contract,
     neededGood!,
@@ -272,7 +267,8 @@ Future<void> _completeContract(
 ) async {
   final response = await api.contracts.fulfillContract(contract.id);
   final data = response!.data;
-  await caches.agent.updateAgent(Agent.fromOpenApi(data.agent));
+  final agent = Agent.fromOpenApi(data.agent);
+  await db.upsertAgent(agent);
   await db.upsertContract(
     Contract.fromOpenApi(data.contract, DateTime.timestamp()),
   );
@@ -285,7 +281,7 @@ Future<void> _completeContract(
   );
   final transaction = Transaction.fromContractTransaction(
     contactTransaction,
-    caches.agent.agent.credits,
+    agent.credits,
   );
   await db.insertTransaction(transaction);
   shipInfo(ship, 'Contract complete!');
@@ -294,7 +290,6 @@ Future<void> _completeContract(
 Future<Contract?> _deliverContractGoodsIfPossible(
   Api api,
   Database db,
-  AgentCache agentCache,
   Ship ship,
   Contract beforeDelivery,
   ContractDeliverGood goods,
@@ -321,7 +316,7 @@ Future<Contract?> _deliverContractGoodsIfPossible(
       ship,
       'Contract ${beforeDelivery.id} not accepted? Accepting before delivery.',
     );
-    await acceptContractAndLog(api, db, agentCache, ship, beforeDelivery);
+    await acceptContractAndLog(api, db, ship, beforeDelivery);
   }
 
   // And we have the desired cargo.
@@ -362,9 +357,12 @@ Future<Contract?> _deliverContractGoodsIfPossible(
     unitsDelivered: unitsDelivered,
     timestamp: DateTime.timestamp(),
   );
+  // Credits don't change on delivery (rather fulfillment), so this fetch
+  // just to record credits is a bit silly.
+  final agent = await db.getMyAgent();
   final transaction = Transaction.fromContractTransaction(
     contactTransaction,
-    agentCache.agent.credits,
+    agent!.credits,
   );
   await db.insertTransaction(transaction);
   return afterDelivery;
@@ -397,7 +395,6 @@ Future<JobResult> _handleConstructionDealAtDelivery(
     await _deliverConstructionMaterialsIfPossible(
       api,
       db,
-      caches.agent,
       caches.construction,
       ship,
       construction,
@@ -421,7 +418,6 @@ Future<SupplyConstruction201ResponseData?>
 _deliverConstructionMaterialsIfPossible(
   Api api,
   Database db,
-  AgentCache agentCache,
   ConstructionCache constructionCache,
   Ship ship,
   Construction construction,
@@ -484,9 +480,12 @@ _deliverConstructionMaterialsIfPossible(
     tradeSymbol: tradeSymbol,
     timestamp: getNow(),
   );
+  // Credits don't change on delivery (rather fulfillment), so this fetch
+  // just to record credits is a bit silly.
+  final agent = await db.getMyAgent();
   final transaction = Transaction.fromConstructionDelivery(
     delivery,
-    agentCache.agent.credits,
+    agent!.credits,
   );
   await db.insertTransaction(transaction);
   return response;
@@ -528,7 +527,6 @@ Future<DateTime?> acceptContractsIfNeeded(
   Api api,
   Database db,
   MarketPriceSnapshot marketPrices,
-  AgentCache agentCache,
   Ship ship,
 ) async {
   /// Accept logic we run any time contract trading is turned on.
@@ -540,7 +538,7 @@ Future<DateTime?> acceptContractsIfNeeded(
   }
   final unacceptedContracts = await db.unacceptedContracts();
   for (final contract in unacceptedContracts) {
-    await acceptContractAndLog(api, db, agentCache, ship, contract);
+    await acceptContractAndLog(api, db, ship, contract);
   }
   return null;
 }
@@ -576,7 +574,6 @@ Future<JobResult> handleUnwantedCargoIfNeeded(
       api,
       db,
       caches.marketPrices,
-      caches.agent,
       currentMarket,
       ship,
       // We don't have a good way to know what type of cargo this is.
@@ -707,14 +704,7 @@ Future<JobResult> doTraderGetCargo(
     // and thus not having to update?
     maxAge: const Duration(milliseconds: 300),
   );
-  await visitLocalShipyard(
-    db,
-    api,
-    caches.waypoints,
-    caches.static,
-    caches.agent,
-    ship,
-  );
+  await visitLocalShipyard(db, api, caches.waypoints, caches.static, ship);
 
   final deal = assertNotNull(
     state.deal,
@@ -780,14 +770,7 @@ Future<JobResult> doTraderDeliverCargo(
     // and thus not having to update?
     maxAge: const Duration(milliseconds: 300),
   );
-  await visitLocalShipyard(
-    db,
-    api,
-    caches.waypoints,
-    caches.static,
-    caches.agent,
-    ship,
-  );
+  await visitLocalShipyard(db, api, caches.waypoints, caches.static, ship);
 
   final deal = assertNotNull(
     state.deal,
@@ -840,21 +823,16 @@ Future<JobResult> _initDeal(
     // This requires a ship, hence is done in trader rather than centralCommand.
     // We may need to be in the faction system to accept contracts.
     // This will dock us at the current waypoint if needed.
-    await acceptContractsIfNeeded(
-      api,
-      db,
-      caches.marketPrices,
-      caches.agent,
-      ship,
-    );
+    await acceptContractsIfNeeded(api, db, caches.marketPrices, ship);
   }
 
   final contractSnapshot = await ContractSnapshot.load(db);
   final behaviors = await BehaviorSnapshot.load(db);
+  final agent = await db.getMyAgent();
 
   // Consider all deals starting at any market within our consideration range.
   var newDeal = centralCommand.findNextDealAndLog(
-    caches.agent,
+    agent!,
     contractSnapshot,
     caches.marketPrices,
     caches.systems,
@@ -862,7 +840,7 @@ Future<JobResult> _initDeal(
     caches.routePlanner,
     behaviors,
     ship,
-    maxTotalOutlay: caches.agent.agent.credits,
+    maxTotalOutlay: agent.credits,
   );
 
   if (newDeal == null) {
@@ -895,7 +873,7 @@ Future<JobResult> _initDeal(
       caches.marketPrices,
       findDeal: (Ship ship, WaypointSymbol startSymbol) {
         return centralCommand.findNextDealAndLog(
-          caches.agent,
+          agent,
           contractSnapshot,
           caches.marketPrices,
           caches.systems,
@@ -904,7 +882,7 @@ Future<JobResult> _initDeal(
           behaviors,
           ship,
           overrideStartSymbol: startSymbol,
-          maxTotalOutlay: caches.agent.agent.credits,
+          maxTotalOutlay: agent.credits,
         );
       },
       ship,

@@ -85,7 +85,6 @@ Future<WarpShip200ResponseData> warpToWaypoint(
 Stream<SellCargo201ResponseData> sellAllCargo(
   Database db,
   Api api,
-  AgentCache agentCache,
   Market market,
   Ship ship, {
   bool Function(TradeSymbol tradeSymbol)? where,
@@ -115,14 +114,7 @@ Stream<SellCargo201ResponseData> sellAllCargo(
     while (leftToSell > 0) {
       final toSell = min(leftToSell, good.tradeVolume);
       leftToSell -= toSell;
-      final response = await sellCargo(
-        db,
-        api,
-        agentCache,
-        ship,
-        item.tradeSymbol,
-        toSell,
-      );
+      final response = await sellCargo(db, api, ship, item.tradeSymbol, toSell);
       yield response;
     }
   }
@@ -135,7 +127,6 @@ Future<List<Transaction>> sellAllCargoAndLog(
   Api api,
   Database db,
   MarketPriceSnapshot marketPrices,
-  AgentCache agentCache,
   Market market,
   Ship ship,
   AccountingType accountingType, {
@@ -150,7 +141,6 @@ Future<List<Transaction>> sellAllCargoAndLog(
   await for (final response in sellAllCargo(
     db,
     api,
-    agentCache,
     market,
     ship,
     where: where,
@@ -196,7 +186,6 @@ Future<void> jettisonCargoAndLog(
 Future<Transaction?> purchaseCargoAndLog(
   Api api,
   Database db,
-  AgentCache agentCache,
   Ship ship,
   TradeSymbol tradeSymbol,
   AccountingType accounting, {
@@ -205,14 +194,7 @@ Future<Transaction?> purchaseCargoAndLog(
 }) async {
   // TODO(eseidel): Move trade volume and cargo space checks inside here.
   try {
-    final data = await purchaseCargo(
-      db,
-      api,
-      agentCache,
-      ship,
-      tradeSymbol,
-      amountToBuy,
-    );
+    final data = await purchaseCargo(db, api, ship, tradeSymbol, amountToBuy);
     // Do we need to handle transaction limits?  Callers should check before.
     // ApiException 400: {"error":{"message":"Market transaction failed.
     // Trade good REACTOR_FUSION_I has a limit of 10 units per transaction.",
@@ -249,25 +231,17 @@ Future<Transaction?> purchaseCargoAndLog(
 Future<PurchaseShip201ResponseData> purchaseShipAndLog(
   Api api,
   Database db,
-  AgentCache agentCache,
   Ship ship,
   WaypointSymbol shipyardSymbol,
   ShipType shipType,
 ) async {
-  final result = await purchaseShip(
-    db,
-    api,
-    agentCache,
-    shipyardSymbol,
-    shipType,
-  );
+  final result = await purchaseShip(db, api, shipyardSymbol, shipType);
   final agent = Agent.fromOpenApi(result.agent);
   logShipyardTransaction(ship, agent, result.transaction);
   shipErr(ship, 'Bought ship: ${result.ship.symbol}');
   final transaction = Transaction.fromShipyardTransaction(
     result.transaction,
-    // purchaseShip updated the agentCache
-    agentCache.agent.credits,
+    agent.credits,
     ship.symbol,
   );
   await db.insertTransaction(transaction);
@@ -278,10 +252,9 @@ Future<PurchaseShip201ResponseData> purchaseShipAndLog(
 Future<ScrapShip200ResponseData> scrapShipAndLog(
   Api api,
   Database db,
-  AgentCache agentCache,
   Ship ship,
 ) async {
-  final result = await scrapShip(db, api, agentCache, ship.symbol);
+  final result = await scrapShip(db, api, ship.symbol);
   final agent = Agent.fromOpenApi(result.agent);
   logScrapTransaction(ship, agent, result.transaction);
   shipErr(
@@ -290,8 +263,7 @@ Future<ScrapShip200ResponseData> scrapShipAndLog(
   );
   final transaction = Transaction.fromScrapTransaction(
     result.transaction,
-    // scrapShip updated the agent cache.
-    agentCache.agent.credits,
+    result.agent.credits,
     ship.symbol,
   );
   await db.insertTransaction(transaction);
@@ -371,7 +343,6 @@ bool _shouldRefuelBasedOnCapacity(Ship ship) {
 Future<RefuelShip200ResponseData?> refuelIfNeededAndLog(
   Api api,
   Database db,
-  AgentCache agentCache,
   Market market,
   Ship ship, {
   required int? medianFuelPurchasePrice,
@@ -399,7 +370,6 @@ Future<RefuelShip200ResponseData?> refuelIfNeededAndLog(
   return refuelAndLog(
     api,
     db,
-    agentCache,
     ship,
     medianFuelPurchasePrice: medianFuelPurchasePrice,
   );
@@ -409,21 +379,14 @@ Future<RefuelShip200ResponseData?> refuelIfNeededAndLog(
 Future<RefuelShip200ResponseData?> refuelAndLog(
   Api api,
   Database db,
-  AgentCache agentCache,
   Ship ship, {
   required int? medianFuelPurchasePrice,
   bool fromCargo = false,
 }) async {
   // shipInfo(ship, 'Refueling (${ship.fuel.current} / ${ship.fuel.capacity})');
-  final data = await refuelShip(
-    db,
-    api,
-    agentCache,
-    ship,
-    fromCargo: fromCargo,
-  );
+  final data = await refuelShip(db, api, ship, fromCargo: fromCargo);
   final marketTransaction = data.transaction;
-  final agent = agentCache.agent;
+  final agent = Agent.fromOpenApi(data.agent);
   logMarketTransaction(
     ship,
     agent,
@@ -592,7 +555,6 @@ Future<void> chartWaypointAndLog(
 Future<JumpShip200ResponseData> useJumpGateAndLog(
   Api api,
   Database db,
-  AgentCache agentCache,
   Ship ship,
   WaypointSymbol destination, {
   required int? medianAntimatterPrice,
@@ -614,9 +576,9 @@ Future<JumpShip200ResponseData> useJumpGateAndLog(
 
   final data = response.data;
   final marketTransaction = data.transaction;
-  await agentCache.updateAgent(Agent.fromOpenApi(data.agent));
+  final agent = Agent.fromOpenApi(data.agent);
+  await db.upsertAgent(agent);
 
-  final agent = agentCache.agent;
   logMarketTransaction(
     ship,
     agent,
@@ -657,13 +619,13 @@ Future<Contract> negotiateContractAndLog(
 Future<AcceptContract200ResponseData> acceptContractAndLog(
   Api api,
   Database db,
-  AgentCache agentCache,
   Ship ship,
   Contract contract,
 ) async {
   final response = await api.contracts.acceptContract(contract.id);
   final data = response!.data;
-  await agentCache.updateAgent(Agent.fromOpenApi(data.agent));
+  final agent = Agent.fromOpenApi(data.agent);
+  await db.upsertAgent(agent);
   await db.upsertContract(
     Contract.fromOpenApi(data.contract, DateTime.timestamp()),
   );
@@ -681,7 +643,7 @@ Future<AcceptContract200ResponseData> acceptContractAndLog(
   );
   final transaction = Transaction.fromContractTransaction(
     contactTransaction,
-    agentCache.agent.credits,
+    agent.credits,
   );
   await db.insertTransaction(transaction);
 
@@ -692,7 +654,6 @@ Future<AcceptContract200ResponseData> acceptContractAndLog(
 Future<InstallMount201ResponseData> installMountAndLog(
   Api api,
   Database db,
-  AgentCache agentCache,
   Ship ship,
   ShipMountSymbolEnum tradeSymbol,
 ) async {
@@ -701,15 +662,16 @@ Future<InstallMount201ResponseData> installMountAndLog(
     installMountRequest: InstallMountRequest(symbol: tradeSymbol.value),
   );
   final data = response!.data;
-  await agentCache.updateAgent(Agent.fromOpenApi(data.agent));
+  final agent = Agent.fromOpenApi(data.agent);
+  await db.upsertAgent(agent);
   ship
     ..cargo = data.cargo
     ..mounts = data.mounts;
   await db.upsertShip(ship);
-  logShipModificationTransaction(ship, agentCache.agent, data.transaction);
+  logShipModificationTransaction(ship, agent, data.transaction);
   final transaction = Transaction.fromShipModificationTransaction(
     data.transaction,
-    agentCache.agent.credits,
+    agent.credits,
   );
   await db.insertTransaction(transaction);
   return data;
@@ -719,7 +681,6 @@ Future<InstallMount201ResponseData> installMountAndLog(
 Future<RemoveMount201ResponseData> removeMountAndLog(
   Api api,
   Database db,
-  AgentCache agentCache,
   Ship ship,
   ShipMountSymbolEnum tradeSymbol,
 ) async {
@@ -728,15 +689,16 @@ Future<RemoveMount201ResponseData> removeMountAndLog(
     removeMountRequest: RemoveMountRequest(symbol: tradeSymbol.value),
   );
   final data = response!.data;
-  await agentCache.updateAgent(Agent.fromOpenApi(data.agent));
+  final agent = Agent.fromOpenApi(data.agent);
+  await db.upsertAgent(agent);
   ship
     ..cargo = data.cargo
     ..mounts = data.mounts;
   await db.upsertShip(ship);
-  logShipModificationTransaction(ship, agentCache.agent, data.transaction);
+  logShipModificationTransaction(ship, agent, data.transaction);
   final transaction = Transaction.fromShipModificationTransaction(
     data.transaction,
-    agentCache.agent.credits,
+    agent.credits,
   );
   await db.insertTransaction(transaction);
   return data;

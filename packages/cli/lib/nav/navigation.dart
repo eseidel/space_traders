@@ -257,7 +257,6 @@ Future<NavResult> continueNavigationIfNeeded(
         response = await useJumpGateAndLog(
           api,
           db,
-          caches.agent,
           ship,
           actionEnd.symbol,
           medianAntimatterPrice: centralCommand.medianAntimatterPurchasePrice,
@@ -301,7 +300,6 @@ Future<NavResult> continueNavigationIfNeeded(
       await refuelIfNeededAndLog(
         api,
         db,
-        caches.agent,
         market,
         ship,
         medianFuelPurchasePrice: centralCommand.medianFuelPurchasePrice,
@@ -326,7 +324,6 @@ Future<NavResult> continueNavigationIfNeeded(
             await refuelIfNeededAndLog(
               api,
               db,
-              caches.agent,
               market,
               ship,
               medianFuelPurchasePrice: centralCommand.medianFuelPurchasePrice,

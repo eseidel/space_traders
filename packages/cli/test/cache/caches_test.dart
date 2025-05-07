@@ -4,8 +4,6 @@ import 'package:db/src/stores/systems_store.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
-class _MockAgentCache extends Mock implements AgentCache {}
-
 class _MockAgentsApi extends Mock implements AgentsApi {}
 
 class _MockApi extends Mock implements Api {}
@@ -157,7 +155,8 @@ void main() {
       logger,
       () async => Caches.loadOrFetch(api, db, httpGet: httpGet),
     );
-    expect(caches.agent, isNotNull);
+    expect(caches.galaxy.systemCount, 100);
+    expect(caches.galaxy.waypointCount, 100);
   });
 
   test('updateRoutingCaches', () async {
@@ -165,7 +164,6 @@ void main() {
     final systemsStore = _MockSystemsStore();
     when(() => db.systems).thenReturn(systemsStore);
     final caches = Caches(
-      agent: _MockAgentCache(),
       marketPrices: _MockMarketPrices(),
       systems: SystemsSnapshot([]),
       waypoints: _MockWaypointCache(),

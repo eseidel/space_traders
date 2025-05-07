@@ -76,14 +76,13 @@ void main() {
     );
 
     final symbol = WaypointSymbol.fromString('S-A-W');
-    when(() => caches.agent.headquartersSymbol).thenReturn(symbol);
     when(() => shipNav.waypointSymbol).thenReturn(symbol.waypoint);
     when(() => shipNav.systemSymbol).thenReturn(symbol.systemString);
 
     final agent = Agent.test();
-    when(() => caches.agent.agent).thenReturn(agent);
     registerFallbackValue(agent);
-    when(() => caches.agent.updateAgent(any())).thenAnswer((_) async {});
+    when(() => db.upsertAgent(any())).thenAnswer((_) async {});
+    when(db.getMyAgent).thenAnswer((_) async => agent);
 
     when(
       () => caches.waypoints.waypointsInSystem(symbol.system),
@@ -161,6 +160,7 @@ void main() {
         db,
         api,
         caches,
+        any(),
         any(),
         any(),
       ),

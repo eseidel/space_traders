@@ -69,7 +69,8 @@ Future<DateTime?> advanceShipBehavior(
   DateTime Function() getNow = defaultGetNow,
 }) async {
   final state = await createBehaviorIfAbsent(db, ship.symbol, () async {
-    final credits = caches.agent.agent.credits;
+    final agent = await db.getMyAgent();
+    final credits = agent!.credits;
     return centralCommand.getJobForShip(
       db,
       caches.systemConnectivity,

@@ -52,12 +52,16 @@ void main() {
       ),
     ]);
 
+    final agent = Agent.test();
+    registerFallbackValue(agent);
+    when(db.getMyAgent).thenAnswer((_) async => agent);
+
     when(
       () => centralCommand.siphonJobForShip(
         db,
         caches.systems,
         caches.charting,
-        caches.agent,
+        any(),
         ship,
       ),
     ).thenAnswer(

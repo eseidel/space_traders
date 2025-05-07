@@ -33,18 +33,18 @@ Future<api.DealsNearbyResponse> dealsNearby({
   );
   final marketPrices = await MarketPriceSnapshot.loadAll(db);
 
-  final agentCache = await AgentCache.load(db);
+  final agent = await db.getMyAgent();
   final contractSnapshot = await ContractSnapshot.load(db);
   final centralCommand = CentralCommand();
 
   final startWaypoint =
       maybeStart == null
-          ? systems.waypoint(agentCache!.headquartersSymbol)
+          ? systems.waypoint(agent!.headquarters)
           : systems.waypoint(maybeStart);
 
   final construction = await centralCommand.computeActiveConstruction(
     db,
-    agentCache!,
+    agent!,
   );
   centralCommand.activeConstruction = construction;
 
@@ -68,7 +68,7 @@ Future<api.DealsNearbyResponse> dealsNearby({
   final extraSellOpps = <SellOpp>[];
   if (centralCommand.isContractTradingEnabled) {
     extraSellOpps.addAll(
-      centralCommand.contractSellOpps(agentCache, behaviors, contractSnapshot),
+      centralCommand.contractSellOpps(agent, behaviors, contractSnapshot),
     );
   }
   if (centralCommand.isConstructionTradingEnabled) {

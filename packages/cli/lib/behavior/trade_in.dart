@@ -19,14 +19,7 @@ Future<JobResult> doTradeInJob(
   DateTime Function() getNow = defaultGetNow,
 }) async {
   // Will also dock the ship.
-  await visitLocalShipyard(
-    db,
-    api,
-    caches.waypoints,
-    caches.static,
-    caches.agent,
-    ship,
-  );
+  await visitLocalShipyard(db, api, caches.waypoints, caches.static, ship);
   // Get the purchase price of a new ship of this type.
   final shipyardShips = await caches.static.shipyardShips.snapshot();
   final shipType = assertNotNull(
@@ -53,8 +46,8 @@ Future<JobResult> doTradeInJob(
     const Duration(minutes: 5),
   );
   // New ships are cheaper than the scrap value, trade in!
-  await purchaseShip(db, api, caches.agent, ship.waypointSymbol, shipType);
-  await scrapShipAndLog(api, db, caches.agent, ship);
+  await purchaseShip(db, api, ship.waypointSymbol, shipType);
+  await scrapShipAndLog(api, db, ship);
   return JobResult.complete();
 }
 

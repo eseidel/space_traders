@@ -30,7 +30,7 @@ Future<JobResult> doScrapJob(
   if (shipyard.waypointSymbol == ship.waypointSymbol) {
     await dockIfNeeded(db, api, ship);
     // We're at the shipyard, scrap the ship.
-    await scrapShipAndLog(api, db, caches.agent, ship);
+    await scrapShipAndLog(api, db, ship);
     return JobResult.complete();
   }
 

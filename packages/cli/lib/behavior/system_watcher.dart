@@ -238,14 +238,7 @@ Future<JobResult> doSystemWatcher(
     );
   }
   await visitLocalMarket(api, db, caches, ship, maxAge: maxAge, getNow: getNow);
-  await visitLocalShipyard(
-    db,
-    api,
-    caches.waypoints,
-    caches.static,
-    caches.agent,
-    ship,
-  );
+  await visitLocalShipyard(db, api, caches.waypoints, caches.static, ship);
 
   if (willCompleteBehavior) {
     // Explore behavior never changes, but it's still the correct thing to

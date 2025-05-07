@@ -77,8 +77,8 @@ Future<void> command(Database db, ArgResults argResults) async {
 
   // Find ones not in our main cluster.
   final systemConnectivity = await loadSystemConnectivity(db);
-  final agentCache = await AgentCache.load(db);
-  final hqSystem = agentCache!.headquartersSystemSymbol;
+  final agent = await db.getMyAgent();
+  final hqSystem = agent!.headquarters.system;
 
   final explorer = ships.ships.firstWhere((s) => s.isExplorer);
 

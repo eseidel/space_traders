@@ -54,7 +54,6 @@ Future<JobResult> goWaitForGoods(
       await purchaseCargoAndLog(
         api,
         db,
-        caches.agent,
         ship,
         TradeSymbol.FUEL,
         AccountingType.fuel,
@@ -84,7 +83,6 @@ Future<JobResult> goWaitForGoods(
     await refuelAndLog(
       api,
       db,
-      caches.agent,
       ship,
       medianFuelPurchasePrice: medianFuelPurchasePrice,
       fromCargo: true,

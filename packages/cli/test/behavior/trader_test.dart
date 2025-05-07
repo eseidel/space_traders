@@ -138,11 +138,16 @@ void main() {
       costPerAntimatterUnit: 10000,
     );
 
+    final agent = Agent.test();
+    registerFallbackValue(agent);
+    when(db.getMyAgent).thenAnswer((_) async => agent);
+    when(() => db.upsertAgent(any())).thenAnswer((_) async {});
+
     registerFallbackValue(ContractSnapshot([]));
     registerFallbackValue(BehaviorSnapshot([]));
     when(
       () => centralCommand.findNextDealAndLog(
-        caches.agent,
+        any(),
         any(),
         caches.marketPrices,
         caches.systems,
@@ -160,11 +165,6 @@ void main() {
     when(() => shipCargo.units).thenReturn(0);
     when(() => shipCargo.capacity).thenReturn(10);
     when(() => shipCargo.inventory).thenReturn([]);
-
-    final agent = Agent.test();
-    when(() => caches.agent.agent).thenReturn(agent);
-    registerFallbackValue(agent);
-    when(() => caches.agent.updateAgent(any())).thenAnswer((_) async {});
 
     final state = BehaviorState(shipSymbol, Behavior.trader);
 
@@ -382,9 +382,8 @@ void main() {
     ]);
 
     final agent = Agent.test();
-    when(() => caches.agent.agent).thenReturn(agent);
     registerFallbackValue(agent);
-    when(() => caches.agent.updateAgent(any())).thenAnswer((_) async {});
+    when(() => db.upsertAgent(any())).thenAnswer((_) async {});
 
     final transaction = MarketTransaction(
       pricePerUnit: 100,
@@ -554,9 +553,6 @@ void main() {
       timestamp: now,
     );
 
-    final agent = Agent.test();
-    when(() => caches.agent.agent).thenReturn(agent);
-
     final contractsApi = _MockContractsApi();
     when(() => api.contracts).thenReturn(contractsApi);
     when(
@@ -662,7 +658,7 @@ void main() {
     registerFallbackValue(ShipSnapshot([]));
     when(
       () => centralCommand.findNextDealAndLog(
-        caches.agent,
+        any(),
         any(),
         caches.marketPrices,
         caches.systems,
@@ -743,6 +739,9 @@ void main() {
 
     when(db.allBehaviorStates).thenAnswer((_) async => []);
     when(() => db.upsertShip(ship)).thenAnswer((_) async {});
+
+    final agent = Agent.test();
+    when(db.getMyAgent).thenAnswer((_) async => agent);
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
@@ -1242,9 +1241,9 @@ void main() {
       ),
     );
 
-    when(() => caches.agent.agent).thenReturn(agent);
     registerFallbackValue(agent);
-    when(() => caches.agent.updateAgent(any())).thenAnswer((_) async {});
+    when(() => db.upsertAgent(any())).thenAnswer((_) async {});
+    when(db.getMyAgent).thenAnswer((_) async => agent);
 
     registerFallbackValue(Transaction.fallbackValue());
     when(() => db.insertTransaction(any())).thenAnswer((_) async {});
@@ -1437,9 +1436,6 @@ void main() {
       ),
     );
 
-    final agent = Agent.test();
-    when(() => caches.agent.agent).thenReturn(agent);
-
     registerFallbackValue(Transaction.fallbackValue());
     when(() => db.insertTransaction(any())).thenAnswer((_) async {});
 
@@ -1455,6 +1451,9 @@ void main() {
     when(
       () => db.medianMarketPurchasePrice(any()),
     ).thenAnswer((_) async => 100);
+
+    final agent = Agent.test();
+    when(db.getMyAgent).thenAnswer((_) async => agent);
 
     final logger = _MockLogger();
     final result = await runWithLogger(

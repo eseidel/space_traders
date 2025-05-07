@@ -42,8 +42,8 @@ Future<void> command(Database db, ArgResults argResults) async {
         (count, systemSymbol) => count ?? 0 + 1,
       );
 
-  final agentCache = await AgentCache.load(db);
-  final hqSystemSymbol = agentCache!.headquartersSystemSymbol;
+  final agent = await db.getMyAgent();
+  final hqSystemSymbol = agent!.headquarters.system;
 
   for (final jumpGate in jumpGates.values) {
     final fromSystemSymbol = jumpGate.waypointSymbol.system;

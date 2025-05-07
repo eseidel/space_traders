@@ -36,14 +36,7 @@ Future<JobResult> doBuyJob(
     // We want to always be using super up-to-date market prices for the trader.
     maxAge: const Duration(seconds: 5),
   );
-  await visitLocalShipyard(
-    db,
-    api,
-    caches.waypoints,
-    caches.static,
-    caches.agent,
-    ship,
-  );
+  await visitLocalShipyard(db, api, caches.waypoints, caches.static, ship);
 
   // Regardless of where we are, if we have cargo that isn't part of our deal,
   // try to sell it.
@@ -87,11 +80,12 @@ Future<JobResult> doBuyJob(
   final tradeSymbol = buyJob.tradeSymbol;
   final good = currentMarket.marketTradeGood(tradeSymbol)!;
 
+  final agent = await db.getMyAgent();
   final units = unitsToPurchase(
     good,
     ship,
     buyJob.units,
-    credits: caches.agent.agent.credits,
+    credits: agent!.credits,
   );
 
   final existingUnits = ship.countUnits(buyJob.tradeSymbol);
@@ -120,7 +114,6 @@ Future<JobResult> doBuyJob(
   final transaction = await purchaseTradeGoodIfPossible(
     api,
     db,
-    caches.agent,
     ship,
     good,
     tradeSymbol,

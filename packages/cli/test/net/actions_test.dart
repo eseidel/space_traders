@@ -6,8 +6,6 @@ import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
-class _MockAgentCache extends Mock implements AgentCache {}
-
 class _MockApi extends Mock implements Api {}
 
 class _MockChartingCache extends Mock implements ChartingCache {}
@@ -67,13 +65,12 @@ void main() {
     registerFallbackValue(Ship.fallbackValue());
     when(() => db.upsertShip(any())).thenAnswer((_) async {});
 
-    final agentCache = AgentCache(agent1, db);
     final shipyardSymbol = WaypointSymbol.fromString('S-A-Y');
     const shipType = ShipType.PROBE;
-    await purchaseShip(db, api, agentCache, shipyardSymbol, shipType);
+    await purchaseShip(db, api, shipyardSymbol, shipType);
     registerFallbackValue(Ship.fallbackValue());
     verify(() => db.upsertShip(any())).called(1);
-    expect(agentCache.agent, agent2);
+    verify(() => db.upsertAgent(any())).called(1);
   });
 
   test('setShipFlightMode', () async {
@@ -332,10 +329,9 @@ void main() {
       ),
     );
 
+    final db = _MockDatabase();
     final agent = Agent.test();
-    final agentCache = _MockAgentCache();
-    when(() => agentCache.agent).thenReturn(agent);
-    when(() => agentCache.updateAgent(agent)).thenAnswer((_) async {});
+    when(() => db.upsertAgent(agent)).thenAnswer((_) async {});
     final marketTransaction = MarketTransaction(
       waypointSymbol: waypointSymbol.waypoint,
       shipSymbol: shipSymbol.symbol,
@@ -346,7 +342,6 @@ void main() {
       totalPrice: 1000,
       timestamp: DateTime(2021),
     );
-    final db = _MockDatabase();
     registerFallbackValue(Transaction.fallbackValue());
     when(() => db.insertTransaction(any())).thenAnswer((_) async {});
     final market = _MockMarket();
@@ -375,7 +370,6 @@ void main() {
       () => refuelIfNeededAndLog(
         api,
         db,
-        agentCache,
         market,
         ship,
         medianFuelPurchasePrice: 100,
@@ -405,7 +399,6 @@ void main() {
       () => refuelIfNeededAndLog(
         api,
         db,
-        agentCache,
         market,
         ship,
         medianFuelPurchasePrice: 100,
@@ -433,7 +426,7 @@ void main() {
       () => refuelIfNeededAndLog(
         api,
         db,
-        agentCache,
+
         market,
         ship,
         medianFuelPurchasePrice: 100,
@@ -464,7 +457,7 @@ void main() {
       () => refuelIfNeededAndLog(
         api,
         db,
-        agentCache,
+
         market,
         ship,
         medianFuelPurchasePrice: 100,
@@ -486,7 +479,7 @@ void main() {
       () => refuelIfNeededAndLog(
         api,
         db,
-        agentCache,
+
         market,
         ship,
         medianFuelPurchasePrice: 100,
@@ -509,7 +502,7 @@ void main() {
       () => refuelIfNeededAndLog(
         api,
         db,
-        agentCache,
+
         market,
         ship,
         medianFuelPurchasePrice: 100,
@@ -532,7 +525,7 @@ void main() {
       () => refuelIfNeededAndLog(
         api,
         db,
-        agentCache,
+
         market,
         ship,
         medianFuelPurchasePrice: 100,
@@ -552,11 +545,9 @@ void main() {
     final fleetApi = _MockFleetApi();
     when(() => api.fleet).thenReturn(fleetApi);
     final logger = _MockLogger();
-    final agent = Agent.test();
-    final agentCache = _MockAgentCache();
-    when(() => agentCache.agent).thenReturn(agent);
-    when(() => agentCache.updateAgent(agent)).thenAnswer((_) async {});
     final db = _MockDatabase();
+    final agent = Agent.test();
+    when(() => db.upsertAgent(agent)).thenAnswer((_) async {});
     final market = _MockMarket();
     when(() => market.tradeGoods).thenReturn([
       MarketTradeGood(
@@ -584,7 +575,7 @@ void main() {
         api,
         db,
         marketPrices,
-        agentCache,
+
         market,
         ship,
         accountingType,
@@ -653,7 +644,7 @@ void main() {
         api,
         db,
         marketPrices,
-        agentCache,
+
         market,
         ship,
         accountingType,
@@ -840,10 +831,8 @@ void main() {
         payment: ContractPayment(onAccepted: 100, onFulfilled: 1000),
       ),
     );
-    final agentCache = _MockAgentCache();
     final agent = Agent.test();
-    when(() => agentCache.agent).thenReturn(agent);
-    when(() => agentCache.updateAgent(agent)).thenAnswer((_) async {});
+    when(() => db.upsertAgent(agent)).thenAnswer((_) async {});
 
     final logger = _MockLogger();
 
@@ -863,7 +852,7 @@ void main() {
     when(() => db.upsertContract(any())).thenAnswer((_) async {});
 
     await runWithLogger(logger, () async {
-      await acceptContractAndLog(api, db, agentCache, ship, contract);
+      await acceptContractAndLog(api, db, ship, contract);
     });
     verify(() => contractsApi.acceptContract(any())).called(1);
   });
@@ -887,9 +876,7 @@ void main() {
     when(() => shipNav.status).thenReturn(shipNavStatus);
     final logger = _MockLogger();
     final agent = Agent.test(credits: 10000000);
-    final agentCache = _MockAgentCache();
-    when(() => agentCache.agent).thenReturn(agent);
-    when(() => agentCache.updateAgent(agent)).thenAnswer((_) async {});
+    when(() => db.upsertAgent(agent)).thenAnswer((_) async {});
     final now = DateTime(2021);
 
     when(
@@ -938,7 +925,7 @@ void main() {
       await useJumpGateAndLog(
         api,
         db,
-        agentCache,
+
         ship,
         endSymbol,
         medianAntimatterPrice: null,

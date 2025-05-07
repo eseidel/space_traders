@@ -24,7 +24,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   const shipType = ShipType.EXPLORER;
   final timing = argResults['timing'] as bool;
 
-  final agentCache = await AgentCache.load(db);
+  final agent = await db.getMyAgent();
   final systemsSnapshot = await db.systems.snapshotAllSystems();
   final marketListings = await MarketListingSnapshot.load(db);
   final sellsFuel = defaultSellsFuel(marketListings);
@@ -55,7 +55,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   final ship = await shipyardShips.get(shipType);
   final shipSpec = ship!.shipSpec;
 
-  final start = agentCache!.headquartersSymbol;
+  final start = agent!.headquarters;
   final interestingSystemSymbols = findInterestingSystems(systemsSnapshot);
 
   // Sort them by distance to start, do the easy ones first.

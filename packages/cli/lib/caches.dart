@@ -1,5 +1,4 @@
 import 'package:cli/api.dart';
-import 'package:cli/cache/agent_cache.dart';
 import 'package:cli/cache/charting_cache.dart';
 import 'package:cli/cache/construction_cache.dart';
 import 'package:cli/cache/contract_snapshot.dart';
@@ -22,7 +21,6 @@ import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
 export 'package:cli/api.dart';
-export 'package:cli/cache/agent_cache.dart';
 export 'package:cli/cache/behavior_snapshot.dart';
 export 'package:cli/cache/charting_cache.dart';
 export 'package:cli/cache/construction_cache.dart';
@@ -46,7 +44,6 @@ class Caches {
   /// Creates a new cache.
   @visibleForTesting
   Caches({
-    required this.agent,
     required this.marketPrices,
     required this.systems,
     required this.waypoints,
@@ -60,9 +57,6 @@ class Caches {
     required this.jumpGates,
     required this.galaxy,
   });
-
-  /// The agent cache.
-  final AgentCache agent;
 
   /// Stats about the galaxy.
   final GalaxyStats galaxy;
@@ -113,7 +107,6 @@ class Caches {
     await fetchShips(db, api);
     await fetchContracts(db, api);
 
-    final agent = await AgentCache.loadOrFetch(db, api);
     final marketPrices = await MarketPriceSnapshot.loadAll(db);
     // Load exports before we load static caches.  We ignore the response
     // but then static.exports will be up to date.
@@ -144,7 +137,6 @@ class Caches {
 
     final galaxy = await getGalaxyStats(api);
     return Caches(
-      agent: agent,
       marketPrices: marketPrices,
       systems: systems,
       waypoints: waypoints,
@@ -230,10 +222,10 @@ class TopOfLoopUpdater {
         toJsonList:
             (e) => e.ships.map((e) => e.toJson()..['cooldown'] = null).toList(),
       );
-      // caches.agent should be deleted.
-      await caches.agent.updateAgent(
+      // We could just upsert instead?
+      await db.upsertAgent(
         _checkForChanges(
-          current: caches.agent.agent,
+          current: (await db.getMyAgent())!,
           server: await getMyAgent(api),
           toJsonList: (e) => [e.toOpenApi().toJson()],
         ),
@@ -298,4 +290,15 @@ Future<TradeExportSnapshot> loadExports(Database db, DataApi dataApi) async {
     );
   }
   return TradeExportSnapshot(exports);
+}
+
+/// Creates a new AgentCache from the API.
+Future<Agent> loadOrFetchAgent(Database db, Api api) async {
+  final cached = await db.getMyAgent();
+  if (cached != null) {
+    return cached;
+  }
+  final agent = await getMyAgent(api);
+  await db.upsertAgent(agent);
+  return agent;
 }
