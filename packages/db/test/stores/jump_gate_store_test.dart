@@ -26,7 +26,7 @@ void main() async {
       expect(retrieved, jumpGate);
 
       final snapshot = await jumpGateStore.snapshotAll();
-      expect(snapshot.recordForSymbol(symbol), jumpGate);
+      expect(snapshot.forSymbol(symbol), jumpGate);
     });
   });
 }

@@ -12,6 +12,6 @@ class JumpGateSnapshot {
   final List<JumpGate> values;
 
   /// Gets the JumpGate for the given waypoint symbol.
-  JumpGate? recordForSymbol(WaypointSymbol waypointSymbol) => values
-      .firstWhereOrNull((record) => record.waypointSymbol == waypointSymbol);
+  JumpGate? forSymbol(WaypointSymbol waypoint) =>
+      values.firstWhereOrNull((record) => record.waypointSymbol == waypoint);
 }

@@ -21,7 +21,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   while (systems.isNotEmpty || jumpGates.isNotEmpty) {
     if (jumpGates.isNotEmpty) {
       final from = jumpGates.take();
-      final fromRecord = jumpGateSnapshot.recordForSymbol(from.value);
+      final fromRecord = jumpGateSnapshot.forSymbol(from.value);
       if (fromRecord == null) {
         final chartingRecord = chartingSnapshot.getRecord(from.value);
         if (chartingRecord == null) {
