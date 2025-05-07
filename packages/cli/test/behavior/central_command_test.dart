@@ -26,6 +26,8 @@ class _MockDeal extends Mock implements Deal {}
 
 class _MockLogger extends Mock implements Logger {}
 
+class _MockRoutePlanner extends Mock implements RoutePlanner {}
+
 class _MockShip extends Mock implements Ship {}
 
 class _MockShipCache extends Mock implements ShipSnapshot {}
@@ -771,6 +773,35 @@ void main() {
         shipyardShips,
       ),
       ShipType.ORE_HOUND,
+    );
+  });
+
+  test('findNextDealAndLog smoke test', () async {
+    final centralCommand = CentralCommand();
+    final agent = Agent.test();
+    final contractSnapshot = ContractSnapshot([]);
+    final systemConnectivity = _MockSystemConnectivity();
+    final behaviors = BehaviorSnapshot([]);
+    final shipSymbol = ShipSymbol.fromString('X-A');
+    final ship = Ship.test(shipSymbol);
+    final marketPrices = MarketPriceSnapshot([]);
+    final systems = SystemsSnapshot([]);
+    final routePlanner = _MockRoutePlanner();
+
+    final logger = _MockLogger();
+    await runWithLogger(
+      logger,
+      () async => centralCommand.findNextDealAndLog(
+        agent,
+        contractSnapshot,
+        marketPrices,
+        systems,
+        systemConnectivity,
+        routePlanner,
+        behaviors,
+        ship,
+        maxTotalOutlay: 1000000,
+      ),
     );
   });
 }
