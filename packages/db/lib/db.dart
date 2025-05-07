@@ -32,6 +32,7 @@ Future<Database> defaultDatabase({
     settings: defaultDatabaseConnectionSettings,
   );
   await db.open(openConnection: openConnection);
+  await db.migrateToLatestSchema();
   return db;
 }
 
