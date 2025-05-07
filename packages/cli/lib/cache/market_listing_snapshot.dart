@@ -13,7 +13,7 @@ class MarketListingSnapshot {
 
   /// Load the MarketListingSnapshot from the database.
   static Future<MarketListingSnapshot> load(Database db) async {
-    final listings = await db.allMarketListings();
+    final listings = await db.marketListings.all();
     return MarketListingSnapshot(listings);
   }
 
@@ -22,7 +22,7 @@ class MarketListingSnapshot {
     Database db,
     SystemSymbol systemSymbol,
   ) async {
-    final listings = await db.marketListingsInSystem(systemSymbol);
+    final listings = await db.marketListings.inSystem(systemSymbol);
     return MarketListingSnapshot(listings);
   }
 

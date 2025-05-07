@@ -109,3 +109,7 @@ MarketListing marketListingFromColumnMap(Map<String, dynamic> values) {
             .toSet(),
   );
 }
+
+/// Convert a column map to a market listing symbol.
+WaypointSymbol marketListingSymbolFromColumnMap(Map<String, dynamic> map) =>
+    WaypointSymbol.fromString(map['symbol'] as String);

@@ -139,7 +139,7 @@ Future<Map<TradeSymbol, WaypointSymbol>> findImportingMarketsForGoods(
   final start = systems.waypoint(startSymbol);
   final markets = <TradeSymbol, WaypointSymbol>{};
   for (final good in goods) {
-    final marketSymbols = await db.marketsWithImportInSystem(
+    final marketSymbols = await db.marketListings.marketsWithImportInSystem(
       start.system,
       good,
     );

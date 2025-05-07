@@ -29,6 +29,8 @@ class _MockLogger extends Mock implements Logger {}
 
 class _MockMarketCache extends Mock implements MarketCache {}
 
+class _MockMarketListingStore extends Mock implements MarketListingStore {}
+
 class _MockMarketPrices extends Mock implements MarketPriceSnapshot {}
 
 class _MockRoutePlanner extends Mock implements RoutePlanner {}
@@ -117,7 +119,9 @@ void main() {
       jumpGateStore.snapshotAll,
     ).thenAnswer((_) async => JumpGateSnapshot([]));
 
-    when(db.allMarketListings).thenAnswer((_) async => []);
+    final marketListingStore = _MockMarketListingStore();
+    when(() => db.marketListings).thenReturn(marketListingStore);
+    when(marketListingStore.all).thenAnswer((_) async => []);
     when(db.allMarketPrices).thenAnswer((_) async => []);
     when(db.allShipyardListings).thenAnswer((_) async => []);
     when(db.allShipyardPrices).thenAnswer((_) async => []);

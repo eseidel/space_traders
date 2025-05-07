@@ -8,9 +8,15 @@ class _MockChartingStore extends Mock implements ChartingStore {}
 
 class _MockDatabase extends Mock implements Database {}
 
+class _MockMarketListingStore extends Mock implements MarketListingStore {}
+
 void main() {
   test('evaluateWaypointsForMining', () async {
     final db = _MockDatabase();
+
+    final marketListingStore = _MockMarketListingStore();
+    when(() => db.marketListings).thenReturn(marketListingStore);
+
     final systemSymbol = SystemSymbol.fromString('W-A');
     final sourceSymbol = WaypointSymbol.fromString('W-A-A');
     final source = SystemWaypoint.test(sourceSymbol);
@@ -42,7 +48,7 @@ void main() {
     };
     for (final good in aImports) {
       when(
-        () => db.marketsWithImportInSystem(systemSymbol, good),
+        () => marketListingStore.marketsWithImportInSystem(systemSymbol, good),
       ).thenAnswer((_) async => [marketA.symbol]);
     }
     const bImports = {
@@ -52,7 +58,7 @@ void main() {
     };
     for (final good in bImports) {
       when(
-        () => db.marketsWithImportInSystem(systemSymbol, good),
+        () => marketListingStore.marketsWithImportInSystem(systemSymbol, good),
       ).thenAnswer((_) async => [marketB.symbol]);
     }
     final chartingStore = _MockChartingStore();
@@ -85,6 +91,10 @@ void main() {
 
   test('evaluateWaypointsForSiphoning', () async {
     final db = _MockDatabase();
+
+    final marketListingStore = _MockMarketListingStore();
+    when(() => db.marketListings).thenReturn(marketListingStore);
+
     final sourceSymbol = WaypointSymbol.fromString('W-A-A');
     final systemSymbol = SystemSymbol.fromString('W-A');
     final source = SystemWaypoint.test(
@@ -106,7 +116,7 @@ void main() {
     };
     for (final good in producedGoods) {
       when(
-        () => db.marketsWithImportInSystem(systemSymbol, good),
+        () => marketListingStore.marketsWithImportInSystem(systemSymbol, good),
       ).thenAnswer((_) async => [market.symbol]);
     }
 

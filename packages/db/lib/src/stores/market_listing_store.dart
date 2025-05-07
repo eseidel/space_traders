@@ -1,0 +1,69 @@
+import 'package:db/db.dart';
+import 'package:db/src/queries/market_listing.dart';
+import 'package:types/types.dart';
+
+/// A store for market listings.
+class MarketListingStore {
+  /// Create a new market listing store.
+  MarketListingStore(this._db);
+
+  final Database _db;
+
+  /// Get the market listing for the given symbol.
+  Future<MarketListing?> at(WaypointSymbol waypointSymbol) async {
+    final query = marketListingByWaypointSymbolQuery(waypointSymbol);
+    return _db.queryOne(query, marketListingFromColumnMap);
+  }
+
+  /// Get all market listings.
+  Future<Iterable<MarketListing>> all() async {
+    final query = allMarketListingsQuery();
+    return _db.queryMany(query, marketListingFromColumnMap);
+  }
+
+  /// Get all market listings within a system.
+  Future<Iterable<MarketListing>> inSystem(SystemSymbol system) async {
+    final query = marketListingsInSystemQuery(system);
+    return _db.queryMany(query, marketListingFromColumnMap);
+  }
+
+  /// Get all WaypointSymbols with a market importing the given tradeSymbol.
+  Future<Iterable<WaypointSymbol>> marketsWithImportInSystem(
+    SystemSymbol system,
+    TradeSymbol tradeSymbol,
+  ) async {
+    final query = marketsWithImportInSystemQuery(system, tradeSymbol);
+    return _db.queryMany(query, marketListingSymbolFromColumnMap);
+  }
+
+  /// Get all WaypointSymbols which buys [tradeSymbol] within [system].
+  /// Buys means imports or exchange.
+  Future<Iterable<WaypointSymbol>> marketsWhichBuysTradeSymbolInSystem(
+    SystemSymbol system,
+    TradeSymbol tradeSymbol,
+  ) async {
+    final query = marketsWhichBuysTradeSymbolInSystemQuery(system, tradeSymbol);
+    return _db.queryMany(query, marketListingSymbolFromColumnMap);
+  }
+
+  /// Get all WaypointSymbols with a market importing the given tradeSymbol.
+  Future<Iterable<WaypointSymbol>> marketsWithExportInSystem(
+    SystemSymbol system,
+    TradeSymbol tradeSymbol,
+  ) async {
+    final query = marketsWithExportInSystemQuery(system, tradeSymbol);
+    return _db.queryMany(query, marketListingSymbolFromColumnMap);
+  }
+
+  /// Returns true if we know of a market which trades the given symbol.
+  Future<bool> knowOfMarketWhichTrades(TradeSymbol tradeSymbol) async {
+    final query = knowOfMarketWhichTradesQuery(tradeSymbol);
+    final result = await _db.execute(query);
+    return result[0][0]! as bool;
+  }
+
+  /// Update the given market listing in the database.
+  Future<void> upsert(MarketListing listing) async {
+    await _db.execute(upsertMarketListingQuery(listing));
+  }
+}

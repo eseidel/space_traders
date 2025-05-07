@@ -540,7 +540,7 @@ class CentralCommand {
       if (_availableMounts.contains(mountSymbol)) {
         continue;
       }
-      final isAvailable = await db.knowOfMarketWhichTrades(
+      final isAvailable = await db.marketListings.knowOfMarketWhichTrades(
         tradeSymbolForMountSymbol(mountSymbol),
       );
       if (isAvailable) {

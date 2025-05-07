@@ -35,7 +35,7 @@ class MarketCache {
   Future<Market> refreshMarket(WaypointSymbol waypointSymbol) async {
     final market = await getMarket(_api, waypointSymbol);
     _marketsBySymbol[waypointSymbol] = market;
-    await _db.upsertMarketListing(
+    await _db.marketListings.upsert(
       MarketListing(
         waypointSymbol: market.waypointSymbol,
         imports: market.imports.map((t) => t.symbol).toSet(),
