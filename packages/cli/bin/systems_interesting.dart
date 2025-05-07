@@ -5,7 +5,7 @@ import 'package:cli/cli.dart';
 Future<void> command(Database db, ArgResults argResults) async {
   final systemsCache = await db.systems.snapshotAllSystems();
   final constructionSnapshot = await db.construction.snapshotAllRecords();
-  final jumpGateSnapshot = await JumpGateSnapshot.load(db);
+  final jumpGateSnapshot = await db.jumpGates.snapshotAll();
   final systemConnectivity = SystemConnectivity.fromJumpGates(
     jumpGateSnapshot,
     constructionSnapshot,

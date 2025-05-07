@@ -11,7 +11,7 @@ Future<void> command(Database db, ArgResults argResults) async {
 
   // Can't use loadSystemConnectivity because need constructionSnapshot later.
   final constructionSnapshot = await db.construction.snapshotAllRecords();
-  final jumpGateSnapshot = await JumpGateSnapshot.load(db);
+  final jumpGateSnapshot = await db.jumpGates.snapshotAll();
   final systemConnectivity = SystemConnectivity.fromJumpGates(
     jumpGateSnapshot,
     constructionSnapshot,

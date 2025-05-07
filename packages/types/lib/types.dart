@@ -25,6 +25,7 @@ export 'src/price.dart';
 export 'src/ship.dart';
 export 'src/snapshot/charting_snapshot.dart';
 export 'src/snapshot/construction_snapshot.dart';
+export 'src/snapshot/jump_gate_snapshot.dart';
 export 'src/snapshot/systems_snapshot.dart';
 export 'src/survey.dart';
 export 'src/symbol.dart';

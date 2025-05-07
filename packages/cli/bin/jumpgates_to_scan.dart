@@ -7,7 +7,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   // Walk the web of jump gates to find endpoints we should scan.
   final systemSymbol = await myHqSystemSymbol(db);
   final systemsCache = await db.systems.snapshotAllSystems();
-  final jumpGateSnapshot = await JumpGateSnapshot.load(db);
+  final jumpGateSnapshot = await db.jumpGates.snapshotAll();
   final constructionSnapshot = await db.construction.snapshotAllRecords();
   final chartingSnapshot = await db.charting.snapshotAllRecords();
 

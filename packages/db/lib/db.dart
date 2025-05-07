@@ -5,6 +5,7 @@ import 'package:db/src/query.dart';
 import 'package:db/src/queue.dart';
 import 'package:db/src/stores/charting_store.dart';
 import 'package:db/src/stores/construction_store.dart';
+import 'package:db/src/stores/jump_gate_store.dart';
 import 'package:db/src/stores/systems_store.dart';
 import 'package:db/src/stores/transaction_store.dart';
 import 'package:meta/meta.dart';
@@ -14,6 +15,7 @@ import 'package:types/types.dart';
 export 'package:db/config.dart';
 export 'package:db/src/stores/charting_store.dart';
 export 'package:db/src/stores/construction_store.dart';
+export 'package:db/src/stores/jump_gate_store.dart';
 export 'package:db/src/stores/systems_store.dart';
 export 'package:db/src/stores/transaction_store.dart';
 
@@ -227,6 +229,9 @@ class Database {
 
   /// Get the charting store.
   ChartingStore get charting => ChartingStore(this);
+
+  /// Get the jump gate store.
+  JumpGateStore get jumpGates => JumpGateStore(this);
 
   /// Get the transaction store.
   TransactionStore get transactions => TransactionStore(this);
@@ -546,22 +551,6 @@ class Database {
   /// Add a shipyard price to the database.
   Future<void> upsertShipyardPrice(ShipyardPrice price) async {
     await execute(upsertShipyardPriceQuery(price));
-  }
-
-  /// Get all jump gates from the database.
-  Future<Iterable<JumpGate>> allJumpGates() async {
-    return queryMany(allJumpGatesQuery(), jumpGateFromColumnMap);
-  }
-
-  /// Add a jump gate to the database.
-  Future<void> upsertJumpGate(JumpGate jumpGate) async {
-    await execute(upsertJumpGateQuery(jumpGate));
-  }
-
-  /// Get the jump gate for the given waypoint symbol.
-  Future<JumpGate?> getJumpGate(WaypointSymbol waypointSymbol) async {
-    final query = getJumpGateQuery(waypointSymbol);
-    return queryOne(query, jumpGateFromColumnMap);
   }
 
   /// Get all contracts from the database.

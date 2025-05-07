@@ -23,6 +23,8 @@ class _MockGlobalApi extends Mock implements GlobalApi {}
 
 class _MockJumpGateSnapshot extends Mock implements JumpGateSnapshot {}
 
+class _MockJumpGateStore extends Mock implements JumpGateStore {}
+
 class _MockLogger extends Mock implements Logger {}
 
 class _MockMarketCache extends Mock implements MarketCache {}
@@ -107,11 +109,16 @@ void main() {
       constructionStore.allRecords,
     ).thenAnswer((_) => Future.value(<ConstructionRecord>[]));
 
+    final jumpGateStore = _MockJumpGateStore();
+    when(() => db.jumpGates).thenReturn(jumpGateStore);
+    when(
+      jumpGateStore.snapshotAll,
+    ).thenAnswer((_) async => JumpGateSnapshot([]));
+
     when(db.allMarketListings).thenAnswer((_) async => []);
     when(db.allMarketPrices).thenAnswer((_) async => []);
     when(db.allShipyardListings).thenAnswer((_) async => []);
     when(db.allShipyardPrices).thenAnswer((_) async => []);
-    when(db.allJumpGates).thenAnswer((_) async => []);
     when(db.allBehaviorStates).thenAnswer((_) async => []);
     when(
       systemsStore.snapshotAllSystems,
