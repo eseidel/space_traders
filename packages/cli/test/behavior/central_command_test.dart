@@ -536,7 +536,6 @@ void main() {
     registerFallbackValue(agent);
     when(db.getMyAgent).thenAnswer((_) async => agent);
 
-    when(caches.construction.allRecords).thenAnswer((_) async => []);
     when(db.allMarketListings).thenAnswer((_) async => []);
     when(db.allShips).thenAnswer((_) async => []);
     when(db.allShipyardListings).thenAnswer((_) async => []);

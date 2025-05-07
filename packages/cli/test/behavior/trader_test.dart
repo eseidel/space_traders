@@ -39,6 +39,8 @@ class _MockShipReactor extends Mock implements ShipReactor {}
 
 class _MockSystemsApi extends Mock implements SystemsApi {}
 
+class _MockConstructionStore extends Mock implements ConstructionStore {}
+
 void main() {
   setUpAll(() {
     registerFallbackValue(ShipSpec.fallbackValue());
@@ -1384,10 +1386,7 @@ void main() {
       () => db.hasRecentMarketPrices(end, any()),
     ).thenAnswer((_) async => true);
     when(
-      () => caches.construction.getConstruction(
-        end,
-        maxAge: any(named: 'maxAge'),
-      ),
+      () => db.construction.getConstruction(end, maxAge: any(named: 'maxAge')),
     ).thenAnswer(
       (_) async => Construction(
         symbol: end.waypoint,
@@ -1439,10 +1438,19 @@ void main() {
     registerFallbackValue(Transaction.fallbackValue());
     when(() => db.insertTransaction(any())).thenAnswer((_) async {});
 
-    when(caches.construction.allRecords).thenAnswer((_) async => []);
+    final constructionStore = _MockConstructionStore();
+    when(() => db.construction).thenReturn(constructionStore);
+
+    when(constructionStore.allRecords).thenAnswer((_) async => []);
     when(
-      () => caches.construction.updateConstruction(end, construction),
+      () => constructionStore.updateConstruction(end, construction),
     ).thenAnswer((_) async => {});
+    when(
+      () => constructionStore.getRecord(any()),
+    ).thenAnswer((_) async => null);
+    when(
+      () => constructionStore.getConstruction(any()),
+    ).thenAnswer((_) async => construction);
 
     final state = BehaviorState(const ShipSymbol('S', 1), Behavior.trader)
       ..deal = costedDeal;

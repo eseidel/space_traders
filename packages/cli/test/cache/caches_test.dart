@@ -1,6 +1,5 @@
 import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
-import 'package:db/src/stores/systems_store.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -10,7 +9,7 @@ class _MockApi extends Mock implements Api {}
 
 class _MockChartingCache extends Mock implements ChartingCache {}
 
-class _MockConstructionCache extends Mock implements ConstructionCache {}
+class _MockConstructionStore extends Mock implements ConstructionStore {}
 
 class _MockContractsApi extends Mock implements ContractsApi {}
 
@@ -99,8 +98,15 @@ void main() {
       ),
     );
     when(() => db.upsertFaction(any())).thenAnswer((_) async => {});
+
+    final constructionStore = _MockConstructionStore();
+    when(() => db.construction).thenReturn(constructionStore);
     when(
-      db.allConstructionRecords,
+      constructionStore.snapshotAllRecords,
+    ).thenAnswer((_) async => ConstructionSnapshot([]));
+
+    when(
+      constructionStore.allRecords,
     ).thenAnswer((_) => Future.value(<ConstructionRecord>[]));
 
     when(db.allMarketListings).thenAnswer((_) async => []);
@@ -163,6 +169,13 @@ void main() {
     final db = _MockDatabase();
     final systemsStore = _MockSystemsStore();
     when(() => db.systems).thenReturn(systemsStore);
+
+    final constructionStore = _MockConstructionStore();
+    when(() => db.construction).thenReturn(constructionStore);
+    when(
+      constructionStore.snapshotAllRecords,
+    ).thenAnswer((_) async => ConstructionSnapshot([]));
+
     final caches = Caches(
       marketPrices: _MockMarketPrices(),
       systems: SystemsSnapshot([]),
@@ -171,15 +184,11 @@ void main() {
       charting: _MockChartingCache(),
       routePlanner: _MockRoutePlanner(),
       static: _MockStaticCaches(),
-      construction: _MockConstructionCache(),
       systemConnectivity: _MockSystemConnectivity(),
       jumpGates: _MockJumpGateSnapshot(),
       galaxy: const GalaxyStats(systemCount: 2, waypointCount: 2),
       factions: [],
     );
-    when(
-      caches.construction.snapshot,
-    ).thenAnswer((_) => Future.value(ConstructionSnapshot([])));
 
     // If we've not cached the systems, we need to snapshot them.
     final logger = _MockLogger();

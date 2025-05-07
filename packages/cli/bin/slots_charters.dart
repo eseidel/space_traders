@@ -12,7 +12,7 @@ Future<void> command(Database db, ArgResults argResults) async {
 
   final jumpGates = await JumpGateSnapshot.load(db);
   final charts = await ChartingSnapshot.load(db);
-  final construction = await ConstructionSnapshot.load(db);
+  final construction = await db.construction.snapshotAllRecords();
   final ships = await ShipSnapshot.load(db);
   final behaviors = await BehaviorSnapshot.load(db);
 

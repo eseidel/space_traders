@@ -18,7 +18,6 @@ class WaypointCache {
   final Api? _api;
 
   ChartingCache get _chartingCache => ChartingCache(_db);
-  ConstructionCache get _constructionCache => ConstructionCache(_db);
   WaypointTraitCache get _waypointTraits => WaypointTraitCache(_db);
 
   Future<Waypoint?> _waypointOrNullFromCache(
@@ -85,10 +84,7 @@ class WaypointCache {
           waypoint.isUnderConstruction
               ? await getConstruction(api, waypoint.symbol)
               : null;
-      await _constructionCache.updateConstruction(
-        waypoint.symbol,
-        construction,
-      );
+      await _db.construction.updateConstruction(waypoint.symbol, construction);
     }
   }
 
@@ -153,7 +149,7 @@ class WaypointCache {
   /// Returns true if the given waypoint is under construction.
   Future<bool> isUnderConstruction(WaypointSymbol waypointSymbol) async {
     // If we've cached a false result that can never change.
-    final maybe = await _constructionCache.isUnderConstruction(waypointSymbol);
+    final maybe = await _db.construction.isUnderConstruction(waypointSymbol);
     if (maybe == false) {
       return false;
     }
@@ -194,7 +190,7 @@ class WaypointCache {
     if (record == null) {
       return null;
     }
-    final isUnderConstruction = await _constructionCache.isUnderConstruction(
+    final isUnderConstruction = await _db.construction.isUnderConstruction(
       waypointSymbol,
       maxAge: maxAge,
     );

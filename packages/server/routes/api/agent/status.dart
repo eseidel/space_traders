@@ -1,4 +1,3 @@
-import 'package:cli/caches.dart';
 import 'package:cli/config.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:db/db.dart';
@@ -15,8 +14,7 @@ Future<Response> onRequest(RequestContext context) async {
     agent.headquarters.system,
   );
 
-  final constructionCache = ConstructionCache(db);
-  final underConstruction = await constructionCache.isUnderConstruction(
+  final underConstruction = await db.construction.isUnderConstruction(
     jumpGate!.symbol,
   );
   final config = await Config.fromDb(db);

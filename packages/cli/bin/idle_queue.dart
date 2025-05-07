@@ -33,7 +33,6 @@ Future<void> command(Database db, ArgResults argResults) async {
   final tradeGoods = TradeGoodCache(db);
   final waypointCache = WaypointCache(api, db);
   final marketCache = MarketCache(db, api, tradeGoods);
-  final constructionCache = ConstructionCache(db);
 
   const printEvery = 100;
   var count = 0;
@@ -59,7 +58,7 @@ Future<void> command(Database db, ArgResults argResults) async {
       logger.info('$queue');
     }
 
-    await queue.runOne(db, api, waypointCache, marketCache, constructionCache);
+    await queue.runOne(db, api, waypointCache, marketCache);
   }
 }
 

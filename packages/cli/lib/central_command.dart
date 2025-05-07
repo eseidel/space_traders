@@ -558,7 +558,7 @@ class CentralCommand {
       logger.warn('Failed to find jump gate for $systemSymbol: $e');
       return null;
     }
-    return await ConstructionCache(db).getRecord(jumpGate.symbol);
+    return await db.construction.getRecord(jumpGate.symbol);
   }
 
   /// Returns true if the jumpgate for the given [systemSymbol] is complete.

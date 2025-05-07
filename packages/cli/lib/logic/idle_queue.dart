@@ -133,10 +133,8 @@ class IdleQueue {
   Future<void> _processNextSystem(
     Database db,
     Api api,
-
     WaypointCache waypointCache,
     MarketCache marketCache,
-    ConstructionCache constructionCache,
   ) async {
     final systemRecord = _systems.take();
     final systemSymbol = systemRecord.value;
@@ -173,7 +171,7 @@ class IdleQueue {
           // of loading all the starter systems into our db, even if we can't
           // reach them yet.
           final from = fromRecord.waypointSymbol;
-          if (await constructionCache.isUnderConstruction(from) ?? true) {
+          if (await db.construction.isUnderConstruction(from) ?? true) {
             continue;
           }
           // Queue each jumpGate as it might fetch construction data which could
@@ -198,20 +196,13 @@ class IdleQueue {
     Api api,
     WaypointCache waypointCache,
     MarketCache marketCache,
-    ConstructionCache constructionCache,
   ) async {
     if (isDone) {
       return;
     }
     // Service systems before jumpgates to make a breadth-first search.
     if (_systems.isNotEmpty) {
-      await _processNextSystem(
-        db,
-        api,
-        waypointCache,
-        marketCache,
-        constructionCache,
-      );
+      await _processNextSystem(db, api, waypointCache, marketCache);
       return;
     }
     if (_jumpGates.isNotEmpty) {

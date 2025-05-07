@@ -1,7 +1,6 @@
 import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/plan/supply_chain.dart';
-import 'package:types/config.dart';
 
 // Returns the distance between two waypoints, or null if they are in different
 // systems.
@@ -94,10 +93,7 @@ Future<void> command(Database db, ArgResults argResults) async {
     agent!.headquarters.system,
   );
   final construction =
-      (await db.getConstructionRecord(
-        waypointSymbol!,
-        defaultMaxAge,
-      ))!.construction;
+      (await db.construction.getRecord(waypointSymbol!))!.construction;
 
   final neededExports = construction!.materials
       .where((m) => m.required_ > m.fulfilled)

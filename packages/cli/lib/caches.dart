@@ -1,6 +1,5 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/charting_cache.dart';
-import 'package:cli/cache/construction_cache.dart';
 import 'package:cli/cache/contract_snapshot.dart';
 import 'package:cli/cache/jump_gate_snapshot.dart';
 import 'package:cli/cache/market_cache.dart';
@@ -23,7 +22,6 @@ import 'package:types/types.dart';
 export 'package:cli/api.dart';
 export 'package:cli/cache/behavior_snapshot.dart';
 export 'package:cli/cache/charting_cache.dart';
-export 'package:cli/cache/construction_cache.dart';
 export 'package:cli/cache/contract_snapshot.dart';
 export 'package:cli/cache/jump_gate_snapshot.dart';
 export 'package:cli/cache/market_cache.dart';
@@ -52,7 +50,6 @@ class Caches {
     required this.routePlanner,
     required this.factions,
     required this.static,
-    required this.construction,
     required this.systemConnectivity,
     required this.jumpGates,
     required this.galaxy,
@@ -70,9 +67,6 @@ class Caches {
 
   /// The cache of system connectivity.
   final SystemConnectivity systemConnectivity;
-
-  /// The cache of construction data.
-  final ConstructionCache construction;
 
   /// The cache of waypoints.
   final WaypointCache waypoints;
@@ -115,11 +109,10 @@ class Caches {
     final static = StaticCaches(db);
     final systems = await db.systems.snapshotAllSystems();
     final charting = ChartingCache(db);
-    final construction = ConstructionCache(db);
     final waypoints = WaypointCache(api, db);
     final markets = MarketCache(db, api, static.tradeGoods);
     final jumpGates = await JumpGateSnapshot.load(db);
-    final constructionSnapshot = await ConstructionSnapshot.load(db);
+    final constructionSnapshot = await db.construction.snapshotAllRecords();
     final systemConnectivity = SystemConnectivity.fromJumpGates(
       jumpGates,
       constructionSnapshot,
@@ -145,7 +138,6 @@ class Caches {
       static: static,
       routePlanner: routePlanner,
       factions: factions,
-      construction: construction,
       systemConnectivity: systemConnectivity,
       jumpGates: jumpGates,
       galaxy: galaxy,
@@ -163,7 +155,7 @@ class Caches {
 
     systemConnectivity.updateFromJumpGates(
       jumpGates,
-      await construction.snapshot(),
+      await db.construction.snapshotAllRecords(),
     );
     routePlanner.clearRoutingCaches();
   }
