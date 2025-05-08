@@ -9,7 +9,6 @@ void main(List<String> args) async {
 
 Future<void> command(Database db, ArgResults argResults) async {
   final agent = await db.getMyAgent();
-  final marketListings = await db.marketListings.snapshotAll();
 
   final systemsCache = await db.systems.snapshotAllSystems();
   final ships = await ShipSnapshot.load(db);
@@ -19,7 +18,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   final routePlanner = RoutePlanner.fromSystemsSnapshot(
     systemsCache,
     systemConnectivity,
-    sellsFuel: defaultSellsFuel(marketListings),
+    sellsFuel: await defaultSellsFuel(db),
   );
 
   final explorer = ships.ships.firstWhere((s) => s.isExplorer);

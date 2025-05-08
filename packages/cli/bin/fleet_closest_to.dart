@@ -8,13 +8,11 @@ Future<void> command(Database db, ArgResults argResults) async {
   final destination = WaypointSymbol.fromString(argResults.rest[0]);
   final ships = await ShipSnapshot.load(db);
   final systemsCache = await db.systems.snapshotAllSystems();
-  final marketListings = await db.marketListings.snapshotAll();
-
   final systemConnectivity = await loadSystemConnectivity(db);
   final routePlanner = RoutePlanner.fromSystemsSnapshot(
     systemsCache,
     systemConnectivity,
-    sellsFuel: defaultSellsFuel(marketListings),
+    sellsFuel: await defaultSellsFuel(db),
   );
 
   final travelTimes = <ShipSymbol, Duration>{};

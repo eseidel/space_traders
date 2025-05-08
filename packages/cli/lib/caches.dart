@@ -66,7 +66,7 @@ class Caches {
   final MarketCache markets;
 
   /// The route planner.
-  final RoutePlanner routePlanner;
+  RoutePlanner routePlanner;
 
   /// Cache of static data from the server.
   final StaticCaches static;
@@ -101,11 +101,10 @@ class Caches {
       constructionSnapshot,
     );
     // TODO(eseidel): Find a way to avoid fetching market listings here?
-    final marketListings = await db.marketListings.snapshotAll();
     final routePlanner = RoutePlanner.fromSystemsSnapshot(
       systems,
       systemConnectivity,
-      sellsFuel: defaultSellsFuel(marketListings),
+      sellsFuel: await defaultSellsFuel(db),
     );
 
     // Make sure factions are loaded.
@@ -138,7 +137,11 @@ class Caches {
       await db.jumpGates.snapshotAll(),
       await db.construction.snapshotAllRecords(),
     );
-    routePlanner.clearRoutingCaches();
+    routePlanner = RoutePlanner.fromSystemsSnapshot(
+      systems,
+      systemConnectivity,
+      sellsFuel: await defaultSellsFuel(db),
+    );
   }
 }
 

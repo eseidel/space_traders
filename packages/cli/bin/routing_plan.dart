@@ -89,8 +89,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   } else if (argResults['fuel'] == 'false') {
     sellsFuel = (_) => false;
   } else if (argResults['fuel'] == 'cache') {
-    final marketListings = await db.marketListings.snapshotAll();
-    sellsFuel = defaultSellsFuel(marketListings);
+    sellsFuel = await defaultSellsFuel(db);
   } else {
     throw UnimplementedError();
   }

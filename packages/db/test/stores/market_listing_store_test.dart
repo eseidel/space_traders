@@ -161,6 +161,27 @@ void main() {
         final otherSystemSnapshot = await listings.snapshotSystem(otherSystem);
         expect(otherSystemSnapshot.listings.length, equals(0));
       });
+
+      test('markets which trade fuel', () async {
+        final listings = db.marketListings;
+        final fuelListing1 = MarketListing(
+          waypointSymbol: WaypointSymbol.fromString('X1-A-1'),
+          imports: const {TradeSymbol.FUEL},
+        );
+        final fuelListing2 = MarketListing(
+          waypointSymbol: WaypointSymbol.fromString('X1-B-2'),
+          exchange: const {TradeSymbol.FUEL},
+        );
+        final fuelListing3 = MarketListing(
+          waypointSymbol: WaypointSymbol.fromString('X1-C-3'),
+          exports: const {TradeSymbol.FUEL},
+        );
+        await listings.upsert(fuelListing1);
+        await listings.upsert(fuelListing2);
+        await listings.upsert(fuelListing3);
+        final fuelMarkets = await listings.marketsSellingFuel();
+        expect(fuelMarkets.length, equals(3));
+      });
     });
   });
 }
