@@ -28,7 +28,7 @@ class _MockMarketCache extends Mock implements MarketCache {}
 
 class _MockMarketListingStore extends Mock implements MarketListingStore {}
 
-class _MockMarketPrices extends Mock implements MarketPriceSnapshot {}
+class _MockMarketPriceStore extends Mock implements MarketPriceStore {}
 
 class _MockRoutePlanner extends Mock implements RoutePlanner {}
 
@@ -122,7 +122,10 @@ void main() {
       marketListingStore.marketsSellingFuel,
     ).thenAnswer((_) async => <WaypointSymbol>{});
 
-    when(db.allMarketPrices).thenAnswer((_) async => []);
+    final marketPriceStore = _MockMarketPriceStore();
+    when(() => db.marketPrices).thenReturn(marketPriceStore);
+
+    when(marketPriceStore.all).thenAnswer((_) async => []);
     when(db.allShipyardListings).thenAnswer((_) async => []);
     when(db.allShipyardPrices).thenAnswer((_) async => []);
     when(db.allBehaviorStates).thenAnswer((_) async => []);
@@ -200,7 +203,7 @@ void main() {
     ).thenAnswer((_) async => <WaypointSymbol>{});
 
     final caches = Caches(
-      marketPrices: _MockMarketPrices(),
+      marketPrices: MarketPriceSnapshot([]),
       systems: SystemsSnapshot([]),
       waypoints: _MockWaypointCache(),
       markets: _MockMarketCache(),

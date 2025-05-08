@@ -36,7 +36,7 @@ Future<Market?> visitLocalMarket(
     getNow: getNow,
   );
   if (ship.usesFuel) {
-    final medianFuelPurchasePrice = await db.medianMarketPurchasePrice(
+    final medianFuelPurchasePrice = await db.marketPrices.medianPurchasePrice(
       TradeSymbol.FUEL,
     );
     try {
@@ -97,7 +97,7 @@ Future<Market> recordMarketDataIfNeededAndLog(
   }
   // If we have market data more recent than maxAge, don't bother refreshing.
   // This prevents ships from constantly refreshing the same data.
-  if (await db.hasRecentMarketPrices(marketSymbol, maxAge)) {
+  if (await db.marketPrices.hasRecentAt(marketSymbol, maxAge)) {
     var market = marketCache.fromCache(marketSymbol);
     if (market == null || market.tradeGoods.isEmpty) {
       market = await marketCache.refreshMarket(marketSymbol);

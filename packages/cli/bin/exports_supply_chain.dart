@@ -65,12 +65,12 @@ class DescribingVisitor extends SupplyLinkVisitor {
     final inputStrings = <String>[];
     final waypointSymbol = link.waypointSymbol;
     for (final inputSymbol in link.inputs.keys) {
-      final price = await db.marketPriceAt(waypointSymbol, inputSymbol);
+      final price = await db.marketPrices.at(waypointSymbol, inputSymbol);
       inputStrings.add(_describeGood(inputSymbol, price));
     }
     final inputSymbols = inputStrings.join(', ');
     final name = link.waypointSymbol.waypointName;
-    final sourcePrice = await db.marketPriceAt(
+    final sourcePrice = await db.marketPrices.at(
       link.waypointSymbol,
       link.tradeSymbol,
     );

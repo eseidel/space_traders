@@ -3,23 +3,13 @@ import 'package:db/migrations.dart';
 import 'package:db/src/queries.dart';
 import 'package:db/src/query.dart';
 import 'package:db/src/queue.dart';
-import 'package:db/src/stores/charting_store.dart';
-import 'package:db/src/stores/construction_store.dart';
-import 'package:db/src/stores/jump_gate_store.dart';
-import 'package:db/src/stores/market_listing_store.dart';
-import 'package:db/src/stores/systems_store.dart';
-import 'package:db/src/stores/transaction_store.dart';
+import 'package:db/src/stores.dart';
 import 'package:meta/meta.dart';
 import 'package:postgres/postgres.dart' as pg;
 import 'package:types/types.dart';
 
 export 'package:db/config.dart';
-export 'package:db/src/stores/charting_store.dart';
-export 'package:db/src/stores/construction_store.dart';
-export 'package:db/src/stores/jump_gate_store.dart';
-export 'package:db/src/stores/market_listing_store.dart';
-export 'package:db/src/stores/systems_store.dart';
-export 'package:db/src/stores/transaction_store.dart';
+export 'package:db/src/stores.dart';
 
 /// Connect to the default local database.
 /// Logs and returns null on failure.
@@ -242,6 +232,9 @@ class Database {
   /// Get the market listing store.
   MarketListingStore get marketListings => MarketListingStore(this);
 
+  /// Get the market price store.
+  MarketPriceStore get marketPrices => MarketPriceStore(this);
+
   /// Listen for notifications on a channel.
   Future<void> listen(String channel) async {
     await executeSql('LISTEN $channel');
@@ -437,40 +430,6 @@ class Database {
     await execute(upsertShipyardListingQuery(listing));
   }
 
-  /// Get all market prices from the database.
-  Future<Iterable<MarketPrice>> allMarketPrices() async {
-    return queryMany(allMarketPricesQuery(), marketPriceFromColumnMap);
-  }
-
-  /// Get all market prices within the given system.
-  Future<Iterable<MarketPrice>> marketPricesInSystem(
-    SystemSymbol system,
-  ) async {
-    final query = marketPricesInSystemQuery(system);
-    return queryMany(query, marketPriceFromColumnMap);
-  }
-
-  /// Add a market price to the database.
-  Future<void> upsertMarketPrice(MarketPrice price) async {
-    await execute(upsertMarketPriceQuery(price));
-  }
-
-  /// Get the market price for the given waypoint and trade symbol.
-  Future<MarketPrice?> marketPriceAt(
-    WaypointSymbol waypointSymbol,
-    TradeSymbol tradeSymbol,
-  ) async {
-    final query = marketPriceQuery(waypointSymbol, tradeSymbol);
-    return queryOne(query, marketPriceFromColumnMap);
-  }
-
-  /// Get the median purchase price for the given trade symbol.
-  Future<int?> medianMarketPurchasePrice(TradeSymbol tradeSymbol) async {
-    final query = medianMarketPurchasePriceQuery(tradeSymbol);
-    final result = await execute(query);
-    return result[0][0] as int?;
-  }
-
   /// Get all shipyard prices from the database.
   Future<Iterable<ShipyardPrice>> allShipyardPrices() async {
     return queryMany(allShipyardPricesQuery(), shipyardPriceFromColumnMap);
@@ -576,15 +535,6 @@ class Database {
     return DateTime.now().difference(timestamp) < maxAge;
   }
 
-  /// Check if the given waypoint has recent market prices.
-  Future<bool> hasRecentMarketPrices(
-    WaypointSymbol waypointSymbol,
-    Duration maxAge,
-  ) async {
-    final query = timestampOfMostRecentMarketPriceQuery(waypointSymbol);
-    return _hasRecentPrice(query, maxAge);
-  }
-
   /// Check if the given waypoint has recent shipyard prices.
   Future<bool> hasRecentShipyardPrices(
     WaypointSymbol waypointSymbol,
@@ -592,20 +542,6 @@ class Database {
   ) async {
     final query = timestampOfMostRecentShipyardPriceQuery(waypointSymbol);
     return _hasRecentPrice(query, maxAge);
-  }
-
-  /// Count the number of market prices in the database.
-  Future<int> marketPricesCount() async {
-    final result = await executeSql('SELECT COUNT(*) FROM market_price_');
-    return result[0][0]! as int;
-  }
-
-  /// Count the number of unique symbols in the MarketPrices table.
-  Future<int> marketPricesWaypointCount() async {
-    final result = await executeSql(
-      'SELECT COUNT(DISTINCT waypoint_symbol) FROM market_price_',
-    );
-    return result[0][0]! as int;
   }
 
   /// Count the number of shipyard prices in the database.
