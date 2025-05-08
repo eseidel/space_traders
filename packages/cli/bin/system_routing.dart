@@ -12,8 +12,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   final shipyardListings = await ShipyardListingSnapshot.load(db);
   final routePlanner = await defaultRoutePlanner(db);
   final waypoints = systems.waypointsInSystem(hqSystemSymbol);
-  final shipyardListing =
-      shipyardListings.listingsInSystem(hqSystemSymbol).first;
+  final shipyardListing = shipyardListings.inSystem(hqSystemSymbol).first;
   final shipyard = systems.waypoint(shipyardListing.waypointSymbol);
 
   const shipType = ShipType.LIGHT_HAULER;

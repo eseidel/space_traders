@@ -607,7 +607,7 @@ Future<ShipyardListing?> nearestShipyard(
   Ship ship,
 ) async {
   final start = ship.waypointSymbol;
-  final listings = shipyards.listingsInSystem(start.system);
+  final listings = shipyards.inSystem(start.system);
 
   // If not in this system.  Should list all shipyardListings.
   // Filter by ones which are reachable (e.g. if this ship can warp).

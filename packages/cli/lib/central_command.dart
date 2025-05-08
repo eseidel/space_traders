@@ -830,7 +830,7 @@ class CentralCommand {
     // TODO(eseidel): This should be a db query.
     final shipyardSymbol =
         shipyardListings
-            .listingsInSystem(systemSymbol)
+            .inSystem(systemSymbol)
             .firstWhereOrNull((s) => s.hasShip(shipType))
             ?.waypointSymbol;
     if (shipyardSymbol == null) {

@@ -17,8 +17,12 @@ class MarketListingSnapshot {
   Iterable<MarketListing> get listings => _listingBySymbol.values;
 
   /// Fetch the MarketListings for the given SystemSymbol.
-  Iterable<MarketListing> listingsInSystem(SystemSymbol systemSymbol) =>
+  Iterable<MarketListing> _inSystem(SystemSymbol systemSymbol) =>
       listings.where((l) => l.waypointSymbol.system == systemSymbol);
+
+  /// Count the number of MarketListings in the given SystemSymbol.
+  int countInSystem(SystemSymbol systemSymbol) =>
+      _inSystem(systemSymbol).length;
 
   /// Fetch the MarketListing for the given WaypointSymbol.
   MarketListing? operator [](WaypointSymbol waypointSymbol) =>

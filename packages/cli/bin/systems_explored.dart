@@ -64,9 +64,9 @@ Future<void> command(Database db, ArgResults argResults) async {
     table.add([
       systemSymbol.systemName,
       _typeName(system!.type),
-      marketListings.listingsInSystem(systemSymbol).length,
+      marketListings.countInSystem(systemSymbol),
       marketPrices.waypointSymbolsInSystem(systemSymbol).length,
-      shipyardListings.listingsInSystem(systemSymbol).length,
+      shipyardListings.countInSystem(systemSymbol),
       shipyardPrices.waypointSymbolsInSystem(systemSymbol).length,
       waypointCount,
       progressString(chartedOther.length, otherSymbols.length),
