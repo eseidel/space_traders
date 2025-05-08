@@ -5,7 +5,7 @@ import 'package:types/types.dart';
 import '../docker.dart';
 
 void main() {
-  withPostgresServer('contract_store', (server) {
+  withPostgresServer('shipyard_listing_store', (server) {
     test('smoke test', () async {
       final db = Database.testLive(
         endpoint: await server.endpoint(),
@@ -13,10 +13,11 @@ void main() {
       );
       await db.migrateToLatestSchema();
 
-      final contract = Contract.fallbackValue();
-      await db.contracts.upsert(contract);
-      final contracts = await db.contracts.all();
-      expect(contracts.length, equals(1));
+      final shipyardListing = ShipyardListing.fallbackValue();
+      await db.shipyardListings.upsert(shipyardListing);
+      final shipyardListings = await db.shipyardListings.all();
+      expect(shipyardListings.length, equals(1));
+      expect(shipyardListings.first, equals(shipyardListing));
     });
   });
 }
