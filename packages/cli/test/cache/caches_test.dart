@@ -120,8 +120,9 @@ void main() {
     final marketListingStore = _MockMarketListingStore();
     when(() => db.marketListings).thenReturn(marketListingStore);
     when(
-      marketListingStore.snapshotAll,
-    ).thenAnswer((_) async => MarketListingSnapshot([]));
+      marketListingStore.marketsSellingFuel,
+    ).thenAnswer((_) async => <WaypointSymbol>{});
+
     when(db.allMarketPrices).thenAnswer((_) async => []);
     when(db.allShipyardListings).thenAnswer((_) async => []);
     when(db.allShipyardPrices).thenAnswer((_) async => []);
@@ -192,6 +193,12 @@ void main() {
     when(
       jumpGateStore.snapshotAll,
     ).thenAnswer((_) async => JumpGateSnapshot([]));
+
+    final marketListingStore = _MockMarketListingStore();
+    when(() => db.marketListings).thenReturn(marketListingStore);
+    when(
+      marketListingStore.marketsSellingFuel,
+    ).thenAnswer((_) async => <WaypointSymbol>{});
 
     final caches = Caches(
       marketPrices: _MockMarketPrices(),
