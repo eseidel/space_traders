@@ -13,8 +13,18 @@ void main() {
       );
       await db.migrateToLatestSchema();
 
-      final shipyardListing = ShipyardListing.fallbackValue();
+      final waypointSymbol = WaypointSymbol.fromString('A-B-C');
+      final shipyardListing = ShipyardListing(
+        waypointSymbol: waypointSymbol,
+        shipTypes: const {ShipType.EXPLORER},
+      );
       await db.shipyardListings.upsert(shipyardListing);
+
+      expect(
+        await db.shipyardListings.at(waypointSymbol),
+        equals(shipyardListing),
+      );
+
       final shipyardListings = await db.shipyardListings.all();
       expect(shipyardListings.length, equals(1));
       expect(shipyardListings.first, equals(shipyardListing));
