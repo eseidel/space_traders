@@ -13,10 +13,51 @@ void main() {
       );
       await db.migrateToLatestSchema();
 
-      final contract = Contract.fallbackValue();
+      final terms = ContractTerms(
+        deadline: DateTime.now(),
+        payment: ContractPayment(onAccepted: 100, onFulfilled: 100),
+      );
+
+      final contract = Contract.test(
+        id: 'foo',
+        terms: terms,
+        accepted: false,
+        fulfilled: false,
+      );
+
+      final now = DateTime.timestamp();
+      final expired = Contract.test(
+        id: 'expired',
+        terms: terms,
+        accepted: false,
+        fulfilled: false,
+        timestamp: now,
+        deadlineToAccept: now.subtract(const Duration(days: 1)),
+      );
+
+      expect(await db.contracts.unaccepted(), isEmpty);
+      expect(await db.contracts.active(), isEmpty);
+
       await db.contracts.upsert(contract);
-      final contracts = await db.contracts.all();
-      expect(contracts.length, equals(1));
+      await db.contracts.upsert(expired);
+
+      // Contract does not implement equals, so we check the id.
+      expect((await db.contracts.get(contract.id))!.id, equals(contract.id));
+
+      // Expired shows up in all, but not in unaccepted or active.
+      expect(await db.contracts.all(), hasLength(2));
+      expect(await db.contracts.unaccepted(), hasLength(1));
+      expect(await db.contracts.active(), hasLength(1));
+
+      contract.accepted = true;
+      await db.contracts.upsert(contract);
+      expect(await db.contracts.unaccepted(), isEmpty);
+      expect(await db.contracts.active(), isNotEmpty);
+
+      contract.fulfilled = true;
+      await db.contracts.upsert(contract);
+      expect(await db.contracts.unaccepted(), isEmpty);
+      expect(await db.contracts.active(), isEmpty);
     });
   });
 }

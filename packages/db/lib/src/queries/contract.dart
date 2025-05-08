@@ -22,17 +22,21 @@ Query contractByIdQuery(String id) {
 }
 
 /// Get all contracts which are !fulfilled and expiration date is in the future.
-Query activeContractsQuery() {
+Query activeContractsQuery(DateTime now) {
   return Query(
     'SELECT * FROM contract_ '
-    "WHERE fulfilled = 'false' AND 'deadline_to_accept' > @now",
-    parameters: {'now': DateTime.timestamp()},
+    "WHERE fulfilled = 'false' AND deadline_to_accept > @now",
+    parameters: {'now': now},
   );
 }
 
 /// Get all contracts which are !accepted.
-Query unacceptedContractsQuery() {
-  return const Query("SELECT * FROM contract_ WHERE accepted = 'false'");
+Query unacceptedContractsQuery(DateTime now) {
+  return Query(
+    'SELECT * FROM contract_ '
+    "WHERE accepted = 'false' AND deadline_to_accept > @now",
+    parameters: {'now': now},
+  );
 }
 
 /// Converts a contract from a column map.

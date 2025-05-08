@@ -20,14 +20,16 @@ class ContractStore {
     return _db.queryOne(query, contractFromColumnMap);
   }
 
-  /// Get all contracts which are !accepted.
+  /// Get all contracts which are !accepted and !expired.
   Future<Iterable<Contract>> unaccepted() async {
-    return _db.queryMany(unacceptedContractsQuery(), contractFromColumnMap);
+    final now = DateTime.timestamp();
+    return _db.queryMany(unacceptedContractsQuery(now), contractFromColumnMap);
   }
 
   /// Get all contracts which are !fulfilled and !expired.
   Future<Iterable<Contract>> active() async {
-    return _db.queryMany(activeContractsQuery(), contractFromColumnMap);
+    final now = DateTime.timestamp();
+    return _db.queryMany(activeContractsQuery(now), contractFromColumnMap);
   }
 
   /// Upsert a contract into the database.

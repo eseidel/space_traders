@@ -31,7 +31,9 @@ class Contract {
     DateTime? timestamp,
   }) : factionSymbol = factionSymbol ?? 'faction',
        type = type ?? openapi.ContractTypeEnum.PROCUREMENT,
-       deadlineToAccept = deadlineToAccept ?? DateTime.timestamp(),
+       deadlineToAccept =
+           deadlineToAccept ??
+           DateTime.timestamp().add(const Duration(days: 1)),
        accepted = accepted ?? false,
        fulfilled = fulfilled ?? false,
        timestamp = timestamp ?? DateTime.timestamp();
