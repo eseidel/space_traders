@@ -6,7 +6,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   // Count all the trade symbols they saw.
   // Print drop rates for each trade symbol.
 
-  final surveys = await db.allSurveys();
+  final surveys = await db.surveys.all();
   // Was the trade symbol in the survey at all.
   final surveyBySymbol = <String, int>{};
   // Of all values across all surveys, how many were the trade symbol.

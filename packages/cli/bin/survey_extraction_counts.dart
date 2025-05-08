@@ -2,7 +2,7 @@ import 'package:cli/cli.dart';
 import 'package:stats/stats.dart';
 
 Future<void> command(Database db, ArgResults argResults) async {
-  final extractions = await db.allExtractions();
+  final extractions = await db.extractions.all();
   // Count extractions by surveySignature
   final extractionCountBySurveySignature = <String, int>{};
   for (final extraction in extractions) {
@@ -14,7 +14,7 @@ Future<void> command(Database db, ArgResults argResults) async {
         (extractionCountBySurveySignature[signature] ?? 0) + 1;
   }
 
-  final surveys = await db.allSurveys();
+  final surveys = await db.surveys.all();
   final surveyBySignature = <String, HistoricalSurvey>{};
   for (final survey in surveys) {
     surveyBySignature[survey.survey.signature] = survey;

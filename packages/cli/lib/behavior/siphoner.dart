@@ -58,7 +58,7 @@ Future<JobResult> siphonAndLog(
     final cargo = response.cargo;
     final siphonStrength = siphonMountStrength(ship);
     recordEvents(db, ship, response.events);
-    await db.insertExtraction(
+    await db.extractions.insert(
       ExtractionRecord(
         shipSymbol: ship.symbol,
         waypointSymbol: ship.waypointSymbol,

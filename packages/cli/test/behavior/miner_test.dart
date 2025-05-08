@@ -17,6 +17,8 @@ class _MockCentralCommand extends Mock implements CentralCommand {}
 
 class _MockDatabase extends Mock implements Database {}
 
+class _MockExtractionStore extends Mock implements ExtractionStore {}
+
 class _MockFleetApi extends Mock implements FleetApi {}
 
 class _MockLogger extends Mock implements Logger {}
@@ -37,6 +39,8 @@ class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockShipNavRoute extends Mock implements ShipNavRoute {}
 
+class _MockSurveyStore extends Mock implements SurveyStore {}
+
 class _MockTransactionStore extends Mock implements TransactionStore {}
 
 void main() {
@@ -44,8 +48,12 @@ void main() {
     final db = _MockDatabase();
     final marketPrices = _MockMarketPriceSnapshot();
     final symbol = WaypointSymbol.fromString('S-E-A');
+
+    final surveyStore = _MockSurveyStore();
+    when(() => db.surveys).thenReturn(surveyStore);
+
     when(
-      () => db.recentSurveysAtWaypoint(symbol, count: 100),
+      () => surveyStore.recentAt(symbol, count: 100),
     ).thenAnswer((_) async => []);
     final surveys = await surveysWorthMining(
       db,
@@ -58,6 +66,10 @@ void main() {
 
   test('surveyWorthMining', () async {
     final db = _MockDatabase();
+
+    final surveyStore = _MockSurveyStore();
+    when(() => db.surveys).thenReturn(surveyStore);
+
     final marketPrices = _MockMarketPriceSnapshot();
     final now = DateTime(2021);
     DateTime getNow() => now;
@@ -80,7 +92,7 @@ void main() {
         ),
     ];
     when(
-      () => db.recentSurveysAtWaypoint(waypointSymbol, count: 100),
+      () => surveyStore.recentAt(waypointSymbol, count: 100),
     ).thenAnswer((_) => Future.value(surveys));
     when(
       () => marketPrices.recentSellPrice(
@@ -109,6 +121,10 @@ void main() {
   test('advanceMiner smoke test', () async {
     final api = _MockApi();
     final db = _MockDatabase();
+
+    final surveyStore = _MockSurveyStore();
+    when(() => db.surveys).thenReturn(surveyStore);
+
     final ship = _MockShip();
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
 
@@ -143,8 +159,6 @@ void main() {
     when(
       () => caches.waypoints.canBeMined(waypointSymbol),
     ).thenAnswer((_) async => true);
-
-    // when(() => caches.ships.ships).thenReturn([ship]);
 
     final shipCargo = ShipCargo(capacity: 60, units: 0);
     when(() => ship.cargo).thenReturn(shipCargo);
@@ -181,10 +195,14 @@ void main() {
       ),
     );
     when(
-      () => db.recentSurveysAtWaypoint(waypointSymbol, count: 100),
+      () => surveyStore.recentAt(waypointSymbol, count: 100),
     ).thenAnswer((_) async => []);
+
+    final extractionStore = _MockExtractionStore();
+    when(() => db.extractions).thenReturn(extractionStore);
+
     registerFallbackValue(ExtractionRecord.fallbackValue());
-    when(() => db.insertExtraction(any())).thenAnswer((_) async {});
+    when(() => extractionStore.insert(any())).thenAnswer((_) async {});
 
     final logger = _MockLogger();
 
