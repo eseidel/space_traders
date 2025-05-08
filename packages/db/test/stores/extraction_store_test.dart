@@ -1,4 +1,5 @@
 import 'package:db/db.dart';
+import 'package:db/src/queries/extraction.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
@@ -42,5 +43,12 @@ void main() {
         expect(extractions.first.quantity, 100);
       });
     });
+  });
+
+  test('ExtractionRecord round trip', () {
+    final extraction = ExtractionRecord.fallbackValue();
+    final map = extractionToColumnMap(extraction);
+    final newExtraction = extractionFromColumnMap(map);
+    expect(newExtraction, equals(extraction));
   });
 }

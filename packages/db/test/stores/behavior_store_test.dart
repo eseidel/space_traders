@@ -16,7 +16,7 @@ void main() {
   });
 
   withPostgresServer('behavior', (server) {
-    test('Behavior round trip', () async {
+    test('smoke test', () async {
       final endpoint = await server.endpoint();
       final db = Database.testLive(
         endpoint: endpoint,
