@@ -66,7 +66,7 @@ class MarketPriceStore {
 
   /// Count the number of market prices in the database.
   /// Each Waypoint might have many prices.
-  Future<int> countPrices() async {
+  Future<int> count() async {
     final result = await _db.executeSql('SELECT COUNT(*) FROM market_price_');
     return result[0][0]! as int;
   }
