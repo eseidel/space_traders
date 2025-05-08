@@ -1,4 +1,3 @@
-import 'package:cli/cache/market_listing_snapshot.dart';
 import 'package:cli/cli.dart';
 import 'package:cli_table/cli_table.dart';
 
@@ -9,7 +8,7 @@ Map<String, dynamic> rightAlign(Object? content) => <String, dynamic>{
 
 Future<void> command(Database db, ArgResults argResults) async {
   final chartingSnapshot = await db.charting.snapshotAllRecords();
-  final marketListings = await MarketListingSnapshot.load(db);
+  final marketListings = await db.marketListings.snapshotAll();
   final systemsCache = await db.systems.snapshotAllSystems();
 
   // Walk all charting records.

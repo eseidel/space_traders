@@ -26,7 +26,7 @@ Future<void> command(Database db, ArgResults argResults) async {
 
   final agent = await db.getMyAgent();
   final systemsSnapshot = await db.systems.snapshotAllSystems();
-  final marketListings = await MarketListingSnapshot.load(db);
+  final marketListings = await db.marketListings.snapshotAll();
   final sellsFuel = defaultSellsFuel(marketListings);
   // final sellsFuel = defaultFuel;
   // bool sellsFuel(WaypointSymbol symbol) {

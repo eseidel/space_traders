@@ -22,6 +22,10 @@ void main() {
       return connection;
     }
 
+    final result = _MockPostgreSQLResult();
+    when(() => result.isEmpty).thenReturn(true);
+    when(() => connection.execute(any())).thenAnswer((_) async => result);
+    when(() => connection.runTx<void>(any())).thenAnswer((_) async {});
     when(connection.close).thenAnswer((_) async {});
 
     final db = await defaultDatabase(openConnection: openConnection);

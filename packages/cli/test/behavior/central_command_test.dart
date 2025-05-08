@@ -27,6 +27,8 @@ class _MockDeal extends Mock implements Deal {}
 
 class _MockLogger extends Mock implements Logger {}
 
+class _MockMarketListingStore extends Mock implements MarketListingStore {}
+
 class _MockRoutePlanner extends Mock implements RoutePlanner {}
 
 class _MockShip extends Mock implements Ship {}
@@ -523,8 +525,11 @@ void main() {
     registerFallbackValue(ShipType.ORE_HOUND);
     when(() => caches.marketPrices.prices).thenReturn([]);
     registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
+
+    final marketListingStore = _MockMarketListingStore();
+    when(() => db.marketListings).thenReturn(marketListingStore);
     when(
-      () => db.knowOfMarketWhichTrades(any()),
+      () => marketListingStore.whichTrades(any()),
     ).thenAnswer((_) async => false);
     final agent = Agent.test(
       symbol: shipSymbol.agentName,
@@ -535,7 +540,9 @@ void main() {
     registerFallbackValue(agent);
     when(db.getMyAgent).thenAnswer((_) async => agent);
 
-    when(db.allMarketListings).thenAnswer((_) async => []);
+    when(
+      marketListingStore.snapshotAll,
+    ).thenAnswer((_) async => MarketListingSnapshot([]));
     when(db.allShips).thenAnswer((_) async => []);
     when(db.allShipyardListings).thenAnswer((_) async => []);
 

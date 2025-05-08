@@ -14,6 +14,8 @@ class _MockDatabase extends Mock implements Database {}
 
 class _MockLogger extends Mock implements Logger {}
 
+class _MockMarketListingStore extends Mock implements MarketListingStore {}
+
 class _MockMarketPrices extends Mock implements MarketPriceSnapshot {}
 
 class _MockRoutePlanner extends Mock implements RoutePlanner {}
@@ -600,14 +602,17 @@ void main() {
       );
     }
 
+    final marketListingStore = _MockMarketListingStore();
+    when(() => db.marketListings).thenReturn(marketListingStore);
+
     when(
-      () => db.marketListingAt(nearSymbol),
+      () => marketListingStore.at(nearSymbol),
     ).thenAnswer((_) async => listing(nearSymbol));
     when(
-      () => db.marketListingAt(midSymbol),
+      () => marketListingStore.at(midSymbol),
     ).thenAnswer((_) async => listing(midSymbol));
     when(
-      () => db.marketListingAt(farSymbol),
+      () => marketListingStore.at(farSymbol),
     ).thenAnswer((_) async => listing(farSymbol));
 
     final logger = _MockLogger();

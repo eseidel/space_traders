@@ -1,7 +1,6 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/contract_snapshot.dart';
 import 'package:cli/cache/market_cache.dart';
-import 'package:cli/cache/market_listing_snapshot.dart';
 import 'package:cli/cache/market_price_snapshot.dart';
 import 'package:cli/cache/ship_snapshot.dart';
 import 'package:cli/cache/static_cache.dart';
@@ -21,7 +20,6 @@ export 'package:cli/api.dart';
 export 'package:cli/cache/behavior_snapshot.dart';
 export 'package:cli/cache/contract_snapshot.dart';
 export 'package:cli/cache/market_cache.dart';
-export 'package:cli/cache/market_listing_snapshot.dart';
 export 'package:cli/cache/market_price_snapshot.dart';
 export 'package:cli/cache/ship_snapshot.dart';
 export 'package:cli/cache/shipyard_listing_snapshot.dart';
@@ -31,7 +29,6 @@ export 'package:cli/cache/waypoint_cache.dart';
 export 'package:cli/nav/jump_cache.dart';
 export 'package:cli/nav/route.dart';
 export 'package:cli/nav/system_connectivity.dart';
-export 'package:file/file.dart';
 
 /// Container for all the caches.
 class Caches {
@@ -109,7 +106,7 @@ class Caches {
       constructionSnapshot,
     );
     // TODO(eseidel): Find a way to avoid fetching market listings here?
-    final marketListings = await MarketListingSnapshot.load(db);
+    final marketListings = await db.marketListings.snapshotAll();
     final routePlanner = RoutePlanner.fromSystemsSnapshot(
       systems,
       systemConnectivity,

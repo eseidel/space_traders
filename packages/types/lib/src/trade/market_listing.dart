@@ -13,6 +13,14 @@ class MarketListing {
     this.exchange = const {},
   });
 
+  /// Creates a new market listing for mocking.
+  @visibleForTesting
+  const MarketListing.fallbackValue()
+    : waypointSymbol = const WaypointSymbol.fallbackValue(),
+      exports = const {},
+      imports = const {},
+      exchange = const {};
+
   /// Creates a new market description from JSON data.
   factory MarketListing.fromJson(Map<String, dynamic> json) {
     final symbol = WaypointSymbol.fromJson(json['waypointSymbol'] as String);

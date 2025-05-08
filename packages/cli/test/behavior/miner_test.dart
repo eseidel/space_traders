@@ -21,6 +21,8 @@ class _MockFleetApi extends Mock implements FleetApi {}
 
 class _MockLogger extends Mock implements Logger {}
 
+class _MockMarketListingStore extends Mock implements MarketListingStore {}
+
 class _MockMarketPrices extends Mock implements MarketPriceSnapshot {}
 
 class _MockShip extends Mock implements Ship {}
@@ -657,7 +659,10 @@ void main() {
     when(() => centralCommand.minimumSurveys).thenReturn(10);
     when(() => centralCommand.surveyPercentileThreshold).thenReturn(0.9);
 
-    when(() => db.marketListingAt(waypointSymbol)).thenAnswer((_) async {
+    final marketListingStore = _MockMarketListingStore();
+    when(() => db.marketListings).thenReturn(marketListingStore);
+
+    when(() => marketListingStore.at(waypointSymbol)).thenAnswer((_) async {
       return null;
     });
 
@@ -675,7 +680,7 @@ void main() {
     when(() => db.marketPricesInSystem(any())).thenAnswer((_) async => []);
 
     when(
-      () => db.marketsWhichBuysTradeSymbolInSystem(any(), any()),
+      () => marketListingStore.whichBuysInSystem(any(), any()),
     ).thenAnswer((_) async => []);
 
     final logger = _MockLogger();

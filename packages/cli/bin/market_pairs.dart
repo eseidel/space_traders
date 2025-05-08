@@ -27,10 +27,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   final systemsCache = await db.systems.snapshotAllSystems();
   final hqSystem = await myHqSystemSymbol(db);
   final marketPrices = await MarketPriceSnapshot.loadOneSystem(db, hqSystem);
-  final marketListings = await MarketListingSnapshot.loadOneSystem(
-    db,
-    hqSystem,
-  );
+  final marketListings = await db.marketListings.snapshotSystem(hqSystem);
 
   // Collect all imports and exports.
   final exports = <TradeSymbol, WaypointSymbol>{};

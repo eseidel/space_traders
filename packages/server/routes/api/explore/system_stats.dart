@@ -66,7 +66,7 @@ Future<SystemStats> computeSystemStats({
   }
 
   // How many markets?
-  final marketListings = await MarketListingSnapshot.load(db);
+  final marketListings = await db.marketListings.snapshotAll();
   var markets = 0;
   for (final listing in marketListings.listings) {
     // We could sort first by system to save ourselves some lookups.

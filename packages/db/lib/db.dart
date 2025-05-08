@@ -6,6 +6,7 @@ import 'package:db/src/queue.dart';
 import 'package:db/src/stores/charting_store.dart';
 import 'package:db/src/stores/construction_store.dart';
 import 'package:db/src/stores/jump_gate_store.dart';
+import 'package:db/src/stores/market_listing_store.dart';
 import 'package:db/src/stores/systems_store.dart';
 import 'package:db/src/stores/transaction_store.dart';
 import 'package:meta/meta.dart';
@@ -16,6 +17,7 @@ export 'package:db/config.dart';
 export 'package:db/src/stores/charting_store.dart';
 export 'package:db/src/stores/construction_store.dart';
 export 'package:db/src/stores/jump_gate_store.dart';
+export 'package:db/src/stores/market_listing_store.dart';
 export 'package:db/src/stores/systems_store.dart';
 export 'package:db/src/stores/transaction_store.dart';
 
@@ -237,6 +239,9 @@ class Database {
   /// Get the transaction store.
   TransactionStore get transactions => TransactionStore(this);
 
+  /// Get the market listing store.
+  MarketListingStore get marketListings => MarketListingStore(this);
+
   /// Listen for notifications on a channel.
   Future<void> listen(String channel) async {
     await executeSql('LISTEN $channel');
@@ -411,75 +416,6 @@ class Database {
   /// Update the given agent in the database.
   Future<void> upsertAgent(Agent agent) async {
     await execute(upsertAgentQuery(agent));
-  }
-
-  /// Get the market listing for the given symbol.
-  Future<MarketListing?> marketListingAt(WaypointSymbol waypointSymbol) async {
-    final query = marketListingByWaypointSymbolQuery(waypointSymbol);
-    return queryOne(query, marketListingFromColumnMap);
-  }
-
-  /// Get all market listings.
-  Future<Iterable<MarketListing>> allMarketListings() async {
-    final query = allMarketListingsQuery();
-    return queryMany(query, marketListingFromColumnMap);
-  }
-
-  /// Get all market listings within a system.
-  Future<Iterable<MarketListing>> marketListingsInSystem(
-    SystemSymbol system,
-  ) async {
-    final query = marketListingsInSystemQuery(system);
-    return queryMany(query, marketListingFromColumnMap);
-  }
-
-  /// Get all WaypointSymbols with a market importing the given tradeSymbol.
-  Future<Iterable<WaypointSymbol>> marketsWithImportInSystem(
-    SystemSymbol system,
-    TradeSymbol tradeSymbol,
-  ) async {
-    final query = marketsWithImportInSystemQuery(system, tradeSymbol);
-    return queryMany(
-      query,
-      (map) => WaypointSymbol.fromString(map['symbol'] as String),
-    );
-  }
-
-  /// Get all WaypointSymbols which buys [tradeSymbol] within [system].
-  /// Buys means imports or exchange.
-  Future<Iterable<WaypointSymbol>> marketsWhichBuysTradeSymbolInSystem(
-    SystemSymbol system,
-    TradeSymbol tradeSymbol,
-  ) async {
-    final query = marketsWhichBuysTradeSymbolInSystemQuery(system, tradeSymbol);
-    return queryMany(
-      query,
-      (map) => WaypointSymbol.fromString(map['symbol'] as String),
-    );
-  }
-
-  /// Get all WaypointSymbols with a market importing the given tradeSymbol.
-  Future<Iterable<WaypointSymbol>> marketsWithExportInSystem(
-    SystemSymbol system,
-    TradeSymbol tradeSymbol,
-  ) async {
-    final query = marketsWithExportInSystemQuery(system, tradeSymbol);
-    return queryMany(
-      query,
-      (map) => WaypointSymbol.fromString(map['symbol'] as String),
-    );
-  }
-
-  /// Returns true if we know of a market which trades the given symbol.
-  Future<bool> knowOfMarketWhichTrades(TradeSymbol tradeSymbol) async {
-    final query = knowOfMarketWhichTradesQuery(tradeSymbol);
-    final result = await execute(query);
-    return result[0][0]! as bool;
-  }
-
-  /// Update the given market listing in the database.
-  Future<void> upsertMarketListing(MarketListing listing) async {
-    await execute(upsertMarketListingQuery(listing));
   }
 
   /// Get the shipyard listing for the given symbol.

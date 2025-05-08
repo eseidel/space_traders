@@ -1,6 +1,5 @@
 import 'package:cli/api.dart';
 import 'package:cli/behavior/job.dart';
-import 'package:cli/cache/market_listing_snapshot.dart';
 import 'package:cli/central_command.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';

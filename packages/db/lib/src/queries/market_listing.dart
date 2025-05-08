@@ -62,7 +62,8 @@ Query marketsWhichBuysTradeSymbolInSystemQuery(
 ) => Query(
   '''
       SELECT symbol FROM market_listing_
-      WHERE starts_with(symbol, @system) AND @tradeSymbol = ANY(imports) OR @tradeSymbol = ANY(exchange)
+      WHERE starts_with(symbol, @system)
+      AND (@tradeSymbol = ANY(imports) OR @tradeSymbol = ANY(exchange))
       ''',
   parameters: {'system': system.system, 'tradeSymbol': tradeSymbol.toJson()},
 );
@@ -109,3 +110,7 @@ MarketListing marketListingFromColumnMap(Map<String, dynamic> values) {
             .toSet(),
   );
 }
+
+/// Convert a column map to a market listing symbol.
+WaypointSymbol marketListingSymbolFromColumnMap(Map<String, dynamic> map) =>
+    WaypointSymbol.fromString(map['symbol'] as String);

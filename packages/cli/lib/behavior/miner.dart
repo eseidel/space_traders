@@ -335,18 +335,15 @@ Future<JobResult> emptyCargoIfNeededForMining(
 // TODO(eseidel): replace with findBestMarketToSell in all places?
 Future<WaypointSymbol?> _nearbyMarketWhichTrades(
   Database db,
-  WaypointSymbol startSymbol,
+  WaypointSymbol start,
   TradeSymbol tradeSymbol,
 ) async {
-  final startMarket = await db.marketListingAt(startSymbol);
-  if (startMarket != null && startMarket.allowsTradeOf(tradeSymbol)) {
-    return startSymbol;
+  final listings = db.marketListings;
+  if ((await listings.at(start))?.allowsTradeOf(tradeSymbol) ?? false) {
+    return start;
   }
   // TODO(eseidel): Handle jumps again!
-  final symbols = await db.marketsWhichBuysTradeSymbolInSystem(
-    startSymbol.system,
-    tradeSymbol,
-  );
+  final symbols = await listings.whichBuysInSystem(start.system, tradeSymbol);
   return symbols.firstOrNull;
 }
 
