@@ -75,7 +75,7 @@ Future<List<ValuedSurvey>> surveysWorthMining(
   DateTime Function() getNow = defaultGetNow,
 }) async {
   // Get N recent surveys for this waypoint, including expired and exhausted.
-  final recentSurveys = await db.recentSurveysAtWaypoint(
+  final recentSurveys = await db.surveys.recentAt(
     surveyWaypointSymbol,
     count: 100,
   );
@@ -198,7 +198,7 @@ Future<JobResult> extractAndLog(
     if (isSurveyExhaustedException(e)) {
       // If the survey is exhausted, record it as such and try again.
       shipInfo(ship, 'Survey ${maybeSurvey!.signature} exhausted.');
-      await db.markSurveyExhausted(maybeSurvey);
+      await db.surveys.markExhausted(maybeSurvey);
       return JobResult.wait(null);
     }
     // This should have been caught before using the survey, but we'll
@@ -207,7 +207,7 @@ Future<JobResult> extractAndLog(
       shipWarn(ship, 'Survey ${maybeSurvey!.signature} expired.');
       // It's not technically exhausted, but that's our easy way to disable
       // the survey.  We use a warning to catch if we're doing this often.
-      await db.markSurveyExhausted(maybeSurvey);
+      await db.surveys.markExhausted(maybeSurvey);
       return JobResult.wait(null);
     }
     // https://discord.com/channels/792864705139048469/1168786078866604053

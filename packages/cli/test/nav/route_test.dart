@@ -303,7 +303,7 @@ void main() {
     );
     final systemsCache = SystemsSnapshot([system]);
 
-    final systemConnectivity = SystemConnectivity.test({});
+    final systemConnectivity = SystemConnectivity.test(const {});
     final routePlanner = RoutePlanner.fromSystemsSnapshot(
       systemsCache,
       systemConnectivity,

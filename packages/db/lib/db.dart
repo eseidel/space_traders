@@ -214,9 +214,6 @@ class Database {
     });
   }
 
-  /// Get the systems store.
-  SystemsStore get systems => SystemsStore(this);
-
   /// Get the config store.
   ConfigStore get config => ConfigStore(this);
 
@@ -237,6 +234,12 @@ class Database {
 
   /// Get the market price store.
   MarketPriceStore get marketPrices => MarketPriceStore(this);
+
+  /// Get the survey store.
+  SurveyStore get surveys => SurveyStore(this);
+
+  /// Get the systems store.
+  SystemsStore get systems => SystemsStore(this);
 
   /// Listen for notifications on a channel.
   Future<void> listen(String channel) async {
@@ -298,36 +301,6 @@ class Database {
   Future<int> rowsInTable(String tableName) async {
     final result = await executeSql('SELECT COUNT(*) FROM $tableName');
     return result[0][0]! as int;
-  }
-
-  /// Insert a survey into the database.
-  Future<void> insertSurvey(HistoricalSurvey survey) async {
-    await execute(insertSurveyQuery(survey));
-  }
-
-  /// Return the most recent surveys.
-  Future<Iterable<HistoricalSurvey>> recentSurveysAtWaypoint(
-    WaypointSymbol waypointSymbol, {
-    required int count,
-  }) async {
-    final query = recentSurveysAtWaypointQuery(
-      waypointSymbol: waypointSymbol,
-      count: count,
-    );
-    return queryMany(query, surveyFromColumnMap);
-  }
-
-  /// Return all surveys.
-  Future<Iterable<HistoricalSurvey>> allSurveys() async =>
-      queryMany(allSurveysQuery(), surveyFromColumnMap);
-
-  /// Mark the given survey as exhausted.
-  Future<void> markSurveyExhausted(Survey survey) async {
-    final query = markSurveyExhaustedQuery(survey);
-    final result = await execute(query);
-    if (result.affectedRows != 1) {
-      throw ArgumentError('Survey not found: $survey');
-    }
   }
 
   /// Gets all factions.

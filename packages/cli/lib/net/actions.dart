@@ -808,7 +808,7 @@ void recordSurveys(
       timestamp: now,
       exhausted: false,
     );
-    db.insertSurvey(historicalSurvey);
+    db.surveys.insert(historicalSurvey);
   }
 }
 

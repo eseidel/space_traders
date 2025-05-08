@@ -14,7 +14,7 @@ Future<void> command(Database db, ArgResults argResults) async {
         (extractionCountBySurveySignature[signature] ?? 0) + 1;
   }
 
-  final surveys = await db.allSurveys();
+  final surveys = await db.surveys.all();
   final surveyBySignature = <String, HistoricalSurvey>{};
   for (final survey in surveys) {
     surveyBySignature[survey.survey.signature] = survey;

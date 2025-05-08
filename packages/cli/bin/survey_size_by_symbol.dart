@@ -2,7 +2,7 @@ import 'package:cli/cli.dart';
 import 'package:collection/collection.dart';
 
 Future<void> command(Database db, ArgResults argResults) async {
-  final surveys = await db.allSurveys();
+  final surveys = await db.surveys.all();
 
   // Survey size distribution by tradeSymbol
   logger.info('Survey size distribution by tradeSymbol');

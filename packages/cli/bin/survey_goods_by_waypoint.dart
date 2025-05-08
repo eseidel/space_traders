@@ -7,7 +7,7 @@ class _Stats {
 }
 
 Future<void> command(Database db, ArgResults argResults) async {
-  final surveys = await db.allSurveys();
+  final surveys = await db.surveys.all();
   final chartingSnapshot = await db.charting.snapshotAllRecords();
   final systems = db.systems;
 
