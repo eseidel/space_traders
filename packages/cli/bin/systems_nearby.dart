@@ -16,8 +16,7 @@ Future<void> command(Database db, ArgResults argResults) async {
     return;
   }
   for (final connectedSystemSymbol in connectedSystemSymbols) {
-    final marketCount =
-        marketListings.listingsInSystem(connectedSystemSymbol).length;
+    final marketCount = marketListings.countInSystem(connectedSystemSymbol);
     logger.info(
       '${connectedSystemSymbol.system.padRight(9)} $marketCount markets',
     );

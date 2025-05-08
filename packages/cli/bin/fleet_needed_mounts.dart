@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:cli/caches.dart';
 import 'package:cli/central_command.dart';
 import 'package:cli/cli.dart';
 

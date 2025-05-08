@@ -1,4 +1,3 @@
-import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 
 Future<void> command(Database db, ArgResults argResults) async {

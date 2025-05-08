@@ -20,8 +20,7 @@ class _MockFleetApi extends Mock implements FleetApi {}
 
 class _MockLogger extends Mock implements Logger {}
 
-class _MockMarketListingSnapshot extends Mock
-    implements MarketListingSnapshot {}
+class _MockMarketListingStore extends Mock implements MarketListingStore {}
 
 class _MockShip extends Mock implements Ship {}
 
@@ -447,22 +446,16 @@ void main() {
     expect(state.routePlan, isNotNull);
   });
 
-  test('defaultSellsFuel', () {
-    final listings = _MockMarketListingSnapshot();
-    final sellsFuel = defaultSellsFuel(listings);
-    final waypointSymbol = WaypointSymbol.fromString('A-B-C');
-    when(
-      () => listings[waypointSymbol],
-    ).thenReturn(MarketListing(waypointSymbol: waypointSymbol));
-    expect(sellsFuel(waypointSymbol), false);
-
-    when(() => listings[waypointSymbol]).thenReturn(
-      MarketListing(
-        waypointSymbol: waypointSymbol,
-        exchange: const {TradeSymbol.FUEL},
-      ),
+  test('defaultSellsFuel', () async {
+    final db = _MockDatabase();
+    final marketListings = _MockMarketListingStore();
+    when(() => db.marketListings).thenReturn(marketListings);
+    when(marketListings.marketsSellingFuel).thenAnswer(
+      (_) async => <WaypointSymbol>{WaypointSymbol.fromString('A-B-C')},
     );
-    expect(sellsFuel(waypointSymbol), true);
+    final sellsFuel = await defaultSellsFuel(db);
+    expect(sellsFuel(WaypointSymbol.fromString('A-B-C')), true);
+    expect(sellsFuel(WaypointSymbol.fromString('A-B-D')), false);
   });
 
   test('Ship.timeToArrival', () {

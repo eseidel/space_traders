@@ -1,5 +1,4 @@
 import 'package:cli/behavior/job.dart';
-import 'package:cli/caches.dart';
 import 'package:cli/central_command.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/nav/exploring.dart';
@@ -14,13 +13,13 @@ WaypointSymbol _centralWaypoint(List<SystemWaypoint> waypoints) {
 }
 
 RoutePlan? _shortestPathTo(
-  SystemConnectivity systemConnectivity,
   RoutePlanner routePlanner,
   SystemsSnapshot systems,
   SystemSymbol systemSymbol,
   Ship ship,
 ) {
   final maxFuel = ship.frame.fuelCapacity;
+  final systemConnectivity = routePlanner.systemConnectivity;
   final system = systems.systemRecordBySymbol(systemSymbol);
   final nearbySystems = systems.records.where(
     (s) =>
@@ -79,12 +78,12 @@ RoutePlan? _shortestPathTo(
 /// Find the closest system to the seed system that is not in the same cluster.
 Future<RoutePlan?> _routeToClosestSystemToSeed(
   SystemsSnapshot systemsCache,
-  SystemConnectivity systemConnectivity,
   RoutePlanner routePlanner,
   Ship ship, {
   required SystemSymbol mainClusterSystemSymbol,
   bool Function(SystemSymbol waypointSymbol)? filter,
 }) async {
+  final systemConnectivity = routePlanner.systemConnectivity;
   final starterSystems = findInterestingSystems(systemsCache);
   final unreachableSystems =
       starterSystems
@@ -102,7 +101,6 @@ Future<RoutePlan?> _routeToClosestSystemToSeed(
       continue;
     }
     final plan = _shortestPathTo(
-      systemConnectivity,
       routePlanner,
       systemsCache,
       systemSymbol,
@@ -123,9 +121,9 @@ Future<RoutePlan?> routeToNextSystemToSeed(
   BehaviorSnapshot behaviors,
   SystemsSnapshot systems,
   RoutePlanner routePlanner,
-  SystemConnectivity connectivity,
   Ship ship,
 ) async {
+  final connectivity = routePlanner.systemConnectivity;
   // Get all interesting systems which do not have ships in them or ships
   // headed towards them.
   final systemSymbols = <SystemSymbol>{};
@@ -139,14 +137,10 @@ Future<RoutePlan?> routeToNextSystemToSeed(
     }
   }
   final occupiedClusters =
-      systemSymbols
-          .map((s) => connectivity.clusterIdForSystem(s))
-          .nonNulls
-          .toSet();
+      systemSymbols.map(connectivity.clusterIdForSystem).nonNulls.toSet();
 
   final route = await _routeToClosestSystemToSeed(
     systems,
-    connectivity,
     routePlanner,
     ship,
     mainClusterSystemSymbol: agent.headquarters.system,
@@ -206,7 +200,6 @@ Future<JobResult> doSeeder(
       behaviors,
       systems,
       caches.routePlanner,
-      caches.systemConnectivity,
       ship,
     ),
     'No system to seed.',

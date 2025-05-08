@@ -1,4 +1,3 @@
-import 'package:cli/caches.dart';
 import 'package:cli/central_command.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/nav/navigation.dart';
@@ -26,8 +25,7 @@ Future<void> command(Database db, ArgResults argResults) async {
 
   final agent = await db.getMyAgent();
   final systemsSnapshot = await db.systems.snapshotAllSystems();
-  final marketListings = await db.marketListings.snapshotAll();
-  final sellsFuel = defaultSellsFuel(marketListings);
+  final sellsFuel = await defaultSellsFuel(db);
   // final sellsFuel = defaultFuel;
   // bool sellsFuel(WaypointSymbol symbol) {
   //   return true;
@@ -45,11 +43,6 @@ Future<void> command(Database db, ArgResults argResults) async {
   // }
 
   final systemConnectivity = await loadSystemConnectivity(db);
-  // final routePlanner = RoutePlanner.fromSystemsCache(
-  //   systemsCache,
-  //   systemConnectivity,
-  //   sellsFuel: sellsFuel,
-  // );
 
   final shipyardShips = ShipyardShipCache(db);
   final ship = await shipyardShips.get(shipType);

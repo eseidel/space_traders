@@ -43,7 +43,6 @@ class Caches {
     required this.factions,
     required this.static,
     required this.systemConnectivity,
-    required this.jumpGates,
     required this.galaxy,
   });
 
@@ -58,20 +57,16 @@ class Caches {
   SystemsSnapshot systems;
 
   /// The cache of system connectivity.
-  final SystemConnectivity systemConnectivity;
+  SystemConnectivity systemConnectivity;
 
   /// The cache of waypoints.
   final WaypointCache waypoints;
-
-  /// The cache of jump gates.
-  // TODO(eseidel): This needs to update when changes!
-  final JumpGateSnapshot jumpGates;
 
   /// The cache of markets.
   final MarketCache markets;
 
   /// The route planner.
-  final RoutePlanner routePlanner;
+  RoutePlanner routePlanner;
 
   /// Cache of static data from the server.
   final StaticCaches static;
@@ -105,12 +100,10 @@ class Caches {
       jumpGates,
       constructionSnapshot,
     );
-    // TODO(eseidel): Find a way to avoid fetching market listings here?
-    final marketListings = await db.marketListings.snapshotAll();
     final routePlanner = RoutePlanner.fromSystemsSnapshot(
       systems,
       systemConnectivity,
-      sellsFuel: defaultSellsFuel(marketListings),
+      sellsFuel: await defaultSellsFuel(db),
     );
 
     // Make sure factions are loaded.
@@ -126,7 +119,6 @@ class Caches {
       routePlanner: routePlanner,
       factions: factions,
       systemConnectivity: systemConnectivity,
-      jumpGates: jumpGates,
       galaxy: galaxy,
     );
   }
@@ -140,11 +132,17 @@ class Caches {
       systems = await db.systems.snapshotAllSystems();
     }
 
-    systemConnectivity.updateFromJumpGates(
-      jumpGates,
-      await db.construction.snapshotAllRecords(),
+    final jumpGateSnapshot = await db.jumpGates.snapshotAll();
+    final constructionSnapshot = await db.construction.snapshotAllRecords();
+    final systemConnectivity = SystemConnectivity.fromJumpGates(
+      jumpGateSnapshot,
+      constructionSnapshot,
     );
-    routePlanner.clearRoutingCaches();
+    routePlanner = RoutePlanner.fromSystemsSnapshot(
+      systems,
+      systemConnectivity,
+      sellsFuel: await defaultSellsFuel(db),
+    );
   }
 }
 

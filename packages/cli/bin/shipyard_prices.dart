@@ -1,6 +1,3 @@
-import 'package:cli/cache/shipyard_listing_snapshot.dart';
-import 'package:cli/cache/shipyard_price_snapshot.dart';
-import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cli.dart';
 import 'package:cli_table/cli_table.dart';
 
@@ -30,7 +27,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   };
 
   for (final shipType in ShipType.values) {
-    final listings = shipyardListings.listingsWithShip(shipType);
+    final listings = shipyardListings.withShip(shipType);
     if (!showAll && listings.isEmpty) {
       continue;
     }

@@ -17,8 +17,12 @@ class MarketListingSnapshot {
   Iterable<MarketListing> get listings => _listingBySymbol.values;
 
   /// Fetch the MarketListings for the given SystemSymbol.
-  Iterable<MarketListing> listingsInSystem(SystemSymbol systemSymbol) =>
+  Iterable<MarketListing> _inSystem(SystemSymbol systemSymbol) =>
       listings.where((l) => l.waypointSymbol.system == systemSymbol);
+
+  /// Count the number of MarketListings in the given SystemSymbol.
+  int countInSystem(SystemSymbol systemSymbol) =>
+      _inSystem(systemSymbol).length;
 
   /// Fetch the MarketListing for the given WaypointSymbol.
   MarketListing? operator [](WaypointSymbol waypointSymbol) =>
@@ -36,6 +40,19 @@ class MarketListingSnapshot {
         .where((e) => e.value >= n)
         .map((e) => e.key)
         .toSet();
+  }
+
+  /// Returns all MarketListings which export the given TradeSymbol in
+  /// the given SystemSymbol.
+  /// Unlike the MarketListingStore version which returns WaypointSymbols.
+  Iterable<MarketListing> whichExportsInSystem(
+    SystemSymbol system,
+    TradeSymbol tradeSymbol,
+  ) {
+    return listings.where(
+      (l) =>
+          l.waypointSymbol.system == system && l.exports.contains(tradeSymbol),
+    );
   }
 
   /// Returns true if we know of a market which trades the given TradeSymbol.

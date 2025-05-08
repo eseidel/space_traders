@@ -28,22 +28,24 @@ class ShipyardListingSnapshot {
   int get waypointCount => _listingBySymbol.keys.length;
 
   /// Fetch the ShipyardListings for the given SystemSymbol.
-  Iterable<ShipyardListing> listingsInSystem(SystemSymbol system) =>
+  Iterable<ShipyardListing> inSystem(SystemSymbol system) =>
       listings.where((l) => l.waypointSymbol.system == system);
 
+  /// Count the number of ShipyardListings in the given SystemSymbol.
+  int countInSystem(SystemSymbol system) => inSystem(system).length;
+
   /// The ShipyardListings which sell the given ship type.
-  Iterable<ShipyardListing> listingsWithShip(ShipType shipType) {
+  Iterable<ShipyardListing> withShip(ShipType shipType) {
     return listings.where((listing) => listing.hasShip(shipType));
   }
 
   /// Fetch the ShipyardListing for the given WaypointSymbol.
-  ShipyardListing? listingForSymbol(WaypointSymbol waypointSymbol) {
-    return _listingBySymbol[waypointSymbol];
-  }
+  ShipyardListing? at(WaypointSymbol waypointSymbol) =>
+      _listingBySymbol[waypointSymbol];
 
   /// Fetch the ShipyardListing for the given WaypointSymbol.
   ShipyardListing? operator [](WaypointSymbol waypointSymbol) =>
-      listingForSymbol(waypointSymbol);
+      at(waypointSymbol);
 
   /// Returns true if we know of a Shipyard with the given ShipType.
   bool knowOfShipyardWithShip(ShipType shipType) {

@@ -1,4 +1,3 @@
-import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/nav/warp_pathing.dart';
@@ -110,7 +109,7 @@ Future<void> command(Database db, ArgResults argResults) async {
       start: explorer.waypointSymbol,
       // Pick the waypoint closest to our current location?
       end: system.waypoints.first.symbol,
-      sellsFuel: defaultSellsFuel(marketListings),
+      sellsFuel: await defaultSellsFuel(db),
     );
     if (actions != null) {
       final plan = RoutePlan(

@@ -1,7 +1,5 @@
 import 'package:cli/behavior/seeder.dart';
-import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/nav/navigation.dart';
 
 void main(List<String> args) async {
   await runOffline(args, command);
@@ -9,18 +7,12 @@ void main(List<String> args) async {
 
 Future<void> command(Database db, ArgResults argResults) async {
   final agent = await db.getMyAgent();
-  final marketListings = await db.marketListings.snapshotAll();
 
   final systemsCache = await db.systems.snapshotAllSystems();
   final ships = await ShipSnapshot.load(db);
 
   // Find ones not in our main cluster.
-  final systemConnectivity = await loadSystemConnectivity(db);
-  final routePlanner = RoutePlanner.fromSystemsSnapshot(
-    systemsCache,
-    systemConnectivity,
-    sellsFuel: defaultSellsFuel(marketListings),
-  );
+  final routePlanner = await defaultRoutePlanner(db);
 
   final explorer = ships.ships.firstWhere((s) => s.isExplorer);
   final behaviors = await BehaviorSnapshot.load(db);
@@ -31,7 +23,6 @@ Future<void> command(Database db, ArgResults argResults) async {
     behaviors,
     systemsCache,
     routePlanner,
-    systemConnectivity,
     explorer,
   );
   if (route == null) {

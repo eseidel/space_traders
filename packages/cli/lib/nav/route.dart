@@ -380,12 +380,6 @@ class RoutePlanner {
   /// The connectivity used for this RoutePlanner.
   SystemConnectivity get systemConnectivity => _systemConnectivity;
 
-  /// Clear any cached routing data.  Called when jump gate availability changes
-  /// because a jump gate is constructed.
-  void clearRoutingCaches() {
-    _jumpCache.clear();
-  }
-
   RoutePlan? _planJump(
     ShipSpec shipSpec, {
     required WaypointSymbol start,
@@ -613,7 +607,7 @@ Future<ShipyardListing?> nearestShipyard(
   Ship ship,
 ) async {
   final start = ship.waypointSymbol;
-  final listings = shipyards.listingsInSystem(start.system);
+  final listings = shipyards.inSystem(start.system);
 
   // If not in this system.  Should list all shipyardListings.
   // Filter by ones which are reachable (e.g. if this ship can warp).

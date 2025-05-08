@@ -33,6 +33,13 @@ class MarketListingStore {
     return MarketListingSnapshot(listings);
   }
 
+  /// Get all market listings which sell fuel.
+  Future<Set<WaypointSymbol>> marketsSellingFuel() async {
+    final query = marketsWhichTradeFuelQuery();
+    final list = await _db.queryMany(query, marketListingSymbolFromColumnMap);
+    return list.toSet();
+  }
+
   /// Get all market listings within a system.
   Future<Iterable<MarketListing>> inSystem(SystemSymbol system) async {
     final query = marketListingsInSystemQuery(system);

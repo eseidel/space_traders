@@ -1,4 +1,3 @@
-import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
@@ -20,8 +19,6 @@ class _MockFactionsApi extends Mock implements FactionsApi {}
 class _MockFleetApi extends Mock implements FleetApi {}
 
 class _MockGlobalApi extends Mock implements GlobalApi {}
-
-class _MockJumpGateSnapshot extends Mock implements JumpGateSnapshot {}
 
 class _MockJumpGateStore extends Mock implements JumpGateStore {}
 
@@ -122,8 +119,9 @@ void main() {
     final marketListingStore = _MockMarketListingStore();
     when(() => db.marketListings).thenReturn(marketListingStore);
     when(
-      marketListingStore.snapshotAll,
-    ).thenAnswer((_) async => MarketListingSnapshot([]));
+      marketListingStore.marketsSellingFuel,
+    ).thenAnswer((_) async => <WaypointSymbol>{});
+
     when(db.allMarketPrices).thenAnswer((_) async => []);
     when(db.allShipyardListings).thenAnswer((_) async => []);
     when(db.allShipyardPrices).thenAnswer((_) async => []);
@@ -189,6 +187,18 @@ void main() {
       constructionStore.snapshotAllRecords,
     ).thenAnswer((_) async => ConstructionSnapshot([]));
 
+    final jumpGateStore = _MockJumpGateStore();
+    when(() => db.jumpGates).thenReturn(jumpGateStore);
+    when(
+      jumpGateStore.snapshotAll,
+    ).thenAnswer((_) async => JumpGateSnapshot([]));
+
+    final marketListingStore = _MockMarketListingStore();
+    when(() => db.marketListings).thenReturn(marketListingStore);
+    when(
+      marketListingStore.marketsSellingFuel,
+    ).thenAnswer((_) async => <WaypointSymbol>{});
+
     final caches = Caches(
       marketPrices: _MockMarketPrices(),
       systems: SystemsSnapshot([]),
@@ -197,7 +207,6 @@ void main() {
       routePlanner: _MockRoutePlanner(),
       static: _MockStaticCaches(),
       systemConnectivity: _MockSystemConnectivity(),
-      jumpGates: _MockJumpGateSnapshot(),
       galaxy: const GalaxyStats(systemCount: 2, waypointCount: 2),
       factions: [],
     );
@@ -225,6 +234,9 @@ void main() {
     expect(caches.systems.waypointsCount, 2);
     verify(() => logger.info('Systems Snapshot is incomplete, reloading.'));
     verify(() => db.systems.snapshotAllSystems()).called(1);
+    verify(() => db.jumpGates.snapshotAll()).called(1);
+    verify(() => db.construction.snapshotAllRecords()).called(1);
+    verify(() => db.marketListings.marketsSellingFuel()).called(1);
 
     await caches.updateRoutingCaches(db);
     // If we've already cached the systems, we don't need to snapshot them again

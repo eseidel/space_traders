@@ -1,5 +1,4 @@
 import 'package:cli/behavior/system_watcher.dart';
-import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/logic/printing.dart';
 import 'package:cli/nav/navigation.dart';
