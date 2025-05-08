@@ -142,6 +142,25 @@ void main() {
         final unknown = WaypointSymbol.fromString('X1-C-1');
         expect(await db.marketListings.sellsFuel(unknown), isFalse);
       });
+
+      test('snapshot', () async {
+        await db.marketListings.upsert(marketListing);
+
+        final listings = db.marketListings;
+        final snapshot = await listings.snapshotAll();
+        expect(snapshot.listings.length, equals(1));
+        expect(snapshot.listings.first, equals(marketListing));
+
+        final systemSnapshot = await listings.snapshotSystem(
+          waypointSymbol.system,
+        );
+        expect(systemSnapshot.listings.length, equals(1));
+        expect(systemSnapshot.listings.first, equals(marketListing));
+
+        final otherSystem = SystemSymbol.fromString('X1-B');
+        final otherSystemSnapshot = await listings.snapshotSystem(otherSystem);
+        expect(otherSystemSnapshot.listings.length, equals(0));
+      });
     });
   });
 }
