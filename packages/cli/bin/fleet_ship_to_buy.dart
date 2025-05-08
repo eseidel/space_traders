@@ -1,4 +1,3 @@
-import 'package:cli/caches.dart';
 import 'package:cli/central_command.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/config.dart';

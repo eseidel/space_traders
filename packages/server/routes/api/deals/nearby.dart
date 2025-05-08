@@ -1,10 +1,8 @@
 import 'dart:io';
 
-import 'package:cli/caches.dart';
 import 'package:cli/central_command.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/config.dart';
-import 'package:cli/nav/navigation.dart';
 import 'package:cli/plan/trading.dart';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:protocol/protocol.dart' as api;
@@ -19,18 +17,7 @@ Future<api.DealsNearbyResponse> dealsNearby({
 }) async {
   final systems = await db.systems.snapshotAllSystems();
   final marketListings = await db.marketListings.snapshotAll();
-  final jumpGates = await db.jumpGates.snapshotAll();
-  final constructionSnapshot = await db.construction.snapshotAllRecords();
-  // Can't use loadSystemConnectivity because need constructionSnapshot later.
-  final systemConnectivity = SystemConnectivity.fromJumpGates(
-    jumpGates,
-    constructionSnapshot,
-  );
-  final routePlanner = RoutePlanner.fromSystemsSnapshot(
-    systems,
-    systemConnectivity,
-    sellsFuel: await defaultSellsFuel(db),
-  );
+  final routePlanner = await defaultRoutePlanner(db);
   final marketPrices = await MarketPriceSnapshot.loadAll(db);
 
   final agent = await db.getMyAgent();
@@ -80,7 +67,7 @@ Future<api.DealsNearbyResponse> dealsNearby({
   final shipSpec = ship!.shipSpec;
 
   final marketScan = scanReachableMarkets(
-    systemConnectivity,
+    routePlanner.systemConnectivity,
     marketPrices,
     startSystem: startWaypoint.system,
   );

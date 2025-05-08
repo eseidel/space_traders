@@ -1,7 +1,5 @@
-import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/cli_args.dart';
-import 'package:cli/nav/navigation.dart';
 
 // https://discord.com/channels/792864705139048469/792864705139048472/1121165658151997440
 // Planned route from X1-CX76-69886Z to X1-XH63-75510F under fuel: 1200
@@ -32,20 +30,13 @@ void main(List<String> args) async {
     args,
     command,
     addArgs: (ArgParser parser) {
-      parser
-        ..addOption(
-          'ship',
-          abbr: 't',
-          help: 'Ship type used for calculations',
-          allowed: ShipType.values.map(argFromShipType),
-          defaultsTo: argFromShipType(ShipType.COMMAND_FRIGATE),
-        )
-        ..addOption(
-          'fuel',
-          allowed: ['true', 'false', 'cache'],
-          defaultsTo: 'cache',
-          help: 'Whether to assume all waypoints sell fuel, or use cached data',
-        );
+      parser.addOption(
+        'ship',
+        abbr: 't',
+        help: 'Ship type used for calculations',
+        allowed: ShipType.values.map(argFromShipType),
+        defaultsTo: argFromShipType(ShipType.COMMAND_FRIGATE),
+      );
     },
   );
 }
@@ -83,23 +74,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   final start = waypointFromArg(systemsCache, args[0], name: 'start');
   final end = waypointFromArg(systemsCache, args[1], name: 'end');
 
-  final bool Function(WaypointSymbol _) sellsFuel;
-  if (argResults['fuel'] == 'true') {
-    sellsFuel = (_) => true;
-  } else if (argResults['fuel'] == 'false') {
-    sellsFuel = (_) => false;
-  } else if (argResults['fuel'] == 'cache') {
-    sellsFuel = await defaultSellsFuel(db);
-  } else {
-    throw UnimplementedError();
-  }
-
-  final systemConnectivity = await loadSystemConnectivity(db);
-  final routePlanner = RoutePlanner.fromSystemsSnapshot(
-    systemsCache,
-    systemConnectivity,
-    sellsFuel: sellsFuel,
-  );
+  final routePlanner = await defaultRoutePlanner(db);
 
   final shipyardShips = ShipyardShipCache(db);
   final ship = await shipyardShips.get(shipType);

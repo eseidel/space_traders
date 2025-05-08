@@ -1,4 +1,3 @@
-import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/config.dart';
 import 'package:cli/plan/mining.dart';
@@ -150,12 +149,7 @@ int shipPrice(ShipyardPriceSnapshot shipyardPrices, ShipType shipType) {
 Future<void> command(Database db, ArgResults argResults) async {
   final marketPrices = await MarketPriceSnapshot.loadAll(db);
   final systemsCache = await db.systems.snapshotAllSystems();
-  final systemConnectivity = await loadSystemConnectivity(db);
-  final routePlanner = RoutePlanner.fromSystemsSnapshot(
-    systemsCache,
-    systemConnectivity,
-    sellsFuel: (_) => false,
-  );
+  final routePlanner = await defaultRoutePlanner(db);
   final shipyardPrices = await ShipyardPriceSnapshot.load(db);
   final shipyardShips = await ShipyardShipCache(db).snapshot();
   final shipMounts = await ShipMountCache(db).snapshot();

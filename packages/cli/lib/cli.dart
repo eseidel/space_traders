@@ -2,12 +2,14 @@ import 'package:args/args.dart';
 import 'package:cli/caches.dart';
 import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
+import 'package:cli/nav/navigation.dart';
 import 'package:db/db.dart';
 import 'package:meta/meta.dart';
 import 'package:scoped_deps/scoped_deps.dart';
 import 'package:types/types.dart';
 
 export 'package:args/args.dart';
+export 'package:cli/caches.dart';
 export 'package:cli/logger.dart';
 export 'package:db/db.dart';
 export 'package:file/file.dart';
@@ -107,4 +109,15 @@ Future<SystemConnectivity> loadSystemConnectivity(Database db) async {
     constructionSnapshot,
   );
   return systemConnectivity;
+}
+
+/// Load a RoutePlanner from the database.
+Future<RoutePlanner> defaultRoutePlanner(Database db) async {
+  final systems = await db.systems.snapshotAllSystems();
+  final systemConnectivity = await loadSystemConnectivity(db);
+  return RoutePlanner.fromSystemsSnapshot(
+    systems,
+    systemConnectivity,
+    sellsFuel: await defaultSellsFuel(db),
+  );
 }

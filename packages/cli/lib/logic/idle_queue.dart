@@ -1,4 +1,3 @@
-import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/config.dart';
 import 'package:cli/net/queries.dart';

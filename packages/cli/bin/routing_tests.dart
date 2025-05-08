@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/logic/compare.dart';
 import 'package:equatable/equatable.dart';
@@ -261,7 +260,7 @@ void runTests(TestSuite suite, String path) {
   }
 
   final systemsCache = SystemsSnapshot(systems);
-  final systemConnectivity = SystemConnectivity.test({});
+  final systemConnectivity = SystemConnectivity.test(const {});
   final routePlanner = RoutePlanner.fromSystemsSnapshot(
     systemsCache,
     systemConnectivity,

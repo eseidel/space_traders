@@ -1,4 +1,3 @@
-import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/nav/warp_pathing.dart';

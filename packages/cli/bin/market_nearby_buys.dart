@@ -1,15 +1,8 @@
-import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/plan/trading.dart';
 
 Future<void> command(Database db, ArgResults argResults) async {
-  final systemsCache = await db.systems.snapshotAllSystems();
-  final systemConnectivity = await loadSystemConnectivity(db);
-  final routePlanner = RoutePlanner.fromSystemsSnapshot(
-    systemsCache,
-    systemConnectivity,
-    sellsFuel: (_) => false,
-  );
+  final routePlanner = await defaultRoutePlanner(db);
   // TODO(eseidel): Just use hq and command ship spec.
   final ships = await ShipSnapshot.load(db);
   final ship = ships.ships.first;

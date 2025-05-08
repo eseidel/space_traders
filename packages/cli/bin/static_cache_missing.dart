@@ -1,4 +1,3 @@
-import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cli.dart';
 
 void _printMissing<K extends Object, V extends Object>(

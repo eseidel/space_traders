@@ -1,22 +1,14 @@
-import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 import 'package:cli/config.dart';
-import 'package:cli/nav/navigation.dart';
 import 'package:cli/plan/trading.dart';
 import 'package:collection/collection.dart';
 
 Future<void> command(Database db, ArgResults argResults) async {
   // First need to figure out which systems are worth checking.
 
-  final systems = await db.systems.snapshotAllSystems();
-  final systemConnectivity = await loadSystemConnectivity(db);
   final marketPrices = await MarketPriceSnapshot.loadAll(db);
   final agent = await db.getMyAgent();
-  final routePlanner = RoutePlanner.fromSystemsSnapshot(
-    systems,
-    systemConnectivity,
-    sellsFuel: await defaultSellsFuel(db),
-  );
+  final routePlanner = await defaultRoutePlanner(db);
   final startSystem = agent!.headquarters.system;
   const shipType = ShipType.REFINING_FREIGHTER;
 
@@ -33,7 +25,7 @@ Future<void> command(Database db, ArgResults argResults) async {
 
   // Find all trades available across all systems.
   final marketScan = scanReachableMarkets(
-    systemConnectivity,
+    routePlanner.systemConnectivity,
     marketPrices,
     // start system is just used for reachability.
     startSystem: startSystem,

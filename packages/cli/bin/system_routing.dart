@@ -1,6 +1,4 @@
-import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/nav/navigation.dart';
 import 'package:cli_table/cli_table.dart';
 import 'package:collection/collection.dart';
 
@@ -12,12 +10,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   final systems = await db.systems.snapshotAllSystems();
   final hqSystemSymbol = await myHqSystemSymbol(db);
   final shipyardListings = await ShipyardListingSnapshot.load(db);
-  final systemConnectivity = await loadSystemConnectivity(db);
-  final routePlanner = RoutePlanner.fromSystemsSnapshot(
-    systems,
-    systemConnectivity,
-    sellsFuel: await defaultSellsFuel(db),
-  );
+  final routePlanner = await defaultRoutePlanner(db);
   final waypoints = systems.waypointsInSystem(hqSystemSymbol);
   final shipyardListing =
       shipyardListings.listingsInSystem(hqSystemSymbol).first;

@@ -1,19 +1,11 @@
-import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
-import 'package:cli/nav/navigation.dart';
 import 'package:collection/collection.dart';
 
 Future<void> command(Database db, ArgResults argResults) async {
   // For a given destination, compute the time to travel there for each ship.
   final destination = WaypointSymbol.fromString(argResults.rest[0]);
   final ships = await ShipSnapshot.load(db);
-  final systemsCache = await db.systems.snapshotAllSystems();
-  final systemConnectivity = await loadSystemConnectivity(db);
-  final routePlanner = RoutePlanner.fromSystemsSnapshot(
-    systemsCache,
-    systemConnectivity,
-    sellsFuel: await defaultSellsFuel(db),
-  );
+  final routePlanner = await defaultRoutePlanner(db);
 
   final travelTimes = <ShipSymbol, Duration>{};
 

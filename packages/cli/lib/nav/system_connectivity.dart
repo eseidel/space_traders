@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:meta/meta.dart';
 import 'package:types/types.dart';
 
 typedef _ClusterId = int;
@@ -179,6 +180,8 @@ class _Connections {
 }
 
 /// Holds connectivity information between systems.
+/// Represents a snapshot of the connectivity at a point in time.
+@immutable
 class SystemConnectivity {
   /// Creates a new SystemConnectivity.
   SystemConnectivity._(this._connections)
@@ -203,20 +206,8 @@ class SystemConnectivity {
     return SystemConnectivity._(connections);
   }
 
-  // We could make SystemConnectivity immutable, but then we would need
-  // to be careful never to hold onto it.  For now making it internally
-  // mutable is easier.
-  _Connections _connections;
-  _Clusters _clusters;
-
-  /// Updates the SystemConnectivity from the given caches.
-  void updateFromJumpGates(
-    JumpGateSnapshot jumpGates,
-    ConstructionSnapshot constructionSnapshot,
-  ) {
-    _connections = _Connections.fromSnapshots(jumpGates, constructionSnapshot);
-    _clusters = _Clusters.fromConnections(_connections);
-  }
+  final _Connections _connections;
+  final _Clusters _clusters;
 
   /// Returns the number of systems reachable from [systemSymbol].
   int connectedSystemCount(SystemSymbol systemSymbol) =>

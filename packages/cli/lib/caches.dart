@@ -57,7 +57,7 @@ class Caches {
   SystemsSnapshot systems;
 
   /// The cache of system connectivity.
-  final SystemConnectivity systemConnectivity;
+  SystemConnectivity systemConnectivity;
 
   /// The cache of waypoints.
   final WaypointCache waypoints;
@@ -100,7 +100,6 @@ class Caches {
       jumpGates,
       constructionSnapshot,
     );
-    // TODO(eseidel): Find a way to avoid fetching market listings here?
     final routePlanner = RoutePlanner.fromSystemsSnapshot(
       systems,
       systemConnectivity,
@@ -133,9 +132,11 @@ class Caches {
       systems = await db.systems.snapshotAllSystems();
     }
 
-    systemConnectivity.updateFromJumpGates(
-      await db.jumpGates.snapshotAll(),
-      await db.construction.snapshotAllRecords(),
+    final jumpGateSnapshot = await db.jumpGates.snapshotAll();
+    final constructionSnapshot = await db.construction.snapshotAllRecords();
+    final systemConnectivity = SystemConnectivity.fromJumpGates(
+      jumpGateSnapshot,
+      constructionSnapshot,
     );
     routePlanner = RoutePlanner.fromSystemsSnapshot(
       systems,

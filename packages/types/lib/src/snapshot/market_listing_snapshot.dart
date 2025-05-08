@@ -38,6 +38,19 @@ class MarketListingSnapshot {
         .toSet();
   }
 
+  /// Returns all MarketListings which export the given TradeSymbol in
+  /// the given SystemSymbol.
+  /// Unlike the MarketListingStore version which returns WaypointSymbols.
+  Iterable<MarketListing> whichExportsInSystem(
+    SystemSymbol system,
+    TradeSymbol tradeSymbol,
+  ) {
+    return listings.where(
+      (l) =>
+          l.waypointSymbol.system == system && l.exports.contains(tradeSymbol),
+    );
+  }
+
   /// Returns true if we know of a market which trades the given TradeSymbol.
   bool knowOfMarketWhichTrades(TradeSymbol tradeSymbol) =>
       listings.any((l) => l.allowsTradeOf(tradeSymbol));
