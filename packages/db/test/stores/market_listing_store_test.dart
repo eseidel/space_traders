@@ -81,6 +81,52 @@ void main() {
         expect(await listings.whichTrades(exchangeSymbol), isTrue);
         expect(await listings.whichTrades(antimatter), isFalse);
       });
+
+      test('which buys', () async {
+        final listings = db.marketListings;
+        final system = waypointSymbol.system;
+
+        await db.marketListings.upsert(marketListing);
+
+        final importBuys = await listings.whichBuysInSystem(
+          system,
+          importSymbol,
+        );
+        expect(importBuys.toSet(), equals({waypointSymbol}));
+
+        final exchangeBuys = await listings.whichBuysInSystem(
+          system,
+          exchangeSymbol,
+        );
+        expect(exchangeBuys.toSet(), equals({waypointSymbol}));
+
+        final exportBuys = await listings.whichBuysInSystem(
+          system,
+          exportSymbol,
+        );
+        // Exports don't count as buys.
+        expect(exportBuys, isEmpty);
+      });
+
+      test('which exports', () async {
+        final listings = db.marketListings;
+        final system = waypointSymbol.system;
+
+        await db.marketListings.upsert(marketListing);
+
+        final exports = await listings.whichExportsInSystem(
+          system,
+          exportSymbol,
+        );
+        expect(exports.toSet(), equals({waypointSymbol}));
+
+        // Imports don't count as exports.
+        final imports = await listings.whichExportsInSystem(
+          system,
+          importSymbol,
+        );
+        expect(imports, isEmpty);
+      });
     });
   });
 }
