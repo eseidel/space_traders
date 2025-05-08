@@ -21,8 +21,6 @@ class _MockFleetApi extends Mock implements FleetApi {}
 
 class _MockGlobalApi extends Mock implements GlobalApi {}
 
-class _MockJumpGateSnapshot extends Mock implements JumpGateSnapshot {}
-
 class _MockJumpGateStore extends Mock implements JumpGateStore {}
 
 class _MockLogger extends Mock implements Logger {}
@@ -189,6 +187,12 @@ void main() {
       constructionStore.snapshotAllRecords,
     ).thenAnswer((_) async => ConstructionSnapshot([]));
 
+    final jumpGateStore = _MockJumpGateStore();
+    when(() => db.jumpGates).thenReturn(jumpGateStore);
+    when(
+      jumpGateStore.snapshotAll,
+    ).thenAnswer((_) async => JumpGateSnapshot([]));
+
     final caches = Caches(
       marketPrices: _MockMarketPrices(),
       systems: SystemsSnapshot([]),
@@ -197,7 +201,6 @@ void main() {
       routePlanner: _MockRoutePlanner(),
       static: _MockStaticCaches(),
       systemConnectivity: _MockSystemConnectivity(),
-      jumpGates: _MockJumpGateSnapshot(),
       galaxy: const GalaxyStats(systemCount: 2, waypointCount: 2),
       factions: [],
     );

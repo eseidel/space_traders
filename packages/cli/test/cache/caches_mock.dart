@@ -4,8 +4,6 @@ import 'package:types/types.dart';
 
 class _MockEventCache extends Mock implements EventCache {}
 
-class _MockJumpGateSnapshot extends Mock implements JumpGateSnapshot {}
-
 class _MockMarketCache extends Mock implements MarketCache {}
 
 class _MockMarketPrices extends Mock implements MarketPriceSnapshot {}
@@ -83,7 +81,6 @@ Caches mockCaches() {
     factions: [],
     static: staticCaches,
     systemConnectivity: _MockSystemConnectivity(),
-    jumpGates: _MockJumpGateSnapshot(),
     galaxy: _MockGalaxyStats(),
   );
 }
