@@ -10,11 +10,6 @@ import 'package:cli/cli.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:cli/net/actions.dart';
 
-Future<bool> _sellsFuel(Database db, WaypointSymbol waypointSymbol) async {
-  final listing = await db.marketListings.at(waypointSymbol);
-  return listing?.allowsTradeOf(TradeSymbol.FUEL) ?? false;
-}
-
 /// Go wait to be filled by miners.
 Future<JobResult> goWaitForGoods(
   BehaviorState state,
@@ -38,13 +33,15 @@ Future<JobResult> goWaitForGoods(
     'Mine job changed',
     const Duration(minutes: 1),
   );
-  final currentSellsFuel = await _sellsFuel(db, ship.waypointSymbol);
+  final currentSellsFuel = await db.marketListings.sellsFuel(
+    ship.waypointSymbol,
+  );
   final medianFuelPurchasePrice = await db.medianMarketPurchasePrice(
     TradeSymbol.FUEL,
   );
 
   if (ship.waypointSymbol != mineSymbol) {
-    final mineSellsFuel = await _sellsFuel(db, mineSymbol);
+    final mineSellsFuel = await db.marketListings.sellsFuel(mineSymbol);
     final fuelToBuy = (ship.frame.fuelCapacity / 100).ceil();
     if (!mineSellsFuel &&
         currentSellsFuel &&

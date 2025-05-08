@@ -463,8 +463,8 @@ Future<MarketTrip?> findBestMarketToSell(
   var best = nearest;
   // Pick any one further that earns more than expectedCreditsPerSecond
   for (final trip in sorted.sublist(1)) {
-    final listing = await db.marketListings.at(trip.price.waypointSymbol);
-    if (requireFuelAtDestination && !listing!.allowsTradeOf(TradeSymbol.FUEL)) {
+    if (requireFuelAtDestination &&
+        !(await db.marketListings.sellsFuel(trip.price.waypointSymbol))) {
       detail('Skipping ${trip.price.waypointSymbol} due to no fuel');
       continue;
     }

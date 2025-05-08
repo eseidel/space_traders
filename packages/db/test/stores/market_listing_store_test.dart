@@ -127,6 +127,21 @@ void main() {
         );
         expect(imports, isEmpty);
       });
+
+      test('sells fuel', () async {
+        await db.marketListings.upsert(marketListing);
+        expect(await db.marketListings.sellsFuel(waypointSymbol), isFalse);
+
+        final fuelWaypoint = WaypointSymbol.fromString('X1-B-1');
+        final marketListingWithFuel = MarketListing(
+          waypointSymbol: fuelWaypoint,
+          imports: const {TradeSymbol.FUEL},
+        );
+        await db.marketListings.upsert(marketListingWithFuel);
+        expect(await db.marketListings.sellsFuel(fuelWaypoint), isTrue);
+        final unknown = WaypointSymbol.fromString('X1-C-1');
+        expect(await db.marketListings.sellsFuel(unknown), isFalse);
+      });
     });
   });
 }

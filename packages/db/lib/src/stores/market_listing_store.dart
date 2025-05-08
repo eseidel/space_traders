@@ -63,6 +63,11 @@ class MarketListingStore {
     return result[0][0]! as bool;
   }
 
+  /// Returns true only if the given waypoint symbol is known to sell fuel.
+  /// Return false if the waypoint symbol is not known or does not sell fuel.
+  Future<bool> sellsFuel(WaypointSymbol waypointSymbol) async =>
+      (await at(waypointSymbol))?.allowsTradeOf(TradeSymbol.FUEL) ?? false;
+
   /// Update the given market listing in the database.
   Future<void> upsert(MarketListing listing) async {
     await _db.execute(upsertMarketListingQuery(listing));
