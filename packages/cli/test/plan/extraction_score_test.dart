@@ -48,7 +48,7 @@ void main() {
     };
     for (final good in aImports) {
       when(
-        () => marketListingStore.marketsWithImportInSystem(systemSymbol, good),
+        () => marketListingStore.withImportsInSystem(systemSymbol, good),
       ).thenAnswer((_) async => [marketA.symbol]);
     }
     const bImports = {
@@ -58,7 +58,7 @@ void main() {
     };
     for (final good in bImports) {
       when(
-        () => marketListingStore.marketsWithImportInSystem(systemSymbol, good),
+        () => marketListingStore.withImportsInSystem(systemSymbol, good),
       ).thenAnswer((_) async => [marketB.symbol]);
     }
     final chartingStore = _MockChartingStore();
@@ -116,7 +116,7 @@ void main() {
     };
     for (final good in producedGoods) {
       when(
-        () => marketListingStore.marketsWithImportInSystem(systemSymbol, good),
+        () => marketListingStore.withImportsInSystem(systemSymbol, good),
       ).thenAnswer((_) async => [market.symbol]);
     }
 

@@ -343,7 +343,7 @@ Future<WaypointSymbol?> _nearbyMarketWhichTrades(
     return startSymbol;
   }
   // TODO(eseidel): Handle jumps again!
-  final symbols = await db.marketListings.marketsWhichBuysTradeSymbolInSystem(
+  final symbols = await db.marketListings.whichBuysInSystem(
     startSymbol.system,
     tradeSymbol,
   );

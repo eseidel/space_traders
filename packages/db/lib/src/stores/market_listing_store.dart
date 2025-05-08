@@ -28,7 +28,7 @@ class MarketListingStore {
   }
 
   /// Get all WaypointSymbols with a market importing the given tradeSymbol.
-  Future<Iterable<WaypointSymbol>> marketsWithImportInSystem(
+  Future<Iterable<WaypointSymbol>> withImportsInSystem(
     SystemSymbol system,
     TradeSymbol tradeSymbol,
   ) async {
@@ -38,7 +38,7 @@ class MarketListingStore {
 
   /// Get all WaypointSymbols which buys [tradeSymbol] within [system].
   /// Buys means imports or exchange.
-  Future<Iterable<WaypointSymbol>> marketsWhichBuysTradeSymbolInSystem(
+  Future<Iterable<WaypointSymbol>> whichBuysInSystem(
     SystemSymbol system,
     TradeSymbol tradeSymbol,
   ) async {
@@ -47,7 +47,7 @@ class MarketListingStore {
   }
 
   /// Get all WaypointSymbols with a market importing the given tradeSymbol.
-  Future<Iterable<WaypointSymbol>> marketsWithExportInSystem(
+  Future<Iterable<WaypointSymbol>> whichExportsInSystem(
     SystemSymbol system,
     TradeSymbol tradeSymbol,
   ) async {
@@ -56,7 +56,8 @@ class MarketListingStore {
   }
 
   /// Returns true if we know of a market which trades the given symbol.
-  Future<bool> knowOfMarketWhichTrades(TradeSymbol tradeSymbol) async {
+  /// Means any of imports, exports, or exchange.
+  Future<bool> whichTrades(TradeSymbol tradeSymbol) async {
     final query = knowOfMarketWhichTradesQuery(tradeSymbol);
     final result = await _db.execute(query);
     return result[0][0]! as bool;

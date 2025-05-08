@@ -529,7 +529,7 @@ void main() {
     final marketListingStore = _MockMarketListingStore();
     when(() => db.marketListings).thenReturn(marketListingStore);
     when(
-      () => marketListingStore.knowOfMarketWhichTrades(any()),
+      () => marketListingStore.whichTrades(any()),
     ).thenAnswer((_) async => false);
     final agent = Agent.test(
       symbol: shipSymbol.agentName,

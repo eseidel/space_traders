@@ -680,8 +680,7 @@ void main() {
     when(() => db.marketPricesInSystem(any())).thenAnswer((_) async => []);
 
     when(
-      () =>
-          marketListingStore.marketsWhichBuysTradeSymbolInSystem(any(), any()),
+      () => marketListingStore.whichBuysInSystem(any(), any()),
     ).thenAnswer((_) async => []);
 
     final logger = _MockLogger();

@@ -26,6 +26,7 @@ void main() {
       const importSymbol = TradeSymbol.IRON;
       const exportSymbol = TradeSymbol.EXOTIC_MATTER;
       const exchangeSymbol = TradeSymbol.FAB_MATS;
+      const antimatter = TradeSymbol.ANTIMATTER;
       final marketListing = MarketListing(
         waypointSymbol: waypointSymbol,
         imports: const {importSymbol},
@@ -46,10 +47,8 @@ void main() {
         expect(listingsInSystem.first, equals(marketListing));
 
         final otherSystem = SystemSymbol.fromString('X1-B');
-        final listingsInOtherSystem = await db.marketListings.inSystem(
-          otherSystem,
-        );
-        expect(listingsInOtherSystem.length, equals(0));
+        final inOtherSystem = await db.marketListings.inSystem(otherSystem);
+        expect(inOtherSystem.length, equals(0));
 
         final all = await db.marketListings.all();
         expect(all.length, equals(1));
@@ -57,42 +56,30 @@ void main() {
       });
 
       test('which trades', () async {
-        expect(
-          await db.marketListings.knowOfMarketWhichTrades(importSymbol),
-          isFalse,
-        );
+        // Makes most tests fit on one line.
+        final listings = db.marketListings;
+        final system = waypointSymbol.system;
+        expect(await listings.whichTrades(importSymbol), isFalse);
 
-        await db.marketListings.upsert(marketListing);
+        await listings.upsert(marketListing);
 
-        final whichImports = await db.marketListings.marketsWithImportInSystem(
-          waypointSymbol.system,
+        final whichImports = await listings.withImportsInSystem(
+          system,
           importSymbol,
         );
         expect(whichImports.length, equals(1));
         expect(whichImports.first, equals(waypointSymbol));
 
-        final whichImportsEmpty = await db.marketListings
-            .marketsWithImportInSystem(waypointSymbol.system, exportSymbol);
-        expect(whichImportsEmpty.length, equals(0));
+        final notImported = await listings.withImportsInSystem(
+          system,
+          exportSymbol,
+        );
+        expect(notImported.length, equals(0));
 
-        expect(
-          await db.marketListings.knowOfMarketWhichTrades(importSymbol),
-          isTrue,
-        );
-        expect(
-          await db.marketListings.knowOfMarketWhichTrades(exportSymbol),
-          isTrue,
-        );
-        expect(
-          await db.marketListings.knowOfMarketWhichTrades(exchangeSymbol),
-          isTrue,
-        );
-        expect(
-          await db.marketListings.knowOfMarketWhichTrades(
-            TradeSymbol.ANTIMATTER,
-          ),
-          isFalse,
-        );
+        expect(await listings.whichTrades(importSymbol), isTrue);
+        expect(await listings.whichTrades(exportSymbol), isTrue);
+        expect(await listings.whichTrades(exchangeSymbol), isTrue);
+        expect(await listings.whichTrades(antimatter), isFalse);
       });
     });
   });
