@@ -35,7 +35,7 @@ Future<JobResult> goWaitForGoods(
   final currentSellsFuel = await db.marketListings.sellsFuel(
     ship.waypointSymbol,
   );
-  final medianFuelPurchasePrice = await db.medianMarketPurchasePrice(
+  final medianFuelPurchasePrice = await db.marketPrices.medianPurchasePrice(
     TradeSymbol.FUEL,
   );
 

@@ -23,7 +23,9 @@ class _MockLogger extends Mock implements Logger {}
 
 class _MockMarketListingStore extends Mock implements MarketListingStore {}
 
-class _MockMarketPrices extends Mock implements MarketPriceSnapshot {}
+class _MockMarketPriceSnapshot extends Mock implements MarketPriceSnapshot {}
+
+class _MockMarketPriceStore extends Mock implements MarketPriceStore {}
 
 class _MockShip extends Mock implements Ship {}
 
@@ -40,7 +42,7 @@ class _MockTransactionStore extends Mock implements TransactionStore {}
 void main() {
   test('surveyWorthMining with no surveys', () async {
     final db = _MockDatabase();
-    final marketPrices = _MockMarketPrices();
+    final marketPrices = _MockMarketPriceSnapshot();
     final symbol = WaypointSymbol.fromString('S-E-A');
     when(
       () => db.recentSurveysAtWaypoint(symbol, count: 100),
@@ -56,7 +58,7 @@ void main() {
 
   test('surveyWorthMining', () async {
     final db = _MockDatabase();
-    final marketPrices = _MockMarketPrices();
+    final marketPrices = _MockMarketPriceSnapshot();
     final now = DateTime(2021);
     DateTime getNow() => now;
     final oneHourFromNow = now.add(const Duration(hours: 1));
@@ -220,7 +222,10 @@ void main() {
     );
     when(() => db.upsertShip(ship)).thenAnswer((_) async {});
     registerFallbackValue(const SystemSymbol.fallbackValue());
-    when(() => db.marketPricesInSystem(any())).thenAnswer((_) async => []);
+
+    final marketPriceStore = _MockMarketPriceStore();
+    when(() => db.marketPrices).thenReturn(marketPriceStore);
+    when(() => marketPriceStore.inSystem(any())).thenAnswer((_) async => []);
 
     final waitUntil = await runWithLogger(
       logger,
@@ -350,8 +355,11 @@ void main() {
         marketForGood: const {},
         extractionType: ExtractionType.mine,
       );
+
+    final marketPriceStore = _MockMarketPriceStore();
+    when(() => db.marketPrices).thenReturn(marketPriceStore);
     registerFallbackValue(const SystemSymbol.fallbackValue());
-    when(() => db.marketPricesInSystem(any())).thenAnswer((_) async => []);
+    when(() => marketPriceStore.inSystem(any())).thenAnswer((_) async => []);
 
     expect(
       () async => await travelAndSellCargo(
@@ -561,9 +569,12 @@ void main() {
       () => caches.waypoints.canBeMined(waypointSymbol),
     ).thenAnswer((_) async => true);
 
+    final marketPriceStore = _MockMarketPriceStore();
+    when(() => db.marketPrices).thenReturn(marketPriceStore);
     registerFallbackValue(Duration.zero);
+    registerFallbackValue(waypointSymbol);
     when(
-      () => db.hasRecentMarketPrices(waypointSymbol, any()),
+      () => marketPriceStore.hasRecentAt(any(), any()),
     ).thenAnswer((_) async => true);
 
     final market = Market(
@@ -665,6 +676,15 @@ void main() {
     when(() => marketListingStore.at(waypointSymbol)).thenAnswer((_) async {
       return null;
     });
+    registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
+    when(
+      () => marketPriceStore.medianPurchasePrice(any()),
+    ).thenAnswer((_) async => 100);
+    when(() => marketPriceStore.inSystem(any())).thenAnswer((_) async => []);
+
+    when(
+      () => marketListingStore.whichBuysInSystem(any(), any()),
+    ).thenAnswer((_) async => []);
 
     final state = BehaviorState(shipSymbol, Behavior.miner)
       ..extractionJob = ExtractionJob(
@@ -673,15 +693,6 @@ void main() {
         extractionType: ExtractionType.mine,
       );
     when(() => db.upsertShip(ship)).thenAnswer((_) async {});
-    registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
-    when(
-      () => db.medianMarketPurchasePrice(any()),
-    ).thenAnswer((_) async => 100);
-    when(() => db.marketPricesInSystem(any())).thenAnswer((_) async => []);
-
-    when(
-      () => marketListingStore.whichBuysInSystem(any(), any()),
-    ).thenAnswer((_) async => []);
 
     final logger = _MockLogger();
 

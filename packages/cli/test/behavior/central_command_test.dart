@@ -29,6 +29,8 @@ class _MockLogger extends Mock implements Logger {}
 
 class _MockMarketListingStore extends Mock implements MarketListingStore {}
 
+class _MockMarketPriceStore extends Mock implements MarketPriceStore {}
+
 class _MockRoutePlanner extends Mock implements RoutePlanner {}
 
 class _MockShip extends Mock implements Ship {}
@@ -557,8 +559,11 @@ void main() {
       () => chartingStore.chartedValues(hqSymbol),
     ).thenAnswer((_) async => ChartedValues.test());
 
+    final marketPriceStore = _MockMarketPriceStore();
+    when(() => db.marketPrices).thenReturn(marketPriceStore);
+
     when(
-      () => db.medianMarketPurchasePrice(any()),
+      () => marketPriceStore.medianPurchasePrice(any()),
     ).thenAnswer((_) async => 100);
 
     when(

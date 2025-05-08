@@ -12,7 +12,7 @@ class MarketPriceSnapshot extends PriceSnapshot<TradeSymbol, MarketPrice> {
 
   /// Load the price data from the cache.
   static Future<MarketPriceSnapshot> loadAll(Database db) async {
-    final prices = await db.allMarketPrices();
+    final prices = await db.marketPrices.all();
     return MarketPriceSnapshot(prices.toList());
   }
 
@@ -21,7 +21,7 @@ class MarketPriceSnapshot extends PriceSnapshot<TradeSymbol, MarketPrice> {
     Database db,
     SystemSymbol system,
   ) async {
-    final prices = await db.marketPricesInSystem(system);
+    final prices = await db.marketPrices.inSystem(system);
     return MarketPriceSnapshot(prices.toList());
   }
 
@@ -173,6 +173,6 @@ Future<void> recordMarketData(
     logger.warn('No prices for ${market.symbol}!');
   }
   for (final price in prices) {
-    await db.upsertMarketPrice(price);
+    await db.marketPrices.upsert(price);
   }
 }

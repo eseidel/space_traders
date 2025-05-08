@@ -92,7 +92,7 @@ Future<bool> _isMissingRecentMarketData(
   if (!waypoint.hasMarketplace) {
     return false;
   }
-  final result = await db.hasRecentMarketPrices(waypoint.symbol, maxAge);
+  final result = await db.marketPrices.hasRecentAt(waypoint.symbol, maxAge);
   return !result;
 }
 

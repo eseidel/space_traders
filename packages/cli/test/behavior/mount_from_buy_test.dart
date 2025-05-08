@@ -19,6 +19,8 @@ class _MockFleetApi extends Mock implements FleetApi {}
 
 class _MockLogger extends Mock implements Logger {}
 
+class _MockMarketPriceStore extends Mock implements MarketPriceStore {}
+
 class _MockShip extends Mock implements Ship {}
 
 class _MockShipEngine extends Mock implements ShipEngine {}
@@ -125,9 +127,13 @@ void main() {
     when(
       () => caches.markets.refreshMarket(waypointSymbol),
     ).thenAnswer((_) => Future.value(market));
+
+    final marketPricesStore = _MockMarketPriceStore();
+    when(() => db.marketPrices).thenReturn(marketPricesStore);
+
     registerFallbackValue(Duration.zero);
     when(
-      () => db.hasRecentMarketPrices(waypointSymbol, any()),
+      () => marketPricesStore.hasRecentAt(waypointSymbol, any()),
     ).thenAnswer((_) async => true);
     when(
       () => db.hasRecentShipyardPrices(waypointSymbol, any()),
@@ -249,10 +255,19 @@ void main() {
             shipyardSymbol: waypointSymbol,
           );
     when(() => db.upsertShip(ship)).thenAnswer((_) async {});
+
+    final marketPriceStore = _MockMarketPriceStore();
+    when(() => db.marketPrices).thenReturn(marketPriceStore);
+
     registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
     when(
-      () => db.medianMarketPurchasePrice(any()),
+      () => marketPriceStore.medianPurchasePrice(any()),
     ).thenAnswer((_) async => 100);
+    registerFallbackValue(waypointSymbol);
+    registerFallbackValue(Duration.zero);
+    when(
+      () => marketPriceStore.hasRecentAt(any(), any()),
+    ).thenAnswer((_) async => true);
 
     registerFallbackValue(ship.engine);
     when(() => caches.static.engines.add(any())).thenAnswer((_) async {});

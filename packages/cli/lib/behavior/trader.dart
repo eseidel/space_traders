@@ -465,7 +465,7 @@ Future<int?> _expectedContractProfit(Database db, Contract contract) async {
   final tradeSymbols = terms.deliver.map((d) => d.tradeSymbolObject).toSet();
   final medianPricesBySymbol = <TradeSymbol, int>{};
   for (final tradeSymbol in tradeSymbols) {
-    final medianPrice = await db.medianMarketPurchasePrice(tradeSymbol);
+    final medianPrice = await db.marketPrices.medianPurchasePrice(tradeSymbol);
     if (medianPrice == null) {
       return null;
     }

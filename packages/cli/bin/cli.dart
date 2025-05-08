@@ -161,8 +161,8 @@ Future<void> cliMain(List<String> args) async {
   config = await Config.fromDb(db);
 
   final caches = await Caches.loadOrFetch(api, db);
-  final marketPricesCount = await db.marketPricesCount();
-  final marketWaypointsCount = await db.marketPricesWaypointCount();
+  final marketPricesCount = await db.marketPrices.countPrices();
+  final marketWaypointsCount = await db.marketPrices.countWaypoints();
   final shipyardPricesCount = await db.shipyardPricesCount();
   final shipyardWaypointsCount = await db.shipyardPricesWaypointCount();
   logger.info(

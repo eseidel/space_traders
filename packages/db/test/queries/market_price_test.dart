@@ -29,21 +29,21 @@ void main() {
         tradeVolume: 100,
         timestamp: timestamp,
       );
-      await db.upsertMarketPrice(marketPrice);
+      await db.marketPrices.upsert(marketPrice);
 
-      final result = await db.marketPriceAt(waypointSymbol, tradeSymbol);
+      final result = await db.marketPrices.at(waypointSymbol, tradeSymbol);
       expect(result, equals(marketPrice));
 
-      final all = await db.allMarketPrices();
+      final all = await db.marketPrices.all();
       expect(all.length, equals(1));
       expect(all.first, equals(marketPrice));
 
       final system = SystemSymbol.fromString('X1-A');
-      final systemPrices = await db.marketPricesInSystem(system);
+      final systemPrices = await db.marketPrices.inSystem(system);
       expect(systemPrices.length, equals(1));
       expect(systemPrices.first, equals(marketPrice));
 
-      final median = await db.medianMarketPurchasePrice(tradeSymbol);
+      final median = await db.marketPrices.medianPurchasePrice(tradeSymbol);
       expect(median, equals(100));
     });
   });

@@ -23,6 +23,8 @@ class _MockFleetApi extends Mock implements FleetApi {}
 
 class _MockLogger extends Mock implements Logger {}
 
+class _MockMarketPriceStore extends Mock implements MarketPriceStore {}
+
 class _MockShip extends Mock implements Ship {}
 
 class _MockShipCargo extends Mock implements ShipCargo {}
@@ -96,8 +98,11 @@ void main() {
       () => caches.markets.refreshMarket(start),
     ).thenAnswer((_) => Future.value(market));
 
+    final marketPriceStore = _MockMarketPriceStore();
+    when(() => db.marketPrices).thenReturn(marketPriceStore);
+
     when(
-      () => db.hasRecentMarketPrices(start, any()),
+      () => marketPriceStore.hasRecentAt(start, any()),
     ).thenAnswer((_) async => true);
 
     registerFallbackValue(start);
@@ -302,10 +307,18 @@ void main() {
     when(() => shipEngine.speed).thenReturn(shipSpeed);
     when(() => ship.engine).thenReturn(shipEngine);
 
+    final marketPriceStore = _MockMarketPriceStore();
+    when(() => db.marketPrices).thenReturn(marketPriceStore);
+
     registerFallbackValue(Duration.zero);
     when(
-      () => db.hasRecentMarketPrices(start, any()),
+      () => marketPriceStore.hasRecentAt(start, any()),
     ).thenAnswer((_) async => true);
+
+    registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
+    when(
+      () => marketPriceStore.medianPurchasePrice(any()),
+    ).thenAnswer((_) async => 100);
 
     when(
       () => caches.waypoints.hasMarketplace(start),
@@ -510,10 +523,6 @@ void main() {
     registerFallbackValue(Transaction.fallbackValue());
     when(() => transactionStore.insert(any())).thenAnswer((_) async {});
     when(() => db.upsertShip(ship)).thenAnswer((_) async {});
-    registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
-    when(
-      () => db.medianMarketPurchasePrice(any()),
-    ).thenAnswer((_) async => 100);
 
     final logger = _MockLogger();
     final result = await runWithLogger(
@@ -1057,12 +1066,15 @@ void main() {
       () => caches.markets.refreshMarket(end),
     ).thenAnswer((_) => Future.value(market));
 
+    final marketPriceStore = _MockMarketPriceStore();
+    when(() => db.marketPrices).thenReturn(marketPriceStore);
+
     when(
-      () => db.hasRecentMarketPrices(end, any()),
+      () => marketPriceStore.hasRecentAt(end, any()),
     ).thenAnswer((_) async => true);
     registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
     when(
-      () => db.medianMarketPurchasePrice(any()),
+      () => marketPriceStore.medianPurchasePrice(any()),
     ).thenAnswer((_) async => 100);
 
     final state = BehaviorState(const ShipSymbol('S', 1), Behavior.trader)
@@ -1216,9 +1228,16 @@ void main() {
       () => caches.markets.refreshMarket(end),
     ).thenAnswer((_) => Future.value(market));
 
+    final marketPriceStore = _MockMarketPriceStore();
+    when(() => db.marketPrices).thenReturn(marketPriceStore);
+
     when(
-      () => db.hasRecentMarketPrices(end, any()),
+      () => marketPriceStore.hasRecentAt(end, any()),
     ).thenAnswer((_) async => true);
+    registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
+    when(
+      () => marketPriceStore.medianPurchasePrice(any()),
+    ).thenAnswer((_) async => 100);
 
     final contractsApi = _MockContractsApi();
     when(() => api.contracts).thenReturn(contractsApi);
@@ -1268,10 +1287,6 @@ void main() {
     final state = BehaviorState(const ShipSymbol('S', 1), Behavior.trader)
       ..deal = costedDeal;
     when(() => db.upsertShip(ship)).thenAnswer((_) async {});
-    registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
-    when(
-      () => db.medianMarketPurchasePrice(any()),
-    ).thenAnswer((_) async => 100);
 
     final logger = _MockLogger();
     final result = await runWithLogger(
@@ -1395,9 +1410,17 @@ void main() {
       () => caches.markets.refreshMarket(end),
     ).thenAnswer((_) => Future.value(market));
 
+    final marketPriceStore = _MockMarketPriceStore();
+    when(() => db.marketPrices).thenReturn(marketPriceStore);
+
     when(
-      () => db.hasRecentMarketPrices(end, any()),
+      () => marketPriceStore.hasRecentAt(end, any()),
     ).thenAnswer((_) async => true);
+    registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
+    when(
+      () => marketPriceStore.medianPurchasePrice(any()),
+    ).thenAnswer((_) async => 100);
+
     when(
       () => db.construction.getConstruction(end, maxAge: any(named: 'maxAge')),
     ).thenAnswer(
@@ -1471,10 +1494,6 @@ void main() {
     final state = BehaviorState(const ShipSymbol('S', 1), Behavior.trader)
       ..deal = costedDeal;
     when(() => db.upsertShip(ship)).thenAnswer((_) async {});
-    registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
-    when(
-      () => db.medianMarketPurchasePrice(any()),
-    ).thenAnswer((_) async => 100);
 
     final agent = Agent.test();
     when(db.getMyAgent).thenAnswer((_) async => agent);

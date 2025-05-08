@@ -581,13 +581,13 @@ class CentralCommand {
   }
 
   Future<void> _updateMedianPrices(Database db) async {
-    final medianFuelPrice = await db.medianMarketPurchasePrice(
+    final medianFuelPrice = await db.marketPrices.medianPurchasePrice(
       TradeSymbol.FUEL,
     );
     if (medianFuelPrice != null) {
       medianFuelPurchasePrice = medianFuelPrice;
     }
-    final medianAntimatterPrice = await db.medianMarketPurchasePrice(
+    final medianAntimatterPrice = await db.marketPrices.medianPurchasePrice(
       TradeSymbol.ANTIMATTER,
     );
     if (medianAntimatterPrice != null) {
@@ -1251,7 +1251,7 @@ class _ImportCollector extends SupplyLinkVisitor {
     required int depth,
   }) async {
     for (final input in link.inputs.keys) {
-      final price = await db.marketPriceAt(link.waypointSymbol, input);
+      final price = await db.marketPrices.at(link.waypointSymbol, input);
       if (price != null) {
         imports.add(price);
       }
