@@ -661,7 +661,7 @@ class CentralCommand {
     final phase = _determineGamePhase(ships, jumpGateComplete: _isGateComplete);
     logger.info('$phase');
     if (phase != config.gamePhase) {
-      await db.setGamePhase(phase);
+      await db.config.setGamePhase(phase);
       config = await Config.fromDb(db);
     }
 

@@ -55,10 +55,10 @@ Future<Api> waitForApi(
   Database db, {
   int Function() getPriority = defaultGetPriority,
 }) async {
-  var token = await db.getAuthToken();
+  var token = await db.config.getAuthToken();
   while (token == null) {
     await Future<void>.delayed(const Duration(minutes: 1));
-    token = await db.getAuthToken();
+    token = await db.config.getAuthToken();
   }
   return apiFromAuthToken(token, db, getPriority: getPriority);
 }
@@ -69,7 +69,7 @@ Future<Api> defaultApi(
   Database db, {
   int Function() getPriority = defaultGetPriority,
 }) async {
-  final token = await db.getAuthToken();
+  final token = await db.config.getAuthToken();
   if (token == null) {
     throw Exception('No auth token found.');
   }

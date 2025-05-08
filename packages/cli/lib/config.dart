@@ -244,7 +244,7 @@ class Config {
 
   /// Loads the Config object from the database.
   static Future<Config> fromDb(Database db) async {
-    final gamePhase = await db.getGamePhase() ?? GamePhase.bootstrap;
+    final gamePhase = await db.config.getGamePhase() ?? GamePhase.bootstrap;
     return Config(gamePhase);
   }
 }
