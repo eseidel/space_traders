@@ -37,6 +37,11 @@ void main() {
             expiration: now.add(const Duration(days: 1)),
           ),
         );
+
+        // It's a programming error to call markExhausted on a survey that
+        // has not been inserted into the database.
+        expect(db.surveys.markExhausted(survey.survey), throwsArgumentError);
+
         await db.surveys.insert(survey);
 
         final surveys = await db.surveys.all();
