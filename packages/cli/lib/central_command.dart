@@ -42,7 +42,6 @@ class CentralCommand {
   DateTime? _lastRoutingCacheUpdate;
 
   /// Per-system price age data used by system watchers.
-  final Map<SystemSymbol, Duration> _maxPriceAgeForSystem = {};
   final Map<SystemSymbol, bool> _chartAsteroidsInSystem = {};
 
   /// The next planned ship buy job.
@@ -112,17 +111,7 @@ class CentralCommand {
 
   /// Returns the max age for price data for the given [systemSymbol].
   Duration maxPriceAgeForSystem(SystemSymbol systemSymbol) {
-    final maybeAge = _maxPriceAgeForSystem[systemSymbol];
-    if (maybeAge != null) {
-      return maybeAge;
-    }
-    return config.defaultMaxAgeForPriceData;
-  }
-
-  /// Shorten the max age for price data for the given [systemSymbol].
-  Duration shortenMaxPriceAgeForSystem(SystemSymbol systemSymbol) {
-    final age = maxPriceAgeForSystem(systemSymbol);
-    return _maxPriceAgeForSystem[systemSymbol] = age ~/ 2;
+    return config.maxAgeForPriceData;
   }
 
   /// Returns true if we should chart asteroids in the given [systemSymbol].

@@ -589,19 +589,6 @@ void main() {
     expect(centralCommand.nextShipBuyJob, isNull);
   });
 
-  test('CentralCommand.shortenMaxPriceAgeForSystem', () {
-    final centralCommand = CentralCommand();
-    final systemSymbol = SystemSymbol.fromString('S-A');
-    final maxAge = centralCommand.maxPriceAgeForSystem(systemSymbol);
-    final newMaxAge = centralCommand.shortenMaxPriceAgeForSystem(systemSymbol);
-    final newMaxAge2 = centralCommand.maxPriceAgeForSystem(systemSymbol);
-    expect(newMaxAge, lessThan(maxAge));
-    expect(newMaxAge2, newMaxAge);
-    final otherSystem = SystemSymbol.fromString('S-B');
-    final otherMaxAge = centralCommand.maxPriceAgeForSystem(otherSystem);
-    expect(otherMaxAge, maxAge);
-  });
-
   test('sellOppsForContracts', () {
     final now = DateTime(2021);
     final contractSnapshot = _MockContractSnapshot();

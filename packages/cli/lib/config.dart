@@ -199,7 +199,7 @@ class Config {
   final defaultAntimatterCost = 10000;
 
   /// Initial max age for price data in any given system.
-  final defaultMaxAgeForPriceData = const Duration(days: 3);
+  final maxAgeForPriceData = const Duration(minutes: 10);
 
   /// Allow multiple ships to be assigned to the same construction job.
   // This is mostly a hack around the fact that our construction can get

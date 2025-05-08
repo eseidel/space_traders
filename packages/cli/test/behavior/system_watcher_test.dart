@@ -92,9 +92,6 @@ void main() {
     when(
       () => centralCommand.maxPriceAgeForSystem(waypointSymbol.system),
     ).thenReturn(const Duration(days: 3));
-    when(
-      () => centralCommand.shortenMaxPriceAgeForSystem(waypointSymbol.system),
-    ).thenReturn(const Duration(days: 1));
     registerFallbackValue(BehaviorSnapshot([]));
     registerFallbackValue(ShipSnapshot([]));
     when(

@@ -275,22 +275,10 @@ Future<JobResult> doSystemWatcher(
   }
   shipWarn(ship, 'No stale markets near waypoints near ${waypoint.symbol}.');
 
-  jobAssert(
-    maxAge > const Duration(minutes: 10),
+  failJob(
     'Max age for $systemSymbol is already too short, giving up.',
     const Duration(hours: 1),
   );
-
-  // TODO(eseidel): Instead of halving the age, we should figure out what the
-  // oldest current record is and set our max-age to half that?
-  // That would save us many loops through this on startup.
-  final newMaxAge = centralCommand.shortenMaxPriceAgeForSystem(systemSymbol);
-  shipWarn(
-    ship,
-    'Shortened maxAge for $systemSymbol to '
-    '${approximateDuration(newMaxAge)} and resuming.',
-  );
-  return JobResult.wait(null);
 }
 
 /// Advance the system watcher.
