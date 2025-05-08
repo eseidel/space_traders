@@ -15,6 +15,8 @@ class _MockCentralCommand extends Mock implements CentralCommand {}
 
 class _MockDatabase extends Mock implements Database {}
 
+class _MockExtractionStore extends Mock implements ExtractionStore {}
+
 class _MockFleetApi extends Mock implements FleetApi {}
 
 class _MockLogger extends Mock implements Logger {}
@@ -109,8 +111,14 @@ void main() {
         ),
       ),
     );
+
+    final extractionStore = _MockExtractionStore();
+    when(() => db.extractions).thenReturn(extractionStore);
+
     registerFallbackValue(ExtractionRecord.fallbackValue());
-    when(() => db.insertExtraction(any())).thenAnswer((_) async {});
+    when(() => extractionStore.insert(any())).thenAnswer((_) async {
+      return;
+    });
 
     final logger = _MockLogger();
 

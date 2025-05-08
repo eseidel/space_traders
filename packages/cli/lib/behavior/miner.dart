@@ -158,7 +158,7 @@ Future<JobResult> extractAndLog(
     final cargo = response.cargo;
     final laserStrength = laserMountStrength(ship);
     recordEvents(db, ship, response.events);
-    await db.insertExtraction(
+    await db.extractions.insert(
       ExtractionRecord(
         shipSymbol: ship.symbol,
         waypointSymbol: ship.waypointSymbol,

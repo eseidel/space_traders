@@ -223,6 +223,9 @@ class Database {
   /// Get the charting store.
   ChartingStore get charting => ChartingStore(this);
 
+  /// Get the extraction store.
+  ExtractionStore get extractions => ExtractionStore(this);
+
   /// Get the jump gate store.
   JumpGateStore get jumpGates => JumpGateStore(this);
 
@@ -311,14 +314,6 @@ class Database {
   Future<void> upsertFaction(Faction faction) async {
     await execute(upsertFactionQuery(faction));
   }
-
-  /// Return all extractions.
-  Future<Iterable<ExtractionRecord>> allExtractions() async =>
-      queryMany(allExtractionsQuery(), extractionFromColumnMap);
-
-  /// Insert an extraction into the database.
-  Future<void> insertExtraction(ExtractionRecord extraction) async =>
-      execute(insertExtractionQuery(extraction));
 
   /// Return the next request to be executed.
   Future<RequestRecord?> nextRequest() =>
