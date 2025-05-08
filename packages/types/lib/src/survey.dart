@@ -1,4 +1,4 @@
-import 'package:types/api.dart';
+import 'package:types/types.dart';
 
 /// Record of a historical survey.
 // This can't be @immutable because Survey is not.
@@ -16,6 +16,21 @@ class HistoricalSurvey {
       timestamp: DateTime.parse(json['timestamp'] as String),
       survey: Survey.fromJson(json['survey'] as Map<String, dynamic>)!,
       exhausted: json['exhausted'] as bool,
+    );
+  }
+
+  /// Create a fallback value.
+  factory HistoricalSurvey.fallbackValue() {
+    return HistoricalSurvey(
+      timestamp: DateTime.now(),
+      survey: Survey(
+        signature: 'signature',
+        symbol: const WaypointSymbol.fallbackValue().waypoint,
+        deposits: [SurveyDeposit(symbol: TradeSymbol.DIAMONDS.value)],
+        expiration: DateTime.now(),
+        size: SurveySizeEnum.SMALL,
+      ),
+      exhausted: false,
     );
   }
 

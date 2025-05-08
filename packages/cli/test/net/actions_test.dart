@@ -32,6 +32,8 @@ class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockShipyardTransaction extends Mock implements ShipyardTransaction {}
 
+class _MockSurveyStore extends Mock implements SurveyStore {}
+
 class _MockSystemsApi extends Mock implements SystemsApi {}
 
 class _MockTransactionStore extends Mock implements TransactionStore {}
@@ -1100,5 +1102,29 @@ void main() {
         medianPrice: 100,
       );
     });
+  });
+
+  test('recordSurveys', () async {
+    final db = _MockDatabase();
+    final surveyStore = _MockSurveyStore();
+    when(() => db.surveys).thenReturn(surveyStore);
+
+    registerFallbackValue(HistoricalSurvey.fallbackValue());
+    when(() => surveyStore.insert(any())).thenAnswer((_) async {});
+
+    Survey testSurvey(String signature) {
+      return Survey(
+        signature: signature,
+        symbol: 'symbol',
+        deposits: [],
+        expiration: DateTime(2021),
+        size: SurveySizeEnum.SMALL,
+      );
+    }
+
+    final surveys = [testSurvey('survey1'), testSurvey('survey2')];
+    recordSurveys(db, surveys);
+
+    verify(() => db.surveys.insert(any())).called(2);
   });
 }
