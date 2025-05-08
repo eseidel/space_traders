@@ -130,24 +130,24 @@ Future<void> cliMain(List<String> args) async {
 
   final db = await defaultDatabase();
 
-  var agentSymbol = await db.getAgentSymbol();
+  var agentSymbol = await db.config.getAgentSymbol();
   if (agentSymbol == null) {
     agentSymbol = Platform.environment['ST_AGENT'];
     if (agentSymbol != null) {
       logger.info('Using agent symbol from environment: $agentSymbol');
-      await db.setAgentSymbol(agentSymbol);
+      await db.config.setAgentSymbol(agentSymbol);
     }
   }
   if (agentSymbol == null) {
     throw StateError('No agent symbol found in database or environment.');
   }
   final Api api;
-  if (await db.getAuthToken() == null) {
+  if (await db.config.getAuthToken() == null) {
     final email = Platform.environment['ST_EMAIL'];
     logger.info('No auth token found.');
     // Otherwise, register a new user.
     final token = await register(db, agentSymbol: agentSymbol, email: email);
-    await db.setAuthToken(token);
+    await db.config.setAuthToken(token);
     api = apiFromAuthToken(token, db);
   } else {
     api = await defaultApi(db);
@@ -155,7 +155,7 @@ Future<void> cliMain(List<String> args) async {
 
   if (results['selloff'] as bool) {
     logger.err('Selling all ships!');
-    await db.setGamePhase(GamePhase.selloff);
+    await db.config.setGamePhase(GamePhase.selloff);
   }
 
   config = await Config.fromDb(db);

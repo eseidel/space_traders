@@ -1,5 +1,6 @@
 import 'package:db/db.dart';
 import 'package:test/test.dart';
+import 'package:types/types.dart';
 
 import '../docker.dart';
 
@@ -17,17 +18,24 @@ void main() {
       });
 
       test('agent symbol', () async {
-        expect(await db.getAgentSymbol(), isNull);
+        expect(await db.config.getAgentSymbol(), isNull);
         const agentSymbol = 'S';
-        await db.setAgentSymbol(agentSymbol);
-        expect(await db.getAgentSymbol(), equals(agentSymbol));
+        await db.config.setAgentSymbol(agentSymbol);
+        expect(await db.config.getAgentSymbol(), equals(agentSymbol));
       });
 
       test('auth token', () async {
-        expect(await db.getAuthToken(), isNull);
+        expect(await db.config.getAuthToken(), isNull);
         const token = '1234567890';
-        await db.setAuthToken(token);
-        expect(await db.getAuthToken(), equals(token));
+        await db.config.setAuthToken(token);
+        expect(await db.config.getAuthToken(), equals(token));
+      });
+
+      test('game phase', () async {
+        expect(await db.config.getGamePhase(), isNull);
+        const phase = GamePhase.selloff;
+        await db.config.setGamePhase(phase);
+        expect(await db.config.getGamePhase(), equals(phase));
       });
     });
   });
