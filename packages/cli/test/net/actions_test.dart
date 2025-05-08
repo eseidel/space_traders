@@ -1046,7 +1046,7 @@ void main() {
     when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
     final marketListingStore = _MockMarketListingStore();
     when(() => db.marketListings).thenReturn(marketListingStore);
-    when(() => marketListingStore.at(any())).thenAnswer((_) async {
+    when(() => marketListingStore.at(waypointSymbol)).thenAnswer((_) async {
       return MarketListing(
         waypointSymbol: waypointSymbol,
         imports: const {TradeSymbol.FUEL},
@@ -1064,7 +1064,12 @@ void main() {
       totalPrice: 100,
       timestamp: DateTime(2021),
     );
-    when(() => fleetApi.purchaseCargo(any())).thenAnswer((_) async {
+    when(
+      () => fleetApi.purchaseCargo(
+        any(),
+        purchaseCargoRequest: any(named: 'purchaseCargoRequest'),
+      ),
+    ).thenAnswer((_) async {
       return PurchaseCargo201Response(
         data: SellCargo201ResponseData(
           agent: agent.toOpenApi(),
@@ -1076,7 +1081,12 @@ void main() {
     when(() => db.upsertShip(ship)).thenAnswer((_) async {});
     when(() => db.transactions.insert(any())).thenAnswer((_) async {});
     when(() => db.upsertAgent(any())).thenAnswer((_) async {});
-    when(() => db.marketListings.upsert(any())).thenAnswer((_) async {});
+    registerFallbackValue(const MarketListing.fallbackValue());
+    when(() => marketListingStore.upsert(any())).thenAnswer((_) async {});
+
+    final transactionStore = _MockTransactionStore();
+    when(() => db.transactions).thenReturn(transactionStore);
+    when(() => transactionStore.insert(any())).thenAnswer((_) async {});
 
     final logger = _MockLogger();
     await runWithLogger(logger, () async {

@@ -18,7 +18,7 @@ Future<api.DealsNearbyResponse> dealsNearby({
   required int credits,
 }) async {
   final systems = await db.systems.snapshotAllSystems();
-  final marketListings = await MarketListingSnapshot.load(db);
+  final marketListings = await db.marketListings.snapshotAll();
   final jumpGates = await db.jumpGates.snapshotAll();
   final constructionSnapshot = await db.construction.snapshotAllRecords();
   // Can't use loadSystemConnectivity because need constructionSnapshot later.

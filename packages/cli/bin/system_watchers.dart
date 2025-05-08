@@ -46,7 +46,7 @@ String plural(int count, String singular, [String plural = 's']) {
 }
 
 Future<void> command(Database db, ArgResults argResults) async {
-  final marketListings = await MarketListingSnapshot.load(db);
+  final marketListings = await db.marketListings.snapshotAll();
   final systemsToWatch = marketListings.systemsWithAtLeastNMarkets(5);
 
   final systemWatcherStates = await db.behaviorsOfType(Behavior.systemWatcher);

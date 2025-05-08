@@ -540,7 +540,9 @@ void main() {
     registerFallbackValue(agent);
     when(db.getMyAgent).thenAnswer((_) async => agent);
 
-    when(marketListingStore.all).thenAnswer((_) async => []);
+    when(
+      marketListingStore.snapshotAll,
+    ).thenAnswer((_) async => MarketListingSnapshot([]));
     when(db.allShips).thenAnswer((_) async => []);
     when(db.allShipyardListings).thenAnswer((_) async => []);
 

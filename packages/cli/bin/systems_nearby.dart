@@ -1,4 +1,3 @@
-import 'package:cli/caches.dart';
 import 'package:cli/cli.dart';
 
 Future<void> command(Database db, ArgResults argResults) async {
@@ -7,7 +6,7 @@ Future<void> command(Database db, ArgResults argResults) async {
     argResults.rest.firstOrNull,
   );
 
-  final marketListings = await MarketListingSnapshot.load(db);
+  final marketListings = await db.marketListings.snapshotAll();
   final systemConnectivity = await loadSystemConnectivity(db);
 
   final connectedSystemSymbols = systemConnectivity

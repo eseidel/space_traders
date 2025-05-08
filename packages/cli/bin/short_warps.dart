@@ -69,7 +69,7 @@ void main(List<String> args) async {
 
 Future<void> command(Database db, ArgResults argResults) async {
   // Systems to visit:
-  final marketListings = await MarketListingSnapshot.load(db);
+  final marketListings = await db.marketListings.snapshotAll();
   final systemsToWatch = marketListings.systemsWithAtLeastNMarkets(5);
 
   final systemsCache = await db.systems.snapshotAllSystems();

@@ -121,7 +121,9 @@ void main() {
 
     final marketListingStore = _MockMarketListingStore();
     when(() => db.marketListings).thenReturn(marketListingStore);
-    when(marketListingStore.all).thenAnswer((_) async => []);
+    when(
+      marketListingStore.snapshotAll,
+    ).thenAnswer((_) async => MarketListingSnapshot([]));
     when(db.allMarketPrices).thenAnswer((_) async => []);
     when(db.allShipyardListings).thenAnswer((_) async => []);
     when(db.allShipyardPrices).thenAnswer((_) async => []);

@@ -14,7 +14,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   final marketPrices = await MarketPriceSnapshot.loadAll(db);
   final shipyardPrices = await ShipyardPriceSnapshot.load(db);
   final chartingSnapshot = await db.charting.snapshotAllRecords();
-  final marketListings = await MarketListingSnapshot.load(db);
+  final marketListings = await db.marketListings.snapshotAll();
   final shipyardListings = await ShipyardListingSnapshot.load(db);
 
   // Having market data means it's charted (either by us or someone else).

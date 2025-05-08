@@ -8,7 +8,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   final destination = WaypointSymbol.fromString(argResults.rest[0]);
   final ships = await ShipSnapshot.load(db);
   final systemsCache = await db.systems.snapshotAllSystems();
-  final marketListings = await MarketListingSnapshot.load(db);
+  final marketListings = await db.marketListings.snapshotAll();
 
   final systemConnectivity = await loadSystemConnectivity(db);
   final routePlanner = RoutePlanner.fromSystemsSnapshot(

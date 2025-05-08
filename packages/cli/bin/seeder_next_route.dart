@@ -9,7 +9,7 @@ void main(List<String> args) async {
 
 Future<void> command(Database db, ArgResults argResults) async {
   final agent = await db.getMyAgent();
-  final marketListings = await MarketListingSnapshot.load(db);
+  final marketListings = await db.marketListings.snapshotAll();
 
   final systemsCache = await db.systems.snapshotAllSystems();
   final ships = await ShipSnapshot.load(db);

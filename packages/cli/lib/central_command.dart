@@ -676,7 +676,7 @@ class CentralCommand {
       config = await Config.fromDb(db);
     }
 
-    final marketListings = await MarketListingSnapshot.load(db);
+    final marketListings = await db.marketListings.snapshotAll();
     final shipyardListings = await ShipyardListingSnapshot.load(db);
     final charting = await db.charting.snapshotAllRecords();
 

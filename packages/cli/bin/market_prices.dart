@@ -5,7 +5,7 @@ import 'package:cli/cli.dart';
 
 Future<void> command(Database db, ArgResults argResults) async {
   final marketPrices = await MarketPriceSnapshot.loadAll(db);
-  final marketListings = await MarketListingSnapshot.load(db);
+  final marketListings = await db.marketListings.snapshotAll();
 
   logger.info(
     'Loaded ${marketPrices.prices.length} prices from '

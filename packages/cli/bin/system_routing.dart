@@ -11,7 +11,7 @@ Future<void> command(Database db, ArgResults argResults) async {
 
   final systems = await db.systems.snapshotAllSystems();
   final hqSystemSymbol = await myHqSystemSymbol(db);
-  final marketListings = await MarketListingSnapshot.load(db);
+  final marketListings = await db.marketListings.snapshotAll();
   final shipyardListings = await ShipyardListingSnapshot.load(db);
   final systemConnectivity = await loadSystemConnectivity(db);
   final routePlanner = RoutePlanner.fromSystemsSnapshot(

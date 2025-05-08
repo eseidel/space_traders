@@ -1,4 +1,3 @@
-import 'package:db/db.dart';
 import 'package:types/types.dart';
 
 /// A cached of market listings.
@@ -10,21 +9,6 @@ class MarketListingSnapshot {
       );
 
   final Map<WaypointSymbol, MarketListing> _listingBySymbol;
-
-  /// Load the MarketListingSnapshot from the database.
-  static Future<MarketListingSnapshot> load(Database db) async {
-    final listings = await db.marketListings.all();
-    return MarketListingSnapshot(listings);
-  }
-
-  /// Load the MarketListingSnapshot for a single system.
-  static Future<MarketListingSnapshot> loadOneSystem(
-    Database db,
-    SystemSymbol systemSymbol,
-  ) async {
-    final listings = await db.marketListings.inSystem(systemSymbol);
-    return MarketListingSnapshot(listings);
-  }
 
   /// The WaypointSymbols.
   Iterable<WaypointSymbol> get waypointSymbols => _listingBySymbol.keys;

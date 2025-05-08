@@ -21,6 +21,18 @@ class MarketListingStore {
     return _db.queryMany(query, marketListingFromColumnMap);
   }
 
+  /// Get a snapshot of all market listings.
+  Future<MarketListingSnapshot> snapshotAll() async {
+    final listings = await all();
+    return MarketListingSnapshot(listings);
+  }
+
+  /// Get a snapshot of all market listings in a system.
+  Future<MarketListingSnapshot> snapshotSystem(SystemSymbol system) async {
+    final listings = await inSystem(system);
+    return MarketListingSnapshot(listings);
+  }
+
   /// Get all market listings within a system.
   Future<Iterable<MarketListing>> inSystem(SystemSymbol system) async {
     final query = marketListingsInSystemQuery(system);
