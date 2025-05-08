@@ -11,11 +11,15 @@ import '../cache/caches_mock.dart';
 
 class _MockApi extends Mock implements Api {}
 
+class _MockBehaviorStore extends Mock implements BehaviorStore {}
+
 class _MockCentralCommand extends Mock implements CentralCommand {}
 
 class _MockConstructionStore extends Mock implements ConstructionStore {}
 
 class _MockContractsApi extends Mock implements ContractsApi {}
+
+class _MockContractStore extends Mock implements ContractStore {}
 
 class _MockDatabase extends Mock implements Database {}
 
@@ -66,7 +70,10 @@ void main() {
     when(() => centralCommand.isContractTradingEnabled).thenReturn(false);
     when(() => centralCommand.expectedCreditsPerSecond(ship)).thenReturn(10);
     final caches = mockCaches();
-    when(db.allContracts).thenAnswer((_) async => <Contract>[]);
+
+    final contractStore = _MockContractStore();
+    when(() => db.contracts).thenReturn(contractStore);
+    when(contractStore.all).thenAnswer((_) async => <Contract>[]);
 
     final start = WaypointSymbol.fromString('S-A-B');
     final end = WaypointSymbol.fromString('S-A-C');
@@ -215,7 +222,11 @@ void main() {
 
     registerFallbackValue(Transaction.fallbackValue());
     when(() => transactionStore.insert(any())).thenAnswer((_) async {});
-    when(db.allBehaviorStates).thenAnswer((_) async => []);
+
+    final behaviorStore = _MockBehaviorStore();
+    when(() => db.behaviors).thenReturn(behaviorStore);
+
+    when(behaviorStore.all).thenAnswer((_) async => []);
     registerFallbackValue(BehaviorSnapshot([]));
     registerFallbackValue(ShipSnapshot([]));
     when(
@@ -561,7 +572,10 @@ void main() {
     when(() => centralCommand.isContractTradingEnabled).thenReturn(true);
     when(() => centralCommand.expectedCreditsPerSecond(ship)).thenReturn(1);
     final caches = mockCaches();
-    when(db.activeContracts).thenAnswer((_) async => <Contract>[]);
+
+    final contractStore = _MockContractStore();
+    when(() => db.contracts).thenReturn(contractStore);
+    when(contractStore.active).thenAnswer((_) async => <Contract>[]);
     final contract = Contract(
       id: 'id',
       factionSymbol: 'factionSymbol',
@@ -750,9 +764,11 @@ void main() {
       ),
     );
 
+    when(contractStore.all).thenAnswer((_) async => <Contract>[]);
+
     registerFallbackValue(Contract.fallbackValue());
-    when(() => db.upsertContract(any())).thenAnswer((_) async {});
-    when(db.allContracts).thenAnswer((_) async => <Contract>[]);
+    when(() => contractStore.upsert(any())).thenAnswer((_) async {});
+
     when(
       () => caches.systems.systemBySymbol(shipLocation.system),
     ).thenReturn(System.test(shipLocation.system));
@@ -760,7 +776,10 @@ void main() {
       () => caches.systemConnectivity.systemsReachableFrom(shipLocation.system),
     ).thenReturn([]);
 
-    when(db.allBehaviorStates).thenAnswer((_) async => []);
+    final behaviorStore = _MockBehaviorStore();
+    when(() => db.behaviors).thenReturn(behaviorStore);
+
+    when(behaviorStore.all).thenAnswer((_) async => []);
     when(() => db.upsertShip(ship)).thenAnswer((_) async {});
 
     final agent = Agent.test();
@@ -1171,7 +1190,13 @@ void main() {
       fulfilled: false,
       timestamp: now,
     );
-    when(() => db.contractById(contract.id)).thenAnswer((_) async => contract);
+
+    final contractStore = _MockContractStore();
+    when(() => db.contracts).thenReturn(contractStore);
+
+    when(
+      () => contractStore.get(contract.id),
+    ).thenAnswer((_) async => contract);
     final deal = Deal(
       destination: SellOpp.fromContract(
         waypointSymbol: end,
@@ -1283,8 +1308,11 @@ void main() {
 
     registerFallbackValue(Transaction.fallbackValue());
     when(() => transactionStore.insert(any())).thenAnswer((_) async {});
+
     registerFallbackValue(Contract.fallbackValue());
-    when(() => db.upsertContract(any())).thenAnswer((_) async {});
+    when(() => contractStore.upsert(any())).thenAnswer((_) async {
+      return;
+    });
 
     final state = BehaviorState(const ShipSymbol('S', 1), Behavior.trader)
       ..deal = costedDeal;

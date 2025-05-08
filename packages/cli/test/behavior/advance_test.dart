@@ -11,6 +11,8 @@ import '../cache/caches_mock.dart';
 
 class _MockApi extends Mock implements Api {}
 
+class _MockBehaviorStore extends Mock implements BehaviorStore {}
+
 class _MockCentralCommand extends Mock implements CentralCommand {}
 
 class _MockDatabase extends Mock implements Database {}
@@ -42,7 +44,10 @@ void main() {
     final centralCommand = _MockCentralCommand();
     final logger = _MockLogger();
 
-    when(() => db.getBehavior(shipSymbol)).thenAnswer((_) async => null);
+    final behaviorStore = _MockBehaviorStore();
+    when(() => db.behaviors).thenReturn(behaviorStore);
+
+    when(() => behaviorStore.get(shipSymbol)).thenAnswer((_) async => null);
     when(
       () => centralCommand.getJobForShip(
         db,
@@ -52,8 +57,8 @@ void main() {
       ),
     ).thenAnswer((_) async => BehaviorState(shipSymbol, Behavior.idle));
     registerFallbackValue(BehaviorState.fallbackValue());
-    when(() => db.upsertBehavior(any())).thenAnswer((_) async => {});
-    when(() => db.deleteBehavior(shipSymbol)).thenAnswer((_) async => {});
+    when(() => behaviorStore.upsert(any())).thenAnswer((_) async => {});
+    when(() => behaviorStore.delete(shipSymbol)).thenAnswer((_) async => {});
 
     final agent = Agent.test();
     when(db.getMyAgent).thenAnswer((_) async => agent);
@@ -96,7 +101,9 @@ void main() {
 
     final logger = _MockLogger();
 
-    when(() => db.getBehavior(shipSymbol)).thenAnswer((_) async => null);
+    final behaviorStore = _MockBehaviorStore();
+    when(() => db.behaviors).thenReturn(behaviorStore);
+    when(() => behaviorStore.get(shipSymbol)).thenAnswer((_) async => null);
     when(
       () => centralCommand.getJobForShip(
         db,
@@ -106,7 +113,7 @@ void main() {
       ),
     ).thenAnswer((_) async => BehaviorState(shipSymbol, Behavior.idle));
     registerFallbackValue(BehaviorState.fallbackValue());
-    when(() => db.upsertBehavior(any())).thenAnswer((_) async => {});
+    when(() => behaviorStore.upsert(any())).thenAnswer((_) async => {});
 
     final agent = Agent.test();
     when(db.getMyAgent).thenAnswer((_) async => agent);

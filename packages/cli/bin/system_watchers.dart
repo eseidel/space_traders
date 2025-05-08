@@ -48,7 +48,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   final marketListings = await db.marketListings.snapshotAll();
   final systemsToWatch = marketListings.systemsWithAtLeastNMarkets(5);
 
-  final systemWatcherStates = await db.behaviorsOfType(Behavior.systemWatcher);
+  final systemWatcherStates = await db.behaviors.ofType(Behavior.systemWatcher);
   final systemsCache = db.systems;
   final ships = await ShipSnapshot.load(db);
   final agent = await db.getMyAgent();

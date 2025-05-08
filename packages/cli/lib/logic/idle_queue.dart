@@ -152,7 +152,7 @@ class IdleQueue {
         }
       }
       if (await waypointCache.hasShipyard(waypointSymbol)) {
-        final listing = await db.shipyardListingForSymbol(waypointSymbol);
+        final listing = await db.shipyardListings.at(waypointSymbol);
         if (listing == null) {
           logger.info(' Shipyard: $waypointSymbol');
           final shipyard = await getShipyard(api, waypointSymbol);

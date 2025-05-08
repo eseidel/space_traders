@@ -625,7 +625,7 @@ Future<Contract> negotiateContractAndLog(
     contractData.contract,
     DateTime.timestamp(),
   );
-  await db.upsertContract(contract);
+  await db.contracts.upsert(contract);
   shipInfo(ship, 'Negotiated contract: ${contractDescription(contract)}');
   return contract;
 }
@@ -641,7 +641,7 @@ Future<AcceptContract200ResponseData> acceptContractAndLog(
   final data = response!.data;
   final agent = Agent.fromOpenApi(data.agent);
   await db.upsertAgent(agent);
-  await db.upsertContract(
+  await db.contracts.upsert(
     Contract.fromOpenApi(data.contract, DateTime.timestamp()),
   );
   shipInfo(ship, 'Accepted: ${contractDescription(contract)}.');
@@ -676,7 +676,7 @@ Future<AcceptContract200ResponseData> completeContractAndLog(
   final data = response!.data;
   final agent = Agent.fromOpenApi(data.agent);
   await db.upsertAgent(agent);
-  await db.upsertContract(
+  await db.contracts.upsert(
     Contract.fromOpenApi(data.contract, DateTime.timestamp()),
   );
 

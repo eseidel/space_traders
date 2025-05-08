@@ -5,6 +5,8 @@ import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
+class _MockBehaviorStore extends Mock implements BehaviorStore {}
+
 class _MockDatabase extends Mock implements Database {}
 
 class _MockLogger extends Mock implements Logger {}
@@ -14,10 +16,16 @@ class _MockShip extends Mock implements Ship {}
 void main() {
   test('BehaviorsTimeouts.isDisabledForShip', () async {
     final db = _MockDatabase();
+
+    final behaviorStore = _MockBehaviorStore();
+    when(() => db.behaviors).thenReturn(behaviorStore);
+
     registerFallbackValue(BehaviorState.fallbackValue());
     registerFallbackValue(const ShipSymbol.fallbackValue());
-    when(() => db.upsertBehavior(any())).thenAnswer((_) async {});
-    when(() => db.deleteBehavior(any())).thenAnswer((_) async {});
+    when(() => behaviorStore.upsert(any())).thenAnswer((_) async {
+      return;
+    });
+    when(() => behaviorStore.delete(any())).thenAnswer((_) async {});
 
     final behaviorTimeouts = BehaviorTimeouts();
     final ship = _MockShip();
@@ -30,7 +38,7 @@ void main() {
     );
 
     when(
-      () => db.getBehavior(shipSymbol),
+      () => behaviorStore.get(shipSymbol),
     ).thenAnswer((_) async => BehaviorState(shipSymbol, Behavior.trader));
 
     final logger = _MockLogger();

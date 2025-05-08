@@ -173,7 +173,7 @@ Future<DeliverContract200ResponseData> deliverContract(
     deliverContractRequest: request,
   );
   final data = response!.data;
-  await db.upsertContract(
+  await db.contracts.upsert(
     Contract.fromOpenApi(data.contract, DateTime.timestamp()),
   );
   ship.cargo = data.cargo;

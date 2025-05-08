@@ -11,7 +11,7 @@ class ShipyardListingSnapshot {
 
   /// Load the charted values from the cache.
   static Future<ShipyardListingSnapshot> load(Database db) async {
-    final values = await db.allShipyardListings();
+    final values = await db.shipyardListings.all();
     return ShipyardListingSnapshot(values);
   }
 
@@ -60,5 +60,5 @@ void recordShipyardListing(Database db, Shipyard shipyard) {
     waypointSymbol: symbol,
     shipTypes: shipyard.shipTypes.map((inner) => inner.type).toSet(),
   );
-  db.upsertShipyardListing(listing);
+  db.shipyardListings.upsert(listing);
 }

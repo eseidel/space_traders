@@ -14,7 +14,7 @@ class ContractSnapshot {
   /// Load the ContractSnapshot from the database.
   static Future<ContractSnapshot> load(Database db) async {
     // Sort in the same order they would normally come from the api?
-    final contracts = (await db.allContracts()).sorted(
+    final contracts = (await db.contracts.all()).sorted(
       (a, b) => a.id.compareTo(b.id),
     );
     return ContractSnapshot(contracts.toList());
@@ -76,7 +76,7 @@ class ContractSnapshot {
 Future<ContractSnapshot> fetchContracts(Database db, Api api) async {
   final contracts = await allMyContracts(api).toList();
   for (final contract in contracts) {
-    await db.upsertContract(contract);
+    await db.contracts.upsert(contract);
   }
   return ContractSnapshot(contracts);
 }
