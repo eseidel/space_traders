@@ -43,7 +43,6 @@ class Caches {
     required this.factions,
     required this.static,
     required this.systemConnectivity,
-    required this.jumpGates,
     required this.galaxy,
   });
 
@@ -62,10 +61,6 @@ class Caches {
 
   /// The cache of waypoints.
   final WaypointCache waypoints;
-
-  /// The cache of jump gates.
-  // TODO(eseidel): This needs to update when changes!
-  final JumpGateSnapshot jumpGates;
 
   /// The cache of markets.
   final MarketCache markets;
@@ -126,7 +121,6 @@ class Caches {
       routePlanner: routePlanner,
       factions: factions,
       systemConnectivity: systemConnectivity,
-      jumpGates: jumpGates,
       galaxy: galaxy,
     );
   }
@@ -141,7 +135,7 @@ class Caches {
     }
 
     systemConnectivity.updateFromJumpGates(
-      jumpGates,
+      await db.jumpGates.snapshotAll(),
       await db.construction.snapshotAllRecords(),
     );
     routePlanner.clearRoutingCaches();
