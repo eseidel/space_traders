@@ -380,12 +380,6 @@ class RoutePlanner {
   /// The connectivity used for this RoutePlanner.
   SystemConnectivity get systemConnectivity => _systemConnectivity;
 
-  /// Clear any cached routing data.  Called when jump gate availability changes
-  /// because a jump gate is constructed.
-  void clearRoutingCaches() {
-    _jumpCache.clear();
-  }
-
   RoutePlan? _planJump(
     ShipSpec shipSpec, {
     required WaypointSymbol start,

@@ -12,11 +12,10 @@ Future<void> command(Database db, ArgResults argResults) async {
   final systemConnectivity = await loadSystemConnectivity(db);
   final marketPrices = await MarketPriceSnapshot.loadAll(db);
   final agent = await db.getMyAgent();
-  final marketListings = await db.marketListings.snapshotAll();
   final routePlanner = RoutePlanner.fromSystemsSnapshot(
     systems,
     systemConnectivity,
-    sellsFuel: defaultSellsFuel(marketListings),
+    sellsFuel: await defaultSellsFuel(db),
   );
   final startSystem = agent!.headquarters.system;
   const shipType = ShipType.REFINING_FREIGHTER;

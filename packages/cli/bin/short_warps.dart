@@ -110,7 +110,7 @@ Future<void> command(Database db, ArgResults argResults) async {
       start: explorer.waypointSymbol,
       // Pick the waypoint closest to our current location?
       end: system.waypoints.first.symbol,
-      sellsFuel: defaultSellsFuel(marketListings),
+      sellsFuel: await defaultSellsFuel(db),
     );
     if (actions != null) {
       final plan = RoutePlan(

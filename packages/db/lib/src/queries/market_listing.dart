@@ -81,6 +81,16 @@ Query knowOfMarketWhichTradesQuery(TradeSymbol tradeSymbol) => Query(
   parameters: {'tradeSymbol': tradeSymbol.toJson()},
 );
 
+/// Query to find all markets which sell fuel.
+Query marketsWhichTradeFuelQuery() => Query(
+  '''
+      SELECT symbol FROM market_listing_
+      WHERE @tradeSymbol = ANY(imports) OR @tradeSymbol = ANY(exchange) OR
+        @tradeSymbol = ANY(exports)
+      ''',
+  parameters: {'tradeSymbol': TradeSymbol.FUEL.toJson()},
+);
+
 /// Build a column map from a market listing.
 Map<String, dynamic> marketListingToColumnMap(MarketListing marketListing) => {
   'symbol': marketListing.waypointSymbol.toJson(),

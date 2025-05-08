@@ -29,7 +29,7 @@ Future<api.DealsNearbyResponse> dealsNearby({
   final routePlanner = RoutePlanner.fromSystemsSnapshot(
     systems,
     systemConnectivity,
-    sellsFuel: defaultSellsFuel(marketListings),
+    sellsFuel: await defaultSellsFuel(db),
   );
   final marketPrices = await MarketPriceSnapshot.loadAll(db);
 
