@@ -20,6 +20,8 @@ class _MockLogger extends Mock implements Logger {}
 
 class _MockMarket extends Mock implements Market {}
 
+class _MockMarketListingStore extends Mock implements MarketListingStore {}
+
 class _MockMarketPrices extends Mock implements MarketPriceSnapshot {}
 
 class _MockShip extends Mock implements Ship {}
@@ -999,5 +1001,94 @@ void main() {
         jumpShipRequest: JumpShipRequest(waypointSymbol: endSymbol.waypoint),
       ),
     ).called(1);
+  });
+
+  test('purchaseCargoAndLog with invalid amount', () async {
+    await expectLater(
+      () async => await purchaseCargoAndLog(
+        _MockApi(),
+        _MockDatabase(),
+        _MockShip(),
+        TradeSymbol.FUEL,
+        AccountingType.fuel,
+        amountToBuy: 0,
+        medianPrice: 100,
+      ),
+      throwsArgumentError,
+    );
+
+    await expectLater(
+      () async => await purchaseCargoAndLog(
+        _MockApi(),
+        _MockDatabase(),
+        _MockShip(),
+        TradeSymbol.FUEL,
+        AccountingType.fuel,
+        amountToBuy: -1,
+        medianPrice: 100,
+      ),
+      throwsArgumentError,
+    );
+  });
+
+  test('purchaseCargoAndLog', () async {
+    final api = _MockApi();
+    final db = _MockDatabase();
+    final fleetApi = _MockFleetApi();
+    when(() => api.fleet).thenReturn(fleetApi);
+    final ship = _MockShip();
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
+    final shipSymbol = ShipSymbol.fromString('S-1');
+    when(() => ship.symbol).thenReturn(shipSymbol);
+    final shipNav = _MockShipNav();
+    when(() => ship.nav).thenReturn(shipNav);
+    final waypointSymbol = WaypointSymbol.fromString('S-A-W');
+    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
+    final marketListingStore = _MockMarketListingStore();
+    when(() => db.marketListings).thenReturn(marketListingStore);
+    when(() => marketListingStore.at(any())).thenAnswer((_) async {
+      return MarketListing(
+        waypointSymbol: waypointSymbol,
+        imports: const {TradeSymbol.FUEL},
+      );
+    });
+    final agent = Agent.test(credits: 10000000);
+    final cargo = ShipCargo(capacity: 100, units: 0);
+    final transaction = MarketTransaction(
+      waypointSymbol: waypointSymbol.waypoint,
+      shipSymbol: shipSymbol.symbol,
+      tradeSymbol: TradeSymbol.FUEL.value,
+      type: MarketTransactionTypeEnum.PURCHASE,
+      units: 1,
+      pricePerUnit: 100,
+      totalPrice: 100,
+      timestamp: DateTime(2021),
+    );
+    when(() => fleetApi.purchaseCargo(any())).thenAnswer((_) async {
+      return PurchaseCargo201Response(
+        data: SellCargo201ResponseData(
+          agent: agent.toOpenApi(),
+          cargo: cargo,
+          transaction: transaction,
+        ),
+      );
+    });
+    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
+    when(() => db.transactions.insert(any())).thenAnswer((_) async {});
+    when(() => db.upsertAgent(any())).thenAnswer((_) async {});
+    when(() => db.marketListings.upsert(any())).thenAnswer((_) async {});
+
+    final logger = _MockLogger();
+    await runWithLogger(logger, () async {
+      await purchaseCargoAndLog(
+        api,
+        db,
+        ship,
+        TradeSymbol.FUEL,
+        AccountingType.fuel,
+        amountToBuy: 1,
+        medianPrice: 100,
+      );
+    });
   });
 }
