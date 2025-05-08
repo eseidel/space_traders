@@ -108,7 +108,9 @@ Future<JobResult> _handleAtSourceWithDeal(
 
   // Could this get confused by having other cargo in our hold?
   final units = unitsToPurchase(good, ship, maxUnits);
-  final medianPrice = caches.marketPrices.medianPurchasePrice(dealTradeSymbol);
+  final medianPrice = await db.marketPrices.medianPurchasePrice(
+    dealTradeSymbol,
+  );
   if (units > 0) {
     final transaction = await purchaseTradeGoodIfPossible(
       api,
@@ -494,7 +496,6 @@ Future<String> describeExpectedContractProfit(
 Future<DateTime?> acceptContractsIfNeeded(
   Api api,
   Database db,
-  MarketPriceSnapshot marketPrices,
   Ship ship,
 ) async {
   /// Accept logic we run any time contract trading is turned on.
@@ -791,7 +792,7 @@ Future<JobResult> _initDeal(
     // This requires a ship, hence is done in trader rather than centralCommand.
     // We may need to be in the faction system to accept contracts.
     // This will dock us at the current waypoint if needed.
-    await acceptContractsIfNeeded(api, db, caches.marketPrices, ship);
+    await acceptContractsIfNeeded(api, db, ship);
   }
 
   final contractSnapshot = await ContractSnapshot.load(db);

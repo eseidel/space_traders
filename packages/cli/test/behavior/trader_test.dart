@@ -104,6 +104,10 @@ void main() {
     when(
       () => marketPriceStore.hasRecentAt(start, any()),
     ).thenAnswer((_) async => true);
+    registerFallbackValue(TradeSymbol.ADVANCED_CIRCUITRY);
+    when(
+      () => marketPriceStore.medianPurchasePrice(any()),
+    ).thenAnswer((_) async => 100);
 
     registerFallbackValue(start);
     when(
@@ -219,8 +223,6 @@ void main() {
     ).thenReturn([]);
     when(db.allShips).thenAnswer((_) async => []);
     when(() => db.upsertShip(ship)).thenAnswer((_) async {});
-
-    when(() => caches.marketPrices.prices).thenReturn([]);
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
