@@ -3,8 +3,10 @@ import 'package:db/src/queries/transaction.dart';
 import 'package:db/src/query.dart';
 import 'package:types/types.dart';
 
+/// A store for transactions.
 class TransactionStore {
-  TransactionStore(Database db) : _db = db;
+  /// Create a new [TransactionStore].
+  TransactionStore(this._db);
 
   final Database _db;
 

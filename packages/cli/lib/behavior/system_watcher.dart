@@ -104,7 +104,7 @@ Future<bool> _isMissingRecentShipyardData(
   if (!waypoint.hasShipyard) {
     return false;
   }
-  final result = await db.hasRecentShipyardPrices(waypoint.symbol, maxAge);
+  final result = await db.shipyardPrices.hasRecent(waypoint.symbol, maxAge);
   return !result;
 }
 

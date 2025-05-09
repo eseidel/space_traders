@@ -1198,7 +1198,7 @@ void main() {
       ships: [testShipyardShip()],
     );
     recordShipyardPrices(db, shipyard);
-    verify(() => db.shipyardPrices.upsert(any())).called(1);
+    verify(() => shipyardPriceStore.upsert(any())).called(1);
   });
 
   test('recordMarketPrices', () async {
