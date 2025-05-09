@@ -54,10 +54,16 @@ void main() {
         expect(all.length, equals(1));
         expect(all.first, equals(marketPrice));
 
+        final allSnapshot = await db.marketPrices.snapshotAll();
+        expect(allSnapshot.prices, equals([marketPrice]));
+
         final system = SystemSymbol.fromString('X1-A');
         final systemPrices = await db.marketPrices.inSystem(system);
         expect(systemPrices.length, equals(1));
         expect(systemPrices.first, equals(marketPrice));
+
+        final systemSnapshot = await db.marketPrices.snapshotInSystem(system);
+        expect(systemSnapshot.prices, equals([marketPrice]));
 
         final median = await db.marketPrices.medianPurchasePrice(tradeSymbol);
         expect(median, equals(100));
