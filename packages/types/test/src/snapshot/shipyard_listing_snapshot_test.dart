@@ -59,5 +59,16 @@ void main() {
       ]);
       expect(snapshot.countInSystem(SystemSymbol.fromString('A-B')), 1);
     });
+
+    test('count', () {
+      final snapshot = ShipyardListingSnapshot([
+        ShipyardListing(
+          waypointSymbol: WaypointSymbol.fromString('A-B-C'),
+          shipTypes: const {ShipType.ORE_HOUND},
+        ),
+      ]);
+      expect(snapshot.count, 1);
+      expect(snapshot.waypointCount, 1);
+    });
   });
 }
