@@ -65,7 +65,7 @@ void main() {
         deadlineToAccept: now.subtract(const Duration(days: 1)),
       );
 
-      /// Accepted, past acceptence deadline. Active, not yet fulfilled.
+      /// Accepted, past acceptance deadline. Active, not yet fulfilled.
       final acceptedPastDeadline = Contract(
         id: 'acceptedPastDeadline',
         factionSymbol: faction,
