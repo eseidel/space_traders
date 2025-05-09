@@ -16,10 +16,10 @@ class ShipyardPrice extends PriceBase<ShipType> {
   @visibleForTesting
   factory ShipyardPrice.fallbackValue() {
     return ShipyardPrice(
-      waypointSymbol: WaypointSymbol.fromString('S-A-W'),
+      waypointSymbol: const WaypointSymbol.fallbackValue(),
       shipType: ShipType.ORE_HOUND,
       purchasePrice: 100,
-      timestamp: DateTime.now(),
+      timestamp: DateTime.timestamp(),
     );
   }
 
