@@ -243,7 +243,9 @@ void main() {
 
     final marketPriceStore = _MockMarketPriceStore();
     when(() => db.marketPrices).thenReturn(marketPriceStore);
-    when(() => marketPriceStore.inSystem(any())).thenAnswer((_) async => []);
+    when(
+      () => marketPriceStore.snapshotInSystem(any()),
+    ).thenAnswer((_) async => MarketPriceSnapshot([]));
 
     final waitUntil = await runWithLogger(
       logger,
@@ -377,7 +379,9 @@ void main() {
     final marketPriceStore = _MockMarketPriceStore();
     when(() => db.marketPrices).thenReturn(marketPriceStore);
     registerFallbackValue(const SystemSymbol.fallbackValue());
-    when(() => marketPriceStore.inSystem(any())).thenAnswer((_) async => []);
+    when(
+      () => marketPriceStore.snapshotInSystem(any()),
+    ).thenAnswer((_) async => MarketPriceSnapshot([]));
 
     expect(
       () async => await travelAndSellCargo(
@@ -698,7 +702,9 @@ void main() {
     when(
       () => marketPriceStore.medianPurchasePrice(any()),
     ).thenAnswer((_) async => 100);
-    when(() => marketPriceStore.inSystem(any())).thenAnswer((_) async => []);
+    when(
+      () => marketPriceStore.snapshotInSystem(any()),
+    ).thenAnswer((_) async => MarketPriceSnapshot([]));
 
     when(
       () => marketListingStore.whichBuysInSystem(any(), any()),

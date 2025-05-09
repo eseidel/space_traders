@@ -20,7 +20,7 @@ Future<JobResult> doScrapJob(
   // If we're not, find the nearest shipyard.
   // Navigate to that shipyard.
 
-  final shipyardListings = await ShipyardListingSnapshot.load(db);
+  final shipyardListings = await db.shipyardListings.snapshotAll();
   final shipyard = assertNotNull(
     await nearestShipyard(caches.routePlanner, shipyardListings, ship),
     'No shipyard found.',

@@ -9,7 +9,7 @@ Future<void> command(Database db, ArgResults argResults) async {
 
   final systems = await db.systems.snapshotAllSystems();
   final hqSystemSymbol = await myHqSystemSymbol(db);
-  final shipyardListings = await ShipyardListingSnapshot.load(db);
+  final shipyardListings = await db.shipyardListings.snapshotAll();
   final routePlanner = await defaultRoutePlanner(db);
   final waypoints = systems.waypointsInSystem(hqSystemSymbol);
   final shipyardListing = shipyardListings.inSystem(hqSystemSymbol).first;

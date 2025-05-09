@@ -15,6 +15,10 @@ class ShipyardListingStore {
     return _db.queryOne(query, shipyardListingFromColumnMap);
   }
 
+  /// Get a snapshot of all shipyard listings.
+  Future<ShipyardListingSnapshot> snapshotAll() async =>
+      ShipyardListingSnapshot(await all());
+
   /// Get all shipyard listings.
   Future<Iterable<ShipyardListing>> all() async {
     final query = allShipyardListingsQuery();

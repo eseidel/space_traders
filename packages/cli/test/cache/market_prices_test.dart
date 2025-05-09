@@ -1,39 +1,24 @@
-import 'package:cli/cache/market_price_snapshot.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
-/// A DateTime for tests to use.
-final _now = DateTime(2021);
-DateTime _getNow() => _now;
-
-// Creates a fake price with good defaults.
-MarketPrice makePrice({
-  required String waypointSymbol,
-  required TradeSymbol symbol,
-  SupplyLevel supply = SupplyLevel.ABUNDANT,
-  int purchasePrice = 1,
-  int sellPrice = 1,
-  int tradeVolume = 1,
-  DateTime? timestamp,
-}) {
-  return MarketPrice(
-    waypointSymbol: WaypointSymbol.fromString(waypointSymbol),
-    symbol: symbol,
-    supply: supply,
-    purchasePrice: purchasePrice,
-    sellPrice: sellPrice,
-    tradeVolume: tradeVolume,
-    timestamp: timestamp ?? _now,
-    activity: ActivityLevel.WEAK,
-  );
-}
-
 void main() {
+  MarketPrice makePrice({
+    required String waypoint,
+    required TradeSymbol symbol,
+    int sellPrice = 1,
+  }) {
+    return MarketPrice.test(
+      waypointSymbol: WaypointSymbol.fromString(waypoint),
+      symbol: symbol,
+      sellPrice: sellPrice,
+    );
+  }
+
   test('PriceData', () async {
     const a = TradeSymbol.FUEL;
     const b = TradeSymbol.FOOD;
-    final aPrice = makePrice(waypointSymbol: 'S-S-A', symbol: a);
-    final bPrice = makePrice(waypointSymbol: 'S-S-B', symbol: a);
+    final aPrice = makePrice(waypoint: 'S-S-A', symbol: a);
+    final bPrice = makePrice(waypoint: 'S-S-B', symbol: a);
     final marketPrices = MarketPriceSnapshot([aPrice, bPrice]);
     expect(marketPrices.medianPurchasePrice(a), 1);
     expect(marketPrices.medianSellPrice(a), 1);
@@ -64,11 +49,11 @@ void main() {
   test('percentileForSellPrice', () {
     const a = TradeSymbol.FUEL;
     final marketPrices = MarketPriceSnapshot([
-      makePrice(waypointSymbol: 'S-S-A', symbol: a, sellPrice: 100),
-      makePrice(waypointSymbol: 'S-S-B', symbol: a, sellPrice: 110),
-      makePrice(waypointSymbol: 'S-S-C', symbol: a, sellPrice: 150),
-      makePrice(waypointSymbol: 'S-S-D', symbol: a, sellPrice: 200),
-      makePrice(waypointSymbol: 'S-S-E', symbol: a, sellPrice: 300),
+      makePrice(waypoint: 'S-S-A', symbol: a, sellPrice: 100),
+      makePrice(waypoint: 'S-S-B', symbol: a, sellPrice: 110),
+      makePrice(waypoint: 'S-S-C', symbol: a, sellPrice: 150),
+      makePrice(waypoint: 'S-S-D', symbol: a, sellPrice: 200),
+      makePrice(waypoint: 'S-S-E', symbol: a, sellPrice: 300),
     ]);
     expect(marketPrices.percentileForSellPrice(a, 100), 20);
     expect(marketPrices.percentileForSellPrice(a, 110), 40);
@@ -81,23 +66,5 @@ void main() {
     expect(marketPrices.sellPriceAtPercentile(a, 0), 100);
     expect(marketPrices.sellPriceAtPercentile(a, 50), 150);
     expect(marketPrices.sellPriceAtPercentile(a, 25), 110);
-  });
-
-  test('recentSellPrice', () {
-    final price = makePrice(
-      waypointSymbol: 'S-S-A',
-      symbol: TradeSymbol.FUEL,
-      sellPrice: 100,
-      timestamp: _now,
-    );
-    final onePrice = MarketPriceSnapshot([price]);
-    expect(
-      onePrice.recentSellPrice(
-        marketSymbol: price.waypointSymbol,
-        price.symbol,
-        getNow: _getNow,
-      ),
-      price.sellPrice,
-    );
   });
 }

@@ -666,7 +666,7 @@ class CentralCommand {
     }
 
     final marketListings = await db.marketListings.snapshotAll();
-    final shipyardListings = await ShipyardListingSnapshot.load(db);
+    final shipyardListings = await db.shipyardListings.snapshotAll();
     final charting = await db.charting.snapshotAllRecords();
 
     await _updateMedianPrices(db);
@@ -753,7 +753,7 @@ class CentralCommand {
     Ship ship,
     ShipType shipType,
   ) async {
-    final shipyardPrices = await ShipyardPriceSnapshot.load(db);
+    final shipyardPrices = await db.shipyardPrices.snapshotAll();
     final trip = findBestShipyardToBuy(
       shipyardPrices,
       routePlanner,

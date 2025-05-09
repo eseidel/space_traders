@@ -1,4 +1,3 @@
-import 'package:db/db.dart';
 import 'package:types/types.dart';
 
 /// A cached of charted values from Waypoints.
@@ -8,12 +7,6 @@ class ShipyardListingSnapshot {
     : _listingBySymbol = Map.fromEntries(
         listings.map((l) => MapEntry(l.waypointSymbol, l)),
       );
-
-  /// Load the charted values from the cache.
-  static Future<ShipyardListingSnapshot> load(Database db) async {
-    final values = await db.shipyardListings.all();
-    return ShipyardListingSnapshot(values);
-  }
 
   /// The ShipyardListings by WaypointSymbol.
   final Map<WaypointSymbol, ShipyardListing> _listingBySymbol;
@@ -51,14 +44,4 @@ class ShipyardListingSnapshot {
   bool knowOfShipyardWithShip(ShipType shipType) {
     return listings.any((listing) => listing.hasShip(shipType));
   }
-}
-
-/// Add ShipyardListing for the given Shipyard to the cache.
-void recordShipyardListing(Database db, Shipyard shipyard) {
-  final symbol = shipyard.waypointSymbol;
-  final listing = ShipyardListing(
-    waypointSymbol: symbol,
-    shipTypes: shipyard.shipTypes.map((inner) => inner.type).toSet(),
-  );
-  db.shipyardListings.upsert(listing);
 }

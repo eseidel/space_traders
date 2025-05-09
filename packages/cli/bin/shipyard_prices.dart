@@ -4,12 +4,12 @@ import 'package:cli_table/cli_table.dart';
 Future<void> command(Database db, ArgResults argResults) async {
   final showAll = argResults['all'] as bool;
 
-  final shipyardPrices = await ShipyardPriceSnapshot.load(db);
+  final shipyardPrices = await db.shipyardPrices.snapshotAll();
   logger.info(
     'Loaded ${shipyardPrices.prices.length} prices from '
     '${shipyardPrices.waypointCount} waypoints.',
   );
-  final shipyardListings = await ShipyardListingSnapshot.load(db);
+  final shipyardListings = await db.shipyardListings.snapshotAll();
   logger.info(
     'Loaded ${shipyardListings.count} listings from '
     '${shipyardListings.waypointCount} waypoints.',

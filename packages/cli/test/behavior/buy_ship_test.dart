@@ -159,7 +159,9 @@ void main() {
 
     registerFallbackValue(ShipyardListing.fallbackValue());
     when(() => shipyardListingStore.upsert(any())).thenAnswer((_) async {});
-    when(shipyardListingStore.all).thenAnswer((_) async => []);
+    when(
+      shipyardListingStore.snapshotAll,
+    ).thenAnswer((_) async => ShipyardListingSnapshot([]));
 
     registerFallbackValue(Ship.fallbackValue());
     when(() => db.upsertShip(any())).thenAnswer((_) async {});

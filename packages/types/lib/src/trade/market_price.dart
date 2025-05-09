@@ -19,6 +19,38 @@ class MarketPrice extends PriceBase<TradeSymbol> {
     this.activity,
   });
 
+  /// Create a new price record for testing.
+  @visibleForTesting
+  factory MarketPrice.test({
+    required WaypointSymbol waypointSymbol,
+    required TradeSymbol symbol,
+    SupplyLevel supply = SupplyLevel.ABUNDANT,
+    int purchasePrice = 1,
+    int sellPrice = 1,
+    int tradeVolume = 1,
+    DateTime? timestamp,
+  }) {
+    return MarketPrice(
+      waypointSymbol: waypointSymbol,
+      symbol: symbol,
+      supply: supply,
+      purchasePrice: purchasePrice,
+      sellPrice: sellPrice,
+      tradeVolume: tradeVolume,
+      timestamp: timestamp ?? DateTime(2021),
+      activity: ActivityLevel.WEAK,
+    );
+  }
+
+  /// Create a fallback value.
+  @visibleForTesting
+  factory MarketPrice.fallbackValue() {
+    return MarketPrice.test(
+      waypointSymbol: const WaypointSymbol.fallbackValue(),
+      symbol: TradeSymbol.FUEL,
+    );
+  }
+
   /// Create a new price record from a market trade good.
   factory MarketPrice.fromMarketTradeGood(
     MarketTradeGood good,

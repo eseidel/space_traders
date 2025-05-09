@@ -1,7 +1,6 @@
 import 'package:cli/api.dart';
 import 'package:cli/cache/contract_snapshot.dart';
 import 'package:cli/cache/market_cache.dart';
-import 'package:cli/cache/market_price_snapshot.dart';
 import 'package:cli/cache/ship_snapshot.dart';
 import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
@@ -20,10 +19,7 @@ export 'package:cli/api.dart';
 export 'package:cli/cache/behavior_snapshot.dart';
 export 'package:cli/cache/contract_snapshot.dart';
 export 'package:cli/cache/market_cache.dart';
-export 'package:cli/cache/market_price_snapshot.dart';
 export 'package:cli/cache/ship_snapshot.dart';
-export 'package:cli/cache/shipyard_listing_snapshot.dart';
-export 'package:cli/cache/shipyard_price_snapshot.dart';
 export 'package:cli/cache/static_cache.dart';
 export 'package:cli/cache/waypoint_cache.dart';
 export 'package:cli/nav/jump_cache.dart';
@@ -85,7 +81,7 @@ class Caches {
     await fetchShips(db, api);
     await fetchContracts(db, api);
 
-    final marketPrices = await MarketPriceSnapshot.loadAll(db);
+    final marketPrices = await db.marketPrices.snapshotAll();
     // Load exports before we load static caches.  We ignore the response
     // but then static.exports will be up to date.
     await loadExports(db, api.data);
@@ -210,7 +206,7 @@ class TopOfLoopUpdater {
     }
 
     // Should all be deleted from Caches.
-    caches.marketPrices = await MarketPriceSnapshot.loadAll(db);
+    caches.marketPrices = await db.marketPrices.snapshotAll();
   }
 }
 

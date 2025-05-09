@@ -559,7 +559,9 @@ void main() {
 
     final shipyardListingStore = _MockShipyardListingStore();
     when(() => db.shipyardListings).thenReturn(shipyardListingStore);
-    when(shipyardListingStore.all).thenAnswer((_) async => []);
+    when(
+      shipyardListingStore.snapshotAll,
+    ).thenAnswer((_) async => ShipyardListingSnapshot([]));
 
     final behaviorStore = _MockBehaviorStore();
     when(() => db.behaviors).thenReturn(behaviorStore);

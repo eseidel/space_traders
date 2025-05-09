@@ -29,7 +29,7 @@ Future<JobResult> doTradeInJob(
   );
 
   final price = assertNotNull(
-    await db.shipyardPriceAt(ship.waypointSymbol, shipType),
+    await db.shipyardPrices.at(ship.waypointSymbol, shipType),
     'No price found.',
     const Duration(minutes: 5),
   );

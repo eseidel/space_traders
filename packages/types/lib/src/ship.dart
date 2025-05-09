@@ -272,6 +272,12 @@ class Ship {
     this.mounts = const [],
   });
 
+  /// Fallback value for mocking.
+  @visibleForTesting
+  factory Ship.fallbackValue() {
+    return Ship.test(const ShipSymbol.fallbackValue());
+  }
+
   /// Creates a new ship from a JSON map.
   Ship.fromJson(Map<String, dynamic> json)
     : this.fromOpenApi(openapi.Ship.fromJson(json)!);
@@ -372,12 +378,6 @@ class Ship {
     );
   }
 
-  /// Fallback value for mocking.
-  @visibleForTesting
-  factory Ship.fallbackValue() {
-    return Ship.test(const ShipSymbol.fallbackValue());
-  }
-
   /// Converts this ship to an OpenAPI ship.
   openapi.Ship toOpenApi() => openapi.Ship(
     symbol: symbol.symbol,
@@ -452,4 +452,66 @@ class Ship {
 
   /// Fuel carried by this ship.
   openapi.ShipFuel fuel;
+}
+
+/// Create a test ShipyardShip.
+@visibleForTesting
+ShipyardShip testShipyardShip() {
+  return ShipyardShip(
+    type: ShipType.PROBE,
+    purchasePrice: 100,
+    name: 'name',
+    description: 'description',
+    supply: SupplyLevel.MODERATE,
+    frame: ShipFrame(
+      symbol: ShipFrameSymbolEnum.PROBE,
+      name: 'name',
+      description: 'description',
+      condition: 100,
+      integrity: 100,
+      quality: 100,
+      requirements: ShipRequirements(power: 100, crew: 100, slots: 100),
+      moduleSlots: 100,
+      mountingPoints: 100,
+      fuelCapacity: 100,
+    ),
+    reactor: ShipReactor(
+      symbol: ShipReactorSymbolEnum.SOLAR_I,
+      name: 'name',
+      description: 'description',
+      condition: 100,
+      integrity: 100,
+      powerOutput: 100,
+      requirements: ShipRequirements(power: 100, crew: 100, slots: 100),
+      quality: 100,
+    ),
+    engine: ShipEngine(
+      symbol: ShipEngineSymbolEnum.ION_DRIVE_I,
+      name: 'name',
+      description: 'description',
+      condition: 100,
+      integrity: 100,
+      speed: 100,
+      requirements: ShipRequirements(power: 100, crew: 100, slots: 100),
+      quality: 100,
+    ),
+    modules: [
+      ShipModule(
+        symbol: ShipModuleSymbolEnum.MINERAL_PROCESSOR_I,
+        name: 'name',
+        description: 'description',
+        requirements: ShipRequirements(power: 100, crew: 100, slots: 100),
+      ),
+    ],
+    mounts: [
+      ShipMount(
+        symbol: ShipMountSymbolEnum.GAS_SIPHON_I,
+        name: 'name',
+        description: 'description',
+        strength: 100,
+        requirements: ShipRequirements(power: 100, crew: 100, slots: 100),
+      ),
+    ],
+    crew: ShipyardShipCrew(required_: 100, capacity: 100),
+  );
 }

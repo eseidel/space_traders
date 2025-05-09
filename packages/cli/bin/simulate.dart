@@ -147,10 +147,10 @@ int shipPrice(ShipyardPriceSnapshot shipyardPrices, ShipType shipType) {
 }
 
 Future<void> command(Database db, ArgResults argResults) async {
-  final marketPrices = await MarketPriceSnapshot.loadAll(db);
+  final marketPrices = await db.marketPrices.snapshotAll();
   final systemsCache = await db.systems.snapshotAllSystems();
   final routePlanner = await defaultRoutePlanner(db);
-  final shipyardPrices = await ShipyardPriceSnapshot.load(db);
+  final shipyardPrices = await db.shipyardPrices.snapshotAll();
   final shipyardShips = await ShipyardShipCache(db).snapshot();
   final shipMounts = await ShipMountCache(db).snapshot();
 

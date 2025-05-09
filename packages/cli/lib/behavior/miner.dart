@@ -264,8 +264,7 @@ Future<JobResult> doMineJob(
     return JobResult.wait(expiration);
   }
 
-  final marketPrices = await MarketPriceSnapshot.loadOneSystem(
-    db,
+  final marketPrices = await db.marketPrices.snapshotInSystem(
     ship.systemSymbol,
   );
 
@@ -372,8 +371,7 @@ Future<JobResult> emptyCargoIfNeeded(
     getNow: getNow,
   );
   if (currentMarket != null) {
-    final marketPrices = await MarketPriceSnapshot.loadOneSystem(
-      db,
+    final marketPrices = await db.marketPrices.snapshotInSystem(
       ship.systemSymbol,
     );
 
@@ -465,8 +463,7 @@ Future<JobResult> travelAndSellCargo(
 
   // Could be "nearby" systems but marketsTradingSortedByDistance is currently
   // restricted to this system.
-  final marketPrices = await MarketPriceSnapshot.loadOneSystem(
-    db,
+  final marketPrices = await db.marketPrices.snapshotInSystem(
     ship.systemSymbol,
   );
 

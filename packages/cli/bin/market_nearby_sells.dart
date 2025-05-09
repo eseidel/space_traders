@@ -2,7 +2,7 @@ import 'package:cli/cli.dart';
 import 'package:cli/plan/trading.dart';
 
 Future<void> command(Database db, ArgResults argResults) async {
-  final marketPrices = await MarketPriceSnapshot.loadAll(db);
+  final marketPrices = await db.marketPrices.snapshotAll();
   final systemsCache = await db.systems.snapshotAllSystems();
   final routePlanner = await defaultRoutePlanner(db);
   final ships = await ShipSnapshot.load(db);

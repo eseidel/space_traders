@@ -244,6 +244,9 @@ class Database {
   /// Get the market price store.
   MarketPriceStore get marketPrices => MarketPriceStore(this);
 
+  /// Get the shipyard price store.
+  ShipyardPriceStore get shipyardPrices => ShipyardPriceStore(this);
+
   /// Get the shipyard listing store.
   ShipyardListingStore get shipyardListings => ShipyardListingStore(this);
 
@@ -389,25 +392,6 @@ class Database {
   /// Update the given agent in the database.
   Future<void> upsertAgent(Agent agent) async {
     await execute(upsertAgentQuery(agent));
-  }
-
-  /// Get all shipyard prices from the database.
-  Future<Iterable<ShipyardPrice>> allShipyardPrices() async {
-    return queryMany(allShipyardPricesQuery(), shipyardPriceFromColumnMap);
-  }
-
-  /// Get the shipyard price for the given waypoint and ship type.
-  Future<ShipyardPrice?> shipyardPriceAt(
-    WaypointSymbol waypointSymbol,
-    ShipType shipType,
-  ) async {
-    final query = shipyardPriceQuery(waypointSymbol, shipType);
-    return queryOne(query, shipyardPriceFromColumnMap);
-  }
-
-  /// Add a shipyard price to the database.
-  Future<void> upsertShipyardPrice(ShipyardPrice price) async {
-    await execute(upsertShipyardPriceQuery(price));
   }
 
   /// Get all ships.

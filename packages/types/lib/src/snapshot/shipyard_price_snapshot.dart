@@ -1,24 +1,14 @@
 import 'dart:math';
 
-import 'package:cli/cache/price_snapshot.dart';
-import 'package:cli/cache/shipyard_listing_snapshot.dart';
-import 'package:cli/cache/static_cache.dart';
-import 'package:cli/logger.dart';
 import 'package:collection/collection.dart';
-import 'package:db/db.dart';
 import 'package:types/config.dart';
+import 'package:types/src/snapshot/price_snapshot.dart';
 import 'package:types/types.dart';
 
 /// A collection of price records.
 class ShipyardPriceSnapshot extends PriceSnapshot<ShipType, ShipyardPrice> {
   /// Create a new price data collection.
   ShipyardPriceSnapshot(super.records);
-
-  /// Load the price data from the cache.
-  static Future<ShipyardPriceSnapshot> load(Database db) async {
-    final prices = await db.allShipyardPrices();
-    return ShipyardPriceSnapshot(prices.toList());
-  }
 
   /// Get the median purchase price for a [ShipType].
   int? medianPurchasePrice(ShipType shipType) =>
@@ -89,43 +79,5 @@ class ShipyardPriceSnapshot extends PriceSnapshot<ShipType, ShipyardPrice> {
       return null;
     }
     return pricesForSymbolSorted.last.purchasePrice;
-  }
-}
-
-/// Record shipyard data and log the result.
-void recordShipyardDataAndLog(
-  Database db,
-  StaticCaches staticCaches,
-  Shipyard shipyard,
-  Ship ship,
-) {
-  recordShipyardPrices(db, shipyard);
-  recordShipyardShips(staticCaches, shipyard.ships);
-  recordShipyardListing(db, shipyard);
-  // Powershell needs an extra space after the emoji.
-  shipDetail(ship, '✍️  shipyard data @ ${shipyard.symbol}');
-}
-
-/// Record shipyard prices.
-void recordShipyardPrices(
-  Database db,
-  Shipyard shipyard, {
-  DateTime Function() getNow = defaultGetNow,
-}) {
-  final prices =
-      shipyard.ships
-          .map(
-            (s) => ShipyardPrice.fromShipyardShip(
-              s,
-              shipyard.waypointSymbol,
-              getNow: getNow,
-            ),
-          )
-          .toList();
-  if (prices.isEmpty) {
-    logger.warn('No prices for ${shipyard.symbol}!');
-  }
-  for (final price in prices) {
-    db.upsertShipyardPrice(price);
   }
 }

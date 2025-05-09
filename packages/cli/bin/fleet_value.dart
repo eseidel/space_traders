@@ -32,8 +32,8 @@ Map<ShipType, int> _shipTypeCounts(
 
 Future<void> command(Database db, ArgResults argResults) async {
   final ships = await ShipSnapshot.load(db);
-  final marketPrices = await MarketPriceSnapshot.loadAll(db);
-  final shipyardPrices = await ShipyardPriceSnapshot.load(db);
+  final marketPrices = await db.marketPrices.snapshotAll();
+  final shipyardPrices = await db.shipyardPrices.snapshotAll();
   final shipyardShips = await ShipyardShipCache(db).snapshot();
 
   logger.info('Estimating fleet value at current median prices.');

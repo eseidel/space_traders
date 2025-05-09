@@ -24,13 +24,17 @@ class _MockMarket extends Mock implements Market {}
 
 class _MockMarketListingStore extends Mock implements MarketListingStore {}
 
-class _MockMarketPrices extends Mock implements MarketPriceSnapshot {}
+class _MockMarketPriceSnapshot extends Mock implements MarketPriceSnapshot {}
+
+class _MockMarketPriceStore extends Mock implements MarketPriceStore {}
 
 class _MockShip extends Mock implements Ship {}
 
 class _MockShipFrame extends Mock implements ShipFrame {}
 
 class _MockShipNav extends Mock implements ShipNav {}
+
+class _MockShipyardPriceStore extends Mock implements ShipyardPriceStore {}
 
 class _MockShipyardTransaction extends Mock implements ShipyardTransaction {}
 
@@ -579,7 +583,7 @@ void main() {
         sellPrice: 11,
       ),
     ]);
-    final marketPrices = _MockMarketPrices();
+    final marketPrices = _MockMarketPriceSnapshot();
     const accountingType = AccountingType.goods;
 
     final emptyTransactions = await runWithLogger(logger, () async {
@@ -1135,5 +1139,129 @@ void main() {
     recordSurveys(db, surveys);
 
     verify(() => db.surveys.insert(any())).called(2);
+  });
+
+  test('warpToWaypoint', () async {
+    final api = _MockApi();
+    final db = _MockDatabase();
+    final fleetApi = _MockFleetApi();
+    when(() => api.fleet).thenReturn(fleetApi);
+    final ship = _MockShip();
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
+    final shipSymbol = ShipSymbol.fromString('S-1');
+    when(() => ship.symbol).thenReturn(shipSymbol);
+    final waypointSymbol = WaypointSymbol.fromString('S-A-W');
+    final shipNav = _MockShipNav();
+    when(() => ship.nav).thenReturn(shipNav);
+    when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
+    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
+    final logger = _MockLogger();
+
+    when(
+      () => fleetApi.warpShip(
+        any(),
+        navigateShipRequest: any(named: 'navigateShipRequest'),
+      ),
+    ).thenAnswer((_) async {
+      return WarpShip200Response(
+        data: WarpShip200ResponseData(
+          fuel: ShipFuel(current: 0, capacity: 0),
+          nav: _MockShipNav(),
+        ),
+      );
+    });
+
+    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
+    await runWithLogger(logger, () async {
+      await warpToWaypoint(db, api, ship, waypointSymbol);
+    });
+    verify(
+      () => fleetApi.warpShip(
+        shipSymbol.symbol,
+        navigateShipRequest: NavigateShipRequest(
+          waypointSymbol: waypointSymbol.waypoint,
+        ),
+      ),
+    ).called(1);
+  });
+
+  test('recordShipyardPrices', () async {
+    final db = _MockDatabase();
+    final shipyardPriceStore = _MockShipyardPriceStore();
+    when(() => db.shipyardPrices).thenReturn(shipyardPriceStore);
+    registerFallbackValue(ShipyardPrice.fallbackValue());
+    when(() => shipyardPriceStore.upsert(any())).thenAnswer((_) async {});
+    final shipyard = Shipyard(
+      symbol: 'S-A-W',
+      shipTypes: [ShipyardShipTypesInner(type: ShipType.PROBE)],
+      modificationsFee: 100,
+      ships: [testShipyardShip()],
+    );
+    recordShipyardPrices(db, shipyard);
+    verify(() => db.shipyardPrices.upsert(any())).called(1);
+  });
+
+  test('recordMarketPrices', () async {
+    final db = _MockDatabase();
+    final marketPriceStore = _MockMarketPriceStore();
+    when(() => db.marketPrices).thenReturn(marketPriceStore);
+    registerFallbackValue(MarketPrice.fallbackValue());
+    when(() => marketPriceStore.upsert(any())).thenAnswer((_) async {
+      return;
+    });
+    final market = Market(
+      symbol: 'S-A-W',
+      imports: [],
+      exports: [],
+      transactions: [],
+      tradeGoods: [
+        MarketTradeGood(
+          symbol: TradeSymbol.FUEL,
+          supply: SupplyLevel.ABUNDANT,
+          type: MarketTradeGoodTypeEnum.IMPORT,
+          purchasePrice: 1,
+          sellPrice: 1,
+          tradeVolume: 1,
+        ),
+      ],
+    );
+    await recordMarketPrices(db, market);
+    verify(() => db.marketPrices.upsert(any())).called(1);
+  });
+
+  test('scrapShipAndLog', () async {
+    final api = _MockApi();
+    final fleetApi = _MockFleetApi();
+    when(() => api.fleet).thenReturn(fleetApi);
+    final db = _MockDatabase();
+    final transactionStore = _MockTransactionStore();
+    when(() => db.transactions).thenReturn(transactionStore);
+    registerFallbackValue(Transaction.fallbackValue());
+    when(() => transactionStore.insert(any())).thenAnswer((_) async {});
+
+    final agent = Agent.test(credits: 10000000);
+    final shipSymbol = ShipSymbol.fromString('S-1');
+    final ship = Ship.test(shipSymbol);
+    final waypointSymbol = WaypointSymbol.fromString('S-A-W');
+    when(() => fleetApi.scrapShip(any())).thenAnswer((_) async {
+      return ScrapShip200Response(
+        data: ScrapShip200ResponseData(
+          agent: agent.toOpenApi(),
+          transaction: ScrapTransaction(
+            shipSymbol: shipSymbol.symbol,
+            waypointSymbol: waypointSymbol.waypoint,
+            totalPrice: 100,
+            timestamp: DateTime(2021),
+          ),
+        ),
+      );
+    });
+    when(() => db.deleteShip(shipSymbol)).thenAnswer((_) async {});
+    when(() => db.upsertAgent(any())).thenAnswer((_) async {});
+    final logger = _MockLogger();
+    await runWithLogger(logger, () async {
+      await scrapShipAndLog(api, db, ship);
+    });
+    verify(() => fleetApi.scrapShip(shipSymbol.symbol)).called(1);
   });
 }

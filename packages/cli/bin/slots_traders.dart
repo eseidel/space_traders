@@ -6,7 +6,7 @@ import 'package:collection/collection.dart';
 Future<void> command(Database db, ArgResults argResults) async {
   // First need to figure out which systems are worth checking.
 
-  final marketPrices = await MarketPriceSnapshot.loadAll(db);
+  final marketPrices = await db.marketPrices.snapshotAll();
   final agent = await db.getMyAgent();
   final routePlanner = await defaultRoutePlanner(db);
   final startSystem = agent!.headquarters.system;

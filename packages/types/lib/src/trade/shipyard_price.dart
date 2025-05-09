@@ -12,6 +12,17 @@ class ShipyardPrice extends PriceBase<ShipType> {
     required super.timestamp,
   }) : super(symbol: shipType);
 
+  /// Create a fallback value.
+  @visibleForTesting
+  factory ShipyardPrice.fallbackValue() {
+    return ShipyardPrice(
+      waypointSymbol: const WaypointSymbol.fallbackValue(),
+      shipType: ShipType.ORE_HOUND,
+      purchasePrice: 100,
+      timestamp: DateTime.timestamp(),
+    );
+  }
+
   /// Create a new price record from a ShipyardShip.
   factory ShipyardPrice.fromShipyardShip(
     ShipyardShip ship,
