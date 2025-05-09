@@ -24,7 +24,9 @@ class _MockMarket extends Mock implements Market {}
 
 class _MockMarketListingStore extends Mock implements MarketListingStore {}
 
-class _MockMarketPrices extends Mock implements MarketPriceSnapshot {}
+class _MockMarketPriceSnapshot extends Mock implements MarketPriceSnapshot {}
+
+class _MockMarketPriceStore extends Mock implements MarketPriceStore {}
 
 class _MockShip extends Mock implements Ship {}
 
@@ -581,7 +583,7 @@ void main() {
         sellPrice: 11,
       ),
     ]);
-    final marketPrices = _MockMarketPrices();
+    final marketPrices = _MockMarketPriceSnapshot();
     const accountingType = AccountingType.goods;
 
     final emptyTransactions = await runWithLogger(logger, () async {
@@ -1197,5 +1199,33 @@ void main() {
     );
     recordShipyardPrices(db, shipyard);
     verify(() => db.shipyardPrices.upsert(any())).called(1);
+  });
+
+  test('recordMarketPrices', () async {
+    final db = _MockDatabase();
+    final marketPriceStore = _MockMarketPriceStore();
+    when(() => db.marketPrices).thenReturn(marketPriceStore);
+    registerFallbackValue(MarketPrice.fallbackValue());
+    when(() => marketPriceStore.upsert(any())).thenAnswer((_) async {
+      return;
+    });
+    final market = Market(
+      symbol: 'S-A-W',
+      imports: [],
+      exports: [],
+      transactions: [],
+      tradeGoods: [
+        MarketTradeGood(
+          symbol: TradeSymbol.FUEL,
+          supply: SupplyLevel.ABUNDANT,
+          type: MarketTradeGoodTypeEnum.IMPORT,
+          purchasePrice: 1,
+          sellPrice: 1,
+          tradeVolume: 1,
+        ),
+      ],
+    );
+    await recordMarketPrices(db, market);
+    verify(() => db.marketPrices.upsert(any())).called(1);
   });
 }

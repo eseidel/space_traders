@@ -843,8 +843,8 @@ Future<void> setShipFlightModeIfNeeded(
   await setShipFlightMode(db, api, ship, flightMode);
 }
 
-/// Record market data silently.
-Future<void> recordMarketData(
+/// Record market prices silently.
+Future<void> recordMarketPrices(
   Database db,
   Market market, {
   DateTime Function() getNow = defaultGetNow,

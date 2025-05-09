@@ -42,6 +42,15 @@ class MarketPrice extends PriceBase<TradeSymbol> {
     );
   }
 
+  /// Create a fallback value.
+  @visibleForTesting
+  factory MarketPrice.fallbackValue() {
+    return MarketPrice.test(
+      waypointSymbol: const WaypointSymbol.fallbackValue(),
+      symbol: TradeSymbol.FUEL,
+    );
+  }
+
   /// Create a new price record from a market trade good.
   factory MarketPrice.fromMarketTradeGood(
     MarketTradeGood good,
