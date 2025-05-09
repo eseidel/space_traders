@@ -133,7 +133,7 @@ Future<void> recordShipyardDataIfNeededAndLog(
   }
   // If we have shipyard data more recent than maxAge, don't bother refreshing.
   // This prevents ships from constantly refreshing the same data.
-  if (await db.hasRecentShipyardPrices(shipyardSymbol, maxAge)) {
+  if (await db.shipyardPrices.hasRecent(shipyardSymbol, maxAge)) {
     return;
   }
   final shipyard = await getShipyard(api, shipyardSymbol);

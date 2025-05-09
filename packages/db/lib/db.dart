@@ -415,41 +415,6 @@ class Database {
     await execute(deleteShipQuery(symbol));
   }
 
-  Future<bool> _hasRecentPrice(Query query, Duration maxAge) async {
-    final result = await execute(query);
-    if (result.isEmpty) {
-      return false;
-    }
-    final timestamp = result[0][0] as DateTime?;
-    if (timestamp == null) {
-      return false;
-    }
-    return DateTime.now().difference(timestamp) < maxAge;
-  }
-
-  /// Check if the given waypoint has recent shipyard prices.
-  Future<bool> hasRecentShipyardPrices(
-    WaypointSymbol waypointSymbol,
-    Duration maxAge,
-  ) async {
-    final query = timestampOfMostRecentShipyardPriceQuery(waypointSymbol);
-    return _hasRecentPrice(query, maxAge);
-  }
-
-  /// Count the number of shipyard prices in the database.
-  Future<int> shipyardPricesCount() async {
-    final result = await executeSql('SELECT COUNT(*) FROM shipyard_price_');
-    return result[0][0]! as int;
-  }
-
-  /// Count the number of unique symbols in the ShipyardPrices table.
-  Future<int> shipyardPricesWaypointCount() async {
-    final result = await executeSql(
-      'SELECT COUNT(DISTINCT waypoint_symbol) FROM shipyard_price_',
-    );
-    return result[0][0]! as int;
-  }
-
   /// Get static data of type [type] and key [key] from the static_data_ table.
   /// Returns null if not found.
   Future<Map<String, dynamic>?> getFromStaticCache({

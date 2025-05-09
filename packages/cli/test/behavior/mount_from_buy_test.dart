@@ -34,6 +34,8 @@ class _MockRoutePlanner extends Mock implements RoutePlanner {}
 class _MockShipyardListingSnapshot extends Mock
     implements ShipyardListingSnapshot {}
 
+class _MockShipyardPriceStore extends Mock implements ShipyardPriceStore {}
+
 class _MockTransactionStore extends Mock implements TransactionStore {}
 
 void main() {
@@ -135,8 +137,12 @@ void main() {
     when(
       () => marketPricesStore.hasRecentAt(waypointSymbol, any()),
     ).thenAnswer((_) async => true);
+
+    final shipyardPriceStore = _MockShipyardPriceStore();
+    when(() => db.shipyardPrices).thenReturn(shipyardPriceStore);
+
     when(
-      () => db.hasRecentShipyardPrices(waypointSymbol, any()),
+      () => shipyardPriceStore.hasRecent(waypointSymbol, any()),
     ).thenAnswer((_) async => true);
 
     when(
