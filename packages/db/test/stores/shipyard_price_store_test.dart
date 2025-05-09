@@ -37,6 +37,27 @@ void main() {
         expect(all.length, equals(1));
         expect(all.first, equals(price));
       });
+
+      test('hasRecent', () async {
+        final store = db.shipyardPrices;
+        final price = ShipyardPrice.fallbackValue();
+        await store.upsert(price);
+        final result = await store.hasRecent(
+          price.waypointSymbol,
+          const Duration(days: 1),
+        );
+        expect(result, equals(true));
+      });
+
+      test('count', () async {
+        final store = db.shipyardPrices;
+        final price = ShipyardPrice.fallbackValue();
+        await store.upsert(price);
+        final result = await store.count();
+        expect(result, equals(1));
+        final waypointCount = await store.waypointCount();
+        expect(waypointCount, equals(1));
+      });
     });
   });
 }
