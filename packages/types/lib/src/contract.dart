@@ -134,8 +134,6 @@ class Contract {
     );
   }
 
-  // bool needsItem(String tradeSymbol) => goodNeeded(tradeSymbol) != null;
-
   /// Returns the ContractDeliverGood for the given trade good symbol or null if
   /// the contract doesn't need that good.
   openapi.ContractDeliverGood? goodNeeded(openapi.TradeSymbol tradeSymbol) {
