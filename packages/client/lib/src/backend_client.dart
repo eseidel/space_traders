@@ -1,14 +1,7 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:protocol/protocol.dart';
-
-typedef Json = Map<String, dynamic>;
-
-extension JsonDecode on http.Response {
-  Map<String, dynamic> get json => jsonDecode(body) as Json;
-}
 
 class BackendClient {
   BackendClient({required this.hostedUri, http.Client? httpClient})
