@@ -20,7 +20,6 @@ export 'package:cli/cache/behavior_snapshot.dart';
 export 'package:cli/cache/contract_snapshot.dart';
 export 'package:cli/cache/market_cache.dart';
 export 'package:cli/cache/ship_snapshot.dart';
-export 'package:cli/cache/shipyard_listing_snapshot.dart';
 export 'package:cli/cache/static_cache.dart';
 export 'package:cli/cache/waypoint_cache.dart';
 export 'package:cli/nav/jump_cache.dart';

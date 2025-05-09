@@ -165,7 +165,7 @@ Future<JobResult> _doBuyShipJob(
 
   // This is a bit of a hack, but lets us buy ships more often, otherwise
   // we won't have a next job once this one is done.
-  final shipyardListings = await ShipyardListingSnapshot.load(db);
+  final shipyardListings = await db.shipyardListings.snapshotAll();
   final ships = await ShipSnapshot.load(db);
   final agent = await db.getMyAgent();
   await centralCommand.updateBuyShipJobIfNeeded(

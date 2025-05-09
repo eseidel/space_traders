@@ -1,9 +1,8 @@
 import 'dart:math';
 
 import 'package:types/config.dart';
-import 'package:types/types.dart';
-
 import 'package:types/src/snapshot/price_snapshot.dart';
+import 'package:types/types.dart';
 
 /// A collection of price records.
 // Could consider sharding this by system if it gets too big.

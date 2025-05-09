@@ -905,3 +905,13 @@ void recordShipyardPrices(
     db.shipyardPrices.upsert(price);
   }
 }
+
+/// Add ShipyardListing for the given Shipyard to the cache.
+void recordShipyardListing(Database db, Shipyard shipyard) {
+  final symbol = shipyard.waypointSymbol;
+  final listing = ShipyardListing(
+    waypointSymbol: symbol,
+    shipTypes: shipyard.shipTypes.map((inner) => inner.type).toSet(),
+  );
+  db.shipyardListings.upsert(listing);
+}

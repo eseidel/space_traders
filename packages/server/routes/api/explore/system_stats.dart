@@ -77,7 +77,7 @@ Future<SystemStats> computeSystemStats({
   }
 
   // How many shipyards?
-  final shipyardListings = await ShipyardListingSnapshot.load(db);
+  final shipyardListings = await db.shipyardListings.snapshotAll();
   var shipyards = 0;
   for (final listing in shipyardListings.listings) {
     // We could sort first by system to save ourselves some lookups.
