@@ -32,6 +32,8 @@ class _MockShipFrame extends Mock implements ShipFrame {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
+class _MockShipyardPriceStore extends Mock implements ShipyardPriceStore {}
+
 class _MockShipyardTransaction extends Mock implements ShipyardTransaction {}
 
 class _MockSurveyStore extends Mock implements SurveyStore {}
@@ -1179,5 +1181,21 @@ void main() {
         ),
       ),
     ).called(1);
+  });
+
+  test('recordShipyardPrices', () async {
+    final db = _MockDatabase();
+    final shipyardPriceStore = _MockShipyardPriceStore();
+    when(() => db.shipyardPrices).thenReturn(shipyardPriceStore);
+    registerFallbackValue(ShipyardPrice.fallbackValue());
+    when(() => shipyardPriceStore.upsert(any())).thenAnswer((_) async {});
+    final shipyard = Shipyard(
+      symbol: 'S-A-W',
+      shipTypes: [ShipyardShipTypesInner(type: ShipType.PROBE)],
+      modificationsFee: 100,
+      ships: [testShipyardShip()],
+    );
+    recordShipyardPrices(db, shipyard);
+    verify(() => db.shipyardPrices.upsert(any())).called(1);
   });
 }
