@@ -11,6 +11,8 @@ import '../cache/caches_mock.dart';
 
 class _MockApi extends Mock implements Api {}
 
+class _MockBehaviorStore extends Mock implements BehaviorStore {}
+
 class _MockBehaviorTimeouts extends Mock implements BehaviorTimeouts {}
 
 class _MockChartingStore extends Mock implements ChartingStore {}
@@ -46,6 +48,8 @@ class _MockShipyardShipSnapshot extends Mock implements ShipyardShipSnapshot {}
 class _MockShipyardListingSnapshot extends Mock
     implements ShipyardListingSnapshot {}
 
+class _MockShipyardListingStore extends Mock implements ShipyardListingStore {}
+
 class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
 
 class _MockSystemsStore extends Mock implements SystemsStore {}
@@ -69,10 +73,14 @@ void main() {
     }
 
     final db = _MockDatabase();
+
+    final behaviorStore = _MockBehaviorStore();
+    when(() => db.behaviors).thenReturn(behaviorStore);
+
     registerFallbackValue(BehaviorState.fallbackValue());
     registerFallbackValue(const ShipSymbol.fallbackValue());
-    when(() => db.upsertBehavior(any())).thenAnswer((_) async {});
-    when(() => db.deleteBehavior(any())).thenAnswer((_) async {});
+    when(() => behaviorStore.upsert(any())).thenAnswer((_) async {});
+    when(() => behaviorStore.delete(any())).thenAnswer((_) async {});
     final behaviors = BehaviorSnapshot([]);
     final ships = ShipSnapshot([]);
 
@@ -98,7 +106,7 @@ void main() {
       behaviors.states.add(behaviorState);
       ships.ships.add(ship);
       when(
-        () => db.getBehavior(shipSymbol),
+        () => behaviorStore.get(shipSymbol),
       ).thenAnswer((_) async => behaviorState);
     }
 
@@ -359,8 +367,10 @@ void main() {
     );
     // Currently we pad with 100k for trading.
     final paddingCredits = config.shipBuyBufferForTrading;
+    final behaviorStore = _MockBehaviorStore();
+    when(() => db.behaviors).thenReturn(behaviorStore);
     when(
-      () => db.behaviorsOfType(Behavior.buyShip),
+      () => behaviorStore.ofType(Behavior.buyShip),
     ).thenAnswer((_) async => []);
     final systemConnectivity = _MockSystemConnectivity();
     registerFallbackValue(waypointSymbol.system);
@@ -377,7 +387,7 @@ void main() {
     expect(shouldBuy, true);
 
     // But stops if someone else is already buying.
-    when(() => db.behaviorsOfType(Behavior.buyShip)).thenAnswer(
+    when(() => behaviorStore.ofType(Behavior.buyShip)).thenAnswer(
       (_) async => [BehaviorState(const ShipSymbol('A', 1), Behavior.buyShip)],
     );
     expect(
@@ -546,9 +556,14 @@ void main() {
       marketListingStore.snapshotAll,
     ).thenAnswer((_) async => MarketListingSnapshot([]));
     when(db.allShips).thenAnswer((_) async => []);
-    when(db.allShipyardListings).thenAnswer((_) async => []);
 
-    when(() => db.getBehavior(shipSymbol)).thenAnswer((_) async => null);
+    final shipyardListingStore = _MockShipyardListingStore();
+    when(() => db.shipyardListings).thenReturn(shipyardListingStore);
+    when(shipyardListingStore.all).thenAnswer((_) async => []);
+
+    final behaviorStore = _MockBehaviorStore();
+    when(() => db.behaviors).thenReturn(behaviorStore);
+    when(() => behaviorStore.get(shipSymbol)).thenAnswer((_) async => null);
 
     final chartingStore = _MockChartingStore();
     when(() => db.charting).thenReturn(chartingStore);

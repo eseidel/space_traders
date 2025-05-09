@@ -88,7 +88,7 @@ Future<BalanceSheet> computeBalanceSheet(Database db) async {
     shipyardPrices,
   );
 
-  final loans = (await db.activeContracts()).fold(
+  final loans = (await db.contracts.active()).fold(
     0,
     (total, contract) => total + contract.terms.payment.onAccepted,
   );

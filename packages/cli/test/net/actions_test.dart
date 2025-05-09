@@ -10,6 +10,8 @@ class _MockApi extends Mock implements Api {}
 
 class _MockChartingStore extends Mock implements ChartingStore {}
 
+class _MockContractStore extends Mock implements ContractStore {}
+
 class _MockContractsApi extends Mock implements ContractsApi {}
 
 class _MockDatabase extends Mock implements Database {}
@@ -847,10 +849,15 @@ void main() {
 
     final transactionStore = _MockTransactionStore();
     when(() => db.transactions).thenReturn(transactionStore);
-
     when(() => transactionStore.insert(any())).thenAnswer((_) async {});
+
+    final contractStore = _MockContractStore();
+    when(() => db.contracts).thenReturn(contractStore);
+
     registerFallbackValue(Contract.fallbackValue());
-    when(() => db.upsertContract(any())).thenAnswer((_) async {});
+    when(() => contractStore.upsert(any())).thenAnswer((_) async {
+      return;
+    });
     when(() => db.upsertAgent(any())).thenAnswer((_) async {});
 
     await runWithLogger(logger, () async {
@@ -862,7 +869,7 @@ void main() {
         any(that: isA<Agent>().having((a) => a.credits, 'credits', 100)),
       ),
     ).called(1);
-    verify(() => db.upsertContract(any())).called(1);
+    verify(() => db.contracts.upsert(any())).called(1);
   });
 
   test('completeContractAndLog', () async {
@@ -902,10 +909,12 @@ void main() {
 
     final transactionStore = _MockTransactionStore();
     when(() => db.transactions).thenReturn(transactionStore);
-
     when(() => transactionStore.insert(any())).thenAnswer((_) async {});
+
+    final contractStore = _MockContractStore();
+    when(() => db.contracts).thenReturn(contractStore);
     registerFallbackValue(Contract.fallbackValue());
-    when(() => db.upsertContract(any())).thenAnswer((_) async {});
+    when(() => contractStore.upsert(any())).thenAnswer((_) async {});
     when(() => db.upsertAgent(any())).thenAnswer((_) async {});
 
     await runWithLogger(logger, () async {
@@ -917,7 +926,7 @@ void main() {
         any(that: isA<Agent>().having((a) => a.credits, 'credits', 1000)),
       ),
     ).called(1);
-    verify(() => db.upsertContract(any())).called(1);
+    verify(() => db.contracts.upsert(any())).called(1);
   });
 
   test('useJumpGateAndLog', () async {

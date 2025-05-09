@@ -239,7 +239,7 @@ Future<JobResult> _handleContractDealAtDestination(
     const Duration(minutes: 10),
   );
   final contract = assertNotNull(
-    await db.contractById(contractId),
+    await db.contracts.get(contractId),
     'No contract.',
     const Duration(minutes: 10),
   );
@@ -499,13 +499,13 @@ Future<DateTime?> acceptContractsIfNeeded(
   Ship ship,
 ) async {
   /// Accept logic we run any time contract trading is turned on.
-  final activeContracts = await db.activeContracts();
+  final activeContracts = await db.contracts.active();
   if (activeContracts.isEmpty) {
     final contract = await negotiateContractAndLog(db, api, ship);
     shipInfo(ship, await describeExpectedContractProfit(db, contract));
     return null;
   }
-  final unacceptedContracts = await db.unacceptedContracts();
+  final unacceptedContracts = await db.contracts.unaccepted();
   for (final contract in unacceptedContracts) {
     await acceptContractAndLog(api, db, ship, contract);
   }

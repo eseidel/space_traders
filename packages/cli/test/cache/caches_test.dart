@@ -6,6 +6,8 @@ class _MockAgentsApi extends Mock implements AgentsApi {}
 
 class _MockApi extends Mock implements Api {}
 
+class _MockBehaviorStore extends Mock implements BehaviorStore {}
+
 class _MockConstructionStore extends Mock implements ConstructionStore {}
 
 class _MockContractsApi extends Mock implements ContractsApi {}
@@ -31,6 +33,8 @@ class _MockMarketListingStore extends Mock implements MarketListingStore {}
 class _MockMarketPriceStore extends Mock implements MarketPriceStore {}
 
 class _MockRoutePlanner extends Mock implements RoutePlanner {}
+
+class _MockShipyardListingStore extends Mock implements ShipyardListingStore {}
 
 class _MockStaticCaches extends Mock implements StaticCaches {}
 
@@ -124,11 +128,16 @@ void main() {
 
     final marketPriceStore = _MockMarketPriceStore();
     when(() => db.marketPrices).thenReturn(marketPriceStore);
-
     when(marketPriceStore.all).thenAnswer((_) async => []);
-    when(db.allShipyardListings).thenAnswer((_) async => []);
+
+    final shipyardListingStore = _MockShipyardListingStore();
+    when(() => db.shipyardListings).thenReturn(shipyardListingStore);
+    when(shipyardListingStore.all).thenAnswer((_) async => []);
     when(db.allShipyardPrices).thenAnswer((_) async => []);
-    when(db.allBehaviorStates).thenAnswer((_) async => []);
+
+    final behaviorStore = _MockBehaviorStore();
+    when(() => db.behaviors).thenReturn(behaviorStore);
+    when(behaviorStore.all).thenAnswer((_) async => []);
     when(
       systemsStore.snapshotAllSystems,
     ).thenAnswer((_) async => SystemsSnapshot([]));

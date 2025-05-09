@@ -91,7 +91,7 @@ Future<void> advanceShips(
         () async =>
             await advanceShipBehavior(api, db, centralCommand, caches, ship),
         onComplete: (duration, requestCount, queryCounts) async {
-          final behaviorState = await db.getBehavior(shipSymbol);
+          final behaviorState = await db.behaviors.get(shipSymbol);
           final expectedSeconds =
               (requestCount / networkConfig.targetRequestsPerSecond) * 1.2;
           if (duration.inSeconds > expectedSeconds) {

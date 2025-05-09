@@ -1,4 +1,5 @@
 import 'package:db/db.dart';
+import 'package:db/src/queries/transaction.dart';
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
@@ -39,5 +40,13 @@ void main() {
       expect(transactionsWithAccountingType.length, 1);
       expect(transactionsWithAccountingType.first, transaction);
     });
+  });
+
+  test('Transaction round trip', () {
+    final transaction = Transaction.fallbackValue();
+
+    final map = transactionToColumnMap(transaction);
+    final newTransaction = transactionFromColumnMap(map);
+    expect(newTransaction, equals(transaction));
   });
 }

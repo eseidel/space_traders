@@ -27,6 +27,8 @@ class _MockShipEngine extends Mock implements ShipEngine {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
+class _MockShipyardListingStore extends Mock implements ShipyardListingStore {}
+
 class _MockShipyardTransaction extends Mock implements ShipyardTransaction {}
 
 class _MockSystemsApi extends Mock implements SystemsApi {}
@@ -152,11 +154,15 @@ void main() {
     registerFallbackValue(Transaction.fallbackValue());
     when(() => transactionStore.insert(any())).thenAnswer((_) async {});
 
+    final shipyardListingStore = _MockShipyardListingStore();
+    when(() => db.shipyardListings).thenReturn(shipyardListingStore);
+
     registerFallbackValue(ShipyardListing.fallbackValue());
-    when(() => db.upsertShipyardListing(any())).thenAnswer((_) async {});
+    when(() => shipyardListingStore.upsert(any())).thenAnswer((_) async {});
+    when(shipyardListingStore.all).thenAnswer((_) async => []);
+
     registerFallbackValue(Ship.fallbackValue());
     when(() => db.upsertShip(any())).thenAnswer((_) async {});
-    when(db.allShipyardListings).thenAnswer((_) async => []);
     when(db.allShips).thenAnswer((_) async => []);
     registerFallbackValue(ShipyardListingSnapshot([]));
     registerFallbackValue(ShipSnapshot([]));

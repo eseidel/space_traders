@@ -13,6 +13,8 @@ import '../cache/caches_mock.dart';
 
 class _MockApi extends Mock implements Api {}
 
+class _MockBehaviorStore extends Mock implements BehaviorStore {}
+
 class _MockChartingStore extends Mock implements ChartingStore {}
 
 class _MockCentralCommand extends Mock implements CentralCommand {}
@@ -127,7 +129,9 @@ void main() {
       ),
     ).thenReturn(null);
     final state = BehaviorState(shipSymbol, Behavior.charter);
-    when(db.allBehaviorStates).thenAnswer((_) async => []);
+    final behaviorStore = _MockBehaviorStore();
+    when(() => db.behaviors).thenReturn(behaviorStore);
+    when(behaviorStore.all).thenAnswer((_) async => []);
     when(db.allShips).thenAnswer((_) async => []);
 
     final chartingStore = _MockChartingStore();

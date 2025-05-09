@@ -214,11 +214,17 @@ class Database {
     });
   }
 
+  /// Get the behavior store.
+  BehaviorStore get behaviors => BehaviorStore(this);
+
   /// Get the config store.
   ConfigStore get config => ConfigStore(this);
 
   /// Get the construction store.
   ConstructionStore get construction => ConstructionStore(this);
+
+  /// Get the contract store.
+  ContractStore get contracts => ContractStore(this);
 
   /// Get the charting store.
   ChartingStore get charting => ChartingStore(this);
@@ -237,6 +243,9 @@ class Database {
 
   /// Get the market price store.
   MarketPriceStore get marketPrices => MarketPriceStore(this);
+
+  /// Get the shipyard listing store.
+  ShipyardListingStore get shipyardListings => ShipyardListingStore(this);
 
   /// Get the survey store.
   SurveyStore get surveys => SurveyStore(this);
@@ -382,25 +391,6 @@ class Database {
     await execute(upsertAgentQuery(agent));
   }
 
-  /// Get the shipyard listing for the given symbol.
-  Future<ShipyardListing?> shipyardListingForSymbol(
-    WaypointSymbol waypointSymbol,
-  ) async {
-    final query = shipyardListingByWaypointSymbolQuery(waypointSymbol);
-    return queryOne(query, shipyardListingFromColumnMap);
-  }
-
-  /// Get all shipyard listings.
-  Future<Iterable<ShipyardListing>> allShipyardListings() async {
-    final query = allShipyardListingsQuery();
-    return queryMany(query, shipyardListingFromColumnMap);
-  }
-
-  /// Update the given shipyard listing in the database.
-  Future<void> upsertShipyardListing(ShipyardListing listing) async {
-    await execute(upsertShipyardListingQuery(listing));
-  }
-
   /// Get all shipyard prices from the database.
   Future<Iterable<ShipyardPrice>> allShipyardPrices() async {
     return queryMany(allShipyardPricesQuery(), shipyardPriceFromColumnMap);
@@ -418,59 +408,6 @@ class Database {
   /// Add a shipyard price to the database.
   Future<void> upsertShipyardPrice(ShipyardPrice price) async {
     await execute(upsertShipyardPriceQuery(price));
-  }
-
-  /// Get all contracts from the database.
-  Future<Iterable<Contract>> allContracts() async {
-    return queryMany(allContractsQuery(), contractFromColumnMap);
-  }
-
-  /// Get a contract by id.
-  Future<Contract?> contractById(String id) async {
-    final query = contractByIdQuery(id);
-    return queryOne(query, contractFromColumnMap);
-  }
-
-  /// Get all contracts which are !accepted.
-  Future<Iterable<Contract>> unacceptedContracts() async {
-    return queryMany(unacceptedContractsQuery(), contractFromColumnMap);
-  }
-
-  /// Get all contracts which are !fulfilled and !expired.
-  Future<Iterable<Contract>> activeContracts() async {
-    return queryMany(activeContractsQuery(), contractFromColumnMap);
-  }
-
-  /// Upsert a contract into the database.
-  Future<void> upsertContract(Contract contract) async {
-    await execute(upsertContractQuery(contract));
-  }
-
-  /// Get all behavior states.
-  Future<Iterable<BehaviorState>> allBehaviorStates() async {
-    return queryMany(allBehaviorStatesQuery(), behaviorStateFromColumnMap);
-  }
-
-  /// Get all behavior states with the given behavior type.
-  Future<Iterable<BehaviorState>> behaviorsOfType(Behavior behavior) async {
-    final query = behaviorStatesWithBehaviorQuery(behavior);
-    return queryMany(query, behaviorStateFromColumnMap);
-  }
-
-  /// Get a behavior state by ship symbol.
-  Future<BehaviorState?> getBehavior(ShipSymbol shipSymbol) async {
-    final query = behaviorBySymbolQuery(shipSymbol);
-    return queryOne(query, behaviorStateFromColumnMap);
-  }
-
-  /// Get a behavior state by symbol.
-  Future<void> upsertBehavior(BehaviorState behaviorState) async {
-    await execute(upsertBehaviorStateQuery(behaviorState));
-  }
-
-  /// Delete a behavior state.
-  Future<void> deleteBehavior(ShipSymbol shipSymbol) async {
-    await execute(deleteBehaviorQuery(shipSymbol));
   }
 
   /// Get all ships.
