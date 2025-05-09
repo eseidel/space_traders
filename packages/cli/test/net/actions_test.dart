@@ -1228,4 +1228,40 @@ void main() {
     await recordMarketPrices(db, market);
     verify(() => db.marketPrices.upsert(any())).called(1);
   });
+
+  test('scrapShipAndLog', () async {
+    final api = _MockApi();
+    final fleetApi = _MockFleetApi();
+    when(() => api.fleet).thenReturn(fleetApi);
+    final db = _MockDatabase();
+    final transactionStore = _MockTransactionStore();
+    when(() => db.transactions).thenReturn(transactionStore);
+    registerFallbackValue(Transaction.fallbackValue());
+    when(() => transactionStore.insert(any())).thenAnswer((_) async {});
+
+    final agent = Agent.test(credits: 10000000);
+    final shipSymbol = ShipSymbol.fromString('S-1');
+    final ship = Ship.test(shipSymbol);
+    final waypointSymbol = WaypointSymbol.fromString('S-A-W');
+    when(() => fleetApi.scrapShip(any())).thenAnswer((_) async {
+      return ScrapShip200Response(
+        data: ScrapShip200ResponseData(
+          agent: agent.toOpenApi(),
+          transaction: ScrapTransaction(
+            shipSymbol: shipSymbol.symbol,
+            waypointSymbol: waypointSymbol.waypoint,
+            totalPrice: 100,
+            timestamp: DateTime(2021),
+          ),
+        ),
+      );
+    });
+    when(() => db.deleteShip(shipSymbol)).thenAnswer((_) async {});
+    when(() => db.upsertAgent(any())).thenAnswer((_) async {});
+    final logger = _MockLogger();
+    await runWithLogger(logger, () async {
+      await scrapShipAndLog(api, db, ship);
+    });
+    verify(() => fleetApi.scrapShip(shipSymbol.symbol)).called(1);
+  });
 }
