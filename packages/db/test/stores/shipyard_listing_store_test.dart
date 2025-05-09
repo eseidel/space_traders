@@ -28,6 +28,10 @@ void main() {
       final shipyardListings = await db.shipyardListings.all();
       expect(shipyardListings.length, equals(1));
       expect(shipyardListings.first, equals(shipyardListing));
+
+      final snapshot = await db.shipyardListings.snapshotAll();
+      expect(snapshot.listings.length, equals(1));
+      expect(snapshot.at(waypointSymbol), equals(shipyardListing));
     });
   });
 }
