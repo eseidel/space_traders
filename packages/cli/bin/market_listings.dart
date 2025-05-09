@@ -65,7 +65,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   final marketListings = await db.marketListings.snapshotAll();
 
   final waypoints = systemsCache.waypointsInSystem(hqSystem);
-  final marketPrices = await MarketPriceSnapshot.loadOneSystem(db, hqSystem);
+  final marketPrices = await db.marketPrices.snapshotInSystem(hqSystem);
 
   for (final waypoint in waypoints) {
     final marketSymbol = waypoint.symbol;

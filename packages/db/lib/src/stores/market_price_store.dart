@@ -15,6 +15,18 @@ class MarketPriceStore {
     return _db.queryMany(allMarketPricesQuery(), marketPriceFromColumnMap);
   }
 
+  /// Get all market prices from the database.
+  Future<MarketPriceSnapshot> snapshotAll() async {
+    final prices = await all();
+    return MarketPriceSnapshot(prices.toList());
+  }
+
+  /// Get all market prices within the given system.
+  Future<MarketPriceSnapshot> snapshotInSystem(SystemSymbol system) async {
+    final prices = await inSystem(system);
+    return MarketPriceSnapshot(prices.toList());
+  }
+
   /// Get all market prices within the given system.
   Future<Iterable<MarketPrice>> inSystem(SystemSymbol system) async {
     final query = marketPricesInSystemQuery(system);

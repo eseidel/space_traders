@@ -112,7 +112,7 @@ Future<void> command(Database db, ArgResults argResults) async {
     return;
   }
 
-  final marketPrices = await MarketPriceSnapshot.loadAll(db);
+  final marketPrices = await db.marketPrices.snapshotAll();
   for (final ship in matchingShips) {
     final behaviorState = await db.behaviors.get(ship.symbol);
     await logShip(db, marketPrices, ship, behaviorState);

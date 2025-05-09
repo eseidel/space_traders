@@ -64,7 +64,7 @@ Future<void> command(Database db, ArgResults argResults) async {
 
   final systems = await db.systems.snapshotAllSystems();
   final hqSystem = await myHqSystemSymbol(db);
-  final marketPrices = await MarketPriceSnapshot.loadOneSystem(db, hqSystem);
+  final marketPrices = await db.marketPrices.snapshotInSystem(hqSystem);
 
   final List<ExtractionScore> scores;
   if (isSiphon) {

@@ -753,7 +753,7 @@ class CentralCommand {
     Ship ship,
     ShipType shipType,
   ) async {
-    final shipyardPrices = await ShipyardPriceSnapshot.load(db);
+    final shipyardPrices = await db.shipyardPrices.snapshotAll();
     final trip = findBestShipyardToBuy(
       shipyardPrices,
       routePlanner,

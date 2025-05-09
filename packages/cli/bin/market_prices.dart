@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:cli/cli.dart';
 
 Future<void> command(Database db, ArgResults argResults) async {
-  final marketPrices = await MarketPriceSnapshot.loadAll(db);
+  final marketPrices = await db.marketPrices.snapshotAll();
   final marketListings = await db.marketListings.snapshotAll();
 
   logger.info(

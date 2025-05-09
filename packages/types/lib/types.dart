@@ -27,6 +27,8 @@ export 'src/snapshot/charting_snapshot.dart';
 export 'src/snapshot/construction_snapshot.dart';
 export 'src/snapshot/jump_gate_snapshot.dart';
 export 'src/snapshot/market_listing_snapshot.dart';
+export 'src/snapshot/market_price_snapshot.dart';
+export 'src/snapshot/shipyard_price_snapshot.dart';
 export 'src/snapshot/systems_snapshot.dart';
 export 'src/survey.dart';
 export 'src/symbol.dart';

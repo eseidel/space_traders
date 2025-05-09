@@ -1,29 +1,15 @@
 import 'dart:math';
 
-import 'package:cli/cache/price_snapshot.dart';
-import 'package:cli/cli.dart';
 import 'package:types/config.dart';
+import 'package:types/types.dart';
+
+import 'package:types/src/snapshot/price_snapshot.dart';
 
 /// A collection of price records.
 // Could consider sharding this by system if it gets too big.
 class MarketPriceSnapshot extends PriceSnapshot<TradeSymbol, MarketPrice> {
   /// Create a new price data collection.
   MarketPriceSnapshot(super.records);
-
-  /// Load the price data from the cache.
-  static Future<MarketPriceSnapshot> loadAll(Database db) async {
-    final prices = await db.marketPrices.all();
-    return MarketPriceSnapshot(prices.toList());
-  }
-
-  /// Load the price data for a single system from the cache.
-  static Future<MarketPriceSnapshot> loadOneSystem(
-    Database db,
-    SystemSymbol system,
-  ) async {
-    final prices = await db.marketPrices.inSystem(system);
-    return MarketPriceSnapshot(prices.toList());
-  }
 
   static int _sellPriceAscending(MarketPrice a, MarketPrice b) =>
       a.sellPrice.compareTo(b.sellPrice);
@@ -150,29 +136,5 @@ class MarketPriceSnapshot extends PriceSnapshot<TradeSymbol, MarketPrice> {
       maxAge: maxAge,
       getNow: getNow,
     )?.purchasePrice;
-  }
-}
-
-/// Record market data silently.
-Future<void> recordMarketData(
-  Database db,
-  Market market, {
-  DateTime Function() getNow = defaultGetNow,
-}) async {
-  final prices =
-      market.tradeGoods
-          .map(
-            (tradeGood) => MarketPrice.fromMarketTradeGood(
-              tradeGood,
-              market.waypointSymbol,
-              getNow(),
-            ),
-          )
-          .toList();
-  if (prices.isEmpty) {
-    logger.warn('No prices for ${market.symbol}!');
-  }
-  for (final price in prices) {
-    await db.marketPrices.upsert(price);
   }
 }

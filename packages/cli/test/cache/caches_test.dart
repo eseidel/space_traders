@@ -36,6 +36,8 @@ class _MockRoutePlanner extends Mock implements RoutePlanner {}
 
 class _MockShipyardListingStore extends Mock implements ShipyardListingStore {}
 
+class _MockShipyardPriceStore extends Mock implements ShipyardPriceStore {}
+
 class _MockStaticCaches extends Mock implements StaticCaches {}
 
 class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
@@ -128,12 +130,19 @@ void main() {
 
     final marketPriceStore = _MockMarketPriceStore();
     when(() => db.marketPrices).thenReturn(marketPriceStore);
-    when(marketPriceStore.all).thenAnswer((_) async => []);
+    when(
+      marketPriceStore.snapshotAll,
+    ).thenAnswer((_) async => MarketPriceSnapshot([]));
 
     final shipyardListingStore = _MockShipyardListingStore();
     when(() => db.shipyardListings).thenReturn(shipyardListingStore);
     when(shipyardListingStore.all).thenAnswer((_) async => []);
-    when(db.allShipyardPrices).thenAnswer((_) async => []);
+
+    final shipyardPriceStore = _MockShipyardPriceStore();
+    when(() => db.shipyardPrices).thenReturn(shipyardPriceStore);
+    when(
+      shipyardPriceStore.snapshotAll,
+    ).thenAnswer((_) async => ShipyardPriceSnapshot([]));
 
     final behaviorStore = _MockBehaviorStore();
     when(() => db.behaviors).thenReturn(behaviorStore);

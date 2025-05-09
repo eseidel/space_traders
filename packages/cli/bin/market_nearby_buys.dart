@@ -8,7 +8,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   final ship = ships.ships.first;
   const tradeSymbol = TradeSymbol.MOUNT_SURVEYOR_II;
   // Should this only load one system?
-  final marketPrices = await MarketPriceSnapshot.loadAll(db);
+  final marketPrices = await db.marketPrices.snapshotAll();
 
   final best = findBestMarketToBuy(
     marketPrices,

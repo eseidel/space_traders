@@ -22,7 +22,7 @@ extension CountBy<T> on Iterable<T> {
 Future<PricedInventory> computeInventoryValue({required Database db}) async {
   final ships = await ShipSnapshot.load(db);
   // TODO(eseidel): Use a MedianPriceCache rather than MarketPriceSnapshot.
-  final marketPrices = await MarketPriceSnapshot.loadAll(db);
+  final marketPrices = await db.marketPrices.snapshotAll();
   final countByTradeSymbol = ships.ships
       .expand((ship) => ship.cargo.inventory)
       .countBy((item) => item.tradeSymbol, countOf: (item) => item.units);
@@ -73,7 +73,7 @@ Future<PricedFleet> computeShipValue(
 /// Computes the current balance sheet for the agent.
 Future<BalanceSheet> computeBalanceSheet(Database db) async {
   final ships = await ShipSnapshot.load(db);
-  final shipyardPrices = await ShipyardPriceSnapshot.load(db);
+  final shipyardPrices = await db.shipyardPrices.snapshotAll();
   final shipyardShips = await ShipyardShipCache(db).snapshot();
 
   final agent = await db.getMyAgent();

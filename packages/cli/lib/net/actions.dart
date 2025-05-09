@@ -842,3 +842,66 @@ Future<void> setShipFlightModeIfNeeded(
   shipInfo(ship, 'Setting flightMode to $flightMode');
   await setShipFlightMode(db, api, ship, flightMode);
 }
+
+/// Record market data silently.
+Future<void> recordMarketData(
+  Database db,
+  Market market, {
+  DateTime Function() getNow = defaultGetNow,
+}) async {
+  final prices =
+      market.tradeGoods
+          .map(
+            (tradeGood) => MarketPrice.fromMarketTradeGood(
+              tradeGood,
+              market.waypointSymbol,
+              getNow(),
+            ),
+          )
+          .toList();
+  // package:db doesn't have access to a logger yet.
+  if (prices.isEmpty) {
+    logger.warn('No prices for ${market.symbol}!');
+  }
+  for (final price in prices) {
+    await db.marketPrices.upsert(price);
+  }
+}
+
+/// Record shipyard data and log the result.
+void recordShipyardDataAndLog(
+  Database db,
+  StaticCaches staticCaches,
+  Shipyard shipyard,
+  Ship ship,
+) {
+  recordShipyardPrices(db, shipyard);
+  recordShipyardShips(staticCaches, shipyard.ships);
+  recordShipyardListing(db, shipyard);
+  // Powershell needs an extra space after the emoji.
+  shipDetail(ship, '✍️  shipyard data @ ${shipyard.symbol}');
+}
+
+/// Record shipyard prices.
+void recordShipyardPrices(
+  Database db,
+  Shipyard shipyard, {
+  DateTime Function() getNow = defaultGetNow,
+}) {
+  final prices =
+      shipyard.ships
+          .map(
+            (s) => ShipyardPrice.fromShipyardShip(
+              s,
+              shipyard.waypointSymbol,
+              getNow: getNow,
+            ),
+          )
+          .toList();
+  if (prices.isEmpty) {
+    logger.warn('No prices for ${shipyard.symbol}!');
+  }
+  for (final price in prices) {
+    db.shipyardPrices.upsert(price);
+  }
+}
