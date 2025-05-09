@@ -7,9 +7,9 @@ Query allContractsQuery() => const Query('SELECT * FROM contract_');
 /// Upsert a contract.
 Query upsertContractQuery(Contract contract) {
   return Query(parameters: contractToColumnMap(contract), '''
-    INSERT INTO contract_ (id, json, accepted, fulfilled, deadline_to_accept)
-    VALUES (@id, @json, @accepted, @fulfilled, @deadline_to_accept)
-    ON CONFLICT (id) DO UPDATE SET json = @json, accepted = @accepted, fulfilled = @fulfilled, deadline_to_accept = @deadline_to_accept
+    INSERT INTO contract_ (id, json, accepted, fulfilled, deadline_to_accept, deadline_to_complete)
+    VALUES (@id, @json, @accepted, @fulfilled, @deadline_to_accept, @deadline_to_complete)
+    ON CONFLICT (id) DO UPDATE SET json = @json, accepted = @accepted, fulfilled = @fulfilled, deadline_to_accept = @deadline_to_accept, deadline_to_complete = @deadline_to_complete
     ''');
 }
 
@@ -22,10 +22,11 @@ Query contractByIdQuery(String id) {
 }
 
 /// Get all contracts which are !fulfilled and expiration date is in the future.
+/// Both accepted and unaccepted contracts are included.
 Query activeContractsQuery(DateTime now) {
   return Query(
     'SELECT * FROM contract_ '
-    "WHERE fulfilled = 'false' AND deadline_to_accept > @now",
+    'WHERE fulfilled = FALSE AND deadline_to_complete > @now',
     parameters: {'now': now},
   );
 }
@@ -34,7 +35,7 @@ Query activeContractsQuery(DateTime now) {
 Query unacceptedContractsQuery(DateTime now) {
   return Query(
     'SELECT * FROM contract_ '
-    "WHERE accepted = 'false' AND deadline_to_accept > @now",
+    'WHERE accepted = FALSE AND deadline_to_accept > @now',
     parameters: {'now': now},
   );
 }
@@ -55,5 +56,6 @@ Map<String, dynamic> contractToColumnMap(Contract contract) {
     'accepted': contract.accepted,
     'fulfilled': contract.fulfilled,
     'deadline_to_accept': contract.deadlineToAccept,
+    'deadline_to_complete': contract.terms.deadline,
   };
 }
