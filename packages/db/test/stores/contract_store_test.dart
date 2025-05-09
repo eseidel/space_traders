@@ -83,8 +83,8 @@ void main() {
       );
 
       /// accepted, fulfilled (thus not active), not expired.
-      final fullfilled = Contract(
-        id: 'fullfilled',
+      final fulfilled = Contract(
+        id: 'fulfilled',
         factionSymbol: faction,
         type: type,
         terms: ContractTerms(
@@ -104,7 +104,7 @@ void main() {
       await db.contracts.upsert(expiredBeforeAccept);
       await db.contracts.upsert(expiredAfterAccept);
       await db.contracts.upsert(acceptedPastDeadline);
-      await db.contracts.upsert(fullfilled);
+      await db.contracts.upsert(fulfilled);
       // Contract does not implement equals, so we check the id.
       expect(
         (await db.contracts.get(unaccepted.id))!.id,
