@@ -18,7 +18,7 @@ void main() {
       const faction = 'faction';
       const type = ContractTypeEnum.PROCUREMENT;
 
-      // unaccepted, not active.
+      // Not yet accepted, counts as active and unaccepted.
       final unaccepted = Contract(
         id: 'unaccepted',
         factionSymbol: faction,
@@ -33,24 +33,39 @@ void main() {
         deadlineToAccept: now.add(const Duration(days: 1)),
       );
 
-      // expired, not unaccepted, not active.
-      final expired = Contract(
-        id: 'expired',
+      // Expired, never accepted, never fulfilled.
+      final expiredBeforeAccept = Contract(
+        id: 'expiredBeforeAccept',
         factionSymbol: faction,
         type: type,
         terms: ContractTerms(
-          // Out of time, but not complete.
+          // We would still have time to complete if we had accepted it.
           deadline: now.add(const Duration(days: 1)),
           payment: ContractPayment(onAccepted: 100, onFulfilled: 100),
         ),
         accepted: false,
         fulfilled: false,
         timestamp: now,
-        // We could have accepted it if we had not already.
+        // We would have had to accept it before now.
         deadlineToAccept: now.subtract(const Duration(days: 1)),
       );
 
-      /// accepted, active, not fulfilled.
+      final expiredAfterAccept = Contract(
+        id: 'expiredAfterAccept',
+        factionSymbol: faction,
+        type: type,
+        terms: ContractTerms(
+          // Even though accepted, still past the completion deadline.
+          deadline: now.subtract(const Duration(days: 1)),
+          payment: ContractPayment(onAccepted: 100, onFulfilled: 100),
+        ),
+        accepted: true,
+        fulfilled: false,
+        timestamp: now,
+        deadlineToAccept: now.subtract(const Duration(days: 1)),
+      );
+
+      /// Accepted, past acceptence deadline. Active, not yet fulfilled.
       final acceptedPastDeadline = Contract(
         id: 'acceptedPastDeadline',
         factionSymbol: faction,
@@ -86,7 +101,8 @@ void main() {
       expect(await db.contracts.active(), isEmpty);
 
       await db.contracts.upsert(unaccepted);
-      await db.contracts.upsert(expired);
+      await db.contracts.upsert(expiredBeforeAccept);
+      await db.contracts.upsert(expiredAfterAccept);
       await db.contracts.upsert(acceptedPastDeadline);
       await db.contracts.upsert(fullfilled);
       // Contract does not implement equals, so we check the id.
@@ -95,24 +111,28 @@ void main() {
         equals(unaccepted.id),
       );
 
+      Set<String> ids(Iterable<Contract> contracts) =>
+          contracts.map((c) => c.id).toSet();
+
       // Expired shows up in all, but not in unaccepted or active.
-      expect(await db.contracts.all(), hasLength(4));
+      expect(await db.contracts.all(), hasLength(5));
       expect(await db.contracts.unaccepted(), hasLength(1));
-      final active = await db.contracts.active();
-      for (final c in active) {
-        print(c.toJson());
-      }
-      expect(active, hasLength(1));
+      expect(ids(await db.contracts.active()), {
+        'unaccepted',
+        'acceptedPastDeadline',
+      });
 
       unaccepted.accepted = true;
       await db.contracts.upsert(unaccepted);
       expect(await db.contracts.unaccepted(), isEmpty);
-      expect(await db.contracts.active(), isNotEmpty);
-
+      expect(ids(await db.contracts.active()), {
+        'unaccepted',
+        'acceptedPastDeadline',
+      });
       unaccepted.fulfilled = true;
       await db.contracts.upsert(unaccepted);
       expect(await db.contracts.unaccepted(), isEmpty);
-      expect(await db.contracts.active(), isEmpty);
+      expect(ids(await db.contracts.active()), {'acceptedPastDeadline'});
     });
   });
 }

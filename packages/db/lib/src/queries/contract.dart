@@ -23,10 +23,13 @@ Query contractByIdQuery(String id) {
 
 /// Get all contracts which are !fulfilled and expiration date is in the future.
 /// Both accepted and unaccepted contracts are included.
+/// Expired is defined differently for accepted and unaccepted contracts.
 Query activeContractsQuery(DateTime now) {
   return Query(
     'SELECT * FROM contract_ '
-    'WHERE fulfilled = FALSE AND deadline_to_complete > @now',
+    'WHERE fulfilled = FALSE '
+    'AND ((accepted = TRUE AND deadline_to_complete > @now) '
+    'OR (accepted = FALSE AND deadline_to_accept > @now))',
     parameters: {'now': now},
   );
 }
