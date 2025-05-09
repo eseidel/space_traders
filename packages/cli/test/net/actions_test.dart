@@ -1136,4 +1136,48 @@ void main() {
 
     verify(() => db.surveys.insert(any())).called(2);
   });
+
+  test('warpToWaypoint', () async {
+    final api = _MockApi();
+    final db = _MockDatabase();
+    final fleetApi = _MockFleetApi();
+    when(() => api.fleet).thenReturn(fleetApi);
+    final ship = _MockShip();
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
+    final shipSymbol = ShipSymbol.fromString('S-1');
+    when(() => ship.symbol).thenReturn(shipSymbol);
+    final waypointSymbol = WaypointSymbol.fromString('S-A-W');
+    final shipNav = _MockShipNav();
+    when(() => ship.nav).thenReturn(shipNav);
+    when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
+    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
+    final logger = _MockLogger();
+
+    when(
+      () => fleetApi.warpShip(
+        any(),
+        navigateShipRequest: any(named: 'navigateShipRequest'),
+      ),
+    ).thenAnswer((_) async {
+      return WarpShip200Response(
+        data: WarpShip200ResponseData(
+          fuel: ShipFuel(current: 0, capacity: 0),
+          nav: _MockShipNav(),
+        ),
+      );
+    });
+
+    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
+    await runWithLogger(logger, () async {
+      await warpToWaypoint(db, api, ship, waypointSymbol);
+    });
+    verify(
+      () => fleetApi.warpShip(
+        shipSymbol.symbol,
+        navigateShipRequest: NavigateShipRequest(
+          waypointSymbol: waypointSymbol.waypoint,
+        ),
+      ),
+    ).called(1);
+  });
 }
