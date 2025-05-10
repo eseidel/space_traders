@@ -9,17 +9,17 @@ All URIs are relative to *https://api.spacetraders.io/v2*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**getAgent**](AgentsApi.md#getagent) | **GET** /agents/{agentSymbol} | Get Public Agent
-[**getAgents**](AgentsApi.md#getagents) | **GET** /agents | List Agents
+[**getAgent**](AgentsApi.md#getagent) | **GET** /agents/{agentSymbol} | Get public details for a specific agent.
+[**getAgents**](AgentsApi.md#getagents) | **GET** /agents | List all public agent details.
 [**getMyAgent**](AgentsApi.md#getmyagent) | **GET** /my/agent | Get Agent
 
 
 # **getAgent**
-> GetMyAgent200Response getAgent(agentSymbol)
+> GetAgent200Response getAgent(agentSymbol)
 
-Get Public Agent
+Get public details for a specific agent.
 
-Fetch agent details.
+Get public details for a specific agent.
 
 ### Example
 ```dart
@@ -32,7 +32,7 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AgentsApi();
-final agentSymbol = agentSymbol_example; // String | The agent symbol
+final agentSymbol = FEBA66; // String | The agent symbol
 
 try {
     final result = api_instance.getAgent(agentSymbol);
@@ -46,11 +46,11 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **agentSymbol** | **String**| The agent symbol | [default to 'FEBA66']
+ **agentSymbol** | **String**| The agent symbol | 
 
 ### Return type
 
-[**GetMyAgent200Response**](GetMyAgent200Response.md)
+[**GetAgent200Response**](GetAgent200Response.md)
 
 ### Authorization
 
@@ -66,9 +66,9 @@ Name | Type | Description  | Notes
 # **getAgents**
 > GetAgents200Response getAgents(page, limit)
 
-List Agents
+List all public agent details.
 
-Fetch agents details.
+List all public agent details.
 
 ### Example
 ```dart
@@ -81,8 +81,8 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AgentsApi();
-final page = 56; // int | What entry offset to request
-final limit = 56; // int | How many entries to return per page
+final page = 1; // int | What entry offset to request
+final limit = 10; // int | How many entries to return per page
 
 try {
     final result = api_instance.getAgents(page, limit);

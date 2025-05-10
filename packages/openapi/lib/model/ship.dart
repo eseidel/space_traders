@@ -20,11 +20,11 @@ class Ship {
     required this.frame,
     required this.reactor,
     required this.engine,
-    required this.cooldown,
     this.modules = const [],
     this.mounts = const [],
     required this.cargo,
     required this.fuel,
+    required this.cooldown,
   });
 
   /// The globally unique identifier of the ship in the following format: `[AGENT_SYMBOL]-[HEX_ID]`
@@ -42,8 +42,6 @@ class Ship {
 
   ShipEngine engine;
 
-  Cooldown cooldown;
-
   /// Modules installed in this ship.
   List<ShipModule> modules;
 
@@ -53,6 +51,8 @@ class Ship {
   ShipCargo cargo;
 
   ShipFuel fuel;
+
+  Cooldown cooldown;
 
   @override
   bool operator ==(Object other) =>
@@ -65,11 +65,11 @@ class Ship {
           other.frame == frame &&
           other.reactor == reactor &&
           other.engine == engine &&
-          other.cooldown == cooldown &&
           _deepEquality.equals(other.modules, modules) &&
           _deepEquality.equals(other.mounts, mounts) &&
           other.cargo == cargo &&
-          other.fuel == fuel;
+          other.fuel == fuel &&
+          other.cooldown == cooldown;
 
   @override
   int get hashCode =>
@@ -81,15 +81,15 @@ class Ship {
       (frame.hashCode) +
       (reactor.hashCode) +
       (engine.hashCode) +
-      (cooldown.hashCode) +
       (modules.hashCode) +
       (mounts.hashCode) +
       (cargo.hashCode) +
-      (fuel.hashCode);
+      (fuel.hashCode) +
+      (cooldown.hashCode);
 
   @override
   String toString() =>
-      'Ship[symbol=$symbol, registration=$registration, nav=$nav, crew=$crew, frame=$frame, reactor=$reactor, engine=$engine, cooldown=$cooldown, modules=$modules, mounts=$mounts, cargo=$cargo, fuel=$fuel]';
+      'Ship[symbol=$symbol, registration=$registration, nav=$nav, crew=$crew, frame=$frame, reactor=$reactor, engine=$engine, modules=$modules, mounts=$mounts, cargo=$cargo, fuel=$fuel, cooldown=$cooldown]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -100,11 +100,11 @@ class Ship {
     json[r'frame'] = this.frame;
     json[r'reactor'] = this.reactor;
     json[r'engine'] = this.engine;
-    json[r'cooldown'] = this.cooldown;
     json[r'modules'] = this.modules;
     json[r'mounts'] = this.mounts;
     json[r'cargo'] = this.cargo;
     json[r'fuel'] = this.fuel;
+    json[r'cooldown'] = this.cooldown;
     return json;
   }
 
@@ -136,11 +136,11 @@ class Ship {
         frame: ShipFrame.fromJson(json[r'frame'])!,
         reactor: ShipReactor.fromJson(json[r'reactor'])!,
         engine: ShipEngine.fromJson(json[r'engine'])!,
-        cooldown: Cooldown.fromJson(json[r'cooldown'])!,
         modules: ShipModule.listFromJson(json[r'modules']),
         mounts: ShipMount.listFromJson(json[r'mounts']),
         cargo: ShipCargo.fromJson(json[r'cargo'])!,
         fuel: ShipFuel.fromJson(json[r'fuel'])!,
+        cooldown: Cooldown.fromJson(json[r'cooldown'])!,
       );
     }
     return null;
@@ -204,10 +204,10 @@ class Ship {
     'frame',
     'reactor',
     'engine',
-    'cooldown',
     'modules',
     'mounts',
     'cargo',
     'fuel',
+    'cooldown',
   };
 }

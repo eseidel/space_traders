@@ -13,14 +13,14 @@ part of openapi;
 class PurchaseShip201ResponseData {
   /// Returns a new [PurchaseShip201ResponseData] instance.
   PurchaseShip201ResponseData({
-    required this.agent,
     required this.ship,
+    required this.agent,
     required this.transaction,
   });
 
-  Agent agent;
-
   Ship ship;
+
+  Agent agent;
 
   ShipyardTransaction transaction;
 
@@ -28,23 +28,23 @@ class PurchaseShip201ResponseData {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is PurchaseShip201ResponseData &&
-          other.agent == agent &&
           other.ship == ship &&
+          other.agent == agent &&
           other.transaction == transaction;
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (agent.hashCode) + (ship.hashCode) + (transaction.hashCode);
+      (ship.hashCode) + (agent.hashCode) + (transaction.hashCode);
 
   @override
   String toString() =>
-      'PurchaseShip201ResponseData[agent=$agent, ship=$ship, transaction=$transaction]';
+      'PurchaseShip201ResponseData[ship=$ship, agent=$agent, transaction=$transaction]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    json[r'agent'] = this.agent;
     json[r'ship'] = this.ship;
+    json[r'agent'] = this.agent;
     json[r'transaction'] = this.transaction;
     return json;
   }
@@ -70,8 +70,8 @@ class PurchaseShip201ResponseData {
       }());
 
       return PurchaseShip201ResponseData(
-        agent: Agent.fromJson(json[r'agent'])!,
         ship: Ship.fromJson(json[r'ship'])!,
+        agent: Agent.fromJson(json[r'agent'])!,
         transaction: ShipyardTransaction.fromJson(json[r'transaction'])!,
       );
     }
@@ -129,8 +129,8 @@ class PurchaseShip201ResponseData {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'agent',
     'ship',
+    'agent',
     'transaction',
   };
 }

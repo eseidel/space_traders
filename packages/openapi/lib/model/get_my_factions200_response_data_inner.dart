@@ -10,37 +10,44 @@
 
 part of openapi;
 
-class NegotiateContract200Response {
-  /// Returns a new [NegotiateContract200Response] instance.
-  NegotiateContract200Response({
-    required this.data,
+class GetMyFactions200ResponseDataInner {
+  /// Returns a new [GetMyFactions200ResponseDataInner] instance.
+  GetMyFactions200ResponseDataInner({
+    required this.symbol,
+    required this.reputation,
   });
 
-  NegotiateContract200ResponseData data;
+  String symbol;
+
+  int reputation;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is NegotiateContract200Response && other.data == data;
+      other is GetMyFactions200ResponseDataInner &&
+          other.symbol == symbol &&
+          other.reputation == reputation;
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (data.hashCode);
+      (symbol.hashCode) + (reputation.hashCode);
 
   @override
-  String toString() => 'NegotiateContract200Response[data=$data]';
+  String toString() =>
+      'GetMyFactions200ResponseDataInner[symbol=$symbol, reputation=$reputation]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    json[r'data'] = this.data;
+    json[r'symbol'] = this.symbol;
+    json[r'reputation'] = this.reputation;
     return json;
   }
 
-  /// Returns a new [NegotiateContract200Response] instance and imports its values from
+  /// Returns a new [GetMyFactions200ResponseDataInner] instance and imports its values from
   /// [value] if it's a [Map], null otherwise.
   // ignore: prefer_constructors_over_static_methods
-  static NegotiateContract200Response? fromJson(dynamic value) {
+  static GetMyFactions200ResponseDataInner? fromJson(dynamic value) {
     if (value is Map) {
       final json = value.cast<String, dynamic>();
 
@@ -50,28 +57,29 @@ class NegotiateContract200Response {
       assert(() {
         requiredKeys.forEach((key) {
           assert(json.containsKey(key),
-              'Required key "NegotiateContract200Response[$key]" is missing from JSON.');
+              'Required key "GetMyFactions200ResponseDataInner[$key]" is missing from JSON.');
           assert(json[key] != null,
-              'Required key "NegotiateContract200Response[$key]" has a null value in JSON.');
+              'Required key "GetMyFactions200ResponseDataInner[$key]" has a null value in JSON.');
         });
         return true;
       }());
 
-      return NegotiateContract200Response(
-        data: NegotiateContract200ResponseData.fromJson(json[r'data'])!,
+      return GetMyFactions200ResponseDataInner(
+        symbol: mapValueOfType<String>(json, r'symbol')!,
+        reputation: mapValueOfType<int>(json, r'reputation')!,
       );
     }
     return null;
   }
 
-  static List<NegotiateContract200Response> listFromJson(
+  static List<GetMyFactions200ResponseDataInner> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final result = <NegotiateContract200Response>[];
+    final result = <GetMyFactions200ResponseDataInner>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
-        final value = NegotiateContract200Response.fromJson(row);
+        final value = GetMyFactions200ResponseDataInner.fromJson(row);
         if (value != null) {
           result.add(value);
         }
@@ -80,12 +88,13 @@ class NegotiateContract200Response {
     return result.toList(growable: growable);
   }
 
-  static Map<String, NegotiateContract200Response> mapFromJson(dynamic json) {
-    final map = <String, NegotiateContract200Response>{};
+  static Map<String, GetMyFactions200ResponseDataInner> mapFromJson(
+      dynamic json) {
+    final map = <String, GetMyFactions200ResponseDataInner>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = NegotiateContract200Response.fromJson(entry.value);
+        final value = GetMyFactions200ResponseDataInner.fromJson(entry.value);
         if (value != null) {
           map[entry.key] = value;
         }
@@ -94,17 +103,17 @@ class NegotiateContract200Response {
     return map;
   }
 
-  // maps a json object with a list of NegotiateContract200Response-objects as value to a dart map
-  static Map<String, List<NegotiateContract200Response>> mapListFromJson(
+  // maps a json object with a list of GetMyFactions200ResponseDataInner-objects as value to a dart map
+  static Map<String, List<GetMyFactions200ResponseDataInner>> mapListFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final map = <String, List<NegotiateContract200Response>>{};
+    final map = <String, List<GetMyFactions200ResponseDataInner>>{};
     if (json is Map && json.isNotEmpty) {
       // ignore: parameter_assignments
       json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        map[entry.key] = NegotiateContract200Response.listFromJson(
+        map[entry.key] = GetMyFactions200ResponseDataInner.listFromJson(
           entry.value,
           growable: growable,
         );
@@ -115,6 +124,7 @@ class NegotiateContract200Response {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'data',
+    'symbol',
+    'reputation',
   };
 }

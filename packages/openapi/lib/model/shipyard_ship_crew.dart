@@ -17,8 +17,10 @@ class ShipyardShipCrew {
     required this.capacity,
   });
 
+  /// The minimum number of crew members required to maintain the ship.
   int required_;
 
+  /// The maximum number of crew members the ship can support.
   int capacity;
 
   @override

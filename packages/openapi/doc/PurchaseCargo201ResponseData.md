@@ -1,4 +1,4 @@
-# openapi.model.NegotiateContract200ResponseData
+# openapi.model.PurchaseCargo201ResponseData
 
 ## Load the model package
 ```dart
@@ -8,7 +8,9 @@ import 'package:openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**contract** | [**Contract**](Contract.md) |  | 
+**cargo** | [**ShipCargo**](ShipCargo.md) |  | 
+**transaction** | [**MarketTransaction**](MarketTransaction.md) |  | 
+**agent** | [**Agent**](Agent.md) |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

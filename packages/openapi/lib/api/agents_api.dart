@@ -15,9 +15,9 @@ class AgentsApi {
 
   final ApiClient apiClient;
 
-  /// Get Public Agent
+  /// Get public details for a specific agent.
   ///
-  /// Fetch agent details.
+  /// Get public details for a specific agent.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
@@ -52,15 +52,15 @@ class AgentsApi {
     );
   }
 
-  /// Get Public Agent
+  /// Get public details for a specific agent.
   ///
-  /// Fetch agent details.
+  /// Get public details for a specific agent.
   ///
   /// Parameters:
   ///
   /// * [String] agentSymbol (required):
   ///   The agent symbol
-  Future<GetMyAgent200Response?> getAgent(
+  Future<GetAgent200Response?> getAgent(
     String agentSymbol,
   ) async {
     final response = await getAgentWithHttpInfo(
@@ -76,15 +76,15 @@ class AgentsApi {
         response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(
         await _decodeBodyBytes(response),
-        'GetMyAgent200Response',
-      ) as GetMyAgent200Response;
+        'GetAgent200Response',
+      ) as GetAgent200Response;
     }
     return null;
   }
 
-  /// List Agents
+  /// List all public agent details.
   ///
-  /// Fetch agents details.
+  /// List all public agent details.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
@@ -129,9 +129,9 @@ class AgentsApi {
     );
   }
 
-  /// List Agents
+  /// List all public agent details.
   ///
-  /// Fetch agents details.
+  /// List all public agent details.
   ///
   /// Parameters:
   ///

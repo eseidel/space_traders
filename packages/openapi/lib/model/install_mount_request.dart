@@ -16,6 +16,7 @@ class InstallMountRequest {
     required this.symbol,
   });
 
+  /// The symbol of the mount to install.
   String symbol;
 
   @override

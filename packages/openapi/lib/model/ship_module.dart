@@ -14,15 +14,21 @@ class ShipModule {
   /// Returns a new [ShipModule] instance.
   ShipModule({
     required this.symbol,
-    this.capacity,
-    this.range,
     required this.name,
     required this.description,
+    this.capacity,
+    this.range,
     required this.requirements,
   });
 
   /// The symbol of the module.
   ShipModuleSymbolEnum symbol;
+
+  /// Name of this module.
+  String name;
+
+  /// Description of this module.
+  String description;
 
   /// Modules that provide capacity, such as cargo hold or crew quarters will show this value to denote how much of a bonus the module grants.
   ///
@@ -46,12 +52,6 @@ class ShipModule {
   ///
   int? range;
 
-  /// Name of this module.
-  String name;
-
-  /// Description of this module.
-  String description;
-
   ShipRequirements requirements;
 
   @override
@@ -59,29 +59,31 @@ class ShipModule {
       identical(this, other) ||
       other is ShipModule &&
           other.symbol == symbol &&
-          other.capacity == capacity &&
-          other.range == range &&
           other.name == name &&
           other.description == description &&
+          other.capacity == capacity &&
+          other.range == range &&
           other.requirements == requirements;
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
       (symbol.hashCode) +
-      (capacity == null ? 0 : capacity!.hashCode) +
-      (range == null ? 0 : range!.hashCode) +
       (name.hashCode) +
       (description.hashCode) +
+      (capacity == null ? 0 : capacity!.hashCode) +
+      (range == null ? 0 : range!.hashCode) +
       (requirements.hashCode);
 
   @override
   String toString() =>
-      'ShipModule[symbol=$symbol, capacity=$capacity, range=$range, name=$name, description=$description, requirements=$requirements]';
+      'ShipModule[symbol=$symbol, name=$name, description=$description, capacity=$capacity, range=$range, requirements=$requirements]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
     json[r'symbol'] = this.symbol;
+    json[r'name'] = this.name;
+    json[r'description'] = this.description;
     if (this.capacity != null) {
       json[r'capacity'] = this.capacity;
     } else {
@@ -92,8 +94,6 @@ class ShipModule {
     } else {
       json[r'range'] = null;
     }
-    json[r'name'] = this.name;
-    json[r'description'] = this.description;
     json[r'requirements'] = this.requirements;
     return json;
   }
@@ -120,10 +120,10 @@ class ShipModule {
 
       return ShipModule(
         symbol: ShipModuleSymbolEnum.fromJson(json[r'symbol'])!,
-        capacity: mapValueOfType<int>(json, r'capacity'),
-        range: mapValueOfType<int>(json, r'range'),
         name: mapValueOfType<String>(json, r'name')!,
         description: mapValueOfType<String>(json, r'description')!,
+        capacity: mapValueOfType<int>(json, r'capacity'),
+        range: mapValueOfType<int>(json, r'range'),
         requirements: ShipRequirements.fromJson(json[r'requirements'])!,
       );
     }

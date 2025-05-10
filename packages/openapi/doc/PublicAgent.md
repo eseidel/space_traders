@@ -1,4 +1,4 @@
-# openapi.model.Agent
+# openapi.model.PublicAgent
 
 ## Load the model package
 ```dart
@@ -8,7 +8,6 @@ import 'package:openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**accountId** | **String** | Account ID that is tied to this agent. Only included on your own agent. | 
 **symbol** | **String** | Symbol of the agent. | 
 **headquarters** | **String** | The headquarters of the agent. | 
 **credits** | **int** | The number of credits the agent has available. Credits can be negative if funds have been overdrawn. | 

@@ -19,6 +19,7 @@ class ShipConditionEvent {
     required this.description,
   });
 
+  /// The symbol of the event that occurred.
   ShipConditionEventSymbolEnum symbol;
 
   ShipConditionEventComponentEnum component;
@@ -148,6 +149,7 @@ class ShipConditionEvent {
   };
 }
 
+/// The symbol of the event that occurred.
 class ShipConditionEventSymbolEnum {
   /// Instantiate a new enum with the provided [value].
   const ShipConditionEventSymbolEnum._(this.value);

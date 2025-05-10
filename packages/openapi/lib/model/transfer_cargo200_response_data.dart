@@ -10,49 +10,44 @@
 
 part of openapi;
 
-class SellCargo201ResponseData {
-  /// Returns a new [SellCargo201ResponseData] instance.
-  SellCargo201ResponseData({
-    required this.agent,
+class TransferCargo200ResponseData {
+  /// Returns a new [TransferCargo200ResponseData] instance.
+  TransferCargo200ResponseData({
     required this.cargo,
-    required this.transaction,
+    required this.targetCargo,
   });
-
-  Agent agent;
 
   ShipCargo cargo;
 
-  MarketTransaction transaction;
+  ShipCargo targetCargo;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is SellCargo201ResponseData &&
-          other.agent == agent &&
+      other is TransferCargo200ResponseData &&
           other.cargo == cargo &&
-          other.transaction == transaction;
+          other.targetCargo == targetCargo;
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (agent.hashCode) + (cargo.hashCode) + (transaction.hashCode);
+      (cargo.hashCode) + (targetCargo.hashCode);
 
   @override
   String toString() =>
-      'SellCargo201ResponseData[agent=$agent, cargo=$cargo, transaction=$transaction]';
+      'TransferCargo200ResponseData[cargo=$cargo, targetCargo=$targetCargo]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    json[r'agent'] = this.agent;
     json[r'cargo'] = this.cargo;
-    json[r'transaction'] = this.transaction;
+    json[r'targetCargo'] = this.targetCargo;
     return json;
   }
 
-  /// Returns a new [SellCargo201ResponseData] instance and imports its values from
+  /// Returns a new [TransferCargo200ResponseData] instance and imports its values from
   /// [value] if it's a [Map], null otherwise.
   // ignore: prefer_constructors_over_static_methods
-  static SellCargo201ResponseData? fromJson(dynamic value) {
+  static TransferCargo200ResponseData? fromJson(dynamic value) {
     if (value is Map) {
       final json = value.cast<String, dynamic>();
 
@@ -62,30 +57,29 @@ class SellCargo201ResponseData {
       assert(() {
         requiredKeys.forEach((key) {
           assert(json.containsKey(key),
-              'Required key "SellCargo201ResponseData[$key]" is missing from JSON.');
+              'Required key "TransferCargo200ResponseData[$key]" is missing from JSON.');
           assert(json[key] != null,
-              'Required key "SellCargo201ResponseData[$key]" has a null value in JSON.');
+              'Required key "TransferCargo200ResponseData[$key]" has a null value in JSON.');
         });
         return true;
       }());
 
-      return SellCargo201ResponseData(
-        agent: Agent.fromJson(json[r'agent'])!,
+      return TransferCargo200ResponseData(
         cargo: ShipCargo.fromJson(json[r'cargo'])!,
-        transaction: MarketTransaction.fromJson(json[r'transaction'])!,
+        targetCargo: ShipCargo.fromJson(json[r'targetCargo'])!,
       );
     }
     return null;
   }
 
-  static List<SellCargo201ResponseData> listFromJson(
+  static List<TransferCargo200ResponseData> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final result = <SellCargo201ResponseData>[];
+    final result = <TransferCargo200ResponseData>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
-        final value = SellCargo201ResponseData.fromJson(row);
+        final value = TransferCargo200ResponseData.fromJson(row);
         if (value != null) {
           result.add(value);
         }
@@ -94,12 +88,12 @@ class SellCargo201ResponseData {
     return result.toList(growable: growable);
   }
 
-  static Map<String, SellCargo201ResponseData> mapFromJson(dynamic json) {
-    final map = <String, SellCargo201ResponseData>{};
+  static Map<String, TransferCargo200ResponseData> mapFromJson(dynamic json) {
+    final map = <String, TransferCargo200ResponseData>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = SellCargo201ResponseData.fromJson(entry.value);
+        final value = TransferCargo200ResponseData.fromJson(entry.value);
         if (value != null) {
           map[entry.key] = value;
         }
@@ -108,17 +102,17 @@ class SellCargo201ResponseData {
     return map;
   }
 
-  // maps a json object with a list of SellCargo201ResponseData-objects as value to a dart map
-  static Map<String, List<SellCargo201ResponseData>> mapListFromJson(
+  // maps a json object with a list of TransferCargo200ResponseData-objects as value to a dart map
+  static Map<String, List<TransferCargo200ResponseData>> mapListFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final map = <String, List<SellCargo201ResponseData>>{};
+    final map = <String, List<TransferCargo200ResponseData>>{};
     if (json is Map && json.isNotEmpty) {
       // ignore: parameter_assignments
       json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        map[entry.key] = SellCargo201ResponseData.listFromJson(
+        map[entry.key] = TransferCargo200ResponseData.listFromJson(
           entry.value,
           growable: growable,
         );
@@ -129,8 +123,7 @@ class SellCargo201ResponseData {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'agent',
     'cargo',
-    'transaction',
+    'targetCargo',
   };
 }

@@ -10,19 +10,15 @@
 
 part of openapi;
 
-class Agent {
-  /// Returns a new [Agent] instance.
-  Agent({
-    required this.accountId,
+class PublicAgent {
+  /// Returns a new [PublicAgent] instance.
+  PublicAgent({
     required this.symbol,
     required this.headquarters,
     required this.credits,
     required this.startingFaction,
     required this.shipCount,
   });
-
-  /// Account ID that is tied to this agent. Only included on your own agent.
-  String accountId;
 
   /// Symbol of the agent.
   String symbol;
@@ -42,8 +38,7 @@ class Agent {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is Agent &&
-          other.accountId == accountId &&
+      other is PublicAgent &&
           other.symbol == symbol &&
           other.headquarters == headquarters &&
           other.credits == credits &&
@@ -53,7 +48,6 @@ class Agent {
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (accountId.hashCode) +
       (symbol.hashCode) +
       (headquarters.hashCode) +
       (credits.hashCode) +
@@ -62,11 +56,10 @@ class Agent {
 
   @override
   String toString() =>
-      'Agent[accountId=$accountId, symbol=$symbol, headquarters=$headquarters, credits=$credits, startingFaction=$startingFaction, shipCount=$shipCount]';
+      'PublicAgent[symbol=$symbol, headquarters=$headquarters, credits=$credits, startingFaction=$startingFaction, shipCount=$shipCount]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    json[r'accountId'] = this.accountId;
     json[r'symbol'] = this.symbol;
     json[r'headquarters'] = this.headquarters;
     json[r'credits'] = this.credits;
@@ -75,10 +68,10 @@ class Agent {
     return json;
   }
 
-  /// Returns a new [Agent] instance and imports its values from
+  /// Returns a new [PublicAgent] instance and imports its values from
   /// [value] if it's a [Map], null otherwise.
   // ignore: prefer_constructors_over_static_methods
-  static Agent? fromJson(dynamic value) {
+  static PublicAgent? fromJson(dynamic value) {
     if (value is Map) {
       final json = value.cast<String, dynamic>();
 
@@ -88,15 +81,14 @@ class Agent {
       assert(() {
         requiredKeys.forEach((key) {
           assert(json.containsKey(key),
-              'Required key "Agent[$key]" is missing from JSON.');
+              'Required key "PublicAgent[$key]" is missing from JSON.');
           assert(json[key] != null,
-              'Required key "Agent[$key]" has a null value in JSON.');
+              'Required key "PublicAgent[$key]" has a null value in JSON.');
         });
         return true;
       }());
 
-      return Agent(
-        accountId: mapValueOfType<String>(json, r'accountId')!,
+      return PublicAgent(
         symbol: mapValueOfType<String>(json, r'symbol')!,
         headquarters: mapValueOfType<String>(json, r'headquarters')!,
         credits: mapValueOfType<int>(json, r'credits')!,
@@ -107,14 +99,14 @@ class Agent {
     return null;
   }
 
-  static List<Agent> listFromJson(
+  static List<PublicAgent> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final result = <Agent>[];
+    final result = <PublicAgent>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
-        final value = Agent.fromJson(row);
+        final value = PublicAgent.fromJson(row);
         if (value != null) {
           result.add(value);
         }
@@ -123,12 +115,12 @@ class Agent {
     return result.toList(growable: growable);
   }
 
-  static Map<String, Agent> mapFromJson(dynamic json) {
-    final map = <String, Agent>{};
+  static Map<String, PublicAgent> mapFromJson(dynamic json) {
+    final map = <String, PublicAgent>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = Agent.fromJson(entry.value);
+        final value = PublicAgent.fromJson(entry.value);
         if (value != null) {
           map[entry.key] = value;
         }
@@ -137,17 +129,17 @@ class Agent {
     return map;
   }
 
-  // maps a json object with a list of Agent-objects as value to a dart map
-  static Map<String, List<Agent>> mapListFromJson(
+  // maps a json object with a list of PublicAgent-objects as value to a dart map
+  static Map<String, List<PublicAgent>> mapListFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final map = <String, List<Agent>>{};
+    final map = <String, List<PublicAgent>>{};
     if (json is Map && json.isNotEmpty) {
       // ignore: parameter_assignments
       json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        map[entry.key] = Agent.listFromJson(
+        map[entry.key] = PublicAgent.listFromJson(
           entry.value,
           growable: growable,
         );
@@ -158,7 +150,6 @@ class Agent {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'accountId',
     'symbol',
     'headquarters',
     'credits',

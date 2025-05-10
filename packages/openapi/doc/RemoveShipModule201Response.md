@@ -1,4 +1,4 @@
-# openapi.model.NavigateShip200ResponseData
+# openapi.model.RemoveShipModule201Response
 
 ## Load the model package
 ```dart
@@ -8,9 +8,7 @@ import 'package:openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**nav** | [**ShipNav**](ShipNav.md) |  | 
-**fuel** | [**ShipFuel**](ShipFuel.md) |  | 
-**events** | [**List<ShipConditionEvent>**](ShipConditionEvent.md) |  | [default to const []]
+**data** | [**InstallShipModule201ResponseData**](InstallShipModule201ResponseData.md) |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

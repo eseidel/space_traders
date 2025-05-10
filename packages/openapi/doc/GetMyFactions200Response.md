@@ -1,4 +1,4 @@
-# openapi.model.WarpShip200ResponseData
+# openapi.model.GetMyFactions200Response
 
 ## Load the model package
 ```dart
@@ -8,8 +8,8 @@ import 'package:openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**fuel** | [**ShipFuel**](ShipFuel.md) |  | 
-**nav** | [**ShipNav**](ShipNav.md) |  | 
+**data** | [**List<GetMyFactions200ResponseDataInner>**](GetMyFactions200ResponseDataInner.md) |  | [default to const []]
+**meta** | [**Meta**](Meta.md) |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

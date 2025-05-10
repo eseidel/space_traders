@@ -14,7 +14,7 @@ class RefuelShipRequest {
   /// Returns a new [RefuelShipRequest] instance.
   RefuelShipRequest({
     this.units,
-    this.fromCargo,
+    this.fromCargo = false,
   });
 
   /// The amount of fuel to fill in the ship's tanks. When not specified, the ship will be refueled to its maximum fuel capacity. If the amount specified is greater than the ship's remaining capacity, the ship will only be refueled to its maximum fuel capacity. The amount specified is not in market units but in ship fuel units.
@@ -28,14 +28,8 @@ class RefuelShipRequest {
   ///
   int? units;
 
-  /// Wether to use the FUEL thats in your cargo or not. Default: false
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  bool? fromCargo;
+  /// Wether to use the FUEL thats in your cargo or not.
+  bool fromCargo;
 
   @override
   bool operator ==(Object other) =>
@@ -47,8 +41,7 @@ class RefuelShipRequest {
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (units == null ? 0 : units!.hashCode) +
-      (fromCargo == null ? 0 : fromCargo!.hashCode);
+      (units == null ? 0 : units!.hashCode) + (fromCargo.hashCode);
 
   @override
   String toString() => 'RefuelShipRequest[units=$units, fromCargo=$fromCargo]';
@@ -60,11 +53,7 @@ class RefuelShipRequest {
     } else {
       json[r'units'] = null;
     }
-    if (this.fromCargo != null) {
-      json[r'fromCargo'] = this.fromCargo;
-    } else {
-      json[r'fromCargo'] = null;
-    }
+    json[r'fromCargo'] = this.fromCargo;
     return json;
   }
 
@@ -90,7 +79,7 @@ class RefuelShipRequest {
 
       return RefuelShipRequest(
         units: mapValueOfType<int>(json, r'units'),
-        fromCargo: mapValueOfType<bool>(json, r'fromCargo'),
+        fromCargo: mapValueOfType<bool>(json, r'fromCargo') ?? false,
       );
     }
     return null;

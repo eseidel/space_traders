@@ -239,6 +239,8 @@ class ApiClient {
           return Agent.fromJson(value);
         case 'Chart':
           return Chart.fromJson(value);
+        case 'ChartTransaction':
+          return ChartTransaction.fromJson(value);
         case 'Construction':
           return Construction.fromJson(value);
         case 'ConstructionMaterial':
@@ -281,12 +283,12 @@ class ApiClient {
           return DeliverContractRequest.fromJson(value);
         case 'DockShip200Response':
           return DockShip200Response.fromJson(value);
+        case 'DockShip200ResponseData':
+          return DockShip200ResponseData.fromJson(value);
         case 'ExtractResources201Response':
           return ExtractResources201Response.fromJson(value);
         case 'ExtractResources201ResponseData':
           return ExtractResources201ResponseData.fromJson(value);
-        case 'ExtractResourcesRequest':
-          return ExtractResourcesRequest.fromJson(value);
         case 'Extraction':
           return Extraction.fromJson(value);
         case 'ExtractionYield':
@@ -301,6 +303,8 @@ class ApiClient {
           return FactionTraitSymbolTypeTransformer().decode(value);
         case 'FulfillContract200Response':
           return FulfillContract200Response.fromJson(value);
+        case 'GetAgent200Response':
+          return GetAgent200Response.fromJson(value);
         case 'GetAgents200Response':
           return GetAgents200Response.fromJson(value);
         case 'GetConstruction200Response':
@@ -321,6 +325,10 @@ class ApiClient {
           return GetMounts200Response.fromJson(value);
         case 'GetMyAgent200Response':
           return GetMyAgent200Response.fromJson(value);
+        case 'GetMyFactions200Response':
+          return GetMyFactions200Response.fromJson(value);
+        case 'GetMyFactions200ResponseDataInner':
+          return GetMyFactions200ResponseDataInner.fromJson(value);
         case 'GetMyShip200Response':
           return GetMyShip200Response.fromJson(value);
         case 'GetMyShipCargo200Response':
@@ -383,8 +391,6 @@ class ApiClient {
           return InstallShipModule201Response.fromJson(value);
         case 'InstallShipModule201ResponseData':
           return InstallShipModule201ResponseData.fromJson(value);
-        case 'InstallShipModule201ResponseDataTransaction':
-          return InstallShipModule201ResponseDataTransaction.fromJson(value);
         case 'InstallShipModuleRequest':
           return InstallShipModuleRequest.fromJson(value);
         case 'Jettison200Response':
@@ -415,22 +421,22 @@ class ApiClient {
           return NavigateShip200ResponseData.fromJson(value);
         case 'NavigateShipRequest':
           return NavigateShipRequest.fromJson(value);
-        case 'NegotiateContract200Response':
-          return NegotiateContract200Response.fromJson(value);
-        case 'NegotiateContract200ResponseData':
-          return NegotiateContract200ResponseData.fromJson(value);
+        case 'NegotiateContract201Response':
+          return NegotiateContract201Response.fromJson(value);
+        case 'NegotiateContract201ResponseData':
+          return NegotiateContract201ResponseData.fromJson(value);
         case 'OrbitShip200Response':
           return OrbitShip200Response.fromJson(value);
-        case 'OrbitShip200ResponseData':
-          return OrbitShip200ResponseData.fromJson(value);
         case 'PatchShipNav200Response':
           return PatchShipNav200Response.fromJson(value);
-        case 'PatchShipNav200ResponseData':
-          return PatchShipNav200ResponseData.fromJson(value);
         case 'PatchShipNavRequest':
           return PatchShipNavRequest.fromJson(value);
+        case 'PublicAgent':
+          return PublicAgent.fromJson(value);
         case 'PurchaseCargo201Response':
           return PurchaseCargo201Response.fromJson(value);
+        case 'PurchaseCargo201ResponseData':
+          return PurchaseCargo201ResponseData.fromJson(value);
         case 'PurchaseCargoRequest':
           return PurchaseCargoRequest.fromJson(value);
         case 'PurchaseShip201Response':
@@ -451,14 +457,14 @@ class ApiClient {
           return Register201ResponseData.fromJson(value);
         case 'RegisterRequest':
           return RegisterRequest.fromJson(value);
-        case 'RemoveModule201Response':
-          return RemoveModule201Response.fromJson(value);
         case 'RemoveMount201Response':
           return RemoveMount201Response.fromJson(value);
         case 'RemoveMount201ResponseData':
           return RemoveMount201ResponseData.fromJson(value);
         case 'RemoveMountRequest':
           return RemoveMountRequest.fromJson(value);
+        case 'RemoveShipModule201Response':
+          return RemoveShipModule201Response.fromJson(value);
         case 'RemoveShipModuleRequest':
           return RemoveShipModuleRequest.fromJson(value);
         case 'RepairShip200Response':
@@ -489,8 +495,6 @@ class ApiClient {
           return ScrapTransaction.fromJson(value);
         case 'SellCargo201Response':
           return SellCargo201Response.fromJson(value);
-        case 'SellCargo201ResponseData':
-          return SellCargo201ResponseData.fromJson(value);
         case 'SellCargoRequest':
           return SellCargoRequest.fromJson(value);
         case 'Ship':
@@ -575,6 +579,8 @@ class ApiClient {
           return Survey.fromJson(value);
         case 'SurveyDeposit':
           return SurveyDeposit.fromJson(value);
+        case 'SurveySize':
+          return SurveySizeTypeTransformer().decode(value);
         case 'System':
           return System.fromJson(value);
         case 'SystemFaction':
@@ -589,12 +595,10 @@ class ApiClient {
           return TradeSymbolTypeTransformer().decode(value);
         case 'TransferCargo200Response':
           return TransferCargo200Response.fromJson(value);
+        case 'TransferCargo200ResponseData':
+          return TransferCargo200ResponseData.fromJson(value);
         case 'TransferCargoRequest':
           return TransferCargoRequest.fromJson(value);
-        case 'WarpShip200Response':
-          return WarpShip200Response.fromJson(value);
-        case 'WarpShip200ResponseData':
-          return WarpShip200ResponseData.fromJson(value);
         case 'Waypoint':
           return Waypoint.fromJson(value);
         case 'WaypointFaction':

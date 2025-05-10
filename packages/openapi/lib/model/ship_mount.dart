@@ -15,26 +15,20 @@ class ShipMount {
   ShipMount({
     required this.symbol,
     required this.name,
-    this.description,
+    required this.description,
     this.strength,
     this.deposits = const [],
     required this.requirements,
   });
 
-  /// Symbo of this mount.
+  /// Symbol of this mount.
   ShipMountSymbolEnum symbol;
 
   /// Name of this mount.
   String name;
 
   /// Description of this mount.
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? description;
+  String description;
 
   /// Mounts that have this value, such as mining lasers, denote how powerful this mount's capabilities are.
   ///
@@ -68,7 +62,7 @@ class ShipMount {
       // ignore: unnecessary_parenthesis
       (symbol.hashCode) +
       (name.hashCode) +
-      (description == null ? 0 : description!.hashCode) +
+      (description.hashCode) +
       (strength == null ? 0 : strength!.hashCode) +
       (deposits.hashCode) +
       (requirements.hashCode);
@@ -81,11 +75,7 @@ class ShipMount {
     final json = <String, dynamic>{};
     json[r'symbol'] = this.symbol;
     json[r'name'] = this.name;
-    if (this.description != null) {
-      json[r'description'] = this.description;
-    } else {
-      json[r'description'] = null;
-    }
+    json[r'description'] = this.description;
     if (this.strength != null) {
       json[r'strength'] = this.strength;
     } else {
@@ -119,7 +109,7 @@ class ShipMount {
       return ShipMount(
         symbol: ShipMountSymbolEnum.fromJson(json[r'symbol'])!,
         name: mapValueOfType<String>(json, r'name')!,
-        description: mapValueOfType<String>(json, r'description'),
+        description: mapValueOfType<String>(json, r'description')!,
         strength: mapValueOfType<int>(json, r'strength'),
         deposits: ShipMountDepositsEnum.listFromJson(json[r'deposits']),
         requirements: ShipRequirements.fromJson(json[r'requirements'])!,
@@ -181,11 +171,12 @@ class ShipMount {
   static const requiredKeys = <String>{
     'symbol',
     'name',
+    'description',
     'requirements',
   };
 }
 
-/// Symbo of this mount.
+/// Symbol of this mount.
 class ShipMountSymbolEnum {
   /// Instantiate a new enum with the provided [value].
   const ShipMountSymbolEnum._(this.value);

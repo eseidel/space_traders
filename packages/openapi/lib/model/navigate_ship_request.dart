@@ -16,7 +16,7 @@ class NavigateShipRequest {
     required this.waypointSymbol,
   });
 
-  /// The target destination.
+  /// The symbol of the waypoint to navigate/warp to.
   String waypointSymbol;
 
   @override

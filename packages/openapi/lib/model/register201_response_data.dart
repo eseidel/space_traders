@@ -13,54 +13,54 @@ part of openapi;
 class Register201ResponseData {
   /// Returns a new [Register201ResponseData] instance.
   Register201ResponseData({
-    required this.agent,
-    required this.contract,
-    required this.faction,
-    this.ships = const [],
     required this.token,
+    required this.agent,
+    required this.faction,
+    required this.contract,
+    this.ships = const [],
   });
-
-  Agent agent;
-
-  Contract contract;
-
-  Faction faction;
-
-  List<Ship> ships;
 
   /// A Bearer token for accessing secured API endpoints.
   String token;
+
+  Agent agent;
+
+  Faction faction;
+
+  Contract contract;
+
+  List<Ship> ships;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is Register201ResponseData &&
+          other.token == token &&
           other.agent == agent &&
-          other.contract == contract &&
           other.faction == faction &&
-          _deepEquality.equals(other.ships, ships) &&
-          other.token == token;
+          other.contract == contract &&
+          _deepEquality.equals(other.ships, ships);
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
+      (token.hashCode) +
       (agent.hashCode) +
-      (contract.hashCode) +
       (faction.hashCode) +
-      (ships.hashCode) +
-      (token.hashCode);
+      (contract.hashCode) +
+      (ships.hashCode);
 
   @override
   String toString() =>
-      'Register201ResponseData[agent=$agent, contract=$contract, faction=$faction, ships=$ships, token=$token]';
+      'Register201ResponseData[token=$token, agent=$agent, faction=$faction, contract=$contract, ships=$ships]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    json[r'agent'] = this.agent;
-    json[r'contract'] = this.contract;
-    json[r'faction'] = this.faction;
-    json[r'ships'] = this.ships;
     json[r'token'] = this.token;
+    json[r'agent'] = this.agent;
+    json[r'faction'] = this.faction;
+    json[r'contract'] = this.contract;
+    json[r'ships'] = this.ships;
     return json;
   }
 
@@ -85,11 +85,11 @@ class Register201ResponseData {
       }());
 
       return Register201ResponseData(
-        agent: Agent.fromJson(json[r'agent'])!,
-        contract: Contract.fromJson(json[r'contract'])!,
-        faction: Faction.fromJson(json[r'faction'])!,
-        ships: Ship.listFromJson(json[r'ships']),
         token: mapValueOfType<String>(json, r'token')!,
+        agent: Agent.fromJson(json[r'agent'])!,
+        faction: Faction.fromJson(json[r'faction'])!,
+        contract: Contract.fromJson(json[r'contract'])!,
+        ships: Ship.listFromJson(json[r'ships']),
       );
     }
     return null;
@@ -146,9 +146,10 @@ class Register201ResponseData {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'agent',
-    'contract',
-    'faction',
     'token',
+    'agent',
+    'faction',
+    'contract',
+    'ships',
   };
 }

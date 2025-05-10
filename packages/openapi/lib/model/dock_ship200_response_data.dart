@@ -10,47 +10,37 @@
 
 part of openapi;
 
-class ExtractResourcesRequest {
-  /// Returns a new [ExtractResourcesRequest] instance.
-  ExtractResourcesRequest({
-    this.survey,
+class DockShip200ResponseData {
+  /// Returns a new [DockShip200ResponseData] instance.
+  DockShip200ResponseData({
+    required this.nav,
   });
 
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  Survey? survey;
+  ShipNav nav;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is ExtractResourcesRequest && other.survey == survey;
+      other is DockShip200ResponseData && other.nav == nav;
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (survey == null ? 0 : survey!.hashCode);
+      (nav.hashCode);
 
   @override
-  String toString() => 'ExtractResourcesRequest[survey=$survey]';
+  String toString() => 'DockShip200ResponseData[nav=$nav]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    if (this.survey != null) {
-      json[r'survey'] = this.survey;
-    } else {
-      json[r'survey'] = null;
-    }
+    json[r'nav'] = this.nav;
     return json;
   }
 
-  /// Returns a new [ExtractResourcesRequest] instance and imports its values from
+  /// Returns a new [DockShip200ResponseData] instance and imports its values from
   /// [value] if it's a [Map], null otherwise.
   // ignore: prefer_constructors_over_static_methods
-  static ExtractResourcesRequest? fromJson(dynamic value) {
+  static DockShip200ResponseData? fromJson(dynamic value) {
     if (value is Map) {
       final json = value.cast<String, dynamic>();
 
@@ -60,28 +50,28 @@ class ExtractResourcesRequest {
       assert(() {
         requiredKeys.forEach((key) {
           assert(json.containsKey(key),
-              'Required key "ExtractResourcesRequest[$key]" is missing from JSON.');
+              'Required key "DockShip200ResponseData[$key]" is missing from JSON.');
           assert(json[key] != null,
-              'Required key "ExtractResourcesRequest[$key]" has a null value in JSON.');
+              'Required key "DockShip200ResponseData[$key]" has a null value in JSON.');
         });
         return true;
       }());
 
-      return ExtractResourcesRequest(
-        survey: Survey.fromJson(json[r'survey']),
+      return DockShip200ResponseData(
+        nav: ShipNav.fromJson(json[r'nav'])!,
       );
     }
     return null;
   }
 
-  static List<ExtractResourcesRequest> listFromJson(
+  static List<DockShip200ResponseData> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final result = <ExtractResourcesRequest>[];
+    final result = <DockShip200ResponseData>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
-        final value = ExtractResourcesRequest.fromJson(row);
+        final value = DockShip200ResponseData.fromJson(row);
         if (value != null) {
           result.add(value);
         }
@@ -90,12 +80,12 @@ class ExtractResourcesRequest {
     return result.toList(growable: growable);
   }
 
-  static Map<String, ExtractResourcesRequest> mapFromJson(dynamic json) {
-    final map = <String, ExtractResourcesRequest>{};
+  static Map<String, DockShip200ResponseData> mapFromJson(dynamic json) {
+    final map = <String, DockShip200ResponseData>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = ExtractResourcesRequest.fromJson(entry.value);
+        final value = DockShip200ResponseData.fromJson(entry.value);
         if (value != null) {
           map[entry.key] = value;
         }
@@ -104,17 +94,17 @@ class ExtractResourcesRequest {
     return map;
   }
 
-  // maps a json object with a list of ExtractResourcesRequest-objects as value to a dart map
-  static Map<String, List<ExtractResourcesRequest>> mapListFromJson(
+  // maps a json object with a list of DockShip200ResponseData-objects as value to a dart map
+  static Map<String, List<DockShip200ResponseData>> mapListFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final map = <String, List<ExtractResourcesRequest>>{};
+    final map = <String, List<DockShip200ResponseData>>{};
     if (json is Map && json.isNotEmpty) {
       // ignore: parameter_assignments
       json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        map[entry.key] = ExtractResourcesRequest.listFromJson(
+        map[entry.key] = DockShip200ResponseData.listFromJson(
           entry.value,
           growable: growable,
         );
@@ -124,5 +114,7 @@ class ExtractResourcesRequest {
   }
 
   /// The list of required keys that must be present in a JSON.
-  static const requiredKeys = <String>{};
+  static const requiredKeys = <String>{
+    'nav',
+  };
 }

@@ -20,6 +20,8 @@ class SellCargoRequest {
   TradeSymbol symbol;
 
   /// Amounts of units to sell of the selected good.
+  ///
+  /// Minimum value: 1
   int units;
 
   @override

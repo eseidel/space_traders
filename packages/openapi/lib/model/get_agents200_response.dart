@@ -17,7 +17,7 @@ class GetAgents200Response {
     required this.meta,
   });
 
-  List<Agent> data;
+  List<PublicAgent> data;
 
   Meta meta;
 
@@ -64,7 +64,7 @@ class GetAgents200Response {
       }());
 
       return GetAgents200Response(
-        data: Agent.listFromJson(json[r'data']),
+        data: PublicAgent.listFromJson(json[r'data']),
         meta: Meta.fromJson(json[r'meta'])!,
       );
     }

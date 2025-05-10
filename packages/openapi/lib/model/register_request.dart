@@ -13,15 +13,15 @@ part of openapi;
 class RegisterRequest {
   /// Returns a new [RegisterRequest] instance.
   RegisterRequest({
-    required this.faction,
     required this.symbol,
+    required this.faction,
     this.email,
   });
 
-  FactionSymbol faction;
-
   /// Your desired agent symbol. This will be a unique name used to represent your agent, and will be the prefix for your ships.
   String symbol;
+
+  FactionSymbol faction;
 
   /// Your email address. This is used if you reserved your call sign between resets.
   ///
@@ -36,25 +36,25 @@ class RegisterRequest {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is RegisterRequest &&
-          other.faction == faction &&
           other.symbol == symbol &&
+          other.faction == faction &&
           other.email == email;
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (faction.hashCode) +
       (symbol.hashCode) +
+      (faction.hashCode) +
       (email == null ? 0 : email!.hashCode);
 
   @override
   String toString() =>
-      'RegisterRequest[faction=$faction, symbol=$symbol, email=$email]';
+      'RegisterRequest[symbol=$symbol, faction=$faction, email=$email]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    json[r'faction'] = this.faction;
     json[r'symbol'] = this.symbol;
+    json[r'faction'] = this.faction;
     if (this.email != null) {
       json[r'email'] = this.email;
     } else {
@@ -84,8 +84,8 @@ class RegisterRequest {
       }());
 
       return RegisterRequest(
-        faction: FactionSymbol.fromJson(json[r'faction'])!,
         symbol: mapValueOfType<String>(json, r'symbol')!,
+        faction: FactionSymbol.fromJson(json[r'faction'])!,
         email: mapValueOfType<String>(json, r'email'),
       );
     }
@@ -143,7 +143,7 @@ class RegisterRequest {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'faction',
     'symbol',
+    'faction',
   };
 }
