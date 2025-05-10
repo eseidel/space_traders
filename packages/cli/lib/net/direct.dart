@@ -256,6 +256,9 @@ Future<RefuelShip200ResponseData> refuelShip(
   final data = responseWrapper!.data;
   await db.upsertAgent(Agent.fromOpenApi(data.agent));
   ship.fuel = data.fuel;
+  if (data.cargo != null) {
+    ship.cargo = data.cargo!;
+  }
   await db.upsertShip(ship);
   return data;
 }
