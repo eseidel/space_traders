@@ -1,5 +1,4 @@
 import 'package:cli/api.dart';
-import 'package:cli/cache/contract_snapshot.dart';
 import 'package:cli/cache/market_cache.dart';
 import 'package:cli/cache/ship_snapshot.dart';
 import 'package:cli/cache/waypoint_cache.dart';
@@ -16,7 +15,6 @@ import 'package:types/types.dart';
 
 export 'package:cli/api.dart';
 export 'package:cli/cache/behavior_snapshot.dart';
-export 'package:cli/cache/contract_snapshot.dart';
 export 'package:cli/cache/market_cache.dart';
 export 'package:cli/cache/ship_snapshot.dart';
 export 'package:cli/cache/static_cache.dart';
@@ -173,7 +171,7 @@ class TopOfLoopUpdater {
       // This does not need to assign to anything, fetchContracts updates
       // the db already.
       _checkForChanges(
-        current: await ContractSnapshot.load(db),
+        current: await db.contracts.snapshotAll(),
         server: await fetchContracts(db, api),
         // Use OpenAPI's toJson to restrict to only the fields the server sends.
         toJsonList:
@@ -285,4 +283,13 @@ Future<JumpGate> getOrFetchJumpGate(
 ) async {
   return (await db.jumpGates.get(waypointSymbol)) ??
       await fetchAndCacheJumpGate(db, api, waypointSymbol);
+}
+
+/// Fetches all of the user's contracts.
+Future<ContractSnapshot> fetchContracts(Database db, Api api) async {
+  final contracts = await allMyContracts(api).toList();
+  for (final contract in contracts) {
+    await db.contracts.upsert(contract);
+  }
+  return ContractSnapshot(contracts);
 }

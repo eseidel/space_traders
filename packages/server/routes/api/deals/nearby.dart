@@ -21,7 +21,7 @@ Future<api.DealsNearbyResponse> dealsNearby({
   final marketPrices = await db.marketPrices.snapshotAll();
 
   final agent = await db.getMyAgent();
-  final contractSnapshot = await ContractSnapshot.load(db);
+  final contractSnapshot = await db.contracts.snapshotAll();
   final centralCommand = CentralCommand();
 
   final startWaypoint =

@@ -14,6 +14,12 @@ class ContractStore {
     return _db.queryMany(allContractsQuery(), contractFromColumnMap);
   }
 
+  /// Get a snapshot of all contracts.
+  Future<ContractSnapshot> snapshotAll() async {
+    final contracts = await all();
+    return ContractSnapshot(contracts.toList());
+  }
+
   /// Get a contract by id.
   Future<Contract?> get(String id) async {
     final query = contractByIdQuery(id);

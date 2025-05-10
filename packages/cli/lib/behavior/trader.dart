@@ -795,7 +795,7 @@ Future<JobResult> _initDeal(
     await acceptContractsIfNeeded(api, db, ship);
   }
 
-  final contractSnapshot = await ContractSnapshot.load(db);
+  final contractSnapshot = await db.contracts.snapshotAll();
   final behaviors = await BehaviorSnapshot.load(db);
   final agent = await db.getMyAgent();
 
