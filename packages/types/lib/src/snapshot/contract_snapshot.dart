@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:types/types.dart';
 
 /// Snapshot of contracts in the database.
@@ -26,9 +25,5 @@ class ContractSnapshot {
 
   /// Returns a list of all unaccepted contracts.
   List<Contract> get unacceptedContracts =>
-      contracts.where((c) => !c.accepted).toList();
-
-  /// Looks up the contract by id.
-  Contract? contract(String id) =>
-      contracts.firstWhereOrNull((c) => c.id == id);
+      contracts.where((c) => !c.accepted && !c.isExpired).toList();
 }
