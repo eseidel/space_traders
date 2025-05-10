@@ -26,7 +26,8 @@ void main() {
         final store = db.shipMounts;
         expect(store, isA<ShipMountStore>());
         final shipMount = testShipMount();
-        await store.add(shipMount);
+        await store.addAll([shipMount]);
+        expect(await store.get(shipMount.symbol), isNotNull);
         expect(await store.snapshot(), hasLength(1));
       });
 
@@ -34,7 +35,8 @@ void main() {
         final store = db.shipModules;
         expect(store, isA<ShipModuleStore>());
         final shipModule = testShipModule();
-        await store.add(shipModule);
+        await store.addAll([shipModule]);
+        expect(await store.get(shipModule.symbol), isNotNull);
         expect(await store.snapshot(), hasLength(1));
       });
 
@@ -42,7 +44,8 @@ void main() {
         final store = db.shipyardShips;
         expect(store, isA<ShipyardShipStore>());
         final shipyardShip = testShipyardShip();
-        await store.add(shipyardShip);
+        await store.addAll([shipyardShip]);
+        expect(await store.get(shipyardShip.type), isNotNull);
         expect(await store.snapshot(), hasLength(1));
       });
 
@@ -50,7 +53,8 @@ void main() {
         final store = db.shipEngines;
         expect(store, isA<ShipEngineStore>());
         final shipEngine = testShipEngine();
-        await store.add(shipEngine);
+        await store.addAll([shipEngine]);
+        expect(await store.get(shipEngine.symbol), isNotNull);
         expect(await store.snapshot(), hasLength(1));
       });
 
@@ -58,7 +62,8 @@ void main() {
         final store = db.shipReactors;
         expect(store, isA<ShipReactorStore>());
         final shipReactor = testShipReactor();
-        await store.add(shipReactor);
+        await store.addAll([shipReactor]);
+        expect(await store.get(shipReactor.symbol), isNotNull);
         expect(await store.snapshot(), hasLength(1));
       });
 
@@ -66,7 +71,8 @@ void main() {
         final store = db.waypointTraits;
         expect(store, isA<WaypointTraitStore>());
         final waypointTrait = testWaypointTrait();
-        await store.add(waypointTrait);
+        await store.addAll([waypointTrait]);
+        expect(await store.get(waypointTrait.symbol), isNotNull);
         expect(await store.snapshot(), hasLength(1));
       });
 
@@ -74,7 +80,8 @@ void main() {
         final store = db.tradeGoods;
         expect(store, isA<TradeGoodStore>());
         final tradeGood = testTradeGood();
-        await store.add(tradeGood);
+        await store.addAll([tradeGood]);
+        expect(await store.get(tradeGood.symbol), isNotNull);
         expect(await store.snapshot(), hasLength(1));
       });
 
@@ -82,7 +89,8 @@ void main() {
         final store = db.tradeExports;
         expect(store, isA<TradeExportStore>());
         final tradeExport = testTradeExport();
-        await store.add(tradeExport);
+        await store.addAll([tradeExport]);
+        expect(await store.get(tradeExport.export), isNotNull);
         expect(await store.snapshot(), hasLength(1));
       });
 
@@ -90,7 +98,8 @@ void main() {
         final store = db.events;
         expect(store, isA<EventStore>());
         final event = testShipConditionEvent();
-        await store.add(event);
+        await store.addAll([event]);
+        expect(await store.get(event.symbol), isNotNull);
         expect(await store.snapshot(), hasLength(1));
       });
     });

@@ -151,6 +151,7 @@ class ShipyardShipSnapshot extends StaticSnapshot<ShipType, ShipyardShip> {
 class ShipEngineTraits extends Traits<ShipEngineSymbolEnum, ShipEngine> {
   @override
   Json toJson(ShipEngine record) => record.toJson();
+
   @override
   ShipEngine fromJson(Map<String, dynamic> json) => ShipEngine.fromJson(json)!;
 
@@ -208,6 +209,7 @@ class WaypointTraitTraits extends Traits<WaypointTraitSymbol, WaypointTrait> {
   @override
   WaypointTrait fromJson(Map<String, dynamic> json) =>
       WaypointTrait.fromJson(json)!;
+
   @override
   Json toJson(WaypointTrait record) => record.toJson();
 
