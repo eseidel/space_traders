@@ -75,9 +75,9 @@ class Caches {
     await fetchContracts(db, api);
 
     final marketPrices = await db.marketPrices.snapshotAll();
-    // Load exports before we load static caches.  We ignore the response
-    // but then static.exports will be up to date.
-    await loadExports(db, api.data);
+
+    // TODO(eseidel): This only needs to happen once per reset.
+    await fetchExports(db, api.data);
 
     final systems = await db.systems.snapshotAllSystems();
     final waypoints = WaypointCache(api, db);
@@ -94,8 +94,8 @@ class Caches {
       sellsFuel: await defaultSellsFuel(db),
     );
 
-    // Make sure factions are loaded.
-    final factions = await loadFactions(db, api.factions);
+    // TODO(eseidel): This only needs to happen once per reset.
+    final factions = await fetchFactions(db, api.factions);
 
     final galaxy = await getGalaxyStats(api);
     return Caches(
@@ -213,7 +213,10 @@ Future<List<Faction>> allFactions(FactionsApi factionsApi) async {
 
 /// Loads the factions from the database, or fetches them from the API if
 /// they're not cached.
-Future<List<Faction>> loadFactions(Database db, FactionsApi factionsApi) async {
+Future<List<Faction>> fetchFactions(
+  Database db,
+  FactionsApi factionsApi,
+) async {
   final cachedFactions = await db.allFactions();
   if (cachedFactions.length >= FactionSymbol.values.length) {
     return Future.value(cachedFactions.toList());
@@ -227,7 +230,7 @@ Future<List<Faction>> loadFactions(Database db, FactionsApi factionsApi) async {
 
 /// Loads exports from the api and converts them to the old-style
 /// TradeExport list.
-Future<TradeExportSnapshot> loadExports(Database db, DataApi dataApi) async {
+Future<TradeExportSnapshot> fetchExports(Database db, DataApi dataApi) async {
   final cachedExportsJson = await db.getAllFromStaticCache(type: TradeExport);
   if (cachedExportsJson.isNotEmpty) {
     final exports = cachedExportsJson.map(TradeExport.fromJson).toList();
