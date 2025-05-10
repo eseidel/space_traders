@@ -29,6 +29,8 @@ class _MockWaypointCache extends Mock implements WaypointCache {}
 
 class _MockWaypointTraitStore extends Mock implements WaypointTraitStore {}
 
+class _MockTransactionStore extends Mock implements TransactionStore {}
+
 void main() {
   test('advanceSystemWatcher smoke test', () async {
     final api = _MockApi();
@@ -132,6 +134,14 @@ void main() {
     final waypointTraitStore = _MockWaypointTraitStore();
     when(() => db.waypointTraits).thenReturn(waypointTraitStore);
     when(() => waypointTraitStore.addAll(any())).thenAnswer((_) async {});
+
+    final transactionStore = _MockTransactionStore();
+    when(() => db.transactions).thenReturn(transactionStore);
+    registerFallbackValue(Transaction.fallbackValue());
+    when(() => transactionStore.insert(any())).thenAnswer((_) async {});
+
+    registerFallbackValue(Agent.test());
+    when(() => db.upsertAgent(any())).thenAnswer((_) async {});
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(

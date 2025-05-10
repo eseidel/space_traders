@@ -118,7 +118,10 @@ void main() {
       },
       getNow: getNow,
     );
-    expect(worthMining.first.survey.deposits.first.symbol, 'DIAMONDS');
+    expect(
+      worthMining.first.survey.deposits.first.symbol,
+      TradeSymbol.DIAMONDS,
+    );
   });
   test('advanceMiner smoke test', () async {
     final api = _MockApi();

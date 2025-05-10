@@ -448,10 +448,10 @@ void main() {
     registerFallbackValue(start.system);
     final state = BehaviorState(shipSymbol, Behavior.trader, deal: costedDeal);
 
-    when(
-      () =>
-          fleetApi.sellCargo(shipSymbol.symbol, any(named: 'sellCargoRequest')),
-    ).thenAnswer(
+    registerFallbackValue(
+      SellCargoRequest(symbol: TradeSymbol.ADVANCED_CIRCUITRY, units: 10),
+    );
+    when(() => fleetApi.sellCargo(shipSymbol.symbol, any())).thenAnswer(
       (_) => Future.value(
         SellCargo201Response(
           data: PurchaseCargo201ResponseData(

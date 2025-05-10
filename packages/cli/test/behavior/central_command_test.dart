@@ -577,7 +577,7 @@ void main() {
     ).thenAnswer((_) async => ChartingSnapshot([]));
     when(
       () => chartingStore.chartedValues(hqSymbol),
-    ).thenAnswer((_) async => ChartedValues.test());
+    ).thenAnswer((_) async => ChartedValues.test(waypointSymbol: hqSymbol));
 
     final marketPriceStore = _MockMarketPriceStore();
     when(() => db.marketPrices).thenReturn(marketPriceStore);
