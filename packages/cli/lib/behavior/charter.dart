@@ -95,11 +95,11 @@ Future<JobResult> doCharter(
   // Save neededChart to decide if this stop completes the behavior.
   final neededChart = chart == null;
   if (neededChart) {
-    await chartWaypointAndLog(api, db, caches.static.waypointTraits, ship);
+    await chartWaypointAndLog(api, db, ship);
   }
   // We still do market visits even if we've already charted this waypoint.
   await visitLocalMarket(api, db, caches, ship, getNow: getNow);
-  await visitLocalShipyard(db, api, caches.waypoints, caches.static, ship);
+  await visitLocalShipyard(db, api, caches.waypoints, ship);
 
   if (neededChart) {
     // Charter behavior never changes, but it's still the correct thing to

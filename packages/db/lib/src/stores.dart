@@ -9,6 +9,7 @@ export 'package:db/src/stores/market_listing_store.dart';
 export 'package:db/src/stores/market_price_store.dart';
 export 'package:db/src/stores/shipyard_listing_store.dart';
 export 'package:db/src/stores/shipyard_price_store.dart';
+export 'package:db/src/stores/static_data_store.dart';
 export 'package:db/src/stores/survey_store.dart';
 export 'package:db/src/stores/systems_store.dart';
 export 'package:db/src/stores/transaction_store.dart';

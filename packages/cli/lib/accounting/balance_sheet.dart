@@ -74,7 +74,7 @@ Future<PricedFleet> computeShipValue(
 Future<BalanceSheet> computeBalanceSheet(Database db) async {
   final ships = await ShipSnapshot.load(db);
   final shipyardPrices = await db.shipyardPrices.snapshotAll();
-  final shipyardShips = await ShipyardShipCache(db).snapshot();
+  final shipyardShips = await db.shipyardShips.snapshot();
 
   final agent = await db.getMyAgent();
   final inventory = await computeInventoryValue(db: db);

@@ -67,7 +67,7 @@ Future<JobResult> doMountJob(
   // Mount the new mount.
   await installMountAndLog(api, db, ship, mountJob.mountSymbol);
   // Add the new mount to our static_data cache in case it's new to us.
-  recordShip(caches.static, ship);
+  recordShip(db, ship);
   // We're done.
   shipInfo(ship, 'Mounted ${mountJob.mountSymbol}.');
   return JobResult.complete();

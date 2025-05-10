@@ -2,7 +2,6 @@ import 'package:cli/api.dart';
 import 'package:cli/cache/contract_snapshot.dart';
 import 'package:cli/cache/market_cache.dart';
 import 'package:cli/cache/ship_snapshot.dart';
-import 'package:cli/cache/static_cache.dart';
 import 'package:cli/cache/waypoint_cache.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/logic/compare.dart';
@@ -37,7 +36,6 @@ class Caches {
     required this.markets,
     required this.routePlanner,
     required this.factions,
-    required this.static,
     required this.systemConnectivity,
     required this.galaxy,
   });
@@ -64,9 +62,6 @@ class Caches {
   /// The route planner.
   RoutePlanner routePlanner;
 
-  /// Cache of static data from the server.
-  final StaticCaches static;
-
   /// Factions cache.  Factions never change, so just holding them
   /// directly as a list.
   final List<Faction> factions;
@@ -86,10 +81,9 @@ class Caches {
     // but then static.exports will be up to date.
     await loadExports(db, api.data);
 
-    final static = StaticCaches(db);
     final systems = await db.systems.snapshotAllSystems();
     final waypoints = WaypointCache(api, db);
-    final markets = MarketCache(db, api, static.tradeGoods);
+    final markets = MarketCache(db, api);
     final jumpGates = await db.jumpGates.snapshotAll();
     final constructionSnapshot = await db.construction.snapshotAllRecords();
     final systemConnectivity = SystemConnectivity.fromJumpGates(
@@ -111,7 +105,6 @@ class Caches {
       systems: systems,
       waypoints: waypoints,
       markets: markets,
-      static: static,
       routePlanner: routePlanner,
       factions: factions,
       systemConnectivity: systemConnectivity,

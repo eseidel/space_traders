@@ -19,9 +19,9 @@ Future<JobResult> doTradeInJob(
   DateTime Function() getNow = defaultGetNow,
 }) async {
   // Will also dock the ship.
-  await visitLocalShipyard(db, api, caches.waypoints, caches.static, ship);
+  await visitLocalShipyard(db, api, caches.waypoints, ship);
   // Get the purchase price of a new ship of this type.
-  final shipyardShips = await caches.static.shipyardShips.snapshot();
+  final shipyardShips = await db.shipyardShips.snapshot();
   final shipType = assertNotNull(
     shipyardShips.guessShipType(ship),
     'No ship type found.',

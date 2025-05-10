@@ -36,7 +36,7 @@ Future<JobResult> doBuyJob(
     // We want to always be using super up-to-date market prices for the trader.
     maxAge: const Duration(seconds: 5),
   );
-  await visitLocalShipyard(db, api, caches.waypoints, caches.static, ship);
+  await visitLocalShipyard(db, api, caches.waypoints, ship);
 
   // Regardless of where we are, if we have cargo that isn't part of our deal,
   // try to sell it.

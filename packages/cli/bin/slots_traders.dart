@@ -12,7 +12,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   final startSystem = agent!.headquarters.system;
   const shipType = ShipType.REFINING_FREIGHTER;
 
-  final shipyardShips = ShipyardShipCache(db);
+  final shipyardShips = db.shipyardShips;
   final ship = await shipyardShips.get(shipType);
   final shipSpec = ship!.shipSpec;
   const minProfitPerSecond = 5;

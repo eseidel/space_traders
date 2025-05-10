@@ -16,6 +16,8 @@ class _MockDatabase extends Mock implements Database {}
 
 class _MockSystemsStore extends Mock implements SystemsStore {}
 
+class _MockWaypointTraitStore extends Mock implements WaypointTraitStore {}
+
 void main() {
   test('WaypointCache.waypoint', () async {
     final api = _MockApi();
@@ -72,6 +74,10 @@ void main() {
     when(
       () => constructionStore.isUnderConstruction(any()),
     ).thenAnswer((_) async => null);
+
+    final waypointTraitStore = _MockWaypointTraitStore();
+    when(() => db.waypointTraits).thenReturn(waypointTraitStore);
+    when(() => waypointTraitStore.addAll(any())).thenAnswer((_) async => {});
 
     final waypointCache = WaypointCache(api, db);
     expect(

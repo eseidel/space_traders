@@ -82,7 +82,7 @@ class DescribingVisitor extends SupplyLinkVisitor {
 }
 
 Future<void> command(Database db, ArgResults argResults) async {
-  final exports = await TradeExportCache(db).snapshot();
+  final exports = await db.tradeExports.snapshot();
   final systems = await db.systems.snapshotAllSystems();
   final marketListings = await db.marketListings.snapshotAll();
   final charting = await db.charting.snapshotAllRecords();

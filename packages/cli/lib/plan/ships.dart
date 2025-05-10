@@ -1,4 +1,3 @@
-import 'package:cli/cache/static_cache.dart';
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 import 'package:types/types.dart';

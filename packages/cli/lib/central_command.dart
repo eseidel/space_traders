@@ -716,7 +716,7 @@ class CentralCommand {
       subsidizedSellOpps = await computeConstructionMaterialSubsidies(
         db,
         systems,
-        await caches.static.exports.snapshot(),
+        await db.tradeExports.snapshot(),
         marketListings,
         charting,
         activeConstruction!,
@@ -855,7 +855,7 @@ class CentralCommand {
       return unreachableProbeJob;
     }
 
-    final shipyardShips = await caches.static.shipyardShips.snapshot();
+    final shipyardShips = await db.shipyardShips.snapshot();
     final shipType = await shipToBuyFromPlan(
       ships,
       config.buyPlan,

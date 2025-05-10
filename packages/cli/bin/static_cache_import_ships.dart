@@ -3,11 +3,10 @@ import 'package:cli/plan/ships.dart';
 
 Future<void> command(Database db, ArgResults argResults) async {
   final ships = await ShipSnapshot.load(db);
-  final staticCaches = StaticCaches(db);
 
   // Import all info from our current ships.
   for (final ship in ships.ships) {
-    recordShip(staticCaches, ship);
+    recordShip(db, ship);
   }
 
   // We don't import info from cached shipyard ships into parts as
@@ -16,10 +15,10 @@ Future<void> command(Database db, ArgResults argResults) async {
   // If we saved dates with our static data we could be more sophisticated
   // and update based on data freshness.
 
-  final engines = await staticCaches.engines.snapshot();
-  final modules = await staticCaches.modules.snapshot();
-  final mounts = await staticCaches.mounts.snapshot();
-  final shipyardShips = await staticCaches.shipyardShips.snapshot();
+  final engines = await db.shipEngines.snapshot();
+  final modules = await db.shipModules.snapshot();
+  final mounts = await db.shipMounts.snapshot();
+  final shipyardShips = await db.shipyardShips.snapshot();
 
   // However we will update our shipyard cache with the parts from our active
   // ships, for parts which we know are not yet changeable.
@@ -40,7 +39,7 @@ Future<void> command(Database db, ArgResults argResults) async {
           ..modules = ship.modules.map(modules.copyAndNormalize).toList()
           // Mounts on the shipyardShip might be stale, use ones from cache.
           ..mounts = mounts.records.map((m) => mounts[m.symbol]!).toList();
-    recordShipyardShips(staticCaches, [copy]);
+    recordShipyardShips(db, [copy]);
   }
 }
 

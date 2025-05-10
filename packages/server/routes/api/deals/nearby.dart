@@ -35,7 +35,7 @@ Future<api.DealsNearbyResponse> dealsNearby({
   );
   centralCommand.activeConstruction = construction;
 
-  final exportSnapshot = await TradeExportCache(db).snapshot();
+  final exportSnapshot = await db.tradeExports.snapshot();
   final charting = await db.charting.snapshotAllRecords();
 
   if (construction != null) {
@@ -62,7 +62,7 @@ Future<api.DealsNearbyResponse> dealsNearby({
     extraSellOpps.addAll(centralCommand.constructionSellOpps(behaviors));
   }
 
-  final shipyardShips = ShipyardShipCache(db);
+  final shipyardShips = db.shipyardShips;
   final ship = await shipyardShips.get(shipType);
   final shipSpec = ship!.shipSpec;
 

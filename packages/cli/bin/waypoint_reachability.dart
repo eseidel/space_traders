@@ -2,7 +2,7 @@ import 'package:cli/cli.dart';
 import 'package:cli/nav/waypoint_connectivity.dart';
 
 Future<void> command(Database db, ArgResults argResults) async {
-  final shipyardShips = ShipyardShipCache(db);
+  final shipyardShips = db.shipyardShips;
   final systemsCache = await db.systems.snapshotAllSystems();
   final hqSystem = await myHqSystemSymbol(db);
   final fuelCapacity =

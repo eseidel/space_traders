@@ -14,7 +14,7 @@ Future<void> command(Database db, ArgResults argResults) async {
     'Loaded ${shipyardListings.count} listings from '
     '${shipyardListings.waypointCount} waypoints.',
   );
-  final shipyardShips = ShipyardShipCache(db);
+  final shipyardShips = db.shipyardShips;
 
   final table = Table(
     header: ['Type', '# Loc', 'Med. Price', 'Cargo', 'Fuel', 'Speed', 'Mounts'],

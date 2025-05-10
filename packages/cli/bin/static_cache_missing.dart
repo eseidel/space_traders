@@ -14,14 +14,12 @@ void _printMissing<K extends Object, V extends Object>(
 }
 
 Future<void> command(Database db, ArgResults argResults) async {
-  final c = StaticCaches(db);
-
-  _printMissing(ShipMountSymbolEnum.values, await c.mounts.snapshot());
-  _printMissing(ShipModuleSymbolEnum.values, await c.modules.snapshot());
-  _printMissing(ShipType.values, await c.shipyardShips.snapshot());
-  _printMissing(ShipEngineSymbolEnum.values, await c.engines.snapshot());
-  _printMissing(ShipReactorSymbolEnum.values, await c.reactors.snapshot());
-  _printMissing(WaypointTraitSymbol.values, await c.waypointTraits.snapshot());
+  _printMissing(ShipMountSymbolEnum.values, await db.shipMounts.snapshot());
+  _printMissing(ShipModuleSymbolEnum.values, await db.shipModules.snapshot());
+  _printMissing(ShipType.values, await db.shipyardShips.snapshot());
+  _printMissing(ShipEngineSymbolEnum.values, await db.shipEngines.snapshot());
+  _printMissing(ShipReactorSymbolEnum.values, await db.shipReactors.snapshot());
+  _printMissing(WaypointTraitSymbol.values, await db.waypointTraits.snapshot());
 }
 
 void main(List<String> args) async {

@@ -44,7 +44,7 @@ Future<void> command(Database db, ArgResults argResults) async {
 
   final systemConnectivity = await loadSystemConnectivity(db);
 
-  final shipyardShips = ShipyardShipCache(db);
+  final shipyardShips = db.shipyardShips;
   final ship = await shipyardShips.get(shipType);
   final shipSpec = ship!.shipSpec;
 

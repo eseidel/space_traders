@@ -11,7 +11,7 @@ String describeJob(ExtractionJob job) {
 Future<void> command(Database db, ArgResults argResults) async {
   final systems = await db.systems.snapshotAllSystems();
   final ships = await ShipSnapshot.load(db);
-  final shipyardShips = await ShipyardShipCache(db).snapshot();
+  final shipyardShips = await db.shipyardShips.snapshot();
 
   final squads = await assignShipsToSquads(
     db,

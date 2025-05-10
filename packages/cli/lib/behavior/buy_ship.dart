@@ -131,7 +131,7 @@ Future<JobResult> _doBuyShipJob(
 
   // Update our shipyard prices regardless of any later errors.
   final shipyard = await getShipyard(api, ship.waypointSymbol);
-  recordShipyardDataAndLog(db, caches.static, shipyard, ship);
+  recordShipyardDataAndLog(db, shipyard, ship);
 
   final PurchaseShip201ResponseData result;
   try {
@@ -142,7 +142,7 @@ Future<JobResult> _doBuyShipJob(
       shipyard.waypointSymbol,
       shipType,
     );
-    recordShip(caches.static, Ship.fromOpenApi(result.ship));
+    recordShip(db, Ship.fromOpenApi(result.ship));
   } on ApiException catch (e) {
     // ApiException 400: {"error":{"message":"Failed to purchase ship.
     // Agent has insufficient funds.","code":4216,

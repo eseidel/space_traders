@@ -76,7 +76,7 @@ Future<void> command(Database db, ArgResults argResults) async {
 
   final routePlanner = await defaultRoutePlanner(db);
 
-  final shipyardShips = ShipyardShipCache(db);
+  final shipyardShips = db.shipyardShips;
   final ship = await shipyardShips.get(shipType);
 
   final routeStart = DateTime.timestamp();

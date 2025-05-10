@@ -228,10 +228,10 @@ Future<JobResult> doSystemWatcher(
   // We still do our charting and market visits even if this isn't going to
   // cause us to complete the behavior (e.g. refueling).
   if (waypoint.chart == null) {
-    await chartWaypointAndLog(api, db, caches.static.waypointTraits, ship);
+    await chartWaypointAndLog(api, db, ship);
   }
   await visitLocalMarket(api, db, caches, ship, maxAge: maxAge, getNow: getNow);
-  await visitLocalShipyard(db, api, caches.waypoints, caches.static, ship);
+  await visitLocalShipyard(db, api, caches.waypoints, ship);
 
   if (willCompleteBehavior) {
     // Explore behavior never changes, but it's still the correct thing to

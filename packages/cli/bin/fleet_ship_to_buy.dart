@@ -5,7 +5,7 @@ import 'package:cli/config.dart';
 Future<void> command(Database db, ArgResults argResults) async {
   final shipCache = await ShipSnapshot.load(db);
   final shipyardListings = await db.shipyardListings.snapshotAll();
-  final shipyardShips = await ShipyardShipCache(db).snapshot();
+  final shipyardShips = await db.shipyardShips.snapshot();
 
   final shipType = await shipToBuyFromPlan(
     shipCache,

@@ -16,7 +16,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   final shipyard = systems.waypoint(shipyardListing.waypointSymbol);
 
   const shipType = ShipType.LIGHT_HAULER;
-  final shipyardShips = ShipyardShipCache(db);
+  final shipyardShips = db.shipyardShips;
   final ship = await shipyardShips.get(shipType);
   logger.info('Routes from ${shipyard.symbol} with $shipType');
 

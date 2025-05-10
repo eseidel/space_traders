@@ -256,6 +256,33 @@ class Database {
   /// Get the systems store.
   SystemsStore get systems => SystemsStore(this);
 
+  /// Get the ship mount store.
+  ShipMountStore get shipMounts => ShipMountStore(this);
+
+  /// Get the ship module store.
+  ShipModuleStore get shipModules => ShipModuleStore(this);
+
+  /// Get the shipyard ship store.
+  ShipyardShipStore get shipyardShips => ShipyardShipStore(this);
+
+  /// Get the ship engine store.
+  ShipEngineStore get shipEngines => ShipEngineStore(this);
+
+  /// Get the reactor store.
+  ShipReactorStore get shipReactors => ShipReactorStore(this);
+
+  /// Get the waypoint trait store.
+  WaypointTraitStore get waypointTraits => WaypointTraitStore(this);
+
+  /// Get the trade good store.
+  TradeGoodStore get tradeGoods => TradeGoodStore(this);
+
+  /// Get the trade export store.
+  TradeExportStore get tradeExports => TradeExportStore(this);
+
+  /// Event store.
+  EventStore get events => EventStore(this);
+
   /// Listen for notifications on a channel.
   Future<void> listen(String channel) async {
     await executeSql('LISTEN $channel');
