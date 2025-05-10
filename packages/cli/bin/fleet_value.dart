@@ -34,7 +34,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   final ships = await ShipSnapshot.load(db);
   final marketPrices = await db.marketPrices.snapshotAll();
   final shipyardPrices = await db.shipyardPrices.snapshotAll();
-  final shipyardShips = await ShipyardShipCache(db).snapshot();
+  final shipyardShips = await db.shipyardShips.snapshot();
 
   logger.info('Estimating fleet value at current median prices.');
 

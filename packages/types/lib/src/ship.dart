@@ -454,6 +454,76 @@ class Ship {
   openapi.ShipFuel fuel;
 }
 
+/// Create a test ShipFrame.
+@visibleForTesting
+ShipFrame testShipFrame() {
+  return ShipFrame(
+    symbol: ShipFrameSymbolEnum.PROBE,
+    name: 'name',
+    description: 'description',
+    condition: 100,
+    integrity: 100,
+    quality: 100,
+    requirements: ShipRequirements(power: 100, crew: 100, slots: 100),
+    moduleSlots: 100,
+    mountingPoints: 100,
+    fuelCapacity: 100,
+  );
+}
+
+/// Create a test ShipReactor.
+@visibleForTesting
+ShipReactor testShipReactor() {
+  return ShipReactor(
+    symbol: ShipReactorSymbolEnum.SOLAR_I,
+    name: 'name',
+    description: 'description',
+    condition: 100,
+    integrity: 100,
+    powerOutput: 100,
+    requirements: ShipRequirements(power: 100, crew: 100, slots: 100),
+    quality: 100,
+  );
+}
+
+/// Create a test ShipEngine.
+@visibleForTesting
+ShipEngine testShipEngine() {
+  return ShipEngine(
+    symbol: ShipEngineSymbolEnum.ION_DRIVE_I,
+    name: 'name',
+    description: 'description',
+    condition: 100,
+    integrity: 100,
+    speed: 100,
+    requirements: ShipRequirements(power: 100, crew: 100, slots: 100),
+    quality: 100,
+  );
+}
+
+/// Create a test ShipModule.
+@visibleForTesting
+ShipModule testShipModule() {
+  return ShipModule(
+    symbol: ShipModuleSymbolEnum.MINERAL_PROCESSOR_I,
+    name: 'name',
+    description: 'description',
+    requirements: ShipRequirements(power: 100, crew: 100, slots: 100),
+  );
+}
+
+/// Create a test ShipMount.
+@visibleForTesting
+ShipMount testShipMount() {
+  return ShipMount(
+    symbol: ShipMountSymbolEnum.GAS_SIPHON_I,
+    name: 'name',
+    description: 'description',
+    strength: 100,
+    requirements: ShipRequirements(power: 100, crew: 100, slots: 100),
+  );
+}
+
 /// Create a test ShipyardShip.
 @visibleForTesting
 ShipyardShip testShipyardShip() {
@@ -463,55 +533,11 @@ ShipyardShip testShipyardShip() {
     name: 'name',
     description: 'description',
     supply: SupplyLevel.MODERATE,
-    frame: ShipFrame(
-      symbol: ShipFrameSymbolEnum.PROBE,
-      name: 'name',
-      description: 'description',
-      condition: 100,
-      integrity: 100,
-      quality: 100,
-      requirements: ShipRequirements(power: 100, crew: 100, slots: 100),
-      moduleSlots: 100,
-      mountingPoints: 100,
-      fuelCapacity: 100,
-    ),
-    reactor: ShipReactor(
-      symbol: ShipReactorSymbolEnum.SOLAR_I,
-      name: 'name',
-      description: 'description',
-      condition: 100,
-      integrity: 100,
-      powerOutput: 100,
-      requirements: ShipRequirements(power: 100, crew: 100, slots: 100),
-      quality: 100,
-    ),
-    engine: ShipEngine(
-      symbol: ShipEngineSymbolEnum.ION_DRIVE_I,
-      name: 'name',
-      description: 'description',
-      condition: 100,
-      integrity: 100,
-      speed: 100,
-      requirements: ShipRequirements(power: 100, crew: 100, slots: 100),
-      quality: 100,
-    ),
-    modules: [
-      ShipModule(
-        symbol: ShipModuleSymbolEnum.MINERAL_PROCESSOR_I,
-        name: 'name',
-        description: 'description',
-        requirements: ShipRequirements(power: 100, crew: 100, slots: 100),
-      ),
-    ],
-    mounts: [
-      ShipMount(
-        symbol: ShipMountSymbolEnum.GAS_SIPHON_I,
-        name: 'name',
-        description: 'description',
-        strength: 100,
-        requirements: ShipRequirements(power: 100, crew: 100, slots: 100),
-      ),
-    ],
+    frame: testShipFrame(),
+    reactor: testShipReactor(),
+    engine: testShipEngine(),
+    modules: [testShipModule()],
+    mounts: [testShipMount()],
     crew: ShipyardShipCrew(required_: 100, capacity: 100),
   );
 }

@@ -27,6 +27,8 @@ class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockWaypointCache extends Mock implements WaypointCache {}
 
+class _MockWaypointTraitStore extends Mock implements WaypointTraitStore {}
+
 void main() {
   test('advanceSystemWatcher smoke test', () async {
     final api = _MockApi();
@@ -115,6 +117,10 @@ void main() {
     final chartingStore = _MockChartingStore();
     when(() => db.charting).thenReturn(chartingStore);
     when(() => chartingStore.addWaypoint(any())).thenAnswer((_) async => {});
+
+    final waypointTraitStore = _MockWaypointTraitStore();
+    when(() => db.waypointTraits).thenReturn(waypointTraitStore);
+    when(() => waypointTraitStore.addAll(any())).thenAnswer((_) async {});
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(

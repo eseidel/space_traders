@@ -673,7 +673,7 @@ Future<JobResult> doTraderGetCargo(
     // and thus not having to update?
     maxAge: const Duration(milliseconds: 300),
   );
-  await visitLocalShipyard(db, api, caches.waypoints, caches.static, ship);
+  await visitLocalShipyard(db, api, caches.waypoints, ship);
 
   final deal = assertNotNull(
     state.deal,
@@ -739,7 +739,7 @@ Future<JobResult> doTraderDeliverCargo(
     // and thus not having to update?
     maxAge: const Duration(milliseconds: 300),
   );
-  await visitLocalShipyard(db, api, caches.waypoints, caches.static, ship);
+  await visitLocalShipyard(db, api, caches.waypoints, ship);
 
   final deal = assertNotNull(
     state.deal,

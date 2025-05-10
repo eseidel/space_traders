@@ -542,18 +542,13 @@ Future<DateTime> warpToWaypointAndLog(
 }
 
 /// Chart the waypoint [ship] is currently at and log.
-Future<void> chartWaypointAndLog(
-  Api api,
-  Database db,
-  WaypointTraitCache waypointTraitCache,
-  Ship ship,
-) async {
+Future<void> chartWaypointAndLog(Api api, Database db, Ship ship) async {
   try {
     final response = await api.fleet.createChart(ship.symbol.symbol);
     final openapiWaypoint = response!.data.waypoint;
     final waypoint = Waypoint.fromOpenApi(openapiWaypoint);
     await db.charting.addWaypoint(waypoint);
-    await waypointTraitCache.addAll(waypoint.traits);
+    await db.waypointTraits.addAll(waypoint.traits);
     // Powershell needs the space after the emoji.
     shipInfo(ship, '🗺️  ${waypointDescription(waypoint)}');
   } on ApiException catch (e) {
@@ -869,14 +864,9 @@ Future<void> recordMarketPrices(
 }
 
 /// Record shipyard data and log the result.
-void recordShipyardDataAndLog(
-  Database db,
-  StaticCaches staticCaches,
-  Shipyard shipyard,
-  Ship ship,
-) {
+void recordShipyardDataAndLog(Database db, Shipyard shipyard, Ship ship) {
   recordShipyardPrices(db, shipyard);
-  recordShipyardShips(staticCaches, shipyard.ships);
+  recordShipyardShips(db, shipyard.ships);
   recordShipyardListing(db, shipyard);
   // Powershell needs an extra space after the emoji.
   shipDetail(ship, '✍️  shipyard data @ ${shipyard.symbol}');

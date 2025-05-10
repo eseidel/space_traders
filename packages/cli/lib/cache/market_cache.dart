@@ -6,14 +6,10 @@ import 'package:types/types.dart';
 /// Stores Market objects fetched recently from the API.
 class MarketCache {
   /// Create a new MarketplaceCache.
-  MarketCache(Database db, Api api, TradeGoodCache tradeGoods)
-    : _db = db,
-      _api = api,
-      _tradeGoods = tradeGoods;
+  MarketCache(Database db, Api api) : _db = db, _api = api;
 
   final Database _db;
   final Api _api;
-  final TradeGoodCache _tradeGoods;
 
   // This needs to be careful, this caches Market which can differ in
   // response depending on if we have a ship there or not.
@@ -43,7 +39,7 @@ class MarketCache {
         exchange: market.exchange.map((t) => t.symbol).toSet(),
       ),
     );
-    await _tradeGoods.addAll(market.listedTradeGoods);
+    await _db.tradeGoods.addAll(market.listedTradeGoods);
     return market;
   }
 }

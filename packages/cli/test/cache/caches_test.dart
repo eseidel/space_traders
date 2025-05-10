@@ -38,8 +38,6 @@ class _MockShipyardListingStore extends Mock implements ShipyardListingStore {}
 
 class _MockShipyardPriceStore extends Mock implements ShipyardPriceStore {}
 
-class _MockStaticCaches extends Mock implements StaticCaches {}
-
 class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
 
 class _MockSystemsApi extends Mock implements SystemsApi {}
@@ -226,7 +224,6 @@ void main() {
       waypoints: _MockWaypointCache(),
       markets: _MockMarketCache(),
       routePlanner: _MockRoutePlanner(),
-      static: _MockStaticCaches(),
       systemConnectivity: _MockSystemConnectivity(),
       galaxy: const GalaxyStats(systemCount: 2, waypointCount: 2),
       factions: [],

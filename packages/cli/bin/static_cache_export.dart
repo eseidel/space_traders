@@ -4,8 +4,6 @@ import 'package:cli/cli.dart';
 import 'package:file/local.dart';
 
 Future<void> command(Database db, ArgResults argResults) async {
-  final staticCaches = StaticCaches(db);
-
   const fs = LocalFileSystem();
   final directory = fs.directory('static_data');
   if (!await directory.exists()) {
@@ -14,16 +12,16 @@ Future<void> command(Database db, ArgResults argResults) async {
   }
 
   // Walk all static caches and export them to the given directory.
-  final pathToCache = <String, StaticCache>{
-    'engines': staticCaches.engines,
-    'events': staticCaches.events,
-    'exports': staticCaches.exports,
-    'modules': staticCaches.modules,
-    'mounts': staticCaches.mounts,
-    'reactors': staticCaches.reactors,
-    'shipyard_ships': staticCaches.shipyardShips,
-    'trade_goods': staticCaches.tradeGoods,
-    'waypoint_traits': staticCaches.waypointTraits,
+  final pathToCache = <String, StaticStore>{
+    'engines': db.shipEngines,
+    'events': db.events,
+    'exports': db.tradeExports,
+    'modules': db.shipModules,
+    'mounts': db.shipMounts,
+    'reactors': db.shipReactors,
+    'shipyard_ships': db.shipyardShips,
+    'trade_goods': db.tradeGoods,
+    'waypoint_traits': db.waypointTraits,
   };
   const encoder = JsonEncoder.withIndent(' ');
 

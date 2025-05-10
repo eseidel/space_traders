@@ -29,9 +29,8 @@ Future<void> command(Database db, ArgResults argResults) async {
     queue = IdleQueue()..queueSystem(systemSymbol, jumpDistance: 0);
   }
 
-  final tradeGoods = TradeGoodCache(db);
   final waypointCache = WaypointCache(api, db);
-  final marketCache = MarketCache(db, api, tradeGoods);
+  final marketCache = MarketCache(db, api);
 
   const printEvery = 100;
   var count = 0;

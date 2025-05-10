@@ -17,8 +17,6 @@ class WaypointCache {
   final Database _db;
   final Api? _api;
 
-  WaypointTraitCache get _waypointTraits => WaypointTraitCache(_db);
-
   Future<Waypoint?> _waypointOrNullFromCache(
     WaypointSymbol waypointSymbol, {
     Duration maxAge = defaultMaxAge,
@@ -76,7 +74,7 @@ class WaypointCache {
 
   Future<void> _addWaypointsToCaches(Api api, List<Waypoint> waypoints) async {
     await _db.charting.addWaypoints(waypoints);
-    await _waypointTraits.addAll(waypoints.expand((w) => w.traits));
+    await _db.waypointTraits.addAll(waypoints.expand((w) => w.traits));
     for (final waypoint in waypoints) {
       // TODO(eseidel): Only getConstruction if no recent cached one?
       final construction =
@@ -212,7 +210,7 @@ class WaypointCache {
 
     final traits = <WaypointTrait>[];
     for (final traitSymbol in values.traitSymbols) {
-      final trait = await _waypointTraits.get(traitSymbol);
+      final trait = await _db.waypointTraits.get(traitSymbol);
       if (trait == null) {
         logger.warn('Traits cache missing trait: $traitSymbol');
         return null;

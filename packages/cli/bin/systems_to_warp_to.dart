@@ -20,7 +20,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   );
   final systemsCache = await db.systems.snapshotAllSystems();
   final waypointCache = WaypointCache(api, db);
-  final shipyardShips = ShipyardShipCache(db);
+  final shipyardShips = db.shipyardShips;
 
   final reachableSystemSymbols =
       systemConnectivity.systemsReachableFrom(startSystemSymbol).toSet();

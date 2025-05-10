@@ -54,6 +54,8 @@ class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
 
 class _MockSystemsStore extends Mock implements SystemsStore {}
 
+class _MockShipyardShipStore extends Mock implements ShipyardShipStore {}
+
 void main() {
   test('CentralCommand.otherCharterSystems', () async {
     RoutePlan fakeJump(WaypointSymbol start, WaypointSymbol end) {
@@ -583,8 +585,11 @@ void main() {
       () => marketPriceStore.medianPurchasePrice(any()),
     ).thenAnswer((_) async => 100);
 
+    final shipyardShipStore = _MockShipyardShipStore();
+    when(() => db.shipyardShips).thenReturn(shipyardShipStore);
+
     when(
-      caches.static.shipyardShips.snapshot,
+      shipyardShipStore.snapshot,
     ).thenAnswer((_) async => _MockShipyardShipSnapshot());
 
     when(systemsStore.snapshotAllSystems).thenAnswer(

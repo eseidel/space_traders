@@ -25,7 +25,11 @@ class _MockShip extends Mock implements Ship {}
 
 class _MockShipEngine extends Mock implements ShipEngine {}
 
+class _MockShipEngineStore extends Mock implements ShipEngineStore {}
+
 class _MockShipNav extends Mock implements ShipNav {}
+
+class _MockShipReactorStore extends Mock implements ShipReactorStore {}
 
 class _MockShipyardListingStore extends Mock implements ShipyardListingStore {}
 
@@ -34,6 +38,12 @@ class _MockShipyardTransaction extends Mock implements ShipyardTransaction {}
 class _MockSystemsApi extends Mock implements SystemsApi {}
 
 class _MockTransactionStore extends Mock implements TransactionStore {}
+
+class _MockShipyardShipStore extends Mock implements ShipyardShipStore {}
+
+class _MockShipMountStore extends Mock implements ShipMountStore {}
+
+class _MockShipModuleStore extends Mock implements ShipModuleStore {}
 
 void main() {
   setUpAll(() {
@@ -179,10 +189,30 @@ void main() {
       ),
     ).thenAnswer((_) async {});
 
+    final shipEngineStore = _MockShipEngineStore();
+    when(() => db.shipEngines).thenReturn(shipEngineStore);
     registerFallbackValue(ship.engine);
-    when(() => caches.static.engines.add(any())).thenAnswer((_) async {});
+    when(() => shipEngineStore.add(any())).thenAnswer((_) async {});
+
+    final shipReactorStore = _MockShipReactorStore();
+    when(() => db.shipReactors).thenReturn(shipReactorStore);
     registerFallbackValue(ship.reactor);
-    when(() => caches.static.reactors.add(any())).thenAnswer((_) async {});
+    when(() => shipReactorStore.add(any())).thenAnswer((_) async {});
+
+    final shipyardShipStore = _MockShipyardShipStore();
+    when(() => db.shipyardShips).thenReturn(shipyardShipStore);
+    registerFallbackValue(testShipyardShip());
+    when(() => shipyardShipStore.addAll(any())).thenAnswer((_) async {});
+
+    final shipMountStore = _MockShipMountStore();
+    when(() => db.shipMounts).thenReturn(shipMountStore);
+    registerFallbackValue(testShipMount());
+    when(() => shipMountStore.addAll(any())).thenAnswer((_) async {});
+
+    final shipModuleStore = _MockShipModuleStore();
+    when(() => db.shipModules).thenReturn(shipModuleStore);
+    registerFallbackValue(testShipModule());
+    when(() => shipModuleStore.addAll(any())).thenAnswer((_) async {});
 
     final logger = _MockLogger();
     expect(

@@ -60,7 +60,6 @@ Future<void> visitLocalShipyard(
   Database db,
   Api api,
   WaypointCache waypoints,
-  StaticCaches staticCaches,
   Ship ship,
 ) async {
   final waypointSymbol = ship.waypointSymbol;
@@ -69,13 +68,7 @@ Future<void> visitLocalShipyard(
     return;
   }
 
-  await recordShipyardDataIfNeededAndLog(
-    db,
-    api,
-    staticCaches,
-    ship,
-    waypointSymbol,
-  );
+  await recordShipyardDataIfNeededAndLog(db, api, ship, waypointSymbol);
 }
 
 /// Record market data and log the result and returns the market.
@@ -118,7 +111,6 @@ Future<Market> recordMarketDataIfNeededAndLog(
 Future<void> recordShipyardDataIfNeededAndLog(
   Database db,
   Api api,
-  StaticCaches staticCaches,
   Ship ship,
   WaypointSymbol shipyardSymbol, {
   Duration maxAge = const Duration(minutes: 5),
@@ -137,5 +129,5 @@ Future<void> recordShipyardDataIfNeededAndLog(
     return;
   }
   final shipyard = await getShipyard(api, shipyardSymbol);
-  recordShipyardDataAndLog(db, staticCaches, shipyard, ship);
+  recordShipyardDataAndLog(db, shipyard, ship);
 }
