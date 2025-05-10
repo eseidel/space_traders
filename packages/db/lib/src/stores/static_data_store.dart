@@ -11,19 +11,13 @@ abstract class StaticStore<Symbol extends Object, Record extends Object> {
   final Database _db;
   final Traits<Symbol, Record> _traits;
 
-  /// The key for the given record.
-  Symbol keyFor(Record record) => _traits.keyFor(record);
-
   /// Copy and normalize the record for comparison and storage.
   Record copyAndNormalize(Record record) => _traits.copyAndNormalize(record);
-
-  /// Compare two records.
-  int compare(Record a, Record b) => _traits.compare(a, b);
 
   /// Used for writing to a JSON file.
   Future<List<Json>> asSortedJsonList() async {
     final records = await getAll();
-    final sorted = records.toList()..sort(compare);
+    final sorted = records.toList()..sort(_traits.compare);
     return sorted.map(_traits.toJson).toList();
   }
 

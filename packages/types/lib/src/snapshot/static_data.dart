@@ -51,19 +51,13 @@ class StaticSnapshot<Symbol extends Object, Record extends Object> {
   /// The number of records in this snapshot.
   int get length => records.length;
 
-  /// The key for the given record.
-  Symbol keyFor(Record record) => _traits.keyFor(record);
-
   /// Copy and normalize the record for comparison and storage.
   Record copyAndNormalize(Record record) => _traits.copyAndNormalize(record);
-
-  /// Compare two records.
-  int compare(Record a, Record b) => _traits.compare(a, b);
 
   /// Get a record from the cache.
   Record? operator [](Symbol key) {
     for (final record in records) {
-      if (keyFor(record) == key) {
+      if (_traits.keyFor(record) == key) {
         return record;
       }
     }
