@@ -21,36 +21,77 @@ void main() {
         await db.migrateToSchema(version: 0);
         await db.migrateToLatestSchema();
       });
-      test('accessors', () async {
-        expect(db.shipMounts, isA<ShipMountStore>());
-        expect(await db.shipMounts.snapshot(), isA<ShipMountSnapshot>());
 
-        expect(db.shipModules, isA<ShipModuleStore>());
-        expect(await db.shipModules.snapshot(), isA<ShipModuleSnapshot>());
+      test('shipMounts', () async {
+        final store = db.shipMounts;
+        expect(store, isA<ShipMountStore>());
+        final shipMount = testShipMount();
+        await store.add(shipMount);
+        expect(await store.snapshot(), hasLength(1));
+      });
 
-        expect(db.shipyardShips, isA<ShipyardShipStore>());
-        expect(await db.shipyardShips.snapshot(), isA<ShipyardShipSnapshot>());
+      test('shipModules', () async {
+        final store = db.shipModules;
+        expect(store, isA<ShipModuleStore>());
+        final shipModule = testShipModule();
+        await store.add(shipModule);
+        expect(await store.snapshot(), hasLength(1));
+      });
 
-        expect(db.shipEngines, isA<ShipEngineStore>());
-        expect(await db.shipEngines.snapshot(), isA<ShipEngineSnapshot>());
+      test('shipyardShips', () async {
+        final store = db.shipyardShips;
+        expect(store, isA<ShipyardShipStore>());
+        final shipyardShip = testShipyardShip();
+        await store.add(shipyardShip);
+        expect(await store.snapshot(), hasLength(1));
+      });
 
-        expect(db.shipReactors, isA<ShipReactorStore>());
-        expect(await db.shipReactors.snapshot(), isA<ShipReactorSnapshot>());
+      test('shipEngines', () async {
+        final store = db.shipEngines;
+        expect(store, isA<ShipEngineStore>());
+        final shipEngine = testShipEngine();
+        await store.add(shipEngine);
+        expect(await store.snapshot(), hasLength(1));
+      });
 
-        expect(db.waypointTraits, isA<WaypointTraitStore>());
-        expect(
-          await db.waypointTraits.snapshot(),
-          isA<WaypointTraitSnapshot>(),
-        );
+      test('shipReactors', () async {
+        final store = db.shipReactors;
+        expect(store, isA<ShipReactorStore>());
+        final shipReactor = testShipReactor();
+        await store.add(shipReactor);
+        expect(await store.snapshot(), hasLength(1));
+      });
 
-        expect(db.tradeGoods, isA<TradeGoodStore>());
-        expect(await db.tradeGoods.snapshot(), isA<TradeGoodSnapshot>());
+      test('waypointTraits', () async {
+        final store = db.waypointTraits;
+        expect(store, isA<WaypointTraitStore>());
+        final waypointTrait = testWaypointTrait();
+        await store.add(waypointTrait);
+        expect(await store.snapshot(), hasLength(1));
+      });
 
-        expect(db.tradeExports, isA<TradeExportStore>());
-        expect(await db.tradeExports.snapshot(), isA<TradeExportSnapshot>());
+      test('tradeGoods', () async {
+        final store = db.tradeGoods;
+        expect(store, isA<TradeGoodStore>());
+        final tradeGood = testTradeGood();
+        await store.add(tradeGood);
+        expect(await store.snapshot(), hasLength(1));
+      });
 
-        expect(db.events, isA<EventStore>());
-        expect(await db.events.snapshot(), isA<EventSnapshot>());
+      test('tradeExports', () async {
+        final store = db.tradeExports;
+        expect(store, isA<TradeExportStore>());
+        final tradeExport = testTradeExport();
+        await store.add(tradeExport);
+        expect(await store.snapshot(), hasLength(1));
+      });
+
+      test('events', () async {
+        final store = db.events;
+        expect(store, isA<EventStore>());
+        final event = testShipConditionEvent();
+        await store.add(event);
+        expect(await store.snapshot(), hasLength(1));
       });
     });
   });

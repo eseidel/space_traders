@@ -541,3 +541,43 @@ ShipyardShip testShipyardShip() {
     crew: ShipyardShipCrew(required_: 100, capacity: 100),
   );
 }
+
+/// Create a test ShipConditionEvent.
+@visibleForTesting
+ShipConditionEvent testShipConditionEvent() {
+  return ShipConditionEvent(
+    symbol: ShipConditionEventSymbolEnum.REACTOR_OVERLOAD,
+    name: 'name',
+    description: 'description',
+    component: ShipConditionEventComponentEnum.REACTOR,
+  );
+}
+
+/// Create a test WaypointTrait.
+@visibleForTesting
+WaypointTrait testWaypointTrait() {
+  return WaypointTrait(
+    symbol: WaypointTraitSymbol.UNDER_CONSTRUCTION,
+    name: 'name',
+    description: 'description',
+  );
+}
+
+/// Create a test TradeGood.
+@visibleForTesting
+TradeGood testTradeGood() {
+  return TradeGood(
+    symbol: TradeSymbol.IRON,
+    name: 'name',
+    description: 'description',
+  );
+}
+
+/// Create a test TradeExport.
+@visibleForTesting
+TradeExport testTradeExport() {
+  return const TradeExport(
+    export: TradeSymbol.IRON,
+    imports: [TradeSymbol.IRON_ORE],
+  );
+}

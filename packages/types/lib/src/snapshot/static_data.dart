@@ -48,6 +48,9 @@ class StaticSnapshot<Symbol extends Object, Record extends Object> {
   final List<Record> records;
   final Traits<Symbol, Record> _traits;
 
+  /// The number of records in this snapshot.
+  int get length => records.length;
+
   /// The key for the given record.
   Symbol keyFor(Record record) => _traits.keyFor(record);
 
