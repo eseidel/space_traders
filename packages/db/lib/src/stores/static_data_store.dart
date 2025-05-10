@@ -13,7 +13,7 @@ abstract class StaticStore<Symbol extends Object, Record extends Object> {
 
   /// Used for writing to a JSON file.
   Future<List<Json>> asSortedJsonList() async {
-    final records = await getAll();
+    final records = await all();
     final sorted = records.toList()..sort(_traits.compare);
     return sorted.map(_traits.toJson).toList();
   }
@@ -34,7 +34,7 @@ abstract class StaticStore<Symbol extends Object, Record extends Object> {
   Future<StaticSnapshot<Symbol, Record>> snapshot();
 
   /// Get all records from the Store.
-  Future<List<Record>> getAll() async {
+  Future<List<Record>> all() async {
     final records = await _db.getAllFromStaticCache(type: Record);
     return records.map(_traits.fromJson).toList();
   }
@@ -63,8 +63,7 @@ class ShipMountStore extends StaticStore<ShipMountSymbolEnum, ShipMount> {
   ShipMountStore(Database db) : super(db, ShipMountTraits());
 
   @override
-  Future<ShipMountSnapshot> snapshot() async =>
-      ShipMountSnapshot(await getAll());
+  Future<ShipMountSnapshot> snapshot() async => ShipMountSnapshot(await all());
 }
 
 /// A Store of ship modules.
@@ -74,7 +73,7 @@ class ShipModuleStore extends StaticStore<ShipModuleSymbolEnum, ShipModule> {
 
   @override
   Future<ShipModuleSnapshot> snapshot() async =>
-      ShipModuleSnapshot(await getAll());
+      ShipModuleSnapshot(await all());
 }
 
 /// A Store of shipyard ships.
@@ -84,7 +83,7 @@ class ShipyardShipStore extends StaticStore<ShipType, ShipyardShip> {
 
   @override
   Future<ShipyardShipSnapshot> snapshot() async =>
-      ShipyardShipSnapshot(await getAll());
+      ShipyardShipSnapshot(await all());
 }
 
 /// A Store of ship engines.
@@ -94,7 +93,7 @@ class ShipEngineStore extends StaticStore<ShipEngineSymbolEnum, ShipEngine> {
 
   @override
   Future<ShipEngineSnapshot> snapshot() async =>
-      ShipEngineSnapshot(await getAll());
+      ShipEngineSnapshot(await all());
 }
 
 /// A Store of ship reactors.
@@ -104,7 +103,7 @@ class ShipReactorStore extends StaticStore<ShipReactorSymbolEnum, ShipReactor> {
 
   @override
   Future<ShipReactorSnapshot> snapshot() async =>
-      ShipReactorSnapshot(await getAll());
+      ShipReactorSnapshot(await all());
 }
 
 /// A Store of waypoint traits.
@@ -115,7 +114,7 @@ class WaypointTraitStore
 
   @override
   Future<WaypointTraitSnapshot> snapshot() async =>
-      WaypointTraitSnapshot(await getAll());
+      WaypointTraitSnapshot(await all());
 }
 
 /// A Store of trade goods.
@@ -124,8 +123,7 @@ class TradeGoodStore extends StaticStore<TradeSymbol, TradeGood> {
   TradeGoodStore(Database db) : super(db, TradeGoodTraits());
 
   @override
-  Future<TradeGoodSnapshot> snapshot() async =>
-      TradeGoodSnapshot(await getAll());
+  Future<TradeGoodSnapshot> snapshot() async => TradeGoodSnapshot(await all());
 }
 
 /// A Store of trade exports.
@@ -135,7 +133,7 @@ class TradeExportStore extends StaticStore<TradeSymbol, TradeExport> {
 
   @override
   Future<TradeExportSnapshot> snapshot() async =>
-      TradeExportSnapshot(await getAll());
+      TradeExportSnapshot(await all());
 }
 
 /// A Store of events.
@@ -145,5 +143,5 @@ class EventStore
   EventStore(Database db) : super(db, EventTraits());
 
   @override
-  Future<EventSnapshot> snapshot() async => EventSnapshot(await getAll());
+  Future<EventSnapshot> snapshot() async => EventSnapshot(await all());
 }
