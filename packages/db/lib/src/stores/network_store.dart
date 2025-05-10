@@ -31,7 +31,7 @@ class NetworkStore {
     final query = deleteRequestQuery(request);
     final result = await _db.execute(query);
     if (result.affectedRows != 1) {
-      throw ArgumentError('Request not found: $request');
+      throw StateError('Request not found: $request');
     }
   }
 

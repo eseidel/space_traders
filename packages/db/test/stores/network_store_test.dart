@@ -42,6 +42,12 @@ void main() {
         expect(nextRequest, request);
 
         await db.network.deleteRequest(request);
+
+        await expectLater(
+          () => db.network.deleteRequest(request),
+          throwsStateError,
+        );
+
         expect(await db.network.getRequest(request.id!), isNull);
       });
 
