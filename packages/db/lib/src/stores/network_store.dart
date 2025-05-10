@@ -2,7 +2,9 @@ import 'package:db/db.dart';
 import 'package:db/src/query.dart';
 import 'package:db/src/queue.dart';
 
+/// Store for network requests and responses.
 class NetworkStore {
+  /// Creates a new [NetworkStore].
   NetworkStore(this._db);
 
   final Database _db;

@@ -23,7 +23,7 @@ void main() {
         await db.migrateToLatestSchema();
       });
 
-      test('insert', () async {
+      test('request', () async {
         const request = RequestRecord(
           id: 1,
           request: QueuedRequest(
@@ -36,8 +36,40 @@ void main() {
         );
         await db.network.insertRequest(request);
 
+        expect(await db.network.getRequest(request.id!), request);
+
         final nextRequest = await db.network.nextRequest();
         expect(nextRequest, request);
+
+        await db.network.deleteRequest(request);
+        expect(await db.network.getRequest(request.id!), isNull);
+      });
+
+      test('response', () async {
+        const response = ResponseRecord(
+          id: 1,
+          requestId: 1,
+          response: QueuedResponse(body: 'body', statusCode: 200, headers: {}),
+        );
+        await db.network.insertResponse(response);
+
+        // Get can be called multiple times.
+        expect(
+          await db.network.getResponseForRequest(response.requestId),
+          response,
+        );
+        expect(
+          await db.network.getResponseForRequest(response.requestId),
+          response,
+        );
+
+        final now = DateTime.timestamp();
+        await db.network.deleteResponsesBefore(now);
+        // After deleting, the response is no longer available.
+        expect(
+          await db.network.getResponseForRequest(response.requestId),
+          isNull,
+        );
       });
     });
   });
