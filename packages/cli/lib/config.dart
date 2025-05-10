@@ -75,7 +75,7 @@ class Config {
 
   final _explorationShips = [
     // Only buy after gate opens.
-    for (int i = 0; i < 20; i++) ShipType.PROBE,
+    for (int i = 0; i < 50; i++) ShipType.PROBE,
     for (int i = 0; i < 2; i++) ShipType.REFINING_FREIGHTER,
     for (int i = 0; i < 5; i++) ShipType.PROBE,
     for (int i = 0; i < 2; i++) ShipType.REFINING_FREIGHTER,

@@ -1528,8 +1528,6 @@ But we seem to have enough systems needing watching that probes are all
 assigned to systems.  So no probe is able to explore jumpgates to find
 the EXPLORER and we deadlock.
 
-ACTUALLY, it seems like it was the reachability cache being stale?
-
 ### Figure out what the "expected" cost of gate construction is vs. reality.
 Also record how long it took from agent creation to gate completion.
 
