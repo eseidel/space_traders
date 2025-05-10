@@ -11,9 +11,6 @@ abstract class StaticStore<Symbol extends Object, Record extends Object> {
   final Database _db;
   final Traits<Symbol, Record> _traits;
 
-  /// Copy and normalize the record for comparison and storage.
-  Record copyAndNormalize(Record record) => _traits.copyAndNormalize(record);
-
   /// Used for writing to a JSON file.
   Future<List<Json>> asSortedJsonList() async {
     final records = await getAll();
@@ -47,7 +44,7 @@ abstract class StaticStore<Symbol extends Object, Record extends Object> {
     final json = _traits.toJson(_traits.copyAndNormalize(value));
     await _db.upsertInStaticCache(
       type: Record,
-      key: keyFor(value).toString(),
+      key: _traits.keyFor(value).toString(),
       json: json,
     );
   }
