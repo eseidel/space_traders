@@ -33,8 +33,8 @@ void main() {
           survey: Survey(
             signature: '123',
             symbol: waypoint.waypoint,
-            size: SurveySizeEnum.SMALL,
-            deposits: [SurveyDeposit(symbol: symbol.value)],
+            size: SurveySize.SMALL,
+            deposits: [SurveyDeposit(symbol: symbol)],
             expiration: now.add(const Duration(days: 1)),
           ),
         );
@@ -70,7 +70,7 @@ void main() {
         symbol: 'bar',
         deposits: [],
         expiration: DateTime(2021),
-        size: SurveySizeEnum.LARGE,
+        size: SurveySize.LARGE,
       ),
       exhausted: false,
     );

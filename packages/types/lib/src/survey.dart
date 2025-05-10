@@ -26,9 +26,9 @@ class HistoricalSurvey {
       survey: Survey(
         signature: 'signature',
         symbol: const WaypointSymbol.fallbackValue().waypoint,
-        deposits: [SurveyDeposit(symbol: TradeSymbol.DIAMONDS.value)],
+        deposits: [SurveyDeposit(symbol: TradeSymbol.DIAMONDS)],
         expiration: DateTime.now(),
-        size: SurveySizeEnum.SMALL,
+        size: SurveySize.SMALL,
       ),
       exhausted: false,
     );

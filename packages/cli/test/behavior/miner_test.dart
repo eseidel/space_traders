@@ -85,9 +85,11 @@ void main() {
             signature: 'sig$i',
             symbol: waypointSymbol.waypoint,
             deposits: [
-              SurveyDeposit(symbol: (i == 0) ? 'DIAMONDS' : 'ALUMINUM'),
+              SurveyDeposit(
+                symbol: (i == 0) ? TradeSymbol.DIAMONDS : TradeSymbol.ALUMINUM,
+              ),
             ],
-            size: SurveySizeEnum.SMALL,
+            size: SurveySize.SMALL,
           ),
         ),
     ];
@@ -145,6 +147,7 @@ void main() {
       ShipMount(
         symbol: ShipMountSymbolEnum.MINING_LASER_II,
         name: '',
+        description: '',
         requirements: ShipRequirements(),
         strength: 10,
       ),
@@ -476,7 +479,7 @@ void main() {
     when(
       () => fleetApi.transferCargo(
         shipSymbol.symbol,
-        transferCargoRequest: TransferCargoRequest(
+        TransferCargoRequest(
           shipSymbol: haulerSymbol.symbol,
           tradeSymbol: tradeSymbol,
           units: 10,
@@ -485,7 +488,11 @@ void main() {
     ).thenAnswer(
       (_) => Future.value(
         TransferCargo200Response(
-          data: Jettison200ResponseData(cargo: shipCargo),
+          data: TransferCargo200ResponseData(
+            cargo: shipCargo,
+            // Hack to give same cargo for both ships.
+            targetCargo: shipCargo,
+          ),
         ),
       ),
     );
@@ -549,6 +556,7 @@ void main() {
       ShipMount(
         symbol: ShipMountSymbolEnum.MINING_LASER_II,
         name: '',
+        description: '',
         requirements: ShipRequirements(),
         strength: 10,
       ),
@@ -642,15 +650,12 @@ void main() {
     when(
       () => fleetApi.sellCargo(
         shipSymbol.symbol,
-        sellCargoRequest: SellCargoRequest(
-          symbol: tradeSymbol,
-          units: cargoCapacity,
-        ),
+        SellCargoRequest(symbol: tradeSymbol, units: cargoCapacity),
       ),
     ).thenAnswer(
       (_) => Future.value(
         SellCargo201Response(
-          data: SellCargo201ResponseData(
+          data: PurchaseCargo201ResponseData(
             agent: agent.toOpenApi(),
             cargo: ShipCargo(capacity: cargoCapacity, units: 0),
             transaction: transaction,
@@ -674,10 +679,7 @@ void main() {
     when(
       () => fleetApi.jettison(
         shipSymbol.symbol,
-        jettisonRequest: JettisonRequest(
-          symbol: tradeSymbol,
-          units: cargoCapacity,
-        ),
+        JettisonRequest(symbol: tradeSymbol, units: cargoCapacity),
       ),
     ).thenAnswer(
       (_) => Future.value(

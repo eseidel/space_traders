@@ -11,7 +11,7 @@ class Agent extends Equatable {
     required this.credits,
     required this.startingFaction,
     required this.shipCount,
-    this.accountId,
+    required this.accountId,
   });
 
   /// Creates a test agent.
@@ -21,7 +21,7 @@ class Agent extends Equatable {
     this.credits = 1000000,
     FactionSymbol? startingFaction,
     this.shipCount = 1,
-    this.accountId,
+    this.accountId = '123',
   }) : headquarters = headquarters ?? WaypointSymbol.fromString('S-A-W'),
        startingFaction = startingFaction ?? FactionSymbol.AEGIS;
 
@@ -53,7 +53,7 @@ class Agent extends Equatable {
   final int shipCount;
 
   /// The account ID of the agent.
-  final String? accountId;
+  final String accountId;
 
   @override
   List<Object?> get props => [

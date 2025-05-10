@@ -8,7 +8,7 @@ import 'package:db/db.dart';
 import 'package:types/types.dart';
 
 Future<String> _tryRegister(
-  GlobalApi api, {
+  AccountsApi api, {
   required String symbol,
   required FactionSymbol faction,
   String? email,
@@ -18,7 +18,7 @@ Future<String> _tryRegister(
     faction: faction,
     email: email,
   );
-  final registerResponse = await api.register(registerRequest: registerRequest);
+  final registerResponse = await api.register(registerRequest);
   return registerResponse!.data.token;
 }
 
@@ -33,7 +33,7 @@ Future<String> register(
   String? faction,
 }) async {
   final client = getApiClient(db);
-  final defaultApi = GlobalApi(client);
+  final accountsApi = AccountsApi(client);
 
   final factionsApi = FactionsApi(client);
   final factions = await fetchFactions(db, factionsApi);
@@ -55,7 +55,7 @@ Future<String> register(
 
   try {
     return await _tryRegister(
-      defaultApi,
+      accountsApi,
       symbol: agentSymbol,
       faction: chosenFaction.symbol,
       email: email,
@@ -74,7 +74,7 @@ Future<String> register(
       'associated with this call sign to proceed:',
     );
     return await _tryRegister(
-      defaultApi,
+      accountsApi,
       symbol: agentSymbol,
       faction: chosenFaction.symbol,
       email: email,

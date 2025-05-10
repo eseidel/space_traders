@@ -193,15 +193,12 @@ void main() {
     when(
       () => fleetApi.purchaseCargo(
         shipSymbol.symbol,
-        purchaseCargoRequest: PurchaseCargoRequest(
-          symbol: TradeSymbol.ADVANCED_CIRCUITRY,
-          units: 10,
-        ),
+        PurchaseCargoRequest(symbol: TradeSymbol.ADVANCED_CIRCUITRY, units: 10),
       ),
     ).thenAnswer(
       (invocation) => Future.value(
         PurchaseCargo201Response(
-          data: SellCargo201ResponseData(
+          data: PurchaseCargo201ResponseData(
             agent: agent.toOpenApi(),
             cargo: shipCargo,
             transaction: MarketTransaction(
@@ -452,14 +449,12 @@ void main() {
     final state = BehaviorState(shipSymbol, Behavior.trader, deal: costedDeal);
 
     when(
-      () => fleetApi.sellCargo(
-        shipSymbol.symbol,
-        sellCargoRequest: any(named: 'sellCargoRequest'),
-      ),
+      () =>
+          fleetApi.sellCargo(shipSymbol.symbol, any(named: 'sellCargoRequest')),
     ).thenAnswer(
       (_) => Future.value(
         SellCargo201Response(
-          data: SellCargo201ResponseData(
+          data: PurchaseCargo201ResponseData(
             agent: agent.toOpenApi(),
             cargo: shipCargo,
             transaction: MarketTransaction(
@@ -479,7 +474,7 @@ void main() {
     when(() => fleetApi.orbitShip(shipSymbol.symbol)).thenAnswer(
       (_) => Future.value(
         OrbitShip200Response(
-          data: OrbitShip200ResponseData(
+          data: DockShip200ResponseData(
             nav: shipNav..status = ShipNavStatus.IN_ORBIT,
           ),
         ),
@@ -488,7 +483,7 @@ void main() {
     when(
       () => fleetApi.navigateShip(
         shipSymbol.symbol,
-        navigateShipRequest: NavigateShipRequest(waypointSymbol: end.waypoint),
+        NavigateShipRequest(waypointSymbol: end.waypoint),
       ),
     ).thenAnswer(
       (_) => Future.value(
@@ -607,8 +602,8 @@ void main() {
     when(() => api.fleet).thenReturn(fleetApi);
     when(() => fleetApi.negotiateContract(any())).thenAnswer(
       (_) => Future.value(
-        NegotiateContract200Response(
-          data: NegotiateContract200ResponseData(
+        NegotiateContract201Response(
+          data: NegotiateContract201ResponseData(
             contract: contract.toOpenApi(),
           ),
         ),
@@ -722,14 +717,12 @@ void main() {
 
     when(() => fleetApi.orbitShip(shipSymbol.symbol)).thenAnswer(
       (_) async =>
-          OrbitShip200Response(data: OrbitShip200ResponseData(nav: shipNav)),
+          OrbitShip200Response(data: DockShip200ResponseData(nav: shipNav)),
     );
     when(
       () => fleetApi.navigateShip(
         shipSymbol.symbol,
-        navigateShipRequest: NavigateShipRequest(
-          waypointSymbol: start.waypoint,
-        ),
+        NavigateShipRequest(waypointSymbol: start.waypoint),
       ),
     ).thenAnswer(
       (_) async => NavigateShip200Response(
@@ -952,7 +945,7 @@ void main() {
     when(() => fleetApi.orbitShip(shipSymbol.symbol)).thenAnswer(
       (_) => Future.value(
         OrbitShip200Response(
-          data: OrbitShip200ResponseData(
+          data: DockShip200ResponseData(
             nav: shipNav..status = ShipNavStatus.IN_ORBIT,
           ),
         ),
@@ -961,7 +954,7 @@ void main() {
     when(
       () => fleetApi.navigateShip(
         shipSymbol.symbol,
-        navigateShipRequest: NavigateShipRequest(waypointSymbol: end.waypoint),
+        NavigateShipRequest(waypointSymbol: end.waypoint),
       ),
     ).thenAnswer(
       (_) => Future.value(
@@ -1275,7 +1268,7 @@ void main() {
     when(
       () => contractsApi.deliverContract(
         contract.id,
-        deliverContractRequest: DeliverContractRequest(
+        DeliverContractRequest(
           shipSymbol: shipSymbol.symbol,
           units: 10,
           tradeSymbol: tradeSymbol.value,
@@ -1488,9 +1481,9 @@ void main() {
       () => systemsApi.supplyConstruction(
         end.systemString,
         end.waypoint,
-        supplyConstructionRequest: SupplyConstructionRequest(
+        SupplyConstructionRequest(
           shipSymbol: shipSymbol.symbol,
-          tradeSymbol: tradeSymbol.value,
+          tradeSymbol: tradeSymbol,
           units: 10,
         ),
       ),
