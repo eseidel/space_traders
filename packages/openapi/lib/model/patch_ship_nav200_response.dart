@@ -16,7 +16,7 @@ class PatchShipNav200Response {
     required this.data,
   });
 
-  PatchShipNav200ResponseData data;
+  NavigateShip200ResponseData data;
 
   @override
   bool operator ==(Object other) =>
@@ -58,7 +58,7 @@ class PatchShipNav200Response {
       }());
 
       return PatchShipNav200Response(
-        data: PatchShipNav200ResponseData.fromJson(json[r'data'])!,
+        data: NavigateShip200ResponseData.fromJson(json[r'data'])!,
       );
     }
     return null;

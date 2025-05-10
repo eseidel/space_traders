@@ -8,7 +8,7 @@ import 'package:openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**data** | [**List<Agent>**](Agent.md) |  | [default to const []]
+**data** | [**List<PublicAgent>**](PublicAgent.md) |  | [default to const []]
 **meta** | [**Meta**](Meta.md) |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

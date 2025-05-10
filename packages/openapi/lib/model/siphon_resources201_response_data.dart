@@ -13,15 +13,15 @@ part of openapi;
 class SiphonResources201ResponseData {
   /// Returns a new [SiphonResources201ResponseData] instance.
   SiphonResources201ResponseData({
-    required this.cooldown,
     required this.siphon,
+    required this.cooldown,
     required this.cargo,
     this.events = const [],
   });
 
-  Cooldown cooldown;
-
   Siphon siphon;
+
+  Cooldown cooldown;
 
   ShipCargo cargo;
 
@@ -31,27 +31,27 @@ class SiphonResources201ResponseData {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is SiphonResources201ResponseData &&
-          other.cooldown == cooldown &&
           other.siphon == siphon &&
+          other.cooldown == cooldown &&
           other.cargo == cargo &&
           _deepEquality.equals(other.events, events);
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (cooldown.hashCode) +
       (siphon.hashCode) +
+      (cooldown.hashCode) +
       (cargo.hashCode) +
       (events.hashCode);
 
   @override
   String toString() =>
-      'SiphonResources201ResponseData[cooldown=$cooldown, siphon=$siphon, cargo=$cargo, events=$events]';
+      'SiphonResources201ResponseData[siphon=$siphon, cooldown=$cooldown, cargo=$cargo, events=$events]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    json[r'cooldown'] = this.cooldown;
     json[r'siphon'] = this.siphon;
+    json[r'cooldown'] = this.cooldown;
     json[r'cargo'] = this.cargo;
     json[r'events'] = this.events;
     return json;
@@ -78,8 +78,8 @@ class SiphonResources201ResponseData {
       }());
 
       return SiphonResources201ResponseData(
-        cooldown: Cooldown.fromJson(json[r'cooldown'])!,
         siphon: Siphon.fromJson(json[r'siphon'])!,
+        cooldown: Cooldown.fromJson(json[r'cooldown'])!,
         cargo: ShipCargo.fromJson(json[r'cargo'])!,
         events: ShipConditionEvent.listFromJson(json[r'events']),
       );
@@ -138,8 +138,8 @@ class SiphonResources201ResponseData {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'cooldown',
     'siphon',
+    'cooldown',
     'cargo',
     'events',
   };

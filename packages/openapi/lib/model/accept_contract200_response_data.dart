@@ -13,34 +13,34 @@ part of openapi;
 class AcceptContract200ResponseData {
   /// Returns a new [AcceptContract200ResponseData] instance.
   AcceptContract200ResponseData({
-    required this.agent,
     required this.contract,
+    required this.agent,
   });
 
-  Agent agent;
-
   Contract contract;
+
+  Agent agent;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is AcceptContract200ResponseData &&
-          other.agent == agent &&
-          other.contract == contract;
+          other.contract == contract &&
+          other.agent == agent;
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (agent.hashCode) + (contract.hashCode);
+      (contract.hashCode) + (agent.hashCode);
 
   @override
   String toString() =>
-      'AcceptContract200ResponseData[agent=$agent, contract=$contract]';
+      'AcceptContract200ResponseData[contract=$contract, agent=$agent]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    json[r'agent'] = this.agent;
     json[r'contract'] = this.contract;
+    json[r'agent'] = this.agent;
     return json;
   }
 
@@ -65,8 +65,8 @@ class AcceptContract200ResponseData {
       }());
 
       return AcceptContract200ResponseData(
-        agent: Agent.fromJson(json[r'agent'])!,
         contract: Contract.fromJson(json[r'contract'])!,
+        agent: Agent.fromJson(json[r'agent'])!,
       );
     }
     return null;
@@ -123,7 +123,7 @@ class AcceptContract200ResponseData {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'agent',
     'contract',
+    'agent',
   };
 }

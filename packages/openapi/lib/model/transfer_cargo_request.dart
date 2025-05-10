@@ -21,6 +21,8 @@ class TransferCargoRequest {
   TradeSymbol tradeSymbol;
 
   /// Amount of units to transfer.
+  ///
+  /// Minimum value: 1
   int units;
 
   /// The symbol of the ship to transfer to.

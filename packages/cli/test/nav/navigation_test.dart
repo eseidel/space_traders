@@ -189,7 +189,7 @@ void main() {
     when(
       () => fleetApi.jumpShip(
         shipSymbol.symbol,
-        jumpShipRequest: JumpShipRequest(waypointSymbol: endSymbol.waypoint),
+        JumpShipRequest(waypointSymbol: endSymbol.waypoint),
       ),
     ).thenAnswer(
       (_) async => JumpShip200Response(

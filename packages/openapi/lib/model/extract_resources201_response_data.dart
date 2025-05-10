@@ -13,17 +13,20 @@ part of openapi;
 class ExtractResources201ResponseData {
   /// Returns a new [ExtractResources201ResponseData] instance.
   ExtractResources201ResponseData({
-    required this.cooldown,
     required this.extraction,
+    required this.cooldown,
     required this.cargo,
+    this.modifiers = const [],
     this.events = const [],
   });
 
-  Cooldown cooldown;
-
   Extraction extraction;
 
+  Cooldown cooldown;
+
   ShipCargo cargo;
+
+  List<WaypointModifier> modifiers;
 
   List<ShipConditionEvent> events;
 
@@ -31,28 +34,31 @@ class ExtractResources201ResponseData {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is ExtractResources201ResponseData &&
-          other.cooldown == cooldown &&
           other.extraction == extraction &&
+          other.cooldown == cooldown &&
           other.cargo == cargo &&
+          _deepEquality.equals(other.modifiers, modifiers) &&
           _deepEquality.equals(other.events, events);
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (cooldown.hashCode) +
       (extraction.hashCode) +
+      (cooldown.hashCode) +
       (cargo.hashCode) +
+      (modifiers.hashCode) +
       (events.hashCode);
 
   @override
   String toString() =>
-      'ExtractResources201ResponseData[cooldown=$cooldown, extraction=$extraction, cargo=$cargo, events=$events]';
+      'ExtractResources201ResponseData[extraction=$extraction, cooldown=$cooldown, cargo=$cargo, modifiers=$modifiers, events=$events]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    json[r'cooldown'] = this.cooldown;
     json[r'extraction'] = this.extraction;
+    json[r'cooldown'] = this.cooldown;
     json[r'cargo'] = this.cargo;
+    json[r'modifiers'] = this.modifiers;
     json[r'events'] = this.events;
     return json;
   }
@@ -78,9 +84,10 @@ class ExtractResources201ResponseData {
       }());
 
       return ExtractResources201ResponseData(
-        cooldown: Cooldown.fromJson(json[r'cooldown'])!,
         extraction: Extraction.fromJson(json[r'extraction'])!,
+        cooldown: Cooldown.fromJson(json[r'cooldown'])!,
         cargo: ShipCargo.fromJson(json[r'cargo'])!,
+        modifiers: WaypointModifier.listFromJson(json[r'modifiers']),
         events: ShipConditionEvent.listFromJson(json[r'events']),
       );
     }
@@ -139,8 +146,8 @@ class ExtractResources201ResponseData {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'cooldown',
     'extraction',
+    'cooldown',
     'cargo',
     'events',
   };

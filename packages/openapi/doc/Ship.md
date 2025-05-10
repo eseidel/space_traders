@@ -15,11 +15,11 @@ Name | Type | Description | Notes
 **frame** | [**ShipFrame**](ShipFrame.md) |  | 
 **reactor** | [**ShipReactor**](ShipReactor.md) |  | 
 **engine** | [**ShipEngine**](ShipEngine.md) |  | 
-**cooldown** | [**Cooldown**](Cooldown.md) |  | 
 **modules** | [**List<ShipModule>**](ShipModule.md) | Modules installed in this ship. | [default to const []]
 **mounts** | [**List<ShipMount>**](ShipMount.md) | Mounts installed in this ship. | [default to const []]
 **cargo** | [**ShipCargo**](ShipCargo.md) |  | 
 **fuel** | [**ShipFuel**](ShipFuel.md) |  | 
+**cooldown** | [**Cooldown**](Cooldown.md) |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

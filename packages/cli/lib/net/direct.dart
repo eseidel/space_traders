@@ -16,12 +16,11 @@ Future<PurchaseShip201ResponseData> purchaseShip(
   WaypointSymbol shipyardSymbol,
   ShipType shipType,
 ) async {
-  final purchaseShipRequest = PurchaseShipRequest(
-    waypointSymbol: shipyardSymbol.waypoint,
-    shipType: shipType,
-  );
   final purchaseResponse = await api.fleet.purchaseShip(
-    purchaseShipRequest: purchaseShipRequest,
+    PurchaseShipRequest(
+      waypointSymbol: shipyardSymbol.waypoint,
+      shipType: shipType,
+    ),
   );
   final data = purchaseResponse!.data;
   // Add the new ship to our cache.
@@ -74,10 +73,7 @@ Future<NavigateShip200ResponseData> navigateShip(
   WaypointSymbol waypointSymbol,
 ) async {
   final request = NavigateShipRequest(waypointSymbol: waypointSymbol.waypoint);
-  final result = await api.fleet.navigateShip(
-    ship.symbol.symbol,
-    navigateShipRequest: request,
-  );
+  final result = await api.fleet.navigateShip(ship.symbol.symbol, request);
   final data = result!.data;
   ship
     ..nav = data.nav
@@ -87,17 +83,14 @@ Future<NavigateShip200ResponseData> navigateShip(
 }
 
 /// Navigate [ship] to [waypointSymbol]
-Future<WarpShip200ResponseData> warpShip(
+Future<NavigateShip200ResponseData> warpShip(
   Database db,
   Api api,
   Ship ship,
   WaypointSymbol waypointSymbol,
 ) async {
   final request = NavigateShipRequest(waypointSymbol: waypointSymbol.waypoint);
-  final result = await api.fleet.warpShip(
-    ship.symbol.symbol,
-    navigateShipRequest: request,
-  );
+  final result = await api.fleet.warpShip(ship.symbol.symbol, request);
   final data = result!.data;
   ship
     ..nav = data.nav
@@ -168,10 +161,7 @@ Future<DeliverContract200ResponseData> deliverContract(
     tradeSymbol: tradeSymbol.value,
     units: units,
   );
-  final response = await api.contracts.deliverContract(
-    contract.id,
-    deliverContractRequest: request,
-  );
+  final response = await api.contracts.deliverContract(contract.id, request);
   final data = response!.data;
   await db.contracts.upsert(
     Contract.fromOpenApi(data.contract, DateTime.timestamp()),
@@ -192,13 +182,13 @@ Future<SupplyConstruction201ResponseData> supplyConstruction(
 }) async {
   final request = SupplyConstructionRequest(
     shipSymbol: ship.symbol.symbol,
-    tradeSymbol: tradeSymbol.value,
+    tradeSymbol: tradeSymbol,
     units: units,
   );
   final response = await api.systems.supplyConstruction(
     construction.waypointSymbol.systemString,
     construction.waypointSymbol.waypoint,
-    supplyConstructionRequest: request,
+    request,
   );
   final data = response!.data;
   await db.construction.updateConstruction(
@@ -211,7 +201,7 @@ Future<SupplyConstruction201ResponseData> supplyConstruction(
 }
 
 /// Sell [units] of [tradeSymbol] to market.
-Future<SellCargo201ResponseData> sellCargo(
+Future<PurchaseCargo201ResponseData> sellCargo(
   Database db,
   Api api,
   Ship ship,
@@ -219,10 +209,7 @@ Future<SellCargo201ResponseData> sellCargo(
   int units,
 ) async {
   final request = SellCargoRequest(symbol: tradeSymbol, units: units);
-  final response = await api.fleet.sellCargo(
-    ship.symbol.symbol,
-    sellCargoRequest: request,
-  );
+  final response = await api.fleet.sellCargo(ship.symbol.symbol, request);
   final data = response!.data;
   ship.cargo = data.cargo;
   await db.upsertShip(ship);
@@ -233,7 +220,7 @@ Future<SellCargo201ResponseData> sellCargo(
 /// Purchase [units] of [tradeSymbol] from market.
 /// Returns the response data.
 /// Throws an exception if the purchase fails.
-Future<SellCargo201ResponseData> purchaseCargo(
+Future<PurchaseCargo201ResponseData> purchaseCargo(
   Database db,
   Api api,
   Ship ship,
@@ -241,10 +228,7 @@ Future<SellCargo201ResponseData> purchaseCargo(
   int units,
 ) async {
   final request = PurchaseCargoRequest(symbol: tradeSymbol, units: units);
-  final response = await api.fleet.purchaseCargo(
-    ship.symbol.symbol,
-    purchaseCargoRequest: request,
-  );
+  final response = await api.fleet.purchaseCargo(ship.symbol.symbol, request);
   final data = response!.data;
   ship.cargo = data.cargo;
   await db.upsertShip(ship);

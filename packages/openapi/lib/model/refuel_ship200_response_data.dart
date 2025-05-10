@@ -15,12 +15,21 @@ class RefuelShip200ResponseData {
   RefuelShip200ResponseData({
     required this.agent,
     required this.fuel,
+    this.cargo,
     required this.transaction,
   });
 
   Agent agent;
 
   ShipFuel fuel;
+
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  ShipCargo? cargo;
 
   MarketTransaction transaction;
 
@@ -30,21 +39,30 @@ class RefuelShip200ResponseData {
       other is RefuelShip200ResponseData &&
           other.agent == agent &&
           other.fuel == fuel &&
+          other.cargo == cargo &&
           other.transaction == transaction;
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (agent.hashCode) + (fuel.hashCode) + (transaction.hashCode);
+      (agent.hashCode) +
+      (fuel.hashCode) +
+      (cargo == null ? 0 : cargo!.hashCode) +
+      (transaction.hashCode);
 
   @override
   String toString() =>
-      'RefuelShip200ResponseData[agent=$agent, fuel=$fuel, transaction=$transaction]';
+      'RefuelShip200ResponseData[agent=$agent, fuel=$fuel, cargo=$cargo, transaction=$transaction]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
     json[r'agent'] = this.agent;
     json[r'fuel'] = this.fuel;
+    if (this.cargo != null) {
+      json[r'cargo'] = this.cargo;
+    } else {
+      json[r'cargo'] = null;
+    }
     json[r'transaction'] = this.transaction;
     return json;
   }
@@ -72,6 +90,7 @@ class RefuelShip200ResponseData {
       return RefuelShip200ResponseData(
         agent: Agent.fromJson(json[r'agent'])!,
         fuel: ShipFuel.fromJson(json[r'fuel'])!,
+        cargo: ShipCargo.fromJson(json[r'cargo']),
         transaction: MarketTransaction.fromJson(json[r'transaction'])!,
       );
     }

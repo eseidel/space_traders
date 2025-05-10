@@ -15,32 +15,45 @@ class CreateChart201ResponseData {
   CreateChart201ResponseData({
     required this.chart,
     required this.waypoint,
+    required this.transaction,
+    required this.agent,
   });
 
   Chart chart;
 
   Waypoint waypoint;
 
+  ChartTransaction transaction;
+
+  Agent agent;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is CreateChart201ResponseData &&
           other.chart == chart &&
-          other.waypoint == waypoint;
+          other.waypoint == waypoint &&
+          other.transaction == transaction &&
+          other.agent == agent;
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (chart.hashCode) + (waypoint.hashCode);
+      (chart.hashCode) +
+      (waypoint.hashCode) +
+      (transaction.hashCode) +
+      (agent.hashCode);
 
   @override
   String toString() =>
-      'CreateChart201ResponseData[chart=$chart, waypoint=$waypoint]';
+      'CreateChart201ResponseData[chart=$chart, waypoint=$waypoint, transaction=$transaction, agent=$agent]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
     json[r'chart'] = this.chart;
     json[r'waypoint'] = this.waypoint;
+    json[r'transaction'] = this.transaction;
+    json[r'agent'] = this.agent;
     return json;
   }
 
@@ -67,6 +80,8 @@ class CreateChart201ResponseData {
       return CreateChart201ResponseData(
         chart: Chart.fromJson(json[r'chart'])!,
         waypoint: Waypoint.fromJson(json[r'waypoint'])!,
+        transaction: ChartTransaction.fromJson(json[r'transaction'])!,
+        agent: Agent.fromJson(json[r'agent'])!,
       );
     }
     return null;
@@ -125,5 +140,7 @@ class CreateChart201ResponseData {
   static const requiredKeys = <String>{
     'chart',
     'waypoint',
+    'transaction',
+    'agent',
   };
 }

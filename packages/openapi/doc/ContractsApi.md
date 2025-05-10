@@ -14,6 +14,7 @@ Method | HTTP request | Description
 [**fulfillContract**](ContractsApi.md#fulfillcontract) | **POST** /my/contracts/{contractId}/fulfill | Fulfill Contract
 [**getContract**](ContractsApi.md#getcontract) | **GET** /my/contracts/{contractId} | Get Contract
 [**getContracts**](ContractsApi.md#getcontracts) | **GET** /my/contracts | List Contracts
+[**negotiateContract_0**](ContractsApi.md#negotiatecontract_0) | **POST** /my/ships/{shipSymbol}/negotiate/contract | Negotiate Contract
 
 
 # **acceptContract**
@@ -99,7 +100,7 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **contractId** | **String**| The ID of the contract. | 
- **deliverContractRequest** | [**DeliverContractRequest**](DeliverContractRequest.md)|  | [optional] 
+ **deliverContractRequest** | [**DeliverContractRequest**](DeliverContractRequest.md)|  | 
 
 ### Return type
 
@@ -170,7 +171,7 @@ Name | Type | Description  | Notes
 
 Get Contract
 
-Get the details of a contract by ID.
+Get the details of a specific contract.
 
 ### Example
 ```dart
@@ -183,7 +184,7 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = ContractsApi();
-final contractId = contractId_example; // String | The contract ID
+final contractId = contractId_example; // String | The contract ID to accept.
 
 try {
     final result = api_instance.getContract(contractId);
@@ -197,7 +198,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **contractId** | **String**| The contract ID | 
+ **contractId** | **String**| The contract ID to accept. | 
 
 ### Return type
 
@@ -232,8 +233,8 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = ContractsApi();
-final page = 56; // int | What entry offset to request
-final limit = 56; // int | How many entries to return per page
+final page = 1; // int | What entry offset to request
+final limit = 10; // int | How many entries to return per page
 
 try {
     final result = api_instance.getContracts(page, limit);
@@ -253,6 +254,55 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**GetContracts200Response**](GetContracts200Response.md)
+
+### Authorization
+
+[AgentToken](../README.md#AgentToken)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **negotiateContract_0**
+> NegotiateContract201Response negotiateContract_0(shipSymbol)
+
+Negotiate Contract
+
+Negotiate a new contract with the HQ.  In order to negotiate a new contract, an agent must not have ongoing or offered contracts over the allowed maximum amount. Currently the maximum contracts an agent can have at a time is 1.  Once a contract is negotiated, it is added to the list of contracts offered to the agent, which the agent can then accept.   The ship must be present at any waypoint with a faction present to negotiate a contract with that faction.
+
+### Example
+```dart
+import 'package:openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: AgentToken
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = ContractsApi();
+final shipSymbol = shipSymbol_example; // String | The symbol of the ship.
+
+try {
+    final result = api_instance.negotiateContract_0(shipSymbol);
+    print(result);
+} catch (e) {
+    print('Exception when calling ContractsApi->negotiateContract_0: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **shipSymbol** | **String**| The symbol of the ship. | 
+
+### Return type
+
+[**NegotiateContract201Response**](NegotiateContract201Response.md)
 
 ### Authorization
 

@@ -17,7 +17,7 @@ class FleetApi {
 
   /// Create Chart
   ///
-  /// Command a ship to chart the waypoint at its current location.  Most waypoints in the universe are uncharted by default. These waypoints have their traits hidden until they have been charted by a ship.  Charting a waypoint will record your agent as the one who created the chart, and all other agents would also be able to see the waypoint's traits.
+  /// Command a ship to chart the waypoint at its current location.  Most waypoints in the universe are uncharted by default. These waypoints have their traits hidden until they have been charted by a ship.  Charting a waypoint will record your agent as the one who created the chart, and all other agents would also be able to see the waypoint's traits. Charting a waypoint gives you a one time reward of credits based on the rarity of the waypoint's traits.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
@@ -54,7 +54,7 @@ class FleetApi {
 
   /// Create Chart
   ///
-  /// Command a ship to chart the waypoint at its current location.  Most waypoints in the universe are uncharted by default. These waypoints have their traits hidden until they have been charted by a ship.  Charting a waypoint will record your agent as the one who created the chart, and all other agents would also be able to see the waypoint's traits.
+  /// Command a ship to chart the waypoint at its current location.  Most waypoints in the universe are uncharted by default. These waypoints have their traits hidden until they have been charted by a ship.  Charting a waypoint will record your agent as the one who created the chart, and all other agents would also be able to see the waypoint's traits. Charting a waypoint gives you a one time reward of credits based on the rarity of the waypoint's traits.
   ///
   /// Parameters:
   ///
@@ -91,7 +91,7 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   Future<Response> createShipShipScanWithHttpInfo(
     String shipSymbol,
   ) async {
@@ -126,7 +126,7 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   Future<CreateShipShipScan201Response?> createShipShipScan(
     String shipSymbol,
   ) async {
@@ -158,7 +158,7 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   Future<Response> createShipSystemScanWithHttpInfo(
     String shipSymbol,
   ) async {
@@ -193,7 +193,7 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   Future<CreateShipSystemScan201Response?> createShipSystemScan(
     String shipSymbol,
   ) async {
@@ -225,7 +225,7 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   Future<Response> createShipWaypointScanWithHttpInfo(
     String shipSymbol,
   ) async {
@@ -260,7 +260,7 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   Future<CreateShipWaypointScan201Response?> createShipWaypointScan(
     String shipSymbol,
   ) async {
@@ -426,25 +426,22 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
-  ///
-  /// * [ExtractResourcesRequest] extractResourcesRequest:
+  ///   The symbol of the ship.
   Future<Response> extractResourcesWithHttpInfo(
-    String shipSymbol, {
-    ExtractResourcesRequest? extractResourcesRequest,
-  }) async {
+    String shipSymbol,
+  ) async {
     // ignore: prefer_const_declarations
     final path = r'/my/ships/{shipSymbol}/extract'
         .replaceAll('{shipSymbol}', shipSymbol);
 
     // ignore: prefer_final_locals
-    Object? postBody = extractResourcesRequest;
+    Object? postBody;
 
     final queryParams = <QueryParam>[];
     final headerParams = <String, String>{};
     final formParams = <String, String>{};
 
-    const contentTypes = <String>['application/json'];
+    const contentTypes = <String>[];
 
     return apiClient.invokeAPI(
       path,
@@ -464,16 +461,12 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
-  ///
-  /// * [ExtractResourcesRequest] extractResourcesRequest:
+  ///   The symbol of the ship.
   Future<ExtractResources201Response?> extractResources(
-    String shipSymbol, {
-    ExtractResourcesRequest? extractResourcesRequest,
-  }) async {
+    String shipSymbol,
+  ) async {
     final response = await extractResourcesWithHttpInfo(
       shipSymbol,
-      extractResourcesRequest: extractResourcesRequest,
     );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -500,7 +493,7 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   ///
   /// * [Survey] survey:
   Future<Response> extractResourcesWithSurveyWithHttpInfo(
@@ -538,7 +531,7 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   ///
   /// * [Survey] survey:
   Future<ExtractResources201Response?> extractResourcesWithSurvey(
@@ -574,7 +567,7 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship's symbol.
+  ///   The symbol of the ship.
   Future<Response> getMountsWithHttpInfo(
     String shipSymbol,
   ) async {
@@ -609,7 +602,7 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship's symbol.
+  ///   The symbol of the ship.
   Future<GetMounts200Response?> getMounts(
     String shipSymbol,
   ) async {
@@ -850,14 +843,14 @@ class FleetApi {
 
   /// Get Repair Ship
   ///
-  /// Get the cost of repairing a ship.
+  /// Get the cost of repairing a ship. Requires the ship to be docked at a waypoint that has the `Shipyard` trait.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   Future<Response> getRepairShipWithHttpInfo(
     String shipSymbol,
   ) async {
@@ -887,12 +880,12 @@ class FleetApi {
 
   /// Get Repair Ship
   ///
-  /// Get the cost of repairing a ship.
+  /// Get the cost of repairing a ship. Requires the ship to be docked at a waypoint that has the `Shipyard` trait.
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   Future<GetRepairShip200Response?> getRepairShip(
     String shipSymbol,
   ) async {
@@ -917,14 +910,14 @@ class FleetApi {
 
   /// Get Scrap Ship
   ///
-  /// Get the amount of value that will be returned when scrapping a ship.
+  /// Get the value of scrapping a ship. Requires the ship to be docked at a waypoint that has the `Shipyard` trait.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   Future<Response> getScrapShipWithHttpInfo(
     String shipSymbol,
   ) async {
@@ -954,12 +947,12 @@ class FleetApi {
 
   /// Get Scrap Ship
   ///
-  /// Get the amount of value that will be returned when scrapping a ship.
+  /// Get the value of scrapping a ship. Requires the ship to be docked at a waypoint that has the `Shipyard` trait.
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   Future<GetScrapShip200Response?> getScrapShip(
     String shipSymbol,
   ) async {
@@ -1058,7 +1051,7 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The symbol of the ship
+  ///   The symbol of the ship.
   Future<Response> getShipModulesWithHttpInfo(
     String shipSymbol,
   ) async {
@@ -1093,7 +1086,7 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The symbol of the ship
+  ///   The symbol of the ship.
   Future<GetShipModules200Response?> getShipModules(
     String shipSymbol,
   ) async {
@@ -1125,7 +1118,7 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   Future<Response> getShipNavWithHttpInfo(
     String shipSymbol,
   ) async {
@@ -1160,7 +1153,7 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   Future<GetShipNav200Response?> getShipNav(
     String shipSymbol,
   ) async {
@@ -1192,13 +1185,13 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship's symbol.
+  ///   The symbol of the ship.
   ///
-  /// * [InstallMountRequest] installMountRequest:
+  /// * [InstallMountRequest] installMountRequest (required):
   Future<Response> installMountWithHttpInfo(
-    String shipSymbol, {
-    InstallMountRequest? installMountRequest,
-  }) async {
+    String shipSymbol,
+    InstallMountRequest installMountRequest,
+  ) async {
     // ignore: prefer_const_declarations
     final path = r'/my/ships/{shipSymbol}/mounts/install'
         .replaceAll('{shipSymbol}', shipSymbol);
@@ -1230,16 +1223,16 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship's symbol.
+  ///   The symbol of the ship.
   ///
-  /// * [InstallMountRequest] installMountRequest:
+  /// * [InstallMountRequest] installMountRequest (required):
   Future<InstallMount201Response?> installMount(
-    String shipSymbol, {
-    InstallMountRequest? installMountRequest,
-  }) async {
+    String shipSymbol,
+    InstallMountRequest installMountRequest,
+  ) async {
     final response = await installMountWithHttpInfo(
       shipSymbol,
-      installMountRequest: installMountRequest,
+      installMountRequest,
     );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -1266,13 +1259,13 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The symbol of the ship
+  ///   The symbol of the ship.
   ///
-  /// * [InstallShipModuleRequest] installShipModuleRequest:
+  /// * [InstallShipModuleRequest] installShipModuleRequest (required):
   Future<Response> installShipModuleWithHttpInfo(
-    String shipSymbol, {
-    InstallShipModuleRequest? installShipModuleRequest,
-  }) async {
+    String shipSymbol,
+    InstallShipModuleRequest installShipModuleRequest,
+  ) async {
     // ignore: prefer_const_declarations
     final path = r'/my/ships/{shipSymbol}/modules/install'
         .replaceAll('{shipSymbol}', shipSymbol);
@@ -1304,16 +1297,16 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The symbol of the ship
+  ///   The symbol of the ship.
   ///
-  /// * [InstallShipModuleRequest] installShipModuleRequest:
+  /// * [InstallShipModuleRequest] installShipModuleRequest (required):
   Future<InstallShipModule201Response?> installShipModule(
-    String shipSymbol, {
-    InstallShipModuleRequest? installShipModuleRequest,
-  }) async {
+    String shipSymbol,
+    InstallShipModuleRequest installShipModuleRequest,
+  ) async {
     final response = await installShipModuleWithHttpInfo(
       shipSymbol,
-      installShipModuleRequest: installShipModuleRequest,
+      installShipModuleRequest,
     );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -1340,13 +1333,13 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   ///
-  /// * [JettisonRequest] jettisonRequest:
+  /// * [JettisonRequest] jettisonRequest (required):
   Future<Response> jettisonWithHttpInfo(
-    String shipSymbol, {
-    JettisonRequest? jettisonRequest,
-  }) async {
+    String shipSymbol,
+    JettisonRequest jettisonRequest,
+  ) async {
     // ignore: prefer_const_declarations
     final path = r'/my/ships/{shipSymbol}/jettison'
         .replaceAll('{shipSymbol}', shipSymbol);
@@ -1378,16 +1371,16 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   ///
-  /// * [JettisonRequest] jettisonRequest:
+  /// * [JettisonRequest] jettisonRequest (required):
   Future<Jettison200Response?> jettison(
-    String shipSymbol, {
-    JettisonRequest? jettisonRequest,
-  }) async {
+    String shipSymbol,
+    JettisonRequest jettisonRequest,
+  ) async {
     final response = await jettisonWithHttpInfo(
       shipSymbol,
-      jettisonRequest: jettisonRequest,
+      jettisonRequest,
     );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -1414,13 +1407,13 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   ///
-  /// * [JumpShipRequest] jumpShipRequest:
+  /// * [JumpShipRequest] jumpShipRequest (required):
   Future<Response> jumpShipWithHttpInfo(
-    String shipSymbol, {
-    JumpShipRequest? jumpShipRequest,
-  }) async {
+    String shipSymbol,
+    JumpShipRequest jumpShipRequest,
+  ) async {
     // ignore: prefer_const_declarations
     final path =
         r'/my/ships/{shipSymbol}/jump'.replaceAll('{shipSymbol}', shipSymbol);
@@ -1452,16 +1445,16 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   ///
-  /// * [JumpShipRequest] jumpShipRequest:
+  /// * [JumpShipRequest] jumpShipRequest (required):
   Future<JumpShip200Response?> jumpShip(
-    String shipSymbol, {
-    JumpShipRequest? jumpShipRequest,
-  }) async {
+    String shipSymbol,
+    JumpShipRequest jumpShipRequest,
+  ) async {
     final response = await jumpShipWithHttpInfo(
       shipSymbol,
-      jumpShipRequest: jumpShipRequest,
+      jumpShipRequest,
     );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -1488,14 +1481,13 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   ///
-  /// * [NavigateShipRequest] navigateShipRequest:
-  ///
+  /// * [NavigateShipRequest] navigateShipRequest (required):
   Future<Response> navigateShipWithHttpInfo(
-    String shipSymbol, {
-    NavigateShipRequest? navigateShipRequest,
-  }) async {
+    String shipSymbol,
+    NavigateShipRequest navigateShipRequest,
+  ) async {
     // ignore: prefer_const_declarations
     final path = r'/my/ships/{shipSymbol}/navigate'
         .replaceAll('{shipSymbol}', shipSymbol);
@@ -1527,17 +1519,16 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   ///
-  /// * [NavigateShipRequest] navigateShipRequest:
-  ///
+  /// * [NavigateShipRequest] navigateShipRequest (required):
   Future<NavigateShip200Response?> navigateShip(
-    String shipSymbol, {
-    NavigateShipRequest? navigateShipRequest,
-  }) async {
+    String shipSymbol,
+    NavigateShipRequest navigateShipRequest,
+  ) async {
     final response = await navigateShipWithHttpInfo(
       shipSymbol,
-      navigateShipRequest: navigateShipRequest,
+      navigateShipRequest,
     );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -1564,7 +1555,7 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship's symbol.
+  ///   The symbol of the ship.
   Future<Response> negotiateContractWithHttpInfo(
     String shipSymbol,
   ) async {
@@ -1599,8 +1590,8 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship's symbol.
-  Future<NegotiateContract200Response?> negotiateContract(
+  ///   The symbol of the ship.
+  Future<NegotiateContract201Response?> negotiateContract(
     String shipSymbol,
   ) async {
     final response = await negotiateContractWithHttpInfo(
@@ -1616,8 +1607,8 @@ class FleetApi {
         response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(
         await _decodeBodyBytes(response),
-        'NegotiateContract200Response',
-      ) as NegotiateContract200Response;
+        'NegotiateContract201Response',
+      ) as NegotiateContract201Response;
     }
     return null;
   }
@@ -1631,7 +1622,6 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The symbol of the ship.
   Future<Response> orbitShipWithHttpInfo(
     String shipSymbol,
   ) async {
@@ -1666,7 +1656,6 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The symbol of the ship.
   Future<OrbitShip200Response?> orbitShip(
     String shipSymbol,
   ) async {
@@ -1698,7 +1687,7 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   ///
   /// * [PatchShipNavRequest] patchShipNavRequest:
   Future<Response> patchShipNavWithHttpInfo(
@@ -1736,7 +1725,7 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   ///
   /// * [PatchShipNavRequest] patchShipNavRequest:
   Future<PatchShipNav200Response?> patchShipNav(
@@ -1772,13 +1761,13 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship's symbol.
+  ///   The symbol of the ship.
   ///
-  /// * [PurchaseCargoRequest] purchaseCargoRequest:
+  /// * [PurchaseCargoRequest] purchaseCargoRequest (required):
   Future<Response> purchaseCargoWithHttpInfo(
-    String shipSymbol, {
-    PurchaseCargoRequest? purchaseCargoRequest,
-  }) async {
+    String shipSymbol,
+    PurchaseCargoRequest purchaseCargoRequest,
+  ) async {
     // ignore: prefer_const_declarations
     final path = r'/my/ships/{shipSymbol}/purchase'
         .replaceAll('{shipSymbol}', shipSymbol);
@@ -1810,16 +1799,16 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship's symbol.
+  ///   The symbol of the ship.
   ///
-  /// * [PurchaseCargoRequest] purchaseCargoRequest:
+  /// * [PurchaseCargoRequest] purchaseCargoRequest (required):
   Future<PurchaseCargo201Response?> purchaseCargo(
-    String shipSymbol, {
-    PurchaseCargoRequest? purchaseCargoRequest,
-  }) async {
+    String shipSymbol,
+    PurchaseCargoRequest purchaseCargoRequest,
+  ) async {
     final response = await purchaseCargoWithHttpInfo(
       shipSymbol,
-      purchaseCargoRequest: purchaseCargoRequest,
+      purchaseCargoRequest,
     );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -1845,10 +1834,10 @@ class FleetApi {
   ///
   /// Parameters:
   ///
-  /// * [PurchaseShipRequest] purchaseShipRequest:
-  Future<Response> purchaseShipWithHttpInfo({
-    PurchaseShipRequest? purchaseShipRequest,
-  }) async {
+  /// * [PurchaseShipRequest] purchaseShipRequest (required):
+  Future<Response> purchaseShipWithHttpInfo(
+    PurchaseShipRequest purchaseShipRequest,
+  ) async {
     // ignore: prefer_const_declarations
     final path = r'/my/ships';
 
@@ -1878,12 +1867,12 @@ class FleetApi {
   ///
   /// Parameters:
   ///
-  /// * [PurchaseShipRequest] purchaseShipRequest:
-  Future<PurchaseShip201Response?> purchaseShip({
-    PurchaseShipRequest? purchaseShipRequest,
-  }) async {
+  /// * [PurchaseShipRequest] purchaseShipRequest (required):
+  Future<PurchaseShip201Response?> purchaseShip(
+    PurchaseShipRequest purchaseShipRequest,
+  ) async {
     final response = await purchaseShipWithHttpInfo(
-      purchaseShipRequest: purchaseShipRequest,
+      purchaseShipRequest,
     );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -1910,7 +1899,7 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   ///
   /// * [RefuelShipRequest] refuelShipRequest:
   Future<Response> refuelShipWithHttpInfo(
@@ -1948,7 +1937,7 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   ///
   /// * [RefuelShipRequest] refuelShipRequest:
   Future<RefuelShip200Response?> refuelShip(
@@ -1984,13 +1973,13 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship's symbol.
+  ///   The symbol of the ship.
   ///
-  /// * [RemoveMountRequest] removeMountRequest:
+  /// * [RemoveMountRequest] removeMountRequest (required):
   Future<Response> removeMountWithHttpInfo(
-    String shipSymbol, {
-    RemoveMountRequest? removeMountRequest,
-  }) async {
+    String shipSymbol,
+    RemoveMountRequest removeMountRequest,
+  ) async {
     // ignore: prefer_const_declarations
     final path = r'/my/ships/{shipSymbol}/mounts/remove'
         .replaceAll('{shipSymbol}', shipSymbol);
@@ -2022,16 +2011,16 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship's symbol.
+  ///   The symbol of the ship.
   ///
-  /// * [RemoveMountRequest] removeMountRequest:
+  /// * [RemoveMountRequest] removeMountRequest (required):
   Future<RemoveMount201Response?> removeMount(
-    String shipSymbol, {
-    RemoveMountRequest? removeMountRequest,
-  }) async {
+    String shipSymbol,
+    RemoveMountRequest removeMountRequest,
+  ) async {
     final response = await removeMountWithHttpInfo(
       shipSymbol,
-      removeMountRequest: removeMountRequest,
+      removeMountRequest,
     );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -2058,13 +2047,13 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The symbol of the ship
+  ///   The symbol of the ship.
   ///
-  /// * [RemoveShipModuleRequest] removeShipModuleRequest:
+  /// * [RemoveShipModuleRequest] removeShipModuleRequest (required):
   Future<Response> removeShipModuleWithHttpInfo(
-    String shipSymbol, {
-    RemoveShipModuleRequest? removeShipModuleRequest,
-  }) async {
+    String shipSymbol,
+    RemoveShipModuleRequest removeShipModuleRequest,
+  ) async {
     // ignore: prefer_const_declarations
     final path = r'/my/ships/{shipSymbol}/modules/remove'
         .replaceAll('{shipSymbol}', shipSymbol);
@@ -2096,16 +2085,16 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The symbol of the ship
+  ///   The symbol of the ship.
   ///
-  /// * [RemoveShipModuleRequest] removeShipModuleRequest:
-  Future<RemoveModule201Response?> removeShipModule(
-    String shipSymbol, {
-    RemoveShipModuleRequest? removeShipModuleRequest,
-  }) async {
+  /// * [RemoveShipModuleRequest] removeShipModuleRequest (required):
+  Future<RemoveShipModule201Response?> removeShipModule(
+    String shipSymbol,
+    RemoveShipModuleRequest removeShipModuleRequest,
+  ) async {
     final response = await removeShipModuleWithHttpInfo(
       shipSymbol,
-      removeShipModuleRequest: removeShipModuleRequest,
+      removeShipModuleRequest,
     );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -2117,8 +2106,8 @@ class FleetApi {
         response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(
         await _decodeBodyBytes(response),
-        'RemoveModule201Response',
-      ) as RemoveModule201Response;
+        'RemoveShipModule201Response',
+      ) as RemoveShipModule201Response;
     }
     return null;
   }
@@ -2132,7 +2121,7 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   Future<Response> repairShipWithHttpInfo(
     String shipSymbol,
   ) async {
@@ -2167,7 +2156,7 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   Future<RepairShip200Response?> repairShip(
     String shipSymbol,
   ) async {
@@ -2192,14 +2181,14 @@ class FleetApi {
 
   /// Scrap Ship
   ///
-  /// Scrap a ship, removing it from the game and returning a portion of the ship's value to the agent. The ship must be docked in a waypoint that has the `Shipyard` trait in order to use this function. To preview the amount of value that will be returned, use the Get Ship action.
+  /// Scrap a ship, removing it from the game and receiving a portion of the ship's value back in credits. The ship must be docked in a waypoint that has the `Shipyard` trait to be scrapped.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   Future<Response> scrapShipWithHttpInfo(
     String shipSymbol,
   ) async {
@@ -2229,12 +2218,12 @@ class FleetApi {
 
   /// Scrap Ship
   ///
-  /// Scrap a ship, removing it from the game and returning a portion of the ship's value to the agent. The ship must be docked in a waypoint that has the `Shipyard` trait in order to use this function. To preview the amount of value that will be returned, use the Get Ship action.
+  /// Scrap a ship, removing it from the game and receiving a portion of the ship's value back in credits. The ship must be docked in a waypoint that has the `Shipyard` trait to be scrapped.
   ///
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   Future<ScrapShip200Response?> scrapShip(
     String shipSymbol,
   ) async {
@@ -2266,13 +2255,13 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   Symbol of a ship.
+  ///   The symbol of the ship.
   ///
-  /// * [SellCargoRequest] sellCargoRequest:
+  /// * [SellCargoRequest] sellCargoRequest (required):
   Future<Response> sellCargoWithHttpInfo(
-    String shipSymbol, {
-    SellCargoRequest? sellCargoRequest,
-  }) async {
+    String shipSymbol,
+    SellCargoRequest sellCargoRequest,
+  ) async {
     // ignore: prefer_const_declarations
     final path =
         r'/my/ships/{shipSymbol}/sell'.replaceAll('{shipSymbol}', shipSymbol);
@@ -2304,16 +2293,16 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   Symbol of a ship.
+  ///   The symbol of the ship.
   ///
-  /// * [SellCargoRequest] sellCargoRequest:
+  /// * [SellCargoRequest] sellCargoRequest (required):
   Future<SellCargo201Response?> sellCargo(
-    String shipSymbol, {
-    SellCargoRequest? sellCargoRequest,
-  }) async {
+    String shipSymbol,
+    SellCargoRequest sellCargoRequest,
+  ) async {
     final response = await sellCargoWithHttpInfo(
       shipSymbol,
-      sellCargoRequest: sellCargoRequest,
+      sellCargoRequest,
     );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -2342,11 +2331,11 @@ class FleetApi {
   /// * [String] shipSymbol (required):
   ///   The symbol of the ship.
   ///
-  /// * [ShipRefineRequest] shipRefineRequest:
+  /// * [ShipRefineRequest] shipRefineRequest (required):
   Future<Response> shipRefineWithHttpInfo(
-    String shipSymbol, {
-    ShipRefineRequest? shipRefineRequest,
-  }) async {
+    String shipSymbol,
+    ShipRefineRequest shipRefineRequest,
+  ) async {
     // ignore: prefer_const_declarations
     final path =
         r'/my/ships/{shipSymbol}/refine'.replaceAll('{shipSymbol}', shipSymbol);
@@ -2380,14 +2369,14 @@ class FleetApi {
   /// * [String] shipSymbol (required):
   ///   The symbol of the ship.
   ///
-  /// * [ShipRefineRequest] shipRefineRequest:
+  /// * [ShipRefineRequest] shipRefineRequest (required):
   Future<ShipRefine201Response?> shipRefine(
-    String shipSymbol, {
-    ShipRefineRequest? shipRefineRequest,
-  }) async {
+    String shipSymbol,
+    ShipRefineRequest shipRefineRequest,
+  ) async {
     final response = await shipRefineWithHttpInfo(
       shipSymbol,
-      shipRefineRequest: shipRefineRequest,
+      shipRefineRequest,
     );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -2414,7 +2403,7 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   Future<Response> siphonResourcesWithHttpInfo(
     String shipSymbol,
   ) async {
@@ -2449,7 +2438,7 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   Future<SiphonResources201Response?> siphonResources(
     String shipSymbol,
   ) async {
@@ -2481,13 +2470,13 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The transferring ship's symbol.
+  ///   The symbol of the ship.
   ///
-  /// * [TransferCargoRequest] transferCargoRequest:
+  /// * [TransferCargoRequest] transferCargoRequest (required):
   Future<Response> transferCargoWithHttpInfo(
-    String shipSymbol, {
-    TransferCargoRequest? transferCargoRequest,
-  }) async {
+    String shipSymbol,
+    TransferCargoRequest transferCargoRequest,
+  ) async {
     // ignore: prefer_const_declarations
     final path = r'/my/ships/{shipSymbol}/transfer'
         .replaceAll('{shipSymbol}', shipSymbol);
@@ -2519,16 +2508,16 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The transferring ship's symbol.
+  ///   The symbol of the ship.
   ///
-  /// * [TransferCargoRequest] transferCargoRequest:
+  /// * [TransferCargoRequest] transferCargoRequest (required):
   Future<TransferCargo200Response?> transferCargo(
-    String shipSymbol, {
-    TransferCargoRequest? transferCargoRequest,
-  }) async {
+    String shipSymbol,
+    TransferCargoRequest transferCargoRequest,
+  ) async {
     final response = await transferCargoWithHttpInfo(
       shipSymbol,
-      transferCargoRequest: transferCargoRequest,
+      transferCargoRequest,
     );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -2555,14 +2544,13 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   ///
-  /// * [NavigateShipRequest] navigateShipRequest:
-  ///
+  /// * [NavigateShipRequest] navigateShipRequest (required):
   Future<Response> warpShipWithHttpInfo(
-    String shipSymbol, {
-    NavigateShipRequest? navigateShipRequest,
-  }) async {
+    String shipSymbol,
+    NavigateShipRequest navigateShipRequest,
+  ) async {
     // ignore: prefer_const_declarations
     final path =
         r'/my/ships/{shipSymbol}/warp'.replaceAll('{shipSymbol}', shipSymbol);
@@ -2594,17 +2582,16 @@ class FleetApi {
   /// Parameters:
   ///
   /// * [String] shipSymbol (required):
-  ///   The ship symbol.
+  ///   The symbol of the ship.
   ///
-  /// * [NavigateShipRequest] navigateShipRequest:
-  ///
-  Future<WarpShip200Response?> warpShip(
-    String shipSymbol, {
-    NavigateShipRequest? navigateShipRequest,
-  }) async {
+  /// * [NavigateShipRequest] navigateShipRequest (required):
+  Future<NavigateShip200Response?> warpShip(
+    String shipSymbol,
+    NavigateShipRequest navigateShipRequest,
+  ) async {
     final response = await warpShipWithHttpInfo(
       shipSymbol,
-      navigateShipRequest: navigateShipRequest,
+      navigateShipRequest,
     );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -2616,8 +2603,8 @@ class FleetApi {
         response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(
         await _decodeBodyBytes(response),
-        'WarpShip200Response',
-      ) as WarpShip200Response;
+        'NavigateShip200Response',
+      ) as NavigateShip200Response;
     }
     return null;
   }

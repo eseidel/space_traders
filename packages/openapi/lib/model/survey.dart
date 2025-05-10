@@ -32,8 +32,7 @@ class Survey {
   /// The date and time when the survey expires. After this date and time, the survey will no longer be available for extraction.
   DateTime expiration;
 
-  /// The size of the deposit. This value indicates how much can be extracted from the survey before it is exhausted.
-  SurveySizeEnum size;
+  SurveySize size;
 
   @override
   bool operator ==(Object other) =>
@@ -93,7 +92,7 @@ class Survey {
         symbol: mapValueOfType<String>(json, r'symbol')!,
         deposits: SurveyDeposit.listFromJson(json[r'deposits']),
         expiration: mapDateTime(json, r'expiration', r'')!,
-        size: SurveySizeEnum.fromJson(json[r'size'])!,
+        size: SurveySize.fromJson(json[r'size'])!,
       );
     }
     return null;
@@ -156,88 +155,4 @@ class Survey {
     'expiration',
     'size',
   };
-}
-
-/// The size of the deposit. This value indicates how much can be extracted from the survey before it is exhausted.
-class SurveySizeEnum {
-  /// Instantiate a new enum with the provided [value].
-  const SurveySizeEnum._(this.value);
-
-  /// The underlying value of this enum member.
-  final String value;
-
-  @override
-  String toString() => value;
-
-  String toJson() => value;
-
-  static const SMALL = SurveySizeEnum._(r'SMALL');
-  static const MODERATE = SurveySizeEnum._(r'MODERATE');
-  static const LARGE = SurveySizeEnum._(r'LARGE');
-
-  /// List of all possible values in this [enum][SurveySizeEnum].
-  static const values = <SurveySizeEnum>[
-    SMALL,
-    MODERATE,
-    LARGE,
-  ];
-
-  static SurveySizeEnum? fromJson(dynamic value) =>
-      SurveySizeEnumTypeTransformer().decode(value);
-
-  static List<SurveySizeEnum> listFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
-    final result = <SurveySizeEnum>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = SurveySizeEnum.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-}
-
-/// Transformation class that can [encode] an instance of [SurveySizeEnum] to String,
-/// and [decode] dynamic data back to [SurveySizeEnum].
-class SurveySizeEnumTypeTransformer {
-  factory SurveySizeEnumTypeTransformer() =>
-      _instance ??= const SurveySizeEnumTypeTransformer._();
-
-  const SurveySizeEnumTypeTransformer._();
-
-  String encode(SurveySizeEnum data) => data.value;
-
-  /// Decodes a [dynamic value][data] to a SurveySizeEnum.
-  ///
-  /// If [allowNull] is true and the [dynamic value][data] cannot be decoded successfully,
-  /// then null is returned. However, if [allowNull] is false and the [dynamic value][data]
-  /// cannot be decoded successfully, then an [UnimplementedError] is thrown.
-  ///
-  /// The [allowNull] is very handy when an API changes and a new enum value is added or removed,
-  /// and users are still using an old app with the old code.
-  SurveySizeEnum? decode(dynamic data, {bool allowNull = true}) {
-    if (data != null) {
-      switch (data) {
-        case r'SMALL':
-          return SurveySizeEnum.SMALL;
-        case r'MODERATE':
-          return SurveySizeEnum.MODERATE;
-        case r'LARGE':
-          return SurveySizeEnum.LARGE;
-        default:
-          if (!allowNull) {
-            throw ArgumentError('Unknown enum value to decode: $data');
-          }
-      }
-    }
-    return null;
-  }
-
-  /// Singleton [SurveySizeEnumTypeTransformer] instance.
-  static SurveySizeEnumTypeTransformer? _instance;
 }

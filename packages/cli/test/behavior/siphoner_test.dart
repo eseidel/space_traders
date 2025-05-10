@@ -49,6 +49,7 @@ void main() {
       ShipMount(
         symbol: ShipMountSymbolEnum.GAS_SIPHON_II,
         name: '',
+        description: '',
         requirements: ShipRequirements(),
         strength: 10,
       ),

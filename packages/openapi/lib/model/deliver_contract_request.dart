@@ -25,6 +25,8 @@ class DeliverContractRequest {
   String tradeSymbol;
 
   /// Amount of units to deliver.
+  ///
+  /// Minimum value: 1
   int units;
 
   @override

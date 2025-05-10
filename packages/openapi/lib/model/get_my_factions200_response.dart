@@ -10,43 +10,43 @@
 
 part of openapi;
 
-class WarpShip200ResponseData {
-  /// Returns a new [WarpShip200ResponseData] instance.
-  WarpShip200ResponseData({
-    required this.fuel,
-    required this.nav,
+class GetMyFactions200Response {
+  /// Returns a new [GetMyFactions200Response] instance.
+  GetMyFactions200Response({
+    this.data = const [],
+    required this.meta,
   });
 
-  ShipFuel fuel;
+  List<GetMyFactions200ResponseDataInner> data;
 
-  ShipNav nav;
+  Meta meta;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is WarpShip200ResponseData &&
-          other.fuel == fuel &&
-          other.nav == nav;
+      other is GetMyFactions200Response &&
+          _deepEquality.equals(other.data, data) &&
+          other.meta == meta;
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (fuel.hashCode) + (nav.hashCode);
+      (data.hashCode) + (meta.hashCode);
 
   @override
-  String toString() => 'WarpShip200ResponseData[fuel=$fuel, nav=$nav]';
+  String toString() => 'GetMyFactions200Response[data=$data, meta=$meta]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    json[r'fuel'] = this.fuel;
-    json[r'nav'] = this.nav;
+    json[r'data'] = this.data;
+    json[r'meta'] = this.meta;
     return json;
   }
 
-  /// Returns a new [WarpShip200ResponseData] instance and imports its values from
+  /// Returns a new [GetMyFactions200Response] instance and imports its values from
   /// [value] if it's a [Map], null otherwise.
   // ignore: prefer_constructors_over_static_methods
-  static WarpShip200ResponseData? fromJson(dynamic value) {
+  static GetMyFactions200Response? fromJson(dynamic value) {
     if (value is Map) {
       final json = value.cast<String, dynamic>();
 
@@ -56,29 +56,29 @@ class WarpShip200ResponseData {
       assert(() {
         requiredKeys.forEach((key) {
           assert(json.containsKey(key),
-              'Required key "WarpShip200ResponseData[$key]" is missing from JSON.');
+              'Required key "GetMyFactions200Response[$key]" is missing from JSON.');
           assert(json[key] != null,
-              'Required key "WarpShip200ResponseData[$key]" has a null value in JSON.');
+              'Required key "GetMyFactions200Response[$key]" has a null value in JSON.');
         });
         return true;
       }());
 
-      return WarpShip200ResponseData(
-        fuel: ShipFuel.fromJson(json[r'fuel'])!,
-        nav: ShipNav.fromJson(json[r'nav'])!,
+      return GetMyFactions200Response(
+        data: GetMyFactions200ResponseDataInner.listFromJson(json[r'data']),
+        meta: Meta.fromJson(json[r'meta'])!,
       );
     }
     return null;
   }
 
-  static List<WarpShip200ResponseData> listFromJson(
+  static List<GetMyFactions200Response> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final result = <WarpShip200ResponseData>[];
+    final result = <GetMyFactions200Response>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
-        final value = WarpShip200ResponseData.fromJson(row);
+        final value = GetMyFactions200Response.fromJson(row);
         if (value != null) {
           result.add(value);
         }
@@ -87,12 +87,12 @@ class WarpShip200ResponseData {
     return result.toList(growable: growable);
   }
 
-  static Map<String, WarpShip200ResponseData> mapFromJson(dynamic json) {
-    final map = <String, WarpShip200ResponseData>{};
+  static Map<String, GetMyFactions200Response> mapFromJson(dynamic json) {
+    final map = <String, GetMyFactions200Response>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = WarpShip200ResponseData.fromJson(entry.value);
+        final value = GetMyFactions200Response.fromJson(entry.value);
         if (value != null) {
           map[entry.key] = value;
         }
@@ -101,17 +101,17 @@ class WarpShip200ResponseData {
     return map;
   }
 
-  // maps a json object with a list of WarpShip200ResponseData-objects as value to a dart map
-  static Map<String, List<WarpShip200ResponseData>> mapListFromJson(
+  // maps a json object with a list of GetMyFactions200Response-objects as value to a dart map
+  static Map<String, List<GetMyFactions200Response>> mapListFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final map = <String, List<WarpShip200ResponseData>>{};
+    final map = <String, List<GetMyFactions200Response>>{};
     if (json is Map && json.isNotEmpty) {
       // ignore: parameter_assignments
       json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        map[entry.key] = WarpShip200ResponseData.listFromJson(
+        map[entry.key] = GetMyFactions200Response.listFromJson(
           entry.value,
           growable: growable,
         );
@@ -122,7 +122,7 @@ class WarpShip200ResponseData {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'fuel',
-    'nav',
+    'data',
+    'meta',
   };
 }

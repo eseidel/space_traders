@@ -13,7 +13,7 @@ part of openapi;
 class Agent {
   /// Returns a new [Agent] instance.
   Agent({
-    this.accountId,
+    required this.accountId,
     required this.symbol,
     required this.headquarters,
     required this.credits,
@@ -22,13 +22,7 @@ class Agent {
   });
 
   /// Account ID that is tied to this agent. Only included on your own agent.
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? accountId;
+  String accountId;
 
   /// Symbol of the agent.
   String symbol;
@@ -59,7 +53,7 @@ class Agent {
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (accountId == null ? 0 : accountId!.hashCode) +
+      (accountId.hashCode) +
       (symbol.hashCode) +
       (headquarters.hashCode) +
       (credits.hashCode) +
@@ -72,11 +66,7 @@ class Agent {
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    if (this.accountId != null) {
-      json[r'accountId'] = this.accountId;
-    } else {
-      json[r'accountId'] = null;
-    }
+    json[r'accountId'] = this.accountId;
     json[r'symbol'] = this.symbol;
     json[r'headquarters'] = this.headquarters;
     json[r'credits'] = this.credits;
@@ -106,7 +96,7 @@ class Agent {
       }());
 
       return Agent(
-        accountId: mapValueOfType<String>(json, r'accountId'),
+        accountId: mapValueOfType<String>(json, r'accountId')!,
         symbol: mapValueOfType<String>(json, r'symbol')!,
         headquarters: mapValueOfType<String>(json, r'headquarters')!,
         credits: mapValueOfType<int>(json, r'credits')!,
@@ -168,6 +158,7 @@ class Agent {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
+    'accountId',
     'symbol',
     'headquarters',
     'credits',

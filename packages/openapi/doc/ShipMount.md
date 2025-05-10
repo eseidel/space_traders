@@ -8,9 +8,9 @@ import 'package:openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**symbol** | **String** | Symbo of this mount. | 
+**symbol** | **String** | Symbol of this mount. | 
 **name** | **String** | Name of this mount. | 
-**description** | **String** | Description of this mount. | [optional] 
+**description** | **String** | Description of this mount. | 
 **strength** | **int** | Mounts that have this value, such as mining lasers, denote how powerful this mount's capabilities are. | [optional] 
 **deposits** | **List<String>** | Mounts that have this value denote what goods can be produced from using the mount. | [optional] [default to const []]
 **requirements** | [**ShipRequirements**](ShipRequirements.md) |  | 

@@ -15,9 +15,9 @@ class ShipEngine {
   ShipEngine({
     required this.symbol,
     required this.name,
-    required this.description,
     required this.condition,
     required this.integrity,
+    required this.description,
     required this.speed,
     required this.requirements,
     required this.quality,
@@ -29,20 +29,20 @@ class ShipEngine {
   /// The name of the engine.
   String name;
 
-  /// The description of the engine.
-  String description;
-
   /// The repairable condition of a component. A value of 0 indicates the component needs significant repairs, while a value of 1 indicates the component is in near perfect condition. As the condition of a component is repaired, the overall integrity of the component decreases.
   ///
   /// Minimum value: 0
   /// Maximum value: 1
-  num condition;
+  double condition;
 
   /// The overall integrity of the component, which determines the performance of the component. A value of 0 indicates that the component is almost completely degraded, while a value of 1 indicates that the component is in near perfect condition. The integrity of the component is non-repairable, and represents permanent wear over time.
   ///
   /// Minimum value: 0
   /// Maximum value: 1
-  num integrity;
+  double integrity;
+
+  /// The description of the engine.
+  String description;
 
   /// The speed stat of this engine. The higher the speed, the faster a ship can travel from one point to another. Reduces the time of arrival when navigating the ship.
   ///
@@ -60,9 +60,9 @@ class ShipEngine {
       other is ShipEngine &&
           other.symbol == symbol &&
           other.name == name &&
-          other.description == description &&
           other.condition == condition &&
           other.integrity == integrity &&
+          other.description == description &&
           other.speed == speed &&
           other.requirements == requirements &&
           other.quality == quality;
@@ -72,24 +72,24 @@ class ShipEngine {
       // ignore: unnecessary_parenthesis
       (symbol.hashCode) +
       (name.hashCode) +
-      (description.hashCode) +
       (condition.hashCode) +
       (integrity.hashCode) +
+      (description.hashCode) +
       (speed.hashCode) +
       (requirements.hashCode) +
       (quality.hashCode);
 
   @override
   String toString() =>
-      'ShipEngine[symbol=$symbol, name=$name, description=$description, condition=$condition, integrity=$integrity, speed=$speed, requirements=$requirements, quality=$quality]';
+      'ShipEngine[symbol=$symbol, name=$name, condition=$condition, integrity=$integrity, description=$description, speed=$speed, requirements=$requirements, quality=$quality]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
     json[r'symbol'] = this.symbol;
     json[r'name'] = this.name;
-    json[r'description'] = this.description;
     json[r'condition'] = this.condition;
     json[r'integrity'] = this.integrity;
+    json[r'description'] = this.description;
     json[r'speed'] = this.speed;
     json[r'requirements'] = this.requirements;
     json[r'quality'] = this.quality;
@@ -119,9 +119,9 @@ class ShipEngine {
       return ShipEngine(
         symbol: ShipEngineSymbolEnum.fromJson(json[r'symbol'])!,
         name: mapValueOfType<String>(json, r'name')!,
+        condition: mapValueOfType<double>(json, r'condition')!,
+        integrity: mapValueOfType<double>(json, r'integrity')!,
         description: mapValueOfType<String>(json, r'description')!,
-        condition: num.parse('${json[r'condition']}'),
-        integrity: num.parse('${json[r'integrity']}'),
         speed: mapValueOfType<int>(json, r'speed')!,
         requirements: ShipRequirements.fromJson(json[r'requirements'])!,
         quality: num.parse('${json[r'quality']}'),
@@ -183,9 +183,9 @@ class ShipEngine {
   static const requiredKeys = <String>{
     'symbol',
     'name',
-    'description',
     'condition',
     'integrity',
+    'description',
     'speed',
     'requirements',
     'quality',

@@ -20,7 +20,7 @@ Future<void> command(Database db, ArgResults argResults) async {
     surveyBySignature[survey.survey.signature] = survey;
   }
 
-  final extractionCountsBySize = <SurveySizeEnum, List<int>>{};
+  final extractionCountsBySize = <SurveySize, List<int>>{};
   for (final extraction in extractions) {
     final survey = surveyBySignature[extraction.surveySignature];
     if (survey == null) {

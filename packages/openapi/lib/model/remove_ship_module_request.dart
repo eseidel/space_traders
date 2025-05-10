@@ -16,7 +16,7 @@ class RemoveShipModuleRequest {
     required this.symbol,
   });
 
-  /// The symbol of the module to remove
+  /// The symbol of the module to remove.
   String symbol;
 
   @override

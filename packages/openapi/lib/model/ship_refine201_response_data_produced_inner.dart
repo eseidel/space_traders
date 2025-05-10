@@ -18,7 +18,7 @@ class ShipRefine201ResponseDataProducedInner {
   });
 
   /// Symbol of the good.
-  String tradeSymbol;
+  TradeSymbol tradeSymbol;
 
   /// Amount of units of the good.
   int units;
@@ -67,7 +67,7 @@ class ShipRefine201ResponseDataProducedInner {
       }());
 
       return ShipRefine201ResponseDataProducedInner(
-        tradeSymbol: mapValueOfType<String>(json, r'tradeSymbol')!,
+        tradeSymbol: TradeSymbol.fromJson(json[r'tradeSymbol'])!,
         units: mapValueOfType<int>(json, r'units')!,
       );
     }

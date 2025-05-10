@@ -40,7 +40,14 @@ void main() {
       final waypointSymbol2 = WaypointSymbol.fromString('X1-A-Y');
       await db.charting.addWaypoints([
         Waypoint.test(waypointSymbol),
-        Waypoint.test(waypointSymbol2, chart: Chart(submittedBy: 'bar')),
+        Waypoint.test(
+          waypointSymbol2,
+          chart: Chart(
+            waypointSymbol: waypointSymbol2.waypoint,
+            submittedBy: 'bar',
+            submittedOn: DateTime.timestamp(),
+          ),
+        ),
       ]);
 
       final snapshot = await db.charting.snapshotAllRecords();

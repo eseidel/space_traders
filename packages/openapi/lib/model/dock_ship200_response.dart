@@ -16,7 +16,7 @@ class DockShip200Response {
     required this.data,
   });
 
-  OrbitShip200ResponseData data;
+  DockShip200ResponseData data;
 
   @override
   bool operator ==(Object other) =>
@@ -58,7 +58,7 @@ class DockShip200Response {
       }());
 
       return DockShip200Response(
-        data: OrbitShip200ResponseData.fromJson(json[r'data'])!,
+        data: DockShip200ResponseData.fromJson(json[r'data'])!,
       );
     }
     return null;

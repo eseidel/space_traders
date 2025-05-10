@@ -13,14 +13,14 @@ part of openapi;
 class NavigateShip200ResponseData {
   /// Returns a new [NavigateShip200ResponseData] instance.
   NavigateShip200ResponseData({
-    required this.fuel,
     required this.nav,
+    required this.fuel,
     this.events = const [],
   });
 
-  ShipFuel fuel;
-
   ShipNav nav;
+
+  ShipFuel fuel;
 
   List<ShipConditionEvent> events;
 
@@ -28,23 +28,23 @@ class NavigateShip200ResponseData {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is NavigateShip200ResponseData &&
-          other.fuel == fuel &&
           other.nav == nav &&
+          other.fuel == fuel &&
           _deepEquality.equals(other.events, events);
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (fuel.hashCode) + (nav.hashCode) + (events.hashCode);
+      (nav.hashCode) + (fuel.hashCode) + (events.hashCode);
 
   @override
   String toString() =>
-      'NavigateShip200ResponseData[fuel=$fuel, nav=$nav, events=$events]';
+      'NavigateShip200ResponseData[nav=$nav, fuel=$fuel, events=$events]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    json[r'fuel'] = this.fuel;
     json[r'nav'] = this.nav;
+    json[r'fuel'] = this.fuel;
     json[r'events'] = this.events;
     return json;
   }
@@ -70,8 +70,8 @@ class NavigateShip200ResponseData {
       }());
 
       return NavigateShip200ResponseData(
-        fuel: ShipFuel.fromJson(json[r'fuel'])!,
         nav: ShipNav.fromJson(json[r'nav'])!,
+        fuel: ShipFuel.fromJson(json[r'fuel'])!,
         events: ShipConditionEvent.listFromJson(json[r'events']),
       );
     }
@@ -129,8 +129,8 @@ class NavigateShip200ResponseData {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'fuel',
     'nav',
+    'fuel',
     'events',
   };
 }

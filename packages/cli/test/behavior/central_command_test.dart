@@ -467,6 +467,7 @@ void main() {
       final surveyorMount = ShipMount(
         symbol: ShipMountSymbolEnum.SURVEYOR_II,
         name: '',
+        description: '',
         requirements: ShipRequirements(),
       );
       final surveyorOnlyMounts = [surveyorMount, surveyorMount, surveyorMount];

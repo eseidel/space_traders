@@ -76,7 +76,7 @@ Name | Type | Description  | Notes
 
 Get Jump Gate
 
-Get jump gate details for a waypoint. Requires a waypoint of type `JUMP_GATE` to use.  Waypoints connected to this jump gate can be 
+Get jump gate details for a waypoint. Requires a waypoint of type `JUMP_GATE` to use.  Waypoints connected to this jump gate can be found by querying the waypoints in the system.
 
 ### Example
 ```dart
@@ -229,7 +229,7 @@ Name | Type | Description  | Notes
 
 Get System
 
-Get the details of a system.
+Get the details of a system. Requires the system to have been visited or charted.
 
 ### Example
 ```dart
@@ -242,7 +242,7 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = SystemsApi();
-final systemSymbol = systemSymbol_example; // String | The system symbol
+final systemSymbol = systemSymbol_example; // String | 
 
 try {
     final result = api_instance.getSystem(systemSymbol);
@@ -256,7 +256,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **systemSymbol** | **String**| The system symbol | [default to 'X1-OE']
+ **systemSymbol** | **String**|  | 
 
 ### Return type
 
@@ -291,9 +291,9 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = SystemsApi();
-final systemSymbol = systemSymbol_example; // String | The system symbol
-final page = 56; // int | What entry offset to request
-final limit = 56; // int | How many entries to return per page
+final systemSymbol = systemSymbol_example; // String | 
+final page = 1; // int | What entry offset to request
+final limit = 10; // int | How many entries to return per page
 final type = ; // WaypointType | Filter waypoints by type.
 final traits = []; // List<WaypointTraitSymbol> | Filter waypoints by one or more traits.
 
@@ -309,7 +309,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **systemSymbol** | **String**| The system symbol | 
+ **systemSymbol** | **String**|  | 
  **page** | **int**| What entry offset to request | [optional] [default to 1]
  **limit** | **int**| How many entries to return per page | [optional] [default to 10]
  **type** | [**WaypointType**](.md)| Filter waypoints by type. | [optional] 
@@ -348,8 +348,8 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = SystemsApi();
-final page = 56; // int | What entry offset to request
-final limit = 56; // int | How many entries to return per page
+final page = 1; // int | What entry offset to request
+final limit = 10; // int | How many entries to return per page
 
 try {
     final result = api_instance.getSystems(page, limit);
@@ -468,7 +468,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **systemSymbol** | **String**| The system symbol | 
  **waypointSymbol** | **String**| The waypoint symbol | 
- **supplyConstructionRequest** | [**SupplyConstructionRequest**](SupplyConstructionRequest.md)|  | [optional] 
+ **supplyConstructionRequest** | [**SupplyConstructionRequest**](SupplyConstructionRequest.md)|  | 
 
 ### Return type
 

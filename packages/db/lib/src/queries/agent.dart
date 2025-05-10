@@ -29,7 +29,7 @@ Agent agentFromColumnMap(Map<String, dynamic> values) {
     startingFaction:
         FactionSymbol.fromJson(values['starting_faction'] as String)!,
     shipCount: values['ship_count'] as int,
-    accountId: values['account_id'] as String?,
+    accountId: values['account_id'] as String,
   );
 }
 

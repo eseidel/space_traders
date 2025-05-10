@@ -68,7 +68,7 @@ Future<NavigateShip200ResponseData> navigateToLocalWaypoint(
 
 /// Navigate [ship] to [waypointSymbol] will retry in drift mode if
 /// there is insufficient fuel.
-Future<WarpShip200ResponseData> warpToWaypoint(
+Future<NavigateShip200ResponseData> warpToWaypoint(
   Database db,
   Api api,
   Ship ship,
@@ -82,7 +82,7 @@ Future<WarpShip200ResponseData> warpToWaypoint(
 /// Sell all cargo matching the [where] predicate.
 /// If [where] is null, sell all cargo.
 /// returns a stream of the sell responses.
-Stream<SellCargo201ResponseData> sellAllCargo(
+Stream<PurchaseCargo201ResponseData> sellAllCargo(
   Database db,
   Api api,
   Market market,
@@ -173,10 +173,7 @@ Future<void> jettisonCargoAndLog(
   shipWarn(ship, 'Jettisoning ${item.units} ${item.symbol}');
   final response = await api.fleet.jettison(
     ship.symbol.symbol,
-    jettisonRequest: JettisonRequest(
-      symbol: item.tradeSymbol,
-      units: item.units,
-    ),
+    JettisonRequest(symbol: item.tradeSymbol, units: item.units),
   );
   ship.cargo = response!.data.cargo;
   await db.upsertShip(ship);
@@ -545,10 +542,18 @@ Future<DateTime> warpToWaypointAndLog(
 Future<void> chartWaypointAndLog(Api api, Database db, Ship ship) async {
   try {
     final response = await api.fleet.createChart(ship.symbol.symbol);
-    final openapiWaypoint = response!.data.waypoint;
-    final waypoint = Waypoint.fromOpenApi(openapiWaypoint);
+    final data = response!.data;
+    final waypoint = Waypoint.fromOpenApi(data.waypoint);
     await db.charting.addWaypoint(waypoint);
     await db.waypointTraits.addAll(waypoint.traits);
+    final agent = Agent.fromOpenApi(data.agent);
+    final transaction = Transaction.fromChartTransaction(
+      data.transaction,
+      agent.credits,
+    );
+    await db.transactions.insert(transaction);
+    await db.upsertAgent(agent);
+
     // Powershell needs the space after the emoji.
     shipInfo(ship, '🗺️  ${waypointDescription(waypoint)}');
   } on ApiException catch (e) {
@@ -574,17 +579,15 @@ Future<JumpShip200ResponseData> useJumpGateAndLog(
 
   final destinationSystem = destination.system;
   shipDetail(ship, 'Jump from ${ship.nav.systemSymbol} to $destinationSystem');
-  final jumpShipRequest = JumpShipRequest(waypointSymbol: destination.waypoint);
   final response = await api.fleet.jumpShip(
     ship.symbol.symbol,
-    jumpShipRequest: jumpShipRequest,
+    JumpShipRequest(waypointSymbol: destination.waypoint),
   );
+  final data = response!.data;
   ship
-    ..nav = response!.data.nav
-    ..cooldown = response.data.cooldown;
+    ..nav = data.nav
+    ..cooldown = data.cooldown;
   await db.upsertShip(ship);
-
-  final data = response.data;
   final marketTransaction = data.transaction;
   final agent = Agent.fromOpenApi(data.agent);
   await db.upsertAgent(agent);
@@ -701,7 +704,7 @@ Future<InstallMount201ResponseData> installMountAndLog(
 ) async {
   final response = await api.fleet.installMount(
     ship.symbol.symbol,
-    installMountRequest: InstallMountRequest(symbol: tradeSymbol.value),
+    InstallMountRequest(symbol: tradeSymbol.value),
   );
   final data = response!.data;
   final agent = Agent.fromOpenApi(data.agent);
@@ -728,7 +731,7 @@ Future<RemoveMount201ResponseData> removeMountAndLog(
 ) async {
   final response = await api.fleet.removeMount(
     ship.symbol.symbol,
-    removeMountRequest: RemoveMountRequest(symbol: tradeSymbol.value),
+    RemoveMountRequest(symbol: tradeSymbol.value),
   );
   final data = response!.data;
   final agent = Agent.fromOpenApi(data.agent);
@@ -747,7 +750,7 @@ Future<RemoveMount201ResponseData> removeMountAndLog(
 }
 
 /// Transfer cargo between two ships.
-Future<Jettison200ResponseData> transferCargoAndLog(
+Future<TransferCargo200ResponseData> transferCargoAndLog(
   Database db,
   Api api, {
   required Ship from,
@@ -760,10 +763,7 @@ Future<Jettison200ResponseData> transferCargoAndLog(
     tradeSymbol: tradeSymbol,
     units: units,
   );
-  final response = await api.fleet.transferCargo(
-    from.symbol.symbol,
-    transferCargoRequest: request,
-  );
+  final response = await api.fleet.transferCargo(from.symbol.symbol, request);
   // On failure:
   // ApiException 400: {"error":{"message":
   // "Failed to update ship cargo. Ship ESEIDEL-1 cargo does not contain 1
@@ -772,14 +772,8 @@ Future<Jettison200ResponseData> transferCargoAndLog(
   // "tradeSymbol":"MOUNT_MINING_LASER_II","cargoUnits":0,"unitsToRemove":1}}}
 
   final data = response!.data;
-  final good = from.cargo.cargoItem(tradeSymbol)!;
   from.cargo = data.cargo;
-  to.updateCacheWithAddedCargo(
-    tradeSymbol: tradeSymbol,
-    name: good.name,
-    description: good.description,
-    units: units,
-  );
+  to.cargo = data.targetCargo;
   await db.upsertShip(from);
   await db.upsertShip(to);
   shipDetail(

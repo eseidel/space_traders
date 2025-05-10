@@ -16,7 +16,7 @@ class InstallShipModuleRequest {
     required this.symbol,
   });
 
-  /// The symbol of the module to install
+  /// The symbol of the module to install.
   String symbol;
 
   @override

@@ -16,7 +16,7 @@ class PurchaseCargo201Response {
     required this.data,
   });
 
-  SellCargo201ResponseData data;
+  PurchaseCargo201ResponseData data;
 
   @override
   bool operator ==(Object other) =>
@@ -58,7 +58,7 @@ class PurchaseCargo201Response {
       }());
 
       return PurchaseCargo201Response(
-        data: SellCargo201ResponseData.fromJson(json[r'data'])!,
+        data: PurchaseCargo201ResponseData.fromJson(json[r'data'])!,
       );
     }
     return null;

@@ -10,18 +10,18 @@
 
 part of openapi;
 
-class RemoveModule201Response {
-  /// Returns a new [RemoveModule201Response] instance.
-  RemoveModule201Response({
+class NegotiateContract201Response {
+  /// Returns a new [NegotiateContract201Response] instance.
+  NegotiateContract201Response({
     required this.data,
   });
 
-  InstallShipModule201ResponseData data;
+  NegotiateContract201ResponseData data;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is RemoveModule201Response && other.data == data;
+      other is NegotiateContract201Response && other.data == data;
 
   @override
   int get hashCode =>
@@ -29,7 +29,7 @@ class RemoveModule201Response {
       (data.hashCode);
 
   @override
-  String toString() => 'RemoveModule201Response[data=$data]';
+  String toString() => 'NegotiateContract201Response[data=$data]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -37,10 +37,10 @@ class RemoveModule201Response {
     return json;
   }
 
-  /// Returns a new [RemoveModule201Response] instance and imports its values from
+  /// Returns a new [NegotiateContract201Response] instance and imports its values from
   /// [value] if it's a [Map], null otherwise.
   // ignore: prefer_constructors_over_static_methods
-  static RemoveModule201Response? fromJson(dynamic value) {
+  static NegotiateContract201Response? fromJson(dynamic value) {
     if (value is Map) {
       final json = value.cast<String, dynamic>();
 
@@ -50,28 +50,28 @@ class RemoveModule201Response {
       assert(() {
         requiredKeys.forEach((key) {
           assert(json.containsKey(key),
-              'Required key "RemoveModule201Response[$key]" is missing from JSON.');
+              'Required key "NegotiateContract201Response[$key]" is missing from JSON.');
           assert(json[key] != null,
-              'Required key "RemoveModule201Response[$key]" has a null value in JSON.');
+              'Required key "NegotiateContract201Response[$key]" has a null value in JSON.');
         });
         return true;
       }());
 
-      return RemoveModule201Response(
-        data: InstallShipModule201ResponseData.fromJson(json[r'data'])!,
+      return NegotiateContract201Response(
+        data: NegotiateContract201ResponseData.fromJson(json[r'data'])!,
       );
     }
     return null;
   }
 
-  static List<RemoveModule201Response> listFromJson(
+  static List<NegotiateContract201Response> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final result = <RemoveModule201Response>[];
+    final result = <NegotiateContract201Response>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
-        final value = RemoveModule201Response.fromJson(row);
+        final value = NegotiateContract201Response.fromJson(row);
         if (value != null) {
           result.add(value);
         }
@@ -80,12 +80,12 @@ class RemoveModule201Response {
     return result.toList(growable: growable);
   }
 
-  static Map<String, RemoveModule201Response> mapFromJson(dynamic json) {
-    final map = <String, RemoveModule201Response>{};
+  static Map<String, NegotiateContract201Response> mapFromJson(dynamic json) {
+    final map = <String, NegotiateContract201Response>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = RemoveModule201Response.fromJson(entry.value);
+        final value = NegotiateContract201Response.fromJson(entry.value);
         if (value != null) {
           map[entry.key] = value;
         }
@@ -94,17 +94,17 @@ class RemoveModule201Response {
     return map;
   }
 
-  // maps a json object with a list of RemoveModule201Response-objects as value to a dart map
-  static Map<String, List<RemoveModule201Response>> mapListFromJson(
+  // maps a json object with a list of NegotiateContract201Response-objects as value to a dart map
+  static Map<String, List<NegotiateContract201Response>> mapListFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final map = <String, List<RemoveModule201Response>>{};
+    final map = <String, List<NegotiateContract201Response>>{};
     if (json is Map && json.isNotEmpty) {
       // ignore: parameter_assignments
       json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        map[entry.key] = RemoveModule201Response.listFromJson(
+        map[entry.key] = NegotiateContract201Response.listFromJson(
           entry.value,
           growable: growable,
         );

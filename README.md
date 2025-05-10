@@ -43,7 +43,7 @@ when being run as root.  If you're not running as root, you don't need it.
 
 ## Database Setup
 
-Follow the instrutions in packages/db/README.md before continuing.
+Follow the instructions in packages/db/README.md before continuing.
 
 ## Running
 
@@ -53,7 +53,7 @@ you'll also need to set `ST_EMAIL`.
 You can reserve your name by donating to spacetraders.
 
 ```
-export ST_AGENT=yourname
+export ST_AGENT=your_name
 ```
 
 And then otherwise just run:

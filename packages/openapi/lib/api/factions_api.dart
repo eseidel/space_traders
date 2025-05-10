@@ -16,7 +16,7 @@ class FactionsApi {
 
   final ApiClient apiClient;
 
-  /// Get Faction
+  /// Faction details
   ///
   /// View the details of a faction.
   ///
@@ -53,7 +53,7 @@ class FactionsApi {
     );
   }
 
-  /// Get Faction
+  /// Faction details
   ///
   /// View the details of a faction.
   ///
@@ -83,7 +83,7 @@ class FactionsApi {
     return null;
   }
 
-  /// List Factions
+  /// List factions
   ///
   /// Return a paginated list of all the factions in the game.
   ///
@@ -130,7 +130,7 @@ class FactionsApi {
     );
   }
 
-  /// List Factions
+  /// List factions
   ///
   /// Return a paginated list of all the factions in the game.
   ///
@@ -161,6 +161,88 @@ class FactionsApi {
         await _decodeBodyBytes(response),
         'GetFactions200Response',
       ) as GetFactions200Response;
+    }
+    return null;
+  }
+
+  /// Get My Factions
+  ///
+  /// Retrieve factions with which the agent has reputation.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [int] page:
+  ///   What entry offset to request
+  ///
+  /// * [int] limit:
+  ///   How many entries to return per page
+  Future<Response> getMyFactionsWithHttpInfo({
+    int? page,
+    int? limit,
+  }) async {
+    // ignore: prefer_const_declarations
+    final path = r'/my/factions';
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    if (page != null) {
+      queryParams.addAll(_queryParams('', 'page', page));
+    }
+    if (limit != null) {
+      queryParams.addAll(_queryParams('', 'limit', limit));
+    }
+
+    const contentTypes = <String>[];
+
+    return apiClient.invokeAPI(
+      path,
+      'GET',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Get My Factions
+  ///
+  /// Retrieve factions with which the agent has reputation.
+  ///
+  /// Parameters:
+  ///
+  /// * [int] page:
+  ///   What entry offset to request
+  ///
+  /// * [int] limit:
+  ///   How many entries to return per page
+  Future<GetMyFactions200Response?> getMyFactions({
+    int? page,
+    int? limit,
+  }) async {
+    final response = await getMyFactionsWithHttpInfo(
+      page: page,
+      limit: limit,
+    );
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'GetMyFactions200Response',
+      ) as GetMyFactions200Response;
     }
     return null;
   }

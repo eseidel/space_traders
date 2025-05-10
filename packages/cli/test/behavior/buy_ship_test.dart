@@ -134,7 +134,7 @@ void main() {
     when(() => transaction.shipType).thenReturn(shipType.value);
     when(
       () => fleetApi.purchaseShip(
-        purchaseShipRequest: PurchaseShipRequest(
+        PurchaseShipRequest(
           shipType: shipType,
           waypointSymbol: symbol.waypoint,
         ),

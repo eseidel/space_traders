@@ -13,7 +13,11 @@ void main() {
           WaypointTraitSymbol.ASH_CLOUDS,
           WaypointTraitSymbol.BARREN,
         },
-        chart: Chart(),
+        chart: Chart(
+          waypointSymbol: waypointSymbol.waypoint,
+          submittedBy: 'foo',
+          submittedOn: now,
+        ),
       ),
       timestamp: now,
     );

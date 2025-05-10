@@ -94,12 +94,11 @@ class ContractsApi {
   /// * [String] contractId (required):
   ///   The ID of the contract.
   ///
-  /// * [DeliverContractRequest] deliverContractRequest:
-  ///
+  /// * [DeliverContractRequest] deliverContractRequest (required):
   Future<Response> deliverContractWithHttpInfo(
-    String contractId, {
-    DeliverContractRequest? deliverContractRequest,
-  }) async {
+    String contractId,
+    DeliverContractRequest deliverContractRequest,
+  ) async {
     // ignore: prefer_const_declarations
     final path = r'/my/contracts/{contractId}/deliver'
         .replaceAll('{contractId}', contractId);
@@ -133,15 +132,14 @@ class ContractsApi {
   /// * [String] contractId (required):
   ///   The ID of the contract.
   ///
-  /// * [DeliverContractRequest] deliverContractRequest:
-  ///
+  /// * [DeliverContractRequest] deliverContractRequest (required):
   Future<DeliverContract200Response?> deliverContract(
-    String contractId, {
-    DeliverContractRequest? deliverContractRequest,
-  }) async {
+    String contractId,
+    DeliverContractRequest deliverContractRequest,
+  ) async {
     final response = await deliverContractWithHttpInfo(
       contractId,
-      deliverContractRequest: deliverContractRequest,
+      deliverContractRequest,
     );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
@@ -228,14 +226,14 @@ class ContractsApi {
 
   /// Get Contract
   ///
-  /// Get the details of a contract by ID.
+  /// Get the details of a specific contract.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] contractId (required):
-  ///   The contract ID
+  ///   The contract ID to accept.
   Future<Response> getContractWithHttpInfo(
     String contractId,
   ) async {
@@ -265,12 +263,12 @@ class ContractsApi {
 
   /// Get Contract
   ///
-  /// Get the details of a contract by ID.
+  /// Get the details of a specific contract.
   ///
   /// Parameters:
   ///
   /// * [String] contractId (required):
-  ///   The contract ID
+  ///   The contract ID to accept.
   Future<GetContract200Response?> getContract(
     String contractId,
   ) async {
@@ -371,6 +369,73 @@ class ContractsApi {
         await _decodeBodyBytes(response),
         'GetContracts200Response',
       ) as GetContracts200Response;
+    }
+    return null;
+  }
+
+  /// Negotiate Contract
+  ///
+  /// Negotiate a new contract with the HQ.  In order to negotiate a new contract, an agent must not have ongoing or offered contracts over the allowed maximum amount. Currently the maximum contracts an agent can have at a time is 1.  Once a contract is negotiated, it is added to the list of contracts offered to the agent, which the agent can then accept.   The ship must be present at any waypoint with a faction present to negotiate a contract with that faction.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [String] shipSymbol (required):
+  ///   The symbol of the ship.
+  Future<Response> negotiateContractWithHttpInfo(
+    String shipSymbol,
+  ) async {
+    // ignore: prefer_const_declarations
+    final path = r'/my/ships/{shipSymbol}/negotiate/contract'
+        .replaceAll('{shipSymbol}', shipSymbol);
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>[];
+
+    return apiClient.invokeAPI(
+      path,
+      'POST',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Negotiate Contract
+  ///
+  /// Negotiate a new contract with the HQ.  In order to negotiate a new contract, an agent must not have ongoing or offered contracts over the allowed maximum amount. Currently the maximum contracts an agent can have at a time is 1.  Once a contract is negotiated, it is added to the list of contracts offered to the agent, which the agent can then accept.   The ship must be present at any waypoint with a faction present to negotiate a contract with that faction.
+  ///
+  /// Parameters:
+  ///
+  /// * [String] shipSymbol (required):
+  ///   The symbol of the ship.
+  Future<NegotiateContract201Response?> negotiateContract(
+    String shipSymbol,
+  ) async {
+    final response = await negotiateContractWithHttpInfo(
+      shipSymbol,
+    );
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'NegotiateContract201Response',
+      ) as NegotiateContract201Response;
     }
     return null;
   }

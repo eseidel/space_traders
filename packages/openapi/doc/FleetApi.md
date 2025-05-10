@@ -53,7 +53,7 @@ Method | HTTP request | Description
 
 Create Chart
 
-Command a ship to chart the waypoint at its current location.  Most waypoints in the universe are uncharted by default. These waypoints have their traits hidden until they have been charted by a ship.  Charting a waypoint will record your agent as the one who created the chart, and all other agents would also be able to see the waypoint's traits.
+Command a ship to chart the waypoint at its current location.  Most waypoints in the universe are uncharted by default. These waypoints have their traits hidden until they have been charted by a ship.  Charting a waypoint will record your agent as the one who created the chart, and all other agents would also be able to see the waypoint's traits. Charting a waypoint gives you a one time reward of credits based on the rarity of the waypoint's traits.
 
 ### Example
 ```dart
@@ -115,7 +115,7 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = FleetApi();
-final shipSymbol = shipSymbol_example; // String | The ship symbol.
+final shipSymbol = shipSymbol_example; // String | The symbol of the ship.
 
 try {
     final result = api_instance.createShipShipScan(shipSymbol);
@@ -129,7 +129,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **shipSymbol** | **String**| The ship symbol. | 
+ **shipSymbol** | **String**| The symbol of the ship. | 
 
 ### Return type
 
@@ -164,7 +164,7 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = FleetApi();
-final shipSymbol = shipSymbol_example; // String | The ship symbol.
+final shipSymbol = shipSymbol_example; // String | The symbol of the ship.
 
 try {
     final result = api_instance.createShipSystemScan(shipSymbol);
@@ -178,7 +178,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **shipSymbol** | **String**| The ship symbol. | 
+ **shipSymbol** | **String**| The symbol of the ship. | 
 
 ### Return type
 
@@ -213,7 +213,7 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = FleetApi();
-final shipSymbol = shipSymbol_example; // String | The ship symbol.
+final shipSymbol = shipSymbol_example; // String | The symbol of the ship.
 
 try {
     final result = api_instance.createShipWaypointScan(shipSymbol);
@@ -227,7 +227,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **shipSymbol** | **String**| The ship symbol. | 
+ **shipSymbol** | **String**| The symbol of the ship. | 
 
 ### Return type
 
@@ -343,7 +343,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **extractResources**
-> ExtractResources201Response extractResources(shipSymbol, extractResourcesRequest)
+> ExtractResources201Response extractResources(shipSymbol)
 
 Extract Resources
 
@@ -360,11 +360,10 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = FleetApi();
-final shipSymbol = shipSymbol_example; // String | The ship symbol.
-final extractResourcesRequest = ExtractResourcesRequest(); // ExtractResourcesRequest | 
+final shipSymbol = shipSymbol_example; // String | The symbol of the ship.
 
 try {
-    final result = api_instance.extractResources(shipSymbol, extractResourcesRequest);
+    final result = api_instance.extractResources(shipSymbol);
     print(result);
 } catch (e) {
     print('Exception when calling FleetApi->extractResources: $e\n');
@@ -375,8 +374,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **shipSymbol** | **String**| The ship symbol. | 
- **extractResourcesRequest** | [**ExtractResourcesRequest**](ExtractResourcesRequest.md)|  | [optional] 
+ **shipSymbol** | **String**| The symbol of the ship. | 
 
 ### Return type
 
@@ -388,7 +386,7 @@ Name | Type | Description  | Notes
 
 ### HTTP request headers
 
- - **Content-Type**: application/json
+ - **Content-Type**: Not defined
  - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -411,7 +409,7 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = FleetApi();
-final shipSymbol = shipSymbol_example; // String | The ship symbol.
+final shipSymbol = shipSymbol_example; // String | The symbol of the ship.
 final survey = Survey(); // Survey | 
 
 try {
@@ -426,7 +424,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **shipSymbol** | **String**| The ship symbol. | 
+ **shipSymbol** | **String**| The symbol of the ship. | 
  **survey** | [**Survey**](Survey.md)|  | [optional] 
 
 ### Return type
@@ -462,7 +460,7 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = FleetApi();
-final shipSymbol = shipSymbol_example; // String | The ship's symbol.
+final shipSymbol = shipSymbol_example; // String | The symbol of the ship.
 
 try {
     final result = api_instance.getMounts(shipSymbol);
@@ -476,7 +474,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **shipSymbol** | **String**| The ship's symbol. | 
+ **shipSymbol** | **String**| The symbol of the ship. | 
 
 ### Return type
 
@@ -609,8 +607,8 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = FleetApi();
-final page = 56; // int | What entry offset to request
-final limit = 56; // int | How many entries to return per page
+final page = 1; // int | What entry offset to request
+final limit = 10; // int | How many entries to return per page
 
 try {
     final result = api_instance.getMyShips(page, limit);
@@ -647,7 +645,7 @@ Name | Type | Description  | Notes
 
 Get Repair Ship
 
-Get the cost of repairing a ship.
+Get the cost of repairing a ship. Requires the ship to be docked at a waypoint that has the `Shipyard` trait.
 
 ### Example
 ```dart
@@ -660,7 +658,7 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = FleetApi();
-final shipSymbol = shipSymbol_example; // String | The ship symbol.
+final shipSymbol = shipSymbol_example; // String | The symbol of the ship.
 
 try {
     final result = api_instance.getRepairShip(shipSymbol);
@@ -674,7 +672,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **shipSymbol** | **String**| The ship symbol. | 
+ **shipSymbol** | **String**| The symbol of the ship. | 
 
 ### Return type
 
@@ -696,7 +694,7 @@ Name | Type | Description  | Notes
 
 Get Scrap Ship
 
-Get the amount of value that will be returned when scrapping a ship.
+Get the value of scrapping a ship. Requires the ship to be docked at a waypoint that has the `Shipyard` trait.
 
 ### Example
 ```dart
@@ -709,7 +707,7 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = FleetApi();
-final shipSymbol = shipSymbol_example; // String | The ship symbol.
+final shipSymbol = shipSymbol_example; // String | The symbol of the ship.
 
 try {
     final result = api_instance.getScrapShip(shipSymbol);
@@ -723,7 +721,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **shipSymbol** | **String**| The ship symbol. | 
+ **shipSymbol** | **String**| The symbol of the ship. | 
 
 ### Return type
 
@@ -799,12 +797,6 @@ Get the modules installed on a ship.
 ### Example
 ```dart
 import 'package:openapi/api.dart';
-// TODO Configure HTTP Bearer authorization: AccountToken
-// Case 1. Use String Token
-//defaultApiClient.getAuthentication<HttpBearerAuth>('AccountToken').setAccessToken('YOUR_ACCESS_TOKEN');
-// Case 2. Use Function which generate token.
-// String yourTokenGeneratorFunction() { ... }
-//defaultApiClient.getAuthentication<HttpBearerAuth>('AccountToken').setAccessToken(yourTokenGeneratorFunction);
 // TODO Configure HTTP Bearer authorization: AgentToken
 // Case 1. Use String Token
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
@@ -813,7 +805,7 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = FleetApi();
-final shipSymbol = shipSymbol_example; // String | The symbol of the ship
+final shipSymbol = shipSymbol_example; // String | The symbol of the ship.
 
 try {
     final result = api_instance.getShipModules(shipSymbol);
@@ -827,7 +819,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **shipSymbol** | **String**| The symbol of the ship | 
+ **shipSymbol** | **String**| The symbol of the ship. | 
 
 ### Return type
 
@@ -835,7 +827,7 @@ Name | Type | Description  | Notes
 
 ### Authorization
 
-[AccountToken](../README.md#AccountToken), [AgentToken](../README.md#AgentToken)
+[AgentToken](../README.md#AgentToken)
 
 ### HTTP request headers
 
@@ -862,7 +854,7 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = FleetApi();
-final shipSymbol = shipSymbol_example; // String | The ship symbol.
+final shipSymbol = shipSymbol_example; // String | The symbol of the ship.
 
 try {
     final result = api_instance.getShipNav(shipSymbol);
@@ -876,7 +868,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **shipSymbol** | **String**| The ship symbol. | 
+ **shipSymbol** | **String**| The symbol of the ship. | 
 
 ### Return type
 
@@ -898,7 +890,7 @@ Name | Type | Description  | Notes
 
 Install Mount
 
-Install a mount on a ship.  In order to install a mount, the ship must be docked and located in a waypoint that has a `Shipyard` trait. The ship also must have the mount to install in its cargo hold.  An installation fee will be deduced by the Shipyard for installing the mount on the ship. 
+Install a mount on a ship.  In order to install a mount, the ship must be docked and located in a waypoint that has a `Shipyard` trait. The ship also must have the mount to install in its cargo hold.  An installation fee will be deduced by the Shipyard for installing the mount on the ship.
 
 ### Example
 ```dart
@@ -911,7 +903,7 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = FleetApi();
-final shipSymbol = shipSymbol_example; // String | The ship's symbol.
+final shipSymbol = shipSymbol_example; // String | The symbol of the ship.
 final installMountRequest = InstallMountRequest(); // InstallMountRequest | 
 
 try {
@@ -926,8 +918,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **shipSymbol** | **String**| The ship's symbol. | 
- **installMountRequest** | [**InstallMountRequest**](InstallMountRequest.md)|  | [optional] 
+ **shipSymbol** | **String**| The symbol of the ship. | 
+ **installMountRequest** | [**InstallMountRequest**](InstallMountRequest.md)|  | 
 
 ### Return type
 
@@ -954,12 +946,6 @@ Install a module on a ship. The module must be in your cargo.
 ### Example
 ```dart
 import 'package:openapi/api.dart';
-// TODO Configure HTTP Bearer authorization: AccountToken
-// Case 1. Use String Token
-//defaultApiClient.getAuthentication<HttpBearerAuth>('AccountToken').setAccessToken('YOUR_ACCESS_TOKEN');
-// Case 2. Use Function which generate token.
-// String yourTokenGeneratorFunction() { ... }
-//defaultApiClient.getAuthentication<HttpBearerAuth>('AccountToken').setAccessToken(yourTokenGeneratorFunction);
 // TODO Configure HTTP Bearer authorization: AgentToken
 // Case 1. Use String Token
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
@@ -968,7 +954,7 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = FleetApi();
-final shipSymbol = shipSymbol_example; // String | The symbol of the ship
+final shipSymbol = shipSymbol_example; // String | The symbol of the ship.
 final installShipModuleRequest = InstallShipModuleRequest(); // InstallShipModuleRequest | 
 
 try {
@@ -983,8 +969,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **shipSymbol** | **String**| The symbol of the ship | 
- **installShipModuleRequest** | [**InstallShipModuleRequest**](InstallShipModuleRequest.md)|  | [optional] 
+ **shipSymbol** | **String**| The symbol of the ship. | 
+ **installShipModuleRequest** | [**InstallShipModuleRequest**](InstallShipModuleRequest.md)|  | 
 
 ### Return type
 
@@ -992,7 +978,7 @@ Name | Type | Description  | Notes
 
 ### Authorization
 
-[AccountToken](../README.md#AccountToken), [AgentToken](../README.md#AgentToken)
+[AgentToken](../README.md#AgentToken)
 
 ### HTTP request headers
 
@@ -1019,7 +1005,7 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = FleetApi();
-final shipSymbol = shipSymbol_example; // String | The ship symbol.
+final shipSymbol = shipSymbol_example; // String | The symbol of the ship.
 final jettisonRequest = JettisonRequest(); // JettisonRequest | 
 
 try {
@@ -1034,8 +1020,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **shipSymbol** | **String**| The ship symbol. | 
- **jettisonRequest** | [**JettisonRequest**](JettisonRequest.md)|  | [optional] 
+ **shipSymbol** | **String**| The symbol of the ship. | 
+ **jettisonRequest** | [**JettisonRequest**](JettisonRequest.md)|  | 
 
 ### Return type
 
@@ -1070,7 +1056,7 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = FleetApi();
-final shipSymbol = shipSymbol_example; // String | The ship symbol.
+final shipSymbol = shipSymbol_example; // String | The symbol of the ship.
 final jumpShipRequest = JumpShipRequest(); // JumpShipRequest | 
 
 try {
@@ -1085,8 +1071,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **shipSymbol** | **String**| The ship symbol. | 
- **jumpShipRequest** | [**JumpShipRequest**](JumpShipRequest.md)|  | [optional] 
+ **shipSymbol** | **String**| The symbol of the ship. | 
+ **jumpShipRequest** | [**JumpShipRequest**](JumpShipRequest.md)|  | 
 
 ### Return type
 
@@ -1121,7 +1107,7 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = FleetApi();
-final shipSymbol = shipSymbol_example; // String | The ship symbol.
+final shipSymbol = shipSymbol_example; // String | The symbol of the ship.
 final navigateShipRequest = NavigateShipRequest(); // NavigateShipRequest | 
 
 try {
@@ -1136,8 +1122,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **shipSymbol** | **String**| The ship symbol. | 
- **navigateShipRequest** | [**NavigateShipRequest**](NavigateShipRequest.md)|  | [optional] 
+ **shipSymbol** | **String**| The symbol of the ship. | 
+ **navigateShipRequest** | [**NavigateShipRequest**](NavigateShipRequest.md)|  | 
 
 ### Return type
 
@@ -1155,7 +1141,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **negotiateContract**
-> NegotiateContract200Response negotiateContract(shipSymbol)
+> NegotiateContract201Response negotiateContract(shipSymbol)
 
 Negotiate Contract
 
@@ -1172,7 +1158,7 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = FleetApi();
-final shipSymbol = shipSymbol_example; // String | The ship's symbol.
+final shipSymbol = shipSymbol_example; // String | The symbol of the ship.
 
 try {
     final result = api_instance.negotiateContract(shipSymbol);
@@ -1186,11 +1172,11 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **shipSymbol** | **String**| The ship's symbol. | 
+ **shipSymbol** | **String**| The symbol of the ship. | 
 
 ### Return type
 
-[**NegotiateContract200Response**](NegotiateContract200Response.md)
+[**NegotiateContract201Response**](NegotiateContract201Response.md)
 
 ### Authorization
 
@@ -1221,7 +1207,7 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = FleetApi();
-final shipSymbol = shipSymbol_example; // String | The symbol of the ship.
+final shipSymbol = shipSymbol_example; // String | 
 
 try {
     final result = api_instance.orbitShip(shipSymbol);
@@ -1235,7 +1221,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **shipSymbol** | **String**| The symbol of the ship. | 
+ **shipSymbol** | **String**|  | 
 
 ### Return type
 
@@ -1270,7 +1256,7 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = FleetApi();
-final shipSymbol = shipSymbol_example; // String | The ship symbol.
+final shipSymbol = shipSymbol_example; // String | The symbol of the ship.
 final patchShipNavRequest = PatchShipNavRequest(); // PatchShipNavRequest | 
 
 try {
@@ -1285,7 +1271,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **shipSymbol** | **String**| The ship symbol. | 
+ **shipSymbol** | **String**| The symbol of the ship. | 
  **patchShipNavRequest** | [**PatchShipNavRequest**](PatchShipNavRequest.md)|  | [optional] 
 
 ### Return type
@@ -1321,7 +1307,7 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = FleetApi();
-final shipSymbol = shipSymbol_example; // String | The ship's symbol.
+final shipSymbol = shipSymbol_example; // String | The symbol of the ship.
 final purchaseCargoRequest = PurchaseCargoRequest(); // PurchaseCargoRequest | 
 
 try {
@@ -1336,8 +1322,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **shipSymbol** | **String**| The ship's symbol. | 
- **purchaseCargoRequest** | [**PurchaseCargoRequest**](PurchaseCargoRequest.md)|  | [optional] 
+ **shipSymbol** | **String**| The symbol of the ship. | 
+ **purchaseCargoRequest** | [**PurchaseCargoRequest**](PurchaseCargoRequest.md)|  | 
 
 ### Return type
 
@@ -1386,7 +1372,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **purchaseShipRequest** | [**PurchaseShipRequest**](PurchaseShipRequest.md)|  | [optional] 
+ **purchaseShipRequest** | [**PurchaseShipRequest**](PurchaseShipRequest.md)|  | 
 
 ### Return type
 
@@ -1421,7 +1407,7 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = FleetApi();
-final shipSymbol = shipSymbol_example; // String | The ship symbol.
+final shipSymbol = shipSymbol_example; // String | The symbol of the ship.
 final refuelShipRequest = RefuelShipRequest(); // RefuelShipRequest | 
 
 try {
@@ -1436,7 +1422,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **shipSymbol** | **String**| The ship symbol. | 
+ **shipSymbol** | **String**| The symbol of the ship. | 
  **refuelShipRequest** | [**RefuelShipRequest**](RefuelShipRequest.md)|  | [optional] 
 
 ### Return type
@@ -1472,7 +1458,7 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = FleetApi();
-final shipSymbol = shipSymbol_example; // String | The ship's symbol.
+final shipSymbol = shipSymbol_example; // String | The symbol of the ship.
 final removeMountRequest = RemoveMountRequest(); // RemoveMountRequest | 
 
 try {
@@ -1487,8 +1473,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **shipSymbol** | **String**| The ship's symbol. | 
- **removeMountRequest** | [**RemoveMountRequest**](RemoveMountRequest.md)|  | [optional] 
+ **shipSymbol** | **String**| The symbol of the ship. | 
+ **removeMountRequest** | [**RemoveMountRequest**](RemoveMountRequest.md)|  | 
 
 ### Return type
 
@@ -1506,7 +1492,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **removeShipModule**
-> RemoveModule201Response removeShipModule(shipSymbol, removeShipModuleRequest)
+> RemoveShipModule201Response removeShipModule(shipSymbol, removeShipModuleRequest)
 
 Remove Ship Module
 
@@ -1515,12 +1501,6 @@ Remove a module from a ship. The module will be placed in cargo.
 ### Example
 ```dart
 import 'package:openapi/api.dart';
-// TODO Configure HTTP Bearer authorization: AccountToken
-// Case 1. Use String Token
-//defaultApiClient.getAuthentication<HttpBearerAuth>('AccountToken').setAccessToken('YOUR_ACCESS_TOKEN');
-// Case 2. Use Function which generate token.
-// String yourTokenGeneratorFunction() { ... }
-//defaultApiClient.getAuthentication<HttpBearerAuth>('AccountToken').setAccessToken(yourTokenGeneratorFunction);
 // TODO Configure HTTP Bearer authorization: AgentToken
 // Case 1. Use String Token
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
@@ -1529,7 +1509,7 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = FleetApi();
-final shipSymbol = shipSymbol_example; // String | The symbol of the ship
+final shipSymbol = shipSymbol_example; // String | The symbol of the ship.
 final removeShipModuleRequest = RemoveShipModuleRequest(); // RemoveShipModuleRequest | 
 
 try {
@@ -1544,16 +1524,16 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **shipSymbol** | **String**| The symbol of the ship | 
- **removeShipModuleRequest** | [**RemoveShipModuleRequest**](RemoveShipModuleRequest.md)|  | [optional] 
+ **shipSymbol** | **String**| The symbol of the ship. | 
+ **removeShipModuleRequest** | [**RemoveShipModuleRequest**](RemoveShipModuleRequest.md)|  | 
 
 ### Return type
 
-[**RemoveModule201Response**](RemoveModule201Response.md)
+[**RemoveShipModule201Response**](RemoveShipModule201Response.md)
 
 ### Authorization
 
-[AccountToken](../README.md#AccountToken), [AgentToken](../README.md#AgentToken)
+[AgentToken](../README.md#AgentToken)
 
 ### HTTP request headers
 
@@ -1580,7 +1560,7 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = FleetApi();
-final shipSymbol = shipSymbol_example; // String | The ship symbol.
+final shipSymbol = shipSymbol_example; // String | The symbol of the ship.
 
 try {
     final result = api_instance.repairShip(shipSymbol);
@@ -1594,7 +1574,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **shipSymbol** | **String**| The ship symbol. | 
+ **shipSymbol** | **String**| The symbol of the ship. | 
 
 ### Return type
 
@@ -1616,7 +1596,7 @@ Name | Type | Description  | Notes
 
 Scrap Ship
 
-Scrap a ship, removing it from the game and returning a portion of the ship's value to the agent. The ship must be docked in a waypoint that has the `Shipyard` trait in order to use this function. To preview the amount of value that will be returned, use the Get Ship action.
+Scrap a ship, removing it from the game and receiving a portion of the ship's value back in credits. The ship must be docked in a waypoint that has the `Shipyard` trait to be scrapped.
 
 ### Example
 ```dart
@@ -1629,7 +1609,7 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = FleetApi();
-final shipSymbol = shipSymbol_example; // String | The ship symbol.
+final shipSymbol = shipSymbol_example; // String | The symbol of the ship.
 
 try {
     final result = api_instance.scrapShip(shipSymbol);
@@ -1643,7 +1623,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **shipSymbol** | **String**| The ship symbol. | 
+ **shipSymbol** | **String**| The symbol of the ship. | 
 
 ### Return type
 
@@ -1678,7 +1658,7 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = FleetApi();
-final shipSymbol = shipSymbol_example; // String | Symbol of a ship.
+final shipSymbol = shipSymbol_example; // String | The symbol of the ship.
 final sellCargoRequest = SellCargoRequest(); // SellCargoRequest | 
 
 try {
@@ -1693,8 +1673,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **shipSymbol** | **String**| Symbol of a ship. | 
- **sellCargoRequest** | [**SellCargoRequest**](SellCargoRequest.md)|  | [optional] 
+ **shipSymbol** | **String**| The symbol of the ship. | 
+ **sellCargoRequest** | [**SellCargoRequest**](SellCargoRequest.md)|  | 
 
 ### Return type
 
@@ -1745,7 +1725,7 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **shipSymbol** | **String**| The symbol of the ship. | 
- **shipRefineRequest** | [**ShipRefineRequest**](ShipRefineRequest.md)|  | [optional] 
+ **shipRefineRequest** | [**ShipRefineRequest**](ShipRefineRequest.md)|  | 
 
 ### Return type
 
@@ -1780,7 +1760,7 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = FleetApi();
-final shipSymbol = shipSymbol_example; // String | The ship symbol.
+final shipSymbol = shipSymbol_example; // String | The symbol of the ship.
 
 try {
     final result = api_instance.siphonResources(shipSymbol);
@@ -1794,7 +1774,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **shipSymbol** | **String**| The ship symbol. | 
+ **shipSymbol** | **String**| The symbol of the ship. | 
 
 ### Return type
 
@@ -1829,7 +1809,7 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = FleetApi();
-final shipSymbol = shipSymbol_example; // String | The transferring ship's symbol.
+final shipSymbol = shipSymbol_example; // String | The symbol of the ship.
 final transferCargoRequest = TransferCargoRequest(); // TransferCargoRequest | 
 
 try {
@@ -1844,8 +1824,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **shipSymbol** | **String**| The transferring ship's symbol. | 
- **transferCargoRequest** | [**TransferCargoRequest**](TransferCargoRequest.md)|  | [optional] 
+ **shipSymbol** | **String**| The symbol of the ship. | 
+ **transferCargoRequest** | [**TransferCargoRequest**](TransferCargoRequest.md)|  | 
 
 ### Return type
 
@@ -1863,7 +1843,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **warpShip**
-> WarpShip200Response warpShip(shipSymbol, navigateShipRequest)
+> NavigateShip200Response warpShip(shipSymbol, navigateShipRequest)
 
 Warp Ship
 
@@ -1880,7 +1860,7 @@ import 'package:openapi/api.dart';
 //defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = FleetApi();
-final shipSymbol = shipSymbol_example; // String | The ship symbol.
+final shipSymbol = shipSymbol_example; // String | The symbol of the ship.
 final navigateShipRequest = NavigateShipRequest(); // NavigateShipRequest | 
 
 try {
@@ -1895,12 +1875,12 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **shipSymbol** | **String**| The ship symbol. | 
- **navigateShipRequest** | [**NavigateShipRequest**](NavigateShipRequest.md)|  | [optional] 
+ **shipSymbol** | **String**| The symbol of the ship. | 
+ **navigateShipRequest** | [**NavigateShipRequest**](NavigateShipRequest.md)|  | 
 
 ### Return type
 
-[**WarpShip200Response**](WarpShip200Response.md)
+[**NavigateShip200Response**](NavigateShip200Response.md)
 
 ### Authorization
 

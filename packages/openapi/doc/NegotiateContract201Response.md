@@ -1,4 +1,4 @@
-# openapi.model.RemoveModule201Response
+# openapi.model.NegotiateContract201Response
 
 ## Load the model package
 ```dart
@@ -8,7 +8,7 @@ import 'package:openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**data** | [**InstallShipModule201ResponseData**](InstallShipModule201ResponseData.md) |  | 
+**data** | [**NegotiateContract201ResponseData**](NegotiateContract201ResponseData.md) |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

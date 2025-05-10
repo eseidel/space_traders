@@ -1,4 +1,4 @@
-# openapi.model.SellCargo201ResponseData
+# openapi.model.GetMyFactions200ResponseDataInner
 
 ## Load the model package
 ```dart
@@ -8,9 +8,8 @@ import 'package:openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**agent** | [**Agent**](Agent.md) |  | 
-**cargo** | [**ShipCargo**](ShipCargo.md) |  | 
-**transaction** | [**MarketTransaction**](MarketTransaction.md) |  | 
+**symbol** | **String** |  | 
+**reputation** | **int** |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

@@ -40,6 +40,8 @@ void main() {
     final systemsStore = _MockSystemsStore();
     when(() => db.systems).thenReturn(systemsStore);
     final ship = _MockShip();
+    const shipSymbol = ShipSymbol('S', 1);
+    when(() => ship.symbol).thenReturn(shipSymbol);
     final shipNav = _MockShipNav();
     final fleetApi = _MockFleetApi();
     final centralCommand = _MockCentralCommand();
@@ -69,20 +71,31 @@ void main() {
       () => caches.systemConnectivity.systemSymbolsByClusterId(0),
     ).thenReturn([waypointSymbol.system]);
 
+    final chart = Chart(
+      waypointSymbol: waypointSymbol.waypoint,
+      submittedBy: 'foo',
+      submittedOn: DateTime(2021),
+    );
+
     when(() => api.fleet).thenReturn(fleetApi);
     when(() => fleetApi.createChart(any())).thenAnswer(
       (invocation) => Future.value(
         CreateChart201Response(
           data: CreateChart201ResponseData(
-            chart: Chart(),
+            chart: chart,
             waypoint: waypoint.toOpenApi(),
+            transaction: ChartTransaction(
+              waypointSymbol: waypointSymbol.waypoint,
+              shipSymbol: shipSymbol.symbol,
+              totalPrice: 100,
+              timestamp: DateTime(2021),
+            ),
+            agent: Agent.test().toOpenApi(),
           ),
         ),
       ),
     );
 
-    const shipSymbol = ShipSymbol('S', 1);
-    when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
@@ -96,7 +109,7 @@ void main() {
     ).thenAnswer((_) => Future.value(waypoint));
     when(
       () => caches.waypoints.fetchChart(any()),
-    ).thenAnswer((_) => Future.value(Chart()));
+    ).thenAnswer((_) => Future.value(chart));
 
     when(
       () => caches.waypoints.hasMarketplace(waypointSymbol),

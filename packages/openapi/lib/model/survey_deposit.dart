@@ -17,7 +17,7 @@ class SurveyDeposit {
   });
 
   /// The symbol of the deposit.
-  String symbol;
+  TradeSymbol symbol;
 
   @override
   bool operator ==(Object other) =>
@@ -59,7 +59,7 @@ class SurveyDeposit {
       }());
 
       return SurveyDeposit(
-        symbol: mapValueOfType<String>(json, r'symbol')!,
+        symbol: TradeSymbol.fromJson(json[r'symbol'])!,
       );
     }
     return null;

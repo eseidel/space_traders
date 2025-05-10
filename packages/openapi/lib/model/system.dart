@@ -13,22 +13,16 @@ part of openapi;
 class System {
   /// Returns a new [System] instance.
   System({
+    this.constellation,
     required this.symbol,
     required this.sectorSymbol,
-    this.constellation,
-    this.name,
     required this.type,
     required this.x,
     required this.y,
     this.waypoints = const [],
     this.factions = const [],
+    this.name,
   });
-
-  /// The symbol of the system.
-  String symbol;
-
-  /// The symbol of the sector.
-  String sectorSymbol;
 
   /// The constellation that the system is part of.
   ///
@@ -39,14 +33,11 @@ class System {
   ///
   String? constellation;
 
-  /// The name of the system.
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? name;
+  /// The symbol of the system.
+  String symbol;
+
+  /// The symbol of the sector.
+  String sectorSymbol;
 
   SystemType type;
 
@@ -62,56 +53,65 @@ class System {
   /// Factions that control this system.
   List<SystemFaction> factions;
 
+  /// The name of the system.
+  ///
+  /// Please note: This property should have been non-nullable! Since the specification file
+  /// does not include a default value (using the "default:" property), however, the generated
+  /// source code must fall back to having a nullable type.
+  /// Consider adding a "default:" property in the specification file to hide this note.
+  ///
+  String? name;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is System &&
+          other.constellation == constellation &&
           other.symbol == symbol &&
           other.sectorSymbol == sectorSymbol &&
-          other.constellation == constellation &&
-          other.name == name &&
           other.type == type &&
           other.x == x &&
           other.y == y &&
           _deepEquality.equals(other.waypoints, waypoints) &&
-          _deepEquality.equals(other.factions, factions);
+          _deepEquality.equals(other.factions, factions) &&
+          other.name == name;
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
+      (constellation == null ? 0 : constellation!.hashCode) +
       (symbol.hashCode) +
       (sectorSymbol.hashCode) +
-      (constellation == null ? 0 : constellation!.hashCode) +
-      (name == null ? 0 : name!.hashCode) +
       (type.hashCode) +
       (x.hashCode) +
       (y.hashCode) +
       (waypoints.hashCode) +
-      (factions.hashCode);
+      (factions.hashCode) +
+      (name == null ? 0 : name!.hashCode);
 
   @override
   String toString() =>
-      'System[symbol=$symbol, sectorSymbol=$sectorSymbol, constellation=$constellation, name=$name, type=$type, x=$x, y=$y, waypoints=$waypoints, factions=$factions]';
+      'System[constellation=$constellation, symbol=$symbol, sectorSymbol=$sectorSymbol, type=$type, x=$x, y=$y, waypoints=$waypoints, factions=$factions, name=$name]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    json[r'symbol'] = this.symbol;
-    json[r'sectorSymbol'] = this.sectorSymbol;
     if (this.constellation != null) {
       json[r'constellation'] = this.constellation;
     } else {
       json[r'constellation'] = null;
     }
-    if (this.name != null) {
-      json[r'name'] = this.name;
-    } else {
-      json[r'name'] = null;
-    }
+    json[r'symbol'] = this.symbol;
+    json[r'sectorSymbol'] = this.sectorSymbol;
     json[r'type'] = this.type;
     json[r'x'] = this.x;
     json[r'y'] = this.y;
     json[r'waypoints'] = this.waypoints;
     json[r'factions'] = this.factions;
+    if (this.name != null) {
+      json[r'name'] = this.name;
+    } else {
+      json[r'name'] = null;
+    }
     return json;
   }
 
@@ -136,15 +136,15 @@ class System {
       }());
 
       return System(
+        constellation: mapValueOfType<String>(json, r'constellation'),
         symbol: mapValueOfType<String>(json, r'symbol')!,
         sectorSymbol: mapValueOfType<String>(json, r'sectorSymbol')!,
-        constellation: mapValueOfType<String>(json, r'constellation'),
-        name: mapValueOfType<String>(json, r'name'),
         type: SystemType.fromJson(json[r'type'])!,
         x: mapValueOfType<int>(json, r'x')!,
         y: mapValueOfType<int>(json, r'y')!,
         waypoints: SystemWaypoint.listFromJson(json[r'waypoints']),
         factions: SystemFaction.listFromJson(json[r'factions']),
+        name: mapValueOfType<String>(json, r'name'),
       );
     }
     return null;

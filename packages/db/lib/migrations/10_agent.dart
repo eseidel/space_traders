@@ -13,7 +13,7 @@ class CreateAgentMigration implements Migration {
       "credits" int NOT NULL,
       "starting_faction" text NOT NULL,
       "ship_count" int NOT NULL,
-      "account_id" text
+      "account_id" text NOT NULL
     );
   ''';
 
