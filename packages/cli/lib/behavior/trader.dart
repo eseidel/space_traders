@@ -301,21 +301,21 @@ Future<Contract?> _deliverContractGoodsIfPossible(
     tradeSymbol: tradeSymbol,
     units: unitsBefore,
   );
-  final afterDelivery = Contract.fromOpenApi(
-    response.contract,
-    DateTime.timestamp(),
-  );
+  final now = DateTime.timestamp();
+  final afterDelivery = Contract.fromOpenApi(response.contract, now);
   final deliver = assertNotNull(
     afterDelivery.goodNeeded(tradeSymbol),
     'No ContractDeliverGood for $tradeSymbol?',
     const Duration(minutes: 10),
   );
+  // This only considers delivery deadline not accept deadline.
+  final timeUntilDeadline = afterDelivery.terms.deadline.difference(now);
   shipInfo(
     ship,
     'Delivered $unitsBefore ${goods.tradeSymbol} '
     'to ${goods.destinationSymbol}; '
     '${deliver.unitsFulfilled}/${deliver.unitsRequired}, '
-    '${approximateDuration(afterDelivery.timeUntilDeadline)} to deadline',
+    '${approximateDuration(timeUntilDeadline)} to deadline',
   );
 
   // Update our cargo counts after delivering the contract goods.
@@ -328,7 +328,7 @@ Future<Contract?> _deliverContractGoodsIfPossible(
     shipSymbol: ship.symbol,
     waypointSymbol: ship.waypointSymbol,
     unitsDelivered: unitsDelivered,
-    timestamp: DateTime.timestamp(),
+    timestamp: now,
   );
   // Credits don't change on delivery (rather fulfillment), so this fetch
   // just to record credits is a bit silly.

@@ -42,6 +42,22 @@ void main() {
         expect(retrieved?.construction?.isComplete, false);
         expect(retrieved?.construction?.materials.first.fulfilled, 10);
 
+        expect(await db.construction.isUnderConstruction(waypointSymbol), true);
+        expect(
+          await db.construction.getConstruction(waypointSymbol),
+          isNotNull,
+        );
+
+        final otherWaypointSymbol = WaypointSymbol.fromString('X1-B-W');
+        expect(
+          await db.construction.isUnderConstruction(otherWaypointSymbol),
+          isNull,
+        );
+        expect(
+          await db.construction.getConstruction(otherWaypointSymbol),
+          isNull,
+        );
+
         final snapshot = await db.construction.snapshotAll();
         expect(snapshot[waypointSymbol], construction);
       });
