@@ -71,6 +71,7 @@ class StaticSnapshot<Symbol extends Object, Record extends Object> {
   }
 }
 
+/// Traits for ShipMounts.
 class ShipMountTraits extends Traits<ShipMountSymbolEnum, ShipMount> {
   @override
   ShipMount fromJson(Map<String, dynamic> json) => ShipMount.fromJson(json)!;
@@ -119,7 +120,7 @@ class ShipModuleSnapshot
     : super(records, ShipModuleTraits());
 }
 
-/// A cache of shipyard ships.
+/// Traits for ShipyardShips.
 class ShipyardShipTraits extends Traits<ShipType, ShipyardShip> {
   @override
   ShipyardShip fromJson(Map<String, dynamic> json) =>
@@ -152,7 +153,7 @@ class ShipyardShipSnapshot extends StaticSnapshot<ShipType, ShipyardShip> {
     : super(records, ShipyardShipTraits());
 }
 
-/// A cache of ship engines.
+/// Traits for ShipEngines.
 class ShipEngineTraits extends Traits<ShipEngineSymbolEnum, ShipEngine> {
   @override
   Json toJson(ShipEngine record) => record.toJson();
@@ -179,7 +180,7 @@ class ShipEngineSnapshot
     : super(records, ShipEngineTraits());
 }
 
-/// A cache of ship reactors.
+/// Traits for ShipReactors.
 class ShipReactorTraits extends Traits<ShipReactorSymbolEnum, ShipReactor> {
   @override
   ShipReactor fromJson(Map<String, dynamic> json) =>
@@ -208,7 +209,7 @@ class ShipReactorSnapshot
     : super(records, ShipReactorTraits());
 }
 
-/// A cache of waypoint traits.
+/// Traits for WaypointTraits.
 class WaypointTraitTraits extends Traits<WaypointTraitSymbol, WaypointTrait> {
   @override
   WaypointTrait fromJson(Map<String, dynamic> json) =>
@@ -254,7 +255,7 @@ class TradeGoodSnapshot extends StaticSnapshot<TradeSymbol, TradeGood> {
     : super(records, TradeGoodTraits());
 }
 
-/// A cache of trade good descriptions.
+/// Traits for TradeExports.
 class TradeExportTraits extends Traits<TradeSymbol, TradeExport> {
   @override
   TradeExport fromJson(Map<String, dynamic> json) => TradeExport.fromJson(json);
@@ -276,7 +277,7 @@ class TradeExportSnapshot extends StaticSnapshot<TradeSymbol, TradeExport> {
     : super(records, TradeExportTraits());
 }
 
-/// A cache of event descriptions.
+/// Traits for ShipConditionEvents.
 class EventTraits
     extends Traits<ShipConditionEventSymbolEnum, ShipConditionEvent> {
   @override
