@@ -14,7 +14,7 @@ abstract class Traits<Symbol extends Object, Record extends Object> {
   Symbol keyFor(Record record);
 
   /// Copy and normalize the record for comparison and storage.
-  /// Subclasses should override this method to provide nomalization.
+  /// Subclasses should override this method to provide normalization.
   /// The default implementation simply converts the record to JSON and back.
   Record copyAndNormalize(Record record) => deepCopy(record);
 
