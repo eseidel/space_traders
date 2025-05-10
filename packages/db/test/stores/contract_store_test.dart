@@ -116,6 +116,8 @@ void main() {
 
       // Expired shows up in all, but not in unaccepted or active.
       expect(await db.contracts.all(), hasLength(5));
+      expect(await db.contracts.snapshotAll(), hasLength(5));
+
       expect(await db.contracts.unaccepted(), hasLength(1));
       expect(ids(await db.contracts.active()), {
         'unaccepted',

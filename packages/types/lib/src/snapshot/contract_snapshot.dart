@@ -9,6 +9,9 @@ class ContractSnapshot {
   /// Contracts in the cache.
   final List<Contract> contracts;
 
+  /// Returns the number of contracts in the cache.
+  int get length => contracts.length;
+
   /// Returns a list of all completed contracts.
   List<Contract> get completedContracts =>
       contracts.where((c) => c.fulfilled).toList();
