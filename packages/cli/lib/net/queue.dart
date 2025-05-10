@@ -98,7 +98,7 @@ class NetQueue {
   Future<int> _queueRequest(int priority, QueuedRequest request) async {
     assert(role == QueueRole.requestor, 'Only requestors can queue requests.');
     // TODO(eseidel): Move this into db package.
-    final requestId = await _db.insertRequest(
+    final requestId = await _db.network.insertRequest(
       RequestRecord(priority: priority, request: request),
     );
     // TODO(eseidel): This could be a trigger.
@@ -118,7 +118,7 @@ class NetQueue {
     while (true) {
       // TODO(eseidel): This does not yet handle queuing multiple requests
       // and waiting on all of them.
-      final result = await _db.getResponseForRequest(requestId);
+      final result = await _db.network.getResponseForRequest(requestId);
       // If we don't yet have a response, wait for one.
       if (result != null) {
         return result.response.toResponse();
@@ -144,13 +144,13 @@ class NetQueue {
   /// Gets the next request from the queue, or null if there are no requests.
   Future<RequestRecord?> nextRequest() async {
     assert(role == QueueRole.responder, 'Only responders can get requests.');
-    final request = await _db.nextRequest();
+    final request = await _db.network.nextRequest();
     return request;
   }
 
   /// Deletes the given request from the queue.
   Future<void> deleteRequest(RequestRecord request) async {
-    await _db.deleteRequest(request);
+    await _db.network.deleteRequest(request);
   }
 
   /// Responds to the given request with the given response.
@@ -159,7 +159,7 @@ class NetQueue {
     QueuedResponse response,
   ) async {
     assert(role == QueueRole.responder, 'Only responders can respond.');
-    await _db.insertResponse(
+    await _db.network.insertResponse(
       ResponseRecord(requestId: request.id!, response: response),
     );
     // TODO(eseidel): This could be a trigger.
@@ -177,6 +177,6 @@ class NetQueue {
 
   /// Deletes all responses older than the given cutoff.
   Future<void> deleteResponsesBefore(DateTime cutoff) async {
-    await _db.deleteResponsesBefore(cutoff);
+    await _db.network.deleteResponsesBefore(cutoff);
   }
 }
