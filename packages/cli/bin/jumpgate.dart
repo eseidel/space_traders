@@ -20,7 +20,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   final jumpGate = await getOrFetchJumpGate(db, api, jumpGateSymbol);
 
   Future<String> statusForSymbol(WaypointSymbol symbol) async =>
-      constructionStatusString(await db.construction.getRecord(symbol));
+      constructionStatusString(await db.construction.at(symbol));
 
   logger.info('$jumpGateSymbol: ${await statusForSymbol(jumpGateSymbol)}');
   for (final connection in jumpGate.connections) {

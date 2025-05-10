@@ -13,7 +13,7 @@ Future<SystemStats> computeSystemStats({
   final systemsCache = await db.systems.snapshotAllSystems();
   // Can't use loadSystemConnectivity because need jumpGateSnapshot later.
   final jumpGateSnapshot = await db.jumpGates.snapshotAll();
-  final constructionSnapshot = await db.construction.snapshotAllRecords();
+  final constructionSnapshot = await db.construction.snapshotAll();
   final systemConnectivity = SystemConnectivity.fromJumpGates(
     jumpGateSnapshot,
     constructionSnapshot,

@@ -92,7 +92,7 @@ Future<void> command(Database db, ArgResults argResults) async {
     agent!.headquarters.system,
   );
   final construction =
-      (await db.construction.getRecord(waypointSymbol!))!.construction;
+      (await db.construction.at(waypointSymbol!))!.construction;
 
   final neededExports = construction!.materials
       .where((m) => m.required_ > m.fulfilled)

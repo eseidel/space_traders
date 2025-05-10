@@ -1514,13 +1514,11 @@ void main() {
     final constructionStore = _MockConstructionStore();
     when(() => db.construction).thenReturn(constructionStore);
 
-    when(constructionStore.allRecords).thenAnswer((_) async => []);
+    when(constructionStore.all).thenAnswer((_) async => []);
     when(
       () => constructionStore.updateConstruction(end, construction),
     ).thenAnswer((_) async => {});
-    when(
-      () => constructionStore.getRecord(any()),
-    ).thenAnswer((_) async => null);
+    when(() => constructionStore.at(any())).thenAnswer((_) async => null);
     when(
       () => constructionStore.getConstruction(any()),
     ).thenAnswer((_) async => construction);

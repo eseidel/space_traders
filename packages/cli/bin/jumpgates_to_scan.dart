@@ -7,7 +7,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   final systemSymbol = await myHqSystemSymbol(db);
   final systemsCache = await db.systems.snapshotAllSystems();
   final jumpGateSnapshot = await db.jumpGates.snapshotAll();
-  final constructionSnapshot = await db.construction.snapshotAllRecords();
+  final constructionSnapshot = await db.construction.snapshotAll();
   final chartingSnapshot = await db.charting.snapshotAllRecords();
 
   final systems = NonRepeatingDistanceQueue<SystemSymbol>();

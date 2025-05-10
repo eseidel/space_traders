@@ -83,7 +83,7 @@ class Caches {
     final waypoints = WaypointCache(api, db);
     final markets = MarketCache(db, api);
     final jumpGates = await db.jumpGates.snapshotAll();
-    final constructionSnapshot = await db.construction.snapshotAllRecords();
+    final constructionSnapshot = await db.construction.snapshotAll();
     final systemConnectivity = SystemConnectivity.fromJumpGates(
       jumpGates,
       constructionSnapshot,
@@ -120,7 +120,7 @@ class Caches {
     }
 
     final jumpGateSnapshot = await db.jumpGates.snapshotAll();
-    final constructionSnapshot = await db.construction.snapshotAllRecords();
+    final constructionSnapshot = await db.construction.snapshotAll();
     final systemConnectivity = SystemConnectivity.fromJumpGates(
       jumpGateSnapshot,
       constructionSnapshot,
