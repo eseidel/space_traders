@@ -1,7 +1,10 @@
+import 'package:equatable/equatable.dart';
 import 'package:http/http.dart';
+import 'package:meta/meta.dart';
 
 /// Request queued for later execution.
-class QueuedRequest {
+@immutable
+class QueuedRequest extends Equatable {
   /// Creates a new [QueuedRequest].
   const QueuedRequest({
     required this.method,
@@ -12,7 +15,7 @@ class QueuedRequest {
 
   /// Creates an empty [QueuedRequest] with the given [url].
   factory QueuedRequest.empty(String url) {
-    return QueuedRequest(method: 'GET', url: url, body: '', headers: {});
+    return QueuedRequest(method: 'GET', url: url, body: '', headers: const {});
   }
 
   /// Creates a [QueuedRequest] from json.
@@ -46,12 +49,16 @@ class QueuedRequest {
 
   /// Headers of the request.
   final Map<String, String> headers;
+
+  @override
+  List<Object?> get props => [method, url, body, headers];
 }
 
 /// Response queued for later execution.
-class QueuedResponse {
+@immutable
+class QueuedResponse extends Equatable {
   /// Creates a new [QueuedResponse].
-  QueuedResponse({
+  const QueuedResponse({
     required this.body,
     required this.statusCode,
     required this.headers,
@@ -95,4 +102,7 @@ class QueuedResponse {
       'headers': headers,
     };
   }
+
+  @override
+  List<Object?> get props => [body, statusCode, headers];
 }
