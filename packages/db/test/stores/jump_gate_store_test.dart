@@ -12,7 +12,6 @@ void main() async {
         connection: await server.newConnection(),
       );
       await db.migrateToLatestSchema();
-      final jumpGateStore = JumpGateStore(db);
 
       final symbol = WaypointSymbol.fromString('X-A-A');
       final connections = {WaypointSymbol.fromString('X-B-B')};
@@ -20,12 +19,12 @@ void main() async {
         waypointSymbol: symbol,
         connections: connections,
       );
-      await jumpGateStore.upsert(jumpGate);
+      await db.jumpGates.upsert(jumpGate);
 
-      final retrieved = await jumpGateStore.get(symbol);
+      final retrieved = await db.jumpGates.get(symbol);
       expect(retrieved, jumpGate);
 
-      final snapshot = await jumpGateStore.snapshotAll();
+      final snapshot = await db.jumpGates.snapshotAll();
       expect(snapshot.forSymbol(symbol), jumpGate);
     });
   });

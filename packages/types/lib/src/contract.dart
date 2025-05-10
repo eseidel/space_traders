@@ -142,10 +142,12 @@ class Contract {
     );
   }
 
-  /// Returns the duration until the contract deadline.
-  Duration get timeUntilDeadline =>
-      terms.deadline.difference(DateTime.timestamp());
-
   /// Returns true if the contract has expired.
-  bool get isExpired => timeUntilDeadline.isNegative;
+  bool get isExpired {
+    final now = DateTime.timestamp();
+    if (!accepted) {
+      return now.isAfter(deadlineToAccept);
+    }
+    return now.isAfter(terms.deadline);
+  }
 }

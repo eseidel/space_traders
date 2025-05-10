@@ -11,7 +11,7 @@ Future<void> command(Database db, ArgResults argResults) async {
 
   final jumpGates = await db.jumpGates.snapshotAll();
   final charts = await db.charting.snapshotAllRecords();
-  final construction = await db.construction.snapshotAllRecords();
+  final construction = await db.construction.snapshotAll();
   final ships = await ShipSnapshot.load(db);
   final behaviors = await BehaviorSnapshot.load(db);
 

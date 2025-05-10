@@ -73,7 +73,9 @@ void main() {
 
     final contractStore = _MockContractStore();
     when(() => db.contracts).thenReturn(contractStore);
-    when(contractStore.all).thenAnswer((_) async => <Contract>[]);
+    when(
+      contractStore.snapshotAll,
+    ).thenAnswer((_) async => ContractSnapshot([]));
 
     final start = WaypointSymbol.fromString('S-A-B');
     final end = WaypointSymbol.fromString('S-A-C');
@@ -764,7 +766,9 @@ void main() {
       ),
     );
 
-    when(contractStore.all).thenAnswer((_) async => <Contract>[]);
+    when(
+      contractStore.snapshotAll,
+    ).thenAnswer((_) async => ContractSnapshot([]));
 
     registerFallbackValue(Contract.fallbackValue());
     when(() => contractStore.upsert(any())).thenAnswer((_) async {});
@@ -1510,13 +1514,11 @@ void main() {
     final constructionStore = _MockConstructionStore();
     when(() => db.construction).thenReturn(constructionStore);
 
-    when(constructionStore.allRecords).thenAnswer((_) async => []);
+    when(constructionStore.all).thenAnswer((_) async => []);
     when(
       () => constructionStore.updateConstruction(end, construction),
     ).thenAnswer((_) async => {});
-    when(
-      () => constructionStore.getRecord(any()),
-    ).thenAnswer((_) async => null);
+    when(() => constructionStore.at(any())).thenAnswer((_) async => null);
     when(
       () => constructionStore.getConstruction(any()),
     ).thenAnswer((_) async => construction);

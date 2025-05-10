@@ -1,5 +1,4 @@
 import 'package:cli/api.dart';
-import 'package:cli/cache/contract_snapshot.dart';
 import 'package:cli/cache/market_cache.dart';
 import 'package:cli/cache/ship_snapshot.dart';
 import 'package:cli/cache/waypoint_cache.dart';
@@ -16,7 +15,6 @@ import 'package:types/types.dart';
 
 export 'package:cli/api.dart';
 export 'package:cli/cache/behavior_snapshot.dart';
-export 'package:cli/cache/contract_snapshot.dart';
 export 'package:cli/cache/market_cache.dart';
 export 'package:cli/cache/ship_snapshot.dart';
 export 'package:cli/cache/static_cache.dart';
@@ -77,15 +75,15 @@ class Caches {
     await fetchContracts(db, api);
 
     final marketPrices = await db.marketPrices.snapshotAll();
-    // Load exports before we load static caches.  We ignore the response
-    // but then static.exports will be up to date.
-    await loadExports(db, api.data);
+
+    // TODO(eseidel): This only needs to happen once per reset.
+    await fetchExports(db, api.data);
 
     final systems = await db.systems.snapshotAllSystems();
     final waypoints = WaypointCache(api, db);
     final markets = MarketCache(db, api);
     final jumpGates = await db.jumpGates.snapshotAll();
-    final constructionSnapshot = await db.construction.snapshotAllRecords();
+    final constructionSnapshot = await db.construction.snapshotAll();
     final systemConnectivity = SystemConnectivity.fromJumpGates(
       jumpGates,
       constructionSnapshot,
@@ -96,8 +94,8 @@ class Caches {
       sellsFuel: await defaultSellsFuel(db),
     );
 
-    // Make sure factions are loaded.
-    final factions = await loadFactions(db, api.factions);
+    // TODO(eseidel): This only needs to happen once per reset.
+    final factions = await fetchFactions(db, api.factions);
 
     final galaxy = await getGalaxyStats(api);
     return Caches(
@@ -122,7 +120,7 @@ class Caches {
     }
 
     final jumpGateSnapshot = await db.jumpGates.snapshotAll();
-    final constructionSnapshot = await db.construction.snapshotAllRecords();
+    final constructionSnapshot = await db.construction.snapshotAll();
     final systemConnectivity = SystemConnectivity.fromJumpGates(
       jumpGateSnapshot,
       constructionSnapshot,
@@ -173,7 +171,7 @@ class TopOfLoopUpdater {
       // This does not need to assign to anything, fetchContracts updates
       // the db already.
       _checkForChanges(
-        current: await ContractSnapshot.load(db),
+        current: await db.contracts.snapshotAll(),
         server: await fetchContracts(db, api),
         // Use OpenAPI's toJson to restrict to only the fields the server sends.
         toJsonList:
@@ -215,7 +213,10 @@ Future<List<Faction>> allFactions(FactionsApi factionsApi) async {
 
 /// Loads the factions from the database, or fetches them from the API if
 /// they're not cached.
-Future<List<Faction>> loadFactions(Database db, FactionsApi factionsApi) async {
+Future<List<Faction>> fetchFactions(
+  Database db,
+  FactionsApi factionsApi,
+) async {
   final cachedFactions = await db.allFactions();
   if (cachedFactions.length >= FactionSymbol.values.length) {
     return Future.value(cachedFactions.toList());
@@ -229,7 +230,7 @@ Future<List<Faction>> loadFactions(Database db, FactionsApi factionsApi) async {
 
 /// Loads exports from the api and converts them to the old-style
 /// TradeExport list.
-Future<TradeExportSnapshot> loadExports(Database db, DataApi dataApi) async {
+Future<TradeExportSnapshot> fetchExports(Database db, DataApi dataApi) async {
   final cachedExportsJson = await db.getAllFromStaticCache(type: TradeExport);
   if (cachedExportsJson.isNotEmpty) {
     final exports = cachedExportsJson.map(TradeExport.fromJson).toList();
@@ -285,4 +286,13 @@ Future<JumpGate> getOrFetchJumpGate(
 ) async {
   return (await db.jumpGates.get(waypointSymbol)) ??
       await fetchAndCacheJumpGate(db, api, waypointSymbol);
+}
+
+/// Fetches all of the user's contracts.
+Future<ContractSnapshot> fetchContracts(Database db, Api api) async {
+  final contracts = await allMyContracts(api).toList();
+  for (final contract in contracts) {
+    await db.contracts.upsert(contract);
+  }
+  return ContractSnapshot(contracts);
 }

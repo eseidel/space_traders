@@ -16,7 +16,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   final jumpGateSnapshot = await db.jumpGates.snapshotAll();
   final systemConnectivity = SystemConnectivity.fromJumpGates(
     jumpGateSnapshot,
-    await db.construction.snapshotAllRecords(),
+    await db.construction.snapshotAll(),
   );
   final systemsCache = await db.systems.snapshotAllSystems();
   final waypointCache = WaypointCache(api, db);

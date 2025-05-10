@@ -36,7 +36,7 @@ Future<String> register(
   final defaultApi = GlobalApi(client);
 
   final factionsApi = FactionsApi(client);
-  final factions = await loadFactions(db, factionsApi);
+  final factions = await fetchFactions(db, factionsApi);
 
   final recruitingFactions = factions.where((f) => f.isRecruiting).toList();
 

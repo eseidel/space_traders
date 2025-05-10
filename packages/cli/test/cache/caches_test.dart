@@ -107,11 +107,11 @@ void main() {
     final constructionStore = _MockConstructionStore();
     when(() => db.construction).thenReturn(constructionStore);
     when(
-      constructionStore.snapshotAllRecords,
+      constructionStore.snapshotAll,
     ).thenAnswer((_) async => ConstructionSnapshot([]));
 
     when(
-      constructionStore.allRecords,
+      constructionStore.all,
     ).thenAnswer((_) => Future.value(<ConstructionRecord>[]));
 
     final jumpGateStore = _MockJumpGateStore();
@@ -203,7 +203,7 @@ void main() {
     final constructionStore = _MockConstructionStore();
     when(() => db.construction).thenReturn(constructionStore);
     when(
-      constructionStore.snapshotAllRecords,
+      constructionStore.snapshotAll,
     ).thenAnswer((_) async => ConstructionSnapshot([]));
 
     final jumpGateStore = _MockJumpGateStore();
@@ -253,7 +253,7 @@ void main() {
     verify(() => logger.info('Systems Snapshot is incomplete, reloading.'));
     verify(() => db.systems.snapshotAllSystems()).called(1);
     verify(() => db.jumpGates.snapshotAll()).called(1);
-    verify(() => db.construction.snapshotAllRecords()).called(1);
+    verify(() => db.construction.snapshotAll()).called(1);
     verify(() => db.marketListings.marketsSellingFuel()).called(1);
 
     await caches.updateRoutingCaches(db);

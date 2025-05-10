@@ -12,7 +12,7 @@ class ConstructionStore {
   final Database _db;
 
   /// Get a construction record from the database.
-  Future<ConstructionRecord?> getRecord(
+  Future<ConstructionRecord?> at(
     WaypointSymbol waypointSymbol, {
     Duration maxAge = defaultMaxAge,
   }) async => _db.queryOne(
@@ -21,16 +21,16 @@ class ConstructionStore {
   );
 
   /// Return all construction records.
-  Future<Iterable<ConstructionRecord>> allRecords() async =>
+  Future<Iterable<ConstructionRecord>> all() async =>
       _db.queryMany(allConstructionQuery(), constructionFromColumnMap);
 
   /// Insert a construction record into the database.
-  Future<void> upsertRecord(ConstructionRecord record) async =>
+  Future<void> upsert(ConstructionRecord record) async =>
       _db.execute(upsertConstructionQuery(record));
 
   /// Creates a new ConstructionSnapshot from all records, regardless of age.
-  Future<ConstructionSnapshot> snapshotAllRecords() async {
-    return ConstructionSnapshot(await allRecords());
+  Future<ConstructionSnapshot> snapshotAll() async {
+    return ConstructionSnapshot(await all());
   }
 
   /// Load the Construction value for the given waypoint symbol.
@@ -39,7 +39,7 @@ class ConstructionStore {
   Future<Construction?> getConstruction(
     WaypointSymbol waypointSymbol, {
     Duration maxAge = defaultMaxAge,
-  }) async => (await getRecord(waypointSymbol, maxAge: maxAge))?.construction;
+  }) async => (await at(waypointSymbol, maxAge: maxAge))?.construction;
 
   /// Returns true if the given waypoint symbol is under construction.
   /// Returns false if the given waypoint symbol is not under construction.
@@ -47,8 +47,7 @@ class ConstructionStore {
   Future<bool?> isUnderConstruction(
     WaypointSymbol waypointSymbol, {
     Duration maxAge = defaultMaxAge,
-  }) async =>
-      (await getRecord(waypointSymbol, maxAge: maxAge))?.isUnderConstruction;
+  }) async => (await at(waypointSymbol, maxAge: maxAge))?.isUnderConstruction;
 
   /// Update the construction value for the given waypoint symbol.
   Future<void> updateConstruction(
@@ -60,6 +59,6 @@ class ConstructionStore {
       timestamp: DateTime.timestamp(),
       waypointSymbol: waypointSymbol,
     );
-    await upsertRecord(record);
+    await upsert(record);
   }
 }

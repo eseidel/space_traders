@@ -12,7 +12,6 @@ void main() {
         connection: await server.newConnection(),
       );
       await db.migrateToLatestSchema();
-      final chartingStore = ChartingStore(db);
       final waypointSymbol = WaypointSymbol.fromString('X1-A-W');
       final chart = ChartingRecord(
         waypointSymbol: waypointSymbol,
@@ -25,26 +24,26 @@ void main() {
           ),
         ),
       );
-      await chartingStore.upsertChartingRecord(chart);
-      final charts = await chartingStore.allRecords();
+      await db.charting.upsertChartingRecord(chart);
+      final charts = await db.charting.allRecords();
       expect(charts.length, 1);
       expect(charts.first.waypointSymbol, waypointSymbol);
 
-      final record = await chartingStore.chartingRecord(waypointSymbol);
+      final record = await db.charting.chartingRecord(waypointSymbol);
       expect(record?.waypointSymbol, waypointSymbol);
 
-      expect(await chartingStore.isCharted(waypointSymbol), true);
+      expect(await db.charting.isCharted(waypointSymbol), true);
 
-      final values = await chartingStore.chartedValues(waypointSymbol);
+      final values = await db.charting.chartedValues(waypointSymbol);
       expect(values?.traitSymbols, chart.values?.traitSymbols);
 
       final waypointSymbol2 = WaypointSymbol.fromString('X1-A-Y');
-      await chartingStore.addWaypoints([
+      await db.charting.addWaypoints([
         Waypoint.test(waypointSymbol),
         Waypoint.test(waypointSymbol2, chart: Chart(submittedBy: 'bar')),
       ]);
 
-      final snapshot = await chartingStore.snapshotAllRecords();
+      final snapshot = await db.charting.snapshotAllRecords();
       expect(snapshot.records.length, 2);
       expect(snapshot.records.first.waypointSymbol, waypointSymbol);
       expect(snapshot.records.last.waypointSymbol, waypointSymbol2);
