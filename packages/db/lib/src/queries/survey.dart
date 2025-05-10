@@ -8,8 +8,7 @@ HistoricalSurvey surveyFromColumnMap(Map<String, dynamic> values) {
       signature: values['signature'] as String,
       symbol: values['waypoint_symbol'] as String,
       deposits:
-          (values['deposits'] as String)
-              .split(',')
+          (values['deposits'] as List<String>)
               .map((s) => SurveyDeposit(symbol: TradeSymbol.fromJson(s)!))
               .toList(),
       expiration: values['expiration'] as DateTime,
@@ -25,7 +24,7 @@ Map<String, dynamic> surveyToColumnMap(HistoricalSurvey survey) {
   return {
     'signature': survey.survey.signature,
     'waypoint_symbol': survey.survey.symbol,
-    'deposits': survey.survey.deposits.map((e) => e.symbol).join(','),
+    'deposits': survey.survey.deposits.map((e) => e.symbol.value).toList(),
     'expiration': survey.survey.expiration,
     'size': survey.survey.size.toJson(),
     'timestamp': survey.timestamp,
