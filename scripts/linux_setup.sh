@@ -29,7 +29,7 @@ snap install docker
 cd packages/db
 docker pull postgres
 docker run \
-    --name spacetraders_postgres \
+    --name space_traders-db-1 \
     -p 127.0.0.1:5432:5432 \
     -e POSTGRES_USER=postgres \
     -e POSTGRES_DB=spacetraders \
@@ -37,7 +37,7 @@ docker run \
     -d \
     postgres
 
-docker cp scripts/. spacetraders_postgres:/scripts
-docker cp sql/. spacetraders_postgres:/sql
+docker cp scripts/. space_traders-db-1:/scripts
+docker cp sql/. space_traders-db-1:/sql
 
-docker exec spacetraders_postgres /scripts/init_db.sh spacetraders
+docker exec space_traders-db-1 /scripts/init_db.sh spacetraders
