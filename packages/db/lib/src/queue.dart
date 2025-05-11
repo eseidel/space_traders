@@ -1,11 +1,14 @@
 import 'dart:convert';
 
 import 'package:db/src/query.dart';
+import 'package:equatable/equatable.dart';
+import 'package:meta/meta.dart';
 import 'package:types/queue.dart';
 
 /// Request queued for later execution.
 // TODO(eseidel): Does this belong in types?
-class RequestRecord {
+@immutable
+class RequestRecord extends Equatable {
   /// Creates a new [RequestRecord].
   const RequestRecord({required this.priority, required this.request, this.id});
 
@@ -17,12 +20,20 @@ class RequestRecord {
 
   /// The queued request
   final QueuedRequest request;
+
+  @override
+  List<Object?> get props => [id, priority, request];
 }
 
 /// Response record in the database.
-class ResponseRecord {
+@immutable
+class ResponseRecord extends Equatable {
   /// Creates a new [ResponseRecord].
-  ResponseRecord({required this.requestId, required this.response, this.id});
+  const ResponseRecord({
+    required this.requestId,
+    required this.response,
+    this.id,
+  });
 
   /// id of the request in the database if it has been inserted.
   final int? id;
@@ -32,6 +43,9 @@ class ResponseRecord {
 
   /// The queued response
   final QueuedResponse response;
+
+  @override
+  List<Object?> get props => [id, requestId, response];
 }
 
 /// Query to insert a request into the database.
