@@ -1541,3 +1541,11 @@ cli-1     | [WARN] FleetRole.probe has no specified behaviors, idling.
 ### fleet_charters will be empty until restart and then full.
 
 Not sure why. Some cache is not getting invalidated.
+
+### Need new reset logic
+Our existing logic (including manual removal of the db) no longer works well.
+
+### CLI hits errors if all systems aren't cached yet.
+
+Could run the cache from within the CLI?  Or teach it to fetch just the
+systems that it needs for its ships?

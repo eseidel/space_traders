@@ -44,5 +44,17 @@ class SystemsFetcher {
       }
       i++;
     });
+
+    // Confirm we've cached them all.
+    final afterMissingSystems =
+        galaxy.systemCount - await _db.systems.countSystemRecords();
+    final afterMissingWaypoints =
+        galaxy.waypointCount - await _db.systems.countSystemWaypoints();
+    if (afterMissingSystems > 0) {
+      logger.err('Still missing $afterMissingSystems systems');
+    }
+    if (afterMissingWaypoints > 0) {
+      logger.err('Still missing $afterMissingWaypoints waypoints');
+    }
   }
 }
