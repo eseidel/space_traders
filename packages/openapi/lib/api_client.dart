@@ -237,6 +237,8 @@ class ApiClient {
           return ActivityLevelTypeTransformer().decode(value);
         case 'Agent':
           return Agent.fromJson(value);
+        case 'AgentEvent':
+          return AgentEvent.fromJson(value);
         case 'Chart':
           return Chart.fromJson(value);
         case 'ChartTransaction':
@@ -323,8 +325,16 @@ class ApiClient {
           return GetMarket200Response.fromJson(value);
         case 'GetMounts200Response':
           return GetMounts200Response.fromJson(value);
+        case 'GetMyAccount200Response':
+          return GetMyAccount200Response.fromJson(value);
+        case 'GetMyAccount200ResponseData':
+          return GetMyAccount200ResponseData.fromJson(value);
+        case 'GetMyAccount200ResponseDataAccount':
+          return GetMyAccount200ResponseDataAccount.fromJson(value);
         case 'GetMyAgent200Response':
           return GetMyAgent200Response.fromJson(value);
+        case 'GetMyAgentEvents200Response':
+          return GetMyAgentEvents200Response.fromJson(value);
         case 'GetMyFactions200Response':
           return GetMyFactions200Response.fromJson(value);
         case 'GetMyFactions200ResponseDataInner':

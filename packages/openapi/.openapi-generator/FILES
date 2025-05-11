@@ -8,6 +8,7 @@ doc/AcceptContract200ResponseData.md
 doc/AccountsApi.md
 doc/ActivityLevel.md
 doc/Agent.md
+doc/AgentEvent.md
 doc/AgentsApi.md
 doc/Chart.md
 doc/ChartTransaction.md
@@ -57,7 +58,11 @@ doc/GetFactions200Response.md
 doc/GetJumpGate200Response.md
 doc/GetMarket200Response.md
 doc/GetMounts200Response.md
+doc/GetMyAccount200Response.md
+doc/GetMyAccount200ResponseData.md
+doc/GetMyAccount200ResponseDataAccount.md
 doc/GetMyAgent200Response.md
+doc/GetMyAgentEvents200Response.md
 doc/GetMyFactions200Response.md
 doc/GetMyFactions200ResponseDataInner.md
 doc/GetMyShip200Response.md
@@ -227,6 +232,7 @@ lib/model/accept_contract200_response.dart
 lib/model/accept_contract200_response_data.dart
 lib/model/activity_level.dart
 lib/model/agent.dart
+lib/model/agent_event.dart
 lib/model/chart.dart
 lib/model/chart_transaction.dart
 lib/model/construction.dart
@@ -270,7 +276,11 @@ lib/model/get_factions200_response.dart
 lib/model/get_jump_gate200_response.dart
 lib/model/get_market200_response.dart
 lib/model/get_mounts200_response.dart
+lib/model/get_my_account200_response.dart
+lib/model/get_my_account200_response_data.dart
+lib/model/get_my_account200_response_data_account.dart
 lib/model/get_my_agent200_response.dart
+lib/model/get_my_agent_events200_response.dart
 lib/model/get_my_factions200_response.dart
 lib/model/get_my_factions200_response_data_inner.dart
 lib/model/get_my_ship200_response.dart
@@ -420,6 +430,7 @@ test/accept_contract200_response_data_test.dart
 test/accept_contract200_response_test.dart
 test/accounts_api_test.dart
 test/activity_level_test.dart
+test/agent_event_test.dart
 test/agent_test.dart
 test/agents_api_test.dart
 test/chart_test.dart
@@ -470,7 +481,11 @@ test/get_factions200_response_test.dart
 test/get_jump_gate200_response_test.dart
 test/get_market200_response_test.dart
 test/get_mounts200_response_test.dart
+test/get_my_account200_response_data_account_test.dart
+test/get_my_account200_response_data_test.dart
+test/get_my_account200_response_test.dart
 test/get_my_agent200_response_test.dart
+test/get_my_agent_events200_response_test.dart
 test/get_my_factions200_response_data_inner_test.dart
 test/get_my_factions200_response_test.dart
 test/get_my_ship200_response_test.dart

@@ -67,7 +67,7 @@ class DataApi {
 
   /// Subscribe to events
   ///
-  /// Subscribe to departure events for a system.                      ## WebSocket Events                      The following events are available:                      - `systems.{systemSymbol}.departure`: A ship has departed from the system.            ## Subscribe using a message with the following format:            ```json           {             \"action\": \"subscribe\",             \"systemSymbol\": \"{systemSymbol}\"           }           ```                      ## Unsubscribe using a message with the following format:            ```json           {             \"action\": \"unsubscribe\",             \"systemSymbol\": \"{systemSymbol}\"           }           ```
+  /// Subscribe to departure events for a system.            ## WebSocket Events            The following events are available:            - `systems.{systemSymbol}.departure`: A ship has departed from the system.            ## Subscribe using a message with the following format:            ```json           {             \"action\": \"subscribe\",             \"systemSymbol\": \"{systemSymbol}\"           }           ```            ## Unsubscribe using a message with the following format:            ```json           {             \"action\": \"unsubscribe\",             \"systemSymbol\": \"{systemSymbol}\"           }           ```
   ///
   /// Note: This method returns the HTTP [Response].
   Future<Response> websocketDepartureEventsWithHttpInfo() async {
@@ -96,7 +96,7 @@ class DataApi {
 
   /// Subscribe to events
   ///
-  /// Subscribe to departure events for a system.                      ## WebSocket Events                      The following events are available:                      - `systems.{systemSymbol}.departure`: A ship has departed from the system.            ## Subscribe using a message with the following format:            ```json           {             \"action\": \"subscribe\",             \"systemSymbol\": \"{systemSymbol}\"           }           ```                      ## Unsubscribe using a message with the following format:            ```json           {             \"action\": \"unsubscribe\",             \"systemSymbol\": \"{systemSymbol}\"           }           ```
+  /// Subscribe to departure events for a system.            ## WebSocket Events            The following events are available:            - `systems.{systemSymbol}.departure`: A ship has departed from the system.            ## Subscribe using a message with the following format:            ```json           {             \"action\": \"subscribe\",             \"systemSymbol\": \"{systemSymbol}\"           }           ```            ## Unsubscribe using a message with the following format:            ```json           {             \"action\": \"unsubscribe\",             \"systemSymbol\": \"{systemSymbol}\"           }           ```
   Future<void> websocketDepartureEvents() async {
     final response = await websocketDepartureEventsWithHttpInfo();
     if (response.statusCode >= HttpStatus.badRequest) {

@@ -9,8 +9,54 @@ All URIs are relative to *https://api.spacetraders.io/v2*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**getMyAccount**](AccountsApi.md#getmyaccount) | **GET** /my/account | Get Account
 [**register**](AccountsApi.md#register) | **POST** /register | Register New Agent
 
+
+# **getMyAccount**
+> GetMyAccount200Response getMyAccount()
+
+Get Account
+
+Fetch your account details.
+
+### Example
+```dart
+import 'package:openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: AgentToken
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = AccountsApi();
+
+try {
+    final result = api_instance.getMyAccount();
+    print(result);
+} catch (e) {
+    print('Exception when calling AccountsApi->getMyAccount: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**GetMyAccount200Response**](GetMyAccount200Response.md)
+
+### Authorization
+
+[AgentToken](../README.md#AgentToken)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **register**
 > Register201Response register(registerRequest)

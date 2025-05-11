@@ -56,21 +56,20 @@ Please follow the [installation procedure](#installation--usage) and then run th
 ```dart
 import 'package:openapi/api.dart';
 
-// TODO Configure HTTP Bearer authorization: AccountToken
+// TODO Configure HTTP Bearer authorization: AgentToken
 // Case 1. Use String Token
-//defaultApiClient.getAuthentication<HttpBearerAuth>('AccountToken').setAccessToken('YOUR_ACCESS_TOKEN');
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
 // Case 2. Use Function which generate token.
 // String yourTokenGeneratorFunction() { ... }
-//defaultApiClient.getAuthentication<HttpBearerAuth>('AccountToken').setAccessToken(yourTokenGeneratorFunction);
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
 
 final api_instance = AccountsApi();
-final registerRequest = RegisterRequest(); // RegisterRequest | 
 
 try {
-    final result = api_instance.register(registerRequest);
+    final result = api_instance.getMyAccount();
     print(result);
 } catch (e) {
-    print('Exception when calling AccountsApi->register: $e\n');
+    print('Exception when calling AccountsApi->getMyAccount: $e\n');
 }
 
 ```
@@ -81,10 +80,12 @@ All URIs are relative to *https://api.spacetraders.io/v2*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*AccountsApi* | [**getMyAccount**](doc//AccountsApi.md#getmyaccount) | **GET** /my/account | Get Account
 *AccountsApi* | [**register**](doc//AccountsApi.md#register) | **POST** /register | Register New Agent
 *AgentsApi* | [**getAgent**](doc//AgentsApi.md#getagent) | **GET** /agents/{agentSymbol} | Get public details for a specific agent.
 *AgentsApi* | [**getAgents**](doc//AgentsApi.md#getagents) | **GET** /agents | List all public agent details.
 *AgentsApi* | [**getMyAgent**](doc//AgentsApi.md#getmyagent) | **GET** /my/agent | Get Agent
+*AgentsApi* | [**getMyAgentEvents**](doc//AgentsApi.md#getmyagentevents) | **GET** /my/agent/events | Get Agent Events
 *ContractsApi* | [**acceptContract**](doc//ContractsApi.md#acceptcontract) | **POST** /my/contracts/{contractId}/accept | Accept Contract
 *ContractsApi* | [**deliverContract**](doc//ContractsApi.md#delivercontract) | **POST** /my/contracts/{contractId}/deliver | Deliver Cargo to Contract
 *ContractsApi* | [**fulfillContract**](doc//ContractsApi.md#fulfillcontract) | **POST** /my/contracts/{contractId}/fulfill | Fulfill Contract
@@ -153,6 +154,7 @@ Class | Method | HTTP request | Description
  - [AcceptContract200ResponseData](doc//AcceptContract200ResponseData.md)
  - [ActivityLevel](doc//ActivityLevel.md)
  - [Agent](doc//Agent.md)
+ - [AgentEvent](doc//AgentEvent.md)
  - [Chart](doc//Chart.md)
  - [ChartTransaction](doc//ChartTransaction.md)
  - [Construction](doc//Construction.md)
@@ -196,7 +198,11 @@ Class | Method | HTTP request | Description
  - [GetJumpGate200Response](doc//GetJumpGate200Response.md)
  - [GetMarket200Response](doc//GetMarket200Response.md)
  - [GetMounts200Response](doc//GetMounts200Response.md)
+ - [GetMyAccount200Response](doc//GetMyAccount200Response.md)
+ - [GetMyAccount200ResponseData](doc//GetMyAccount200ResponseData.md)
+ - [GetMyAccount200ResponseDataAccount](doc//GetMyAccount200ResponseDataAccount.md)
  - [GetMyAgent200Response](doc//GetMyAgent200Response.md)
+ - [GetMyAgentEvents200Response](doc//GetMyAgentEvents200Response.md)
  - [GetMyFactions200Response](doc//GetMyFactions200Response.md)
  - [GetMyFactions200ResponseDataInner](doc//GetMyFactions200ResponseDataInner.md)
  - [GetMyShip200Response](doc//GetMyShip200Response.md)

@@ -12,6 +12,7 @@ Method | HTTP request | Description
 [**getAgent**](AgentsApi.md#getagent) | **GET** /agents/{agentSymbol} | Get public details for a specific agent.
 [**getAgents**](AgentsApi.md#getagents) | **GET** /agents | List all public agent details.
 [**getMyAgent**](AgentsApi.md#getmyagent) | **GET** /my/agent | Get Agent
+[**getMyAgentEvents**](AgentsApi.md#getmyagentevents) | **GET** /my/agent/events | Get Agent Events
 
 
 # **getAgent**
@@ -147,6 +148,51 @@ This endpoint does not need any parameter.
 ### Return type
 
 [**GetMyAgent200Response**](GetMyAgent200Response.md)
+
+### Authorization
+
+[AgentToken](../README.md#AgentToken)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getMyAgentEvents**
+> GetMyAgentEvents200Response getMyAgentEvents()
+
+Get Agent Events
+
+Get recent events for your agent.
+
+### Example
+```dart
+import 'package:openapi/api.dart';
+// TODO Configure HTTP Bearer authorization: AgentToken
+// Case 1. Use String Token
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken('YOUR_ACCESS_TOKEN');
+// Case 2. Use Function which generate token.
+// String yourTokenGeneratorFunction() { ... }
+//defaultApiClient.getAuthentication<HttpBearerAuth>('AgentToken').setAccessToken(yourTokenGeneratorFunction);
+
+final api_instance = AgentsApi();
+
+try {
+    final result = api_instance.getMyAgentEvents();
+    print(result);
+} catch (e) {
+    print('Exception when calling AgentsApi->getMyAgentEvents: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**GetMyAgentEvents200Response**](GetMyAgentEvents200Response.md)
 
 ### Authorization
 

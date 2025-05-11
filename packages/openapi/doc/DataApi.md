@@ -63,7 +63,7 @@ This endpoint does not need any parameter.
 
 Subscribe to events
 
-Subscribe to departure events for a system.                      ## WebSocket Events                      The following events are available:                      - `systems.{systemSymbol}.departure`: A ship has departed from the system.            ## Subscribe using a message with the following format:            ```json           {             \"action\": \"subscribe\",             \"systemSymbol\": \"{systemSymbol}\"           }           ```                      ## Unsubscribe using a message with the following format:            ```json           {             \"action\": \"unsubscribe\",             \"systemSymbol\": \"{systemSymbol}\"           }           ```
+Subscribe to departure events for a system.            ## WebSocket Events            The following events are available:            - `systems.{systemSymbol}.departure`: A ship has departed from the system.            ## Subscribe using a message with the following format:            ```json           {             \"action\": \"subscribe\",             \"systemSymbol\": \"{systemSymbol}\"           }           ```            ## Unsubscribe using a message with the following format:            ```json           {             \"action\": \"unsubscribe\",             \"systemSymbol\": \"{systemSymbol}\"           }           ```
 
 ### Example
 ```dart
