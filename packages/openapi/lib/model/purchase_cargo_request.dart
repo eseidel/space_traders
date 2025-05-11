@@ -19,7 +19,9 @@ class PurchaseCargoRequest {
 
   TradeSymbol symbol;
 
-  /// Amounts of units to purchase.
+  /// The number of units of the good to purchase.
+  ///
+  /// Minimum value: 1
   int units;
 
   @override

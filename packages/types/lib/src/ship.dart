@@ -121,38 +121,6 @@ extension ShipUtils on Ship {
         .lastWhereOrNull(filter);
   }
 
-  /// Attempt to update this ship's cache to reflect the added cargo.
-  void updateCacheWithAddedCargo({
-    required TradeSymbol tradeSymbol,
-    required int units,
-    required String name,
-    required String description,
-  }) {
-    if (cargo.availableSpace < units) {
-      throw ArgumentError(
-        'Not enough space for $units units of $tradeSymbol in $cargo',
-      );
-    }
-    final item = cargo.cargoItem(tradeSymbol);
-    if (item == null) {
-      final inventory =
-          cargo.inventory.toList()..add(
-            ShipCargoItem(
-              symbol: tradeSymbol,
-              name: name,
-              description: description,
-              // Add initially with zero, we're about to add units below.
-              units: 0,
-            ),
-          );
-      // We may have to replace the list because it defaults to const [] which
-      // is immutable.
-      cargo.inventory = inventory;
-    }
-    cargo.cargoItem(tradeSymbol)!.units += units;
-    cargo.units += units;
-  }
-
   /// Returns true if the ship is out of fuel.  Nothing to do at this point.
   bool get isOutOfFuel => usesFuel && fuel.current == 0;
 

@@ -96,7 +96,7 @@ class SystemsApi {
 
   /// Get Jump Gate
   ///
-  /// Get jump gate details for a waypoint. Requires a waypoint of type `JUMP_GATE` to use.  Waypoints connected to this jump gate can be
+  /// Get jump gate details for a waypoint. Requires a waypoint of type `JUMP_GATE` to use.  Waypoints connected to this jump gate can be found by querying the waypoints in the system.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
@@ -138,7 +138,7 @@ class SystemsApi {
 
   /// Get Jump Gate
   ///
-  /// Get jump gate details for a waypoint. Requires a waypoint of type `JUMP_GATE` to use.  Waypoints connected to this jump gate can be
+  /// Get jump gate details for a waypoint. Requires a waypoint of type `JUMP_GATE` to use.  Waypoints connected to this jump gate can be found by querying the waypoints in the system.
   ///
   /// Parameters:
   ///
@@ -327,14 +327,13 @@ class SystemsApi {
 
   /// Get System
   ///
-  /// Get the details of a system.
+  /// Get the details of a system. Requires the system to have been visited or charted.
   ///
   /// Note: This method returns the HTTP [Response].
   ///
   /// Parameters:
   ///
   /// * [String] systemSymbol (required):
-  ///   The system symbol
   Future<Response> getSystemWithHttpInfo(
     String systemSymbol,
   ) async {
@@ -364,12 +363,11 @@ class SystemsApi {
 
   /// Get System
   ///
-  /// Get the details of a system.
+  /// Get the details of a system. Requires the system to have been visited or charted.
   ///
   /// Parameters:
   ///
   /// * [String] systemSymbol (required):
-  ///   The system symbol
   Future<GetSystem200Response?> getSystem(
     String systemSymbol,
   ) async {
@@ -401,7 +399,6 @@ class SystemsApi {
   /// Parameters:
   ///
   /// * [String] systemSymbol (required):
-  ///   The system symbol
   ///
   /// * [int] page:
   ///   What entry offset to request
@@ -465,7 +462,6 @@ class SystemsApi {
   /// Parameters:
   ///
   /// * [String] systemSymbol (required):
-  ///   The system symbol
   ///
   /// * [int] page:
   ///   What entry offset to request
@@ -681,13 +677,12 @@ class SystemsApi {
   /// * [String] waypointSymbol (required):
   ///   The waypoint symbol
   ///
-  /// * [SupplyConstructionRequest] supplyConstructionRequest:
-  ///
+  /// * [SupplyConstructionRequest] supplyConstructionRequest (required):
   Future<Response> supplyConstructionWithHttpInfo(
     String systemSymbol,
-    String waypointSymbol, {
-    SupplyConstructionRequest? supplyConstructionRequest,
-  }) async {
+    String waypointSymbol,
+    SupplyConstructionRequest supplyConstructionRequest,
+  ) async {
     // ignore: prefer_const_declarations
     final path =
         r'/systems/{systemSymbol}/waypoints/{waypointSymbol}/construction/supply'
@@ -726,17 +721,16 @@ class SystemsApi {
   /// * [String] waypointSymbol (required):
   ///   The waypoint symbol
   ///
-  /// * [SupplyConstructionRequest] supplyConstructionRequest:
-  ///
+  /// * [SupplyConstructionRequest] supplyConstructionRequest (required):
   Future<SupplyConstruction201Response?> supplyConstruction(
     String systemSymbol,
-    String waypointSymbol, {
-    SupplyConstructionRequest? supplyConstructionRequest,
-  }) async {
+    String waypointSymbol,
+    SupplyConstructionRequest supplyConstructionRequest,
+  ) async {
     final response = await supplyConstructionWithHttpInfo(
       systemSymbol,
       waypointSymbol,
-      supplyConstructionRequest: supplyConstructionRequest,
+      supplyConstructionRequest,
     );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));

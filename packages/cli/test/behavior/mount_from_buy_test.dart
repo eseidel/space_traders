@@ -82,12 +82,14 @@ void main() {
       ShipMount(
         symbol: ShipMountSymbolEnum.SURVEYOR_I,
         name: '',
+        description: '',
         requirements: ShipRequirements(),
       ),
       // A mount not in our template (we will remove it)
       ShipMount(
         symbol: ShipMountSymbolEnum.LASER_CANNON_I,
         name: '',
+        description: '',
         requirements: ShipRequirements(),
       ),
     ]);
@@ -197,7 +199,7 @@ void main() {
     when(
       () => fleetApi.installMount(
         shipSymbol.symbol,
-        installMountRequest: InstallMountRequest(symbol: toMount.value),
+        InstallMountRequest(symbol: toMount.value),
       ),
     ).thenAnswer(
       (_) => Future.value(
@@ -219,9 +221,7 @@ void main() {
     when(
       () => fleetApi.removeMount(
         shipSymbol.symbol,
-        removeMountRequest: RemoveMountRequest(
-          symbol: ShipMountSymbolEnum.LASER_CANNON_I.value,
-        ),
+        RemoveMountRequest(symbol: ShipMountSymbolEnum.LASER_CANNON_I.value),
       ),
     ).thenAnswer(
       (_) => Future.value(

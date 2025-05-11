@@ -10,49 +10,37 @@
 
 part of openapi;
 
-class PatchShipNav200ResponseData {
-  /// Returns a new [PatchShipNav200ResponseData] instance.
-  PatchShipNav200ResponseData({
-    required this.nav,
-    required this.fuel,
-    this.events = const [],
+class RemoveShipModule201Response {
+  /// Returns a new [RemoveShipModule201Response] instance.
+  RemoveShipModule201Response({
+    required this.data,
   });
 
-  ShipNav nav;
-
-  ShipFuel fuel;
-
-  List<ShipConditionEvent> events;
+  InstallShipModule201ResponseData data;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is PatchShipNav200ResponseData &&
-          other.nav == nav &&
-          other.fuel == fuel &&
-          _deepEquality.equals(other.events, events);
+      other is RemoveShipModule201Response && other.data == data;
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (nav.hashCode) + (fuel.hashCode) + (events.hashCode);
+      (data.hashCode);
 
   @override
-  String toString() =>
-      'PatchShipNav200ResponseData[nav=$nav, fuel=$fuel, events=$events]';
+  String toString() => 'RemoveShipModule201Response[data=$data]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    json[r'nav'] = this.nav;
-    json[r'fuel'] = this.fuel;
-    json[r'events'] = this.events;
+    json[r'data'] = this.data;
     return json;
   }
 
-  /// Returns a new [PatchShipNav200ResponseData] instance and imports its values from
+  /// Returns a new [RemoveShipModule201Response] instance and imports its values from
   /// [value] if it's a [Map], null otherwise.
   // ignore: prefer_constructors_over_static_methods
-  static PatchShipNav200ResponseData? fromJson(dynamic value) {
+  static RemoveShipModule201Response? fromJson(dynamic value) {
     if (value is Map) {
       final json = value.cast<String, dynamic>();
 
@@ -62,30 +50,28 @@ class PatchShipNav200ResponseData {
       assert(() {
         requiredKeys.forEach((key) {
           assert(json.containsKey(key),
-              'Required key "PatchShipNav200ResponseData[$key]" is missing from JSON.');
+              'Required key "RemoveShipModule201Response[$key]" is missing from JSON.');
           assert(json[key] != null,
-              'Required key "PatchShipNav200ResponseData[$key]" has a null value in JSON.');
+              'Required key "RemoveShipModule201Response[$key]" has a null value in JSON.');
         });
         return true;
       }());
 
-      return PatchShipNav200ResponseData(
-        nav: ShipNav.fromJson(json[r'nav'])!,
-        fuel: ShipFuel.fromJson(json[r'fuel'])!,
-        events: ShipConditionEvent.listFromJson(json[r'events']),
+      return RemoveShipModule201Response(
+        data: InstallShipModule201ResponseData.fromJson(json[r'data'])!,
       );
     }
     return null;
   }
 
-  static List<PatchShipNav200ResponseData> listFromJson(
+  static List<RemoveShipModule201Response> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final result = <PatchShipNav200ResponseData>[];
+    final result = <RemoveShipModule201Response>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
-        final value = PatchShipNav200ResponseData.fromJson(row);
+        final value = RemoveShipModule201Response.fromJson(row);
         if (value != null) {
           result.add(value);
         }
@@ -94,12 +80,12 @@ class PatchShipNav200ResponseData {
     return result.toList(growable: growable);
   }
 
-  static Map<String, PatchShipNav200ResponseData> mapFromJson(dynamic json) {
-    final map = <String, PatchShipNav200ResponseData>{};
+  static Map<String, RemoveShipModule201Response> mapFromJson(dynamic json) {
+    final map = <String, RemoveShipModule201Response>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = PatchShipNav200ResponseData.fromJson(entry.value);
+        final value = RemoveShipModule201Response.fromJson(entry.value);
         if (value != null) {
           map[entry.key] = value;
         }
@@ -108,17 +94,17 @@ class PatchShipNav200ResponseData {
     return map;
   }
 
-  // maps a json object with a list of PatchShipNav200ResponseData-objects as value to a dart map
-  static Map<String, List<PatchShipNav200ResponseData>> mapListFromJson(
+  // maps a json object with a list of RemoveShipModule201Response-objects as value to a dart map
+  static Map<String, List<RemoveShipModule201Response>> mapListFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final map = <String, List<PatchShipNav200ResponseData>>{};
+    final map = <String, List<RemoveShipModule201Response>>{};
     if (json is Map && json.isNotEmpty) {
       // ignore: parameter_assignments
       json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        map[entry.key] = PatchShipNav200ResponseData.listFromJson(
+        map[entry.key] = RemoveShipModule201Response.listFromJson(
           entry.value,
           growable: growable,
         );
@@ -129,8 +115,6 @@ class PatchShipNav200ResponseData {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'nav',
-    'fuel',
-    'events',
+    'data',
   };
 }

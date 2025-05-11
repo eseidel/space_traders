@@ -10,37 +10,37 @@
 
 part of openapi;
 
-class OrbitShip200ResponseData {
-  /// Returns a new [OrbitShip200ResponseData] instance.
-  OrbitShip200ResponseData({
-    required this.nav,
+class GetAgent200Response {
+  /// Returns a new [GetAgent200Response] instance.
+  GetAgent200Response({
+    required this.data,
   });
 
-  ShipNav nav;
+  PublicAgent data;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is OrbitShip200ResponseData && other.nav == nav;
+      other is GetAgent200Response && other.data == data;
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (nav.hashCode);
+      (data.hashCode);
 
   @override
-  String toString() => 'OrbitShip200ResponseData[nav=$nav]';
+  String toString() => 'GetAgent200Response[data=$data]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    json[r'nav'] = this.nav;
+    json[r'data'] = this.data;
     return json;
   }
 
-  /// Returns a new [OrbitShip200ResponseData] instance and imports its values from
+  /// Returns a new [GetAgent200Response] instance and imports its values from
   /// [value] if it's a [Map], null otherwise.
   // ignore: prefer_constructors_over_static_methods
-  static OrbitShip200ResponseData? fromJson(dynamic value) {
+  static GetAgent200Response? fromJson(dynamic value) {
     if (value is Map) {
       final json = value.cast<String, dynamic>();
 
@@ -50,28 +50,28 @@ class OrbitShip200ResponseData {
       assert(() {
         requiredKeys.forEach((key) {
           assert(json.containsKey(key),
-              'Required key "OrbitShip200ResponseData[$key]" is missing from JSON.');
+              'Required key "GetAgent200Response[$key]" is missing from JSON.');
           assert(json[key] != null,
-              'Required key "OrbitShip200ResponseData[$key]" has a null value in JSON.');
+              'Required key "GetAgent200Response[$key]" has a null value in JSON.');
         });
         return true;
       }());
 
-      return OrbitShip200ResponseData(
-        nav: ShipNav.fromJson(json[r'nav'])!,
+      return GetAgent200Response(
+        data: PublicAgent.fromJson(json[r'data'])!,
       );
     }
     return null;
   }
 
-  static List<OrbitShip200ResponseData> listFromJson(
+  static List<GetAgent200Response> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final result = <OrbitShip200ResponseData>[];
+    final result = <GetAgent200Response>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
-        final value = OrbitShip200ResponseData.fromJson(row);
+        final value = GetAgent200Response.fromJson(row);
         if (value != null) {
           result.add(value);
         }
@@ -80,12 +80,12 @@ class OrbitShip200ResponseData {
     return result.toList(growable: growable);
   }
 
-  static Map<String, OrbitShip200ResponseData> mapFromJson(dynamic json) {
-    final map = <String, OrbitShip200ResponseData>{};
+  static Map<String, GetAgent200Response> mapFromJson(dynamic json) {
+    final map = <String, GetAgent200Response>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = OrbitShip200ResponseData.fromJson(entry.value);
+        final value = GetAgent200Response.fromJson(entry.value);
         if (value != null) {
           map[entry.key] = value;
         }
@@ -94,17 +94,17 @@ class OrbitShip200ResponseData {
     return map;
   }
 
-  // maps a json object with a list of OrbitShip200ResponseData-objects as value to a dart map
-  static Map<String, List<OrbitShip200ResponseData>> mapListFromJson(
+  // maps a json object with a list of GetAgent200Response-objects as value to a dart map
+  static Map<String, List<GetAgent200Response>> mapListFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final map = <String, List<OrbitShip200ResponseData>>{};
+    final map = <String, List<GetAgent200Response>>{};
     if (json is Map && json.isNotEmpty) {
       // ignore: parameter_assignments
       json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        map[entry.key] = OrbitShip200ResponseData.listFromJson(
+        map[entry.key] = GetAgent200Response.listFromJson(
           entry.value,
           growable: growable,
         );
@@ -115,6 +115,6 @@ class OrbitShip200ResponseData {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'nav',
+    'data',
   };
 }

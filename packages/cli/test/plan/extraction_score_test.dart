@@ -66,20 +66,20 @@ void main() {
 
     when(() => chartingStore.chartedValues(sourceSymbol)).thenAnswer(
       (_) async => ChartedValues.test(
+        waypointSymbol: sourceSymbol,
         traitSymbols: const {WaypointTraitSymbol.COMMON_METAL_DEPOSITS},
       ),
     );
-    when(
-      () => chartingStore.chartedValues(marketASymbol),
-    ).thenAnswer((_) async => ChartedValues.test());
-    when(
-      () => chartingStore.chartedValues(marketBSymbol),
-    ).thenAnswer((_) async => ChartedValues.test());
+    when(() => chartingStore.chartedValues(marketASymbol)).thenAnswer(
+      (_) async => ChartedValues.test(waypointSymbol: marketASymbol),
+    );
+    when(() => chartingStore.chartedValues(marketBSymbol)).thenAnswer(
+      (_) async => ChartedValues.test(waypointSymbol: marketBSymbol),
+    );
 
     final scores = await evaluateWaypointsForMining(
       db,
       systemsSnapshot,
-
       systemSymbol,
     );
     expect(scores.length, 1);
@@ -125,10 +125,10 @@ void main() {
 
     when(
       () => chartingStore.chartedValues(sourceSymbol),
-    ).thenAnswer((_) async => ChartedValues.test());
+    ).thenAnswer((_) async => ChartedValues.test(waypointSymbol: sourceSymbol));
     when(
       () => chartingStore.chartedValues(marketSymbol),
-    ).thenAnswer((_) async => ChartedValues.test());
+    ).thenAnswer((_) async => ChartedValues.test(waypointSymbol: marketSymbol));
 
     final scores = await evaluateWaypointsForSiphoning(
       db,

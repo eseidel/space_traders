@@ -33,8 +33,8 @@ void main() {
           survey: Survey(
             signature: '123',
             symbol: waypoint.waypoint,
-            size: SurveySizeEnum.SMALL,
-            deposits: [SurveyDeposit(symbol: symbol.value)],
+            size: SurveySize.SMALL,
+            deposits: [SurveyDeposit(symbol: symbol)],
             expiration: now.add(const Duration(days: 1)),
           ),
         );
@@ -47,11 +47,11 @@ void main() {
 
         final surveys = await db.surveys.all();
         expect(surveys.length, 1);
-        expect(surveys.first.survey.deposits.first.symbol, symbol.value);
+        expect(surveys.first.survey.deposits.first.symbol, symbol);
 
         final recent = await db.surveys.recentAt(waypoint, count: 100);
         expect(recent.length, 1);
-        expect(recent.first.survey.deposits.first.symbol, symbol.value);
+        expect(recent.first.survey.deposits.first.symbol, symbol);
 
         expect(recent.first.exhausted, false);
 
@@ -67,10 +67,10 @@ void main() {
       timestamp: DateTime(2021),
       survey: Survey(
         signature: 'foo',
-        symbol: 'bar',
+        symbol: WaypointSymbol.fromString('X1-B-4').waypoint,
         deposits: [],
         expiration: DateTime(2021),
-        size: SurveySizeEnum.LARGE,
+        size: SurveySize.LARGE,
       ),
       exhausted: false,
     );

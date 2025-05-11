@@ -161,6 +161,8 @@ class _IncomeStatementBuilder {
         _fuel(t);
       case AccountingType.capital:
         _capEx(t);
+      case AccountingType.services:
+        _fail(t, 'Services are not a market transaction');
     }
   }
 
@@ -205,6 +207,11 @@ class _IncomeStatementBuilder {
     );
   }
 
+  void _processChartTransaction(Transaction transaction) {
+    _expectAccounting(transaction, AccountingType.services, 'Charting');
+    _zero(transaction, 'Charting');
+  }
+
   void processTransaction(Transaction transaction) {
     switch (transaction.transactionType) {
       case TransactionType.market:
@@ -219,6 +226,8 @@ class _IncomeStatementBuilder {
         _processContractTransaction(transaction);
       case TransactionType.construction:
         _processConstructionTransaction(transaction);
+      case TransactionType.chart:
+        _processChartTransaction(transaction);
     }
   }
 

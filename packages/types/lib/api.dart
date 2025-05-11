@@ -143,7 +143,7 @@ extension SurveyUtils on Survey {
 /// Extensions onto SurveyDeposit to make it easier to work with.
 extension SurveyDepositUtils on SurveyDeposit {
   /// Returns symbol as a TradeSymbol object.
-  TradeSymbol get tradeSymbol => TradeSymbol.fromJson(symbol)!;
+  TradeSymbol get tradeSymbol => symbol;
 }
 
 /// Extensions onto ShipCargoItem to make it easier to work with.

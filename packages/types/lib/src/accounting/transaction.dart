@@ -14,7 +14,10 @@ enum AccountingType {
   fuel,
 
   /// Goods transaction (e.g. buying/selling trade goods).
-  goods;
+  goods,
+
+  /// Services transaction (e.g. charting, surveying).
+  services;
 
   /// Construct an accounting type from json.
   static AccountingType fromJson(String name) {
@@ -43,7 +46,10 @@ enum TransactionType {
   contract,
 
   /// Construction delivery
-  construction;
+  construction,
+
+  /// A charting transaction.
+  chart;
 
   /// Construct a transaction type from json.
   static TransactionType fromJson(String name) {
@@ -279,6 +285,28 @@ class Transaction extends Equatable {
       accounting: AccountingType.goods,
       contractId: null,
       contractAction: null,
+    );
+  }
+
+  /// Create a new transaction from a charting record.
+  factory Transaction.fromChartTransaction(
+    ChartTransaction transaction,
+    int agentCredits,
+  ) {
+    return Transaction(
+      transactionType: TransactionType.chart,
+      shipSymbol: ShipSymbol.fromJson(transaction.shipSymbol),
+      waypointSymbol: WaypointSymbol.fromJson(transaction.waypointSymbol),
+      tradeSymbol: null,
+      shipType: null,
+      quantity: 1,
+      tradeType: null,
+      accounting: AccountingType.services,
+      contractId: null,
+      contractAction: null,
+      perUnitPrice: transaction.totalPrice,
+      timestamp: transaction.timestamp,
+      agentCredits: agentCredits,
     );
   }
 

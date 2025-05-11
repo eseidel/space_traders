@@ -18,13 +18,15 @@ class SupplyConstructionRequest {
     required this.units,
   });
 
-  /// Symbol of the ship to use.
+  /// The symbol of the ship supplying construction materials.
   String shipSymbol;
 
   /// The symbol of the good to supply.
-  String tradeSymbol;
+  TradeSymbol tradeSymbol;
 
   /// Amount of units to supply.
+  ///
+  /// Minimum value: 1
   int units;
 
   @override
@@ -74,7 +76,7 @@ class SupplyConstructionRequest {
 
       return SupplyConstructionRequest(
         shipSymbol: mapValueOfType<String>(json, r'shipSymbol')!,
-        tradeSymbol: mapValueOfType<String>(json, r'tradeSymbol')!,
+        tradeSymbol: TradeSymbol.fromJson(json[r'tradeSymbol'])!,
         units: mapValueOfType<int>(json, r'units')!,
       );
     }

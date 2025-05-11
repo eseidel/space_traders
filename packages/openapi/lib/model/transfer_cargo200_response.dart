@@ -16,7 +16,7 @@ class TransferCargo200Response {
     required this.data,
   });
 
-  Jettison200ResponseData data;
+  TransferCargo200ResponseData data;
 
   @override
   bool operator ==(Object other) =>
@@ -58,7 +58,7 @@ class TransferCargo200Response {
       }());
 
       return TransferCargo200Response(
-        data: Jettison200ResponseData.fromJson(json[r'data'])!,
+        data: TransferCargo200ResponseData.fromJson(json[r'data'])!,
       );
     }
     return null;

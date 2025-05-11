@@ -16,14 +16,26 @@ class ChartedValues {
   /// Creates a new charted values for testing.
   @visibleForTesting
   factory ChartedValues.test({
+    WaypointSymbol? waypointSymbol,
     WaypointFaction? faction,
     Set<WaypointTraitSymbol>? traitSymbols,
     Chart? chart,
-  }) => ChartedValues(
-    faction: faction,
-    traitSymbols: traitSymbols ?? {},
-    chart: chart ?? Chart(),
-  );
+  }) {
+    if (chart == null && waypointSymbol == null) {
+      throw ArgumentError('Either chart or waypointSymbol must be provided');
+    }
+    return ChartedValues(
+      faction: faction,
+      traitSymbols: traitSymbols ?? {},
+      chart:
+          chart ??
+          Chart(
+            waypointSymbol: waypointSymbol!.waypoint,
+            submittedBy: 'agent',
+            submittedOn: DateTime.timestamp(),
+          ),
+    );
+  }
 
   /// Creates a new charted values from JSON data.
   factory ChartedValues.fromJson(Map<String, dynamic> json) {

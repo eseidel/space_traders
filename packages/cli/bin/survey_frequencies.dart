@@ -8,13 +8,13 @@ Future<void> command(Database db, ArgResults argResults) async {
 
   final surveys = await db.surveys.all();
   // Was the trade symbol in the survey at all.
-  final surveyBySymbol = <String, int>{};
+  final surveyBySymbol = <TradeSymbol, int>{};
   // Of all values across all surveys, how many were the trade symbol.
-  final depositBySymbol = <String, int>{};
+  final depositBySymbol = <TradeSymbol, int>{};
   // The total deposits for surveys containing this trade symbol.
   // Used for computing the expected # of deposits of a trade symbol given
   // its known to be in a survey.
-  final totalDepositsByUniqueSymbol = <String, int>{};
+  final totalDepositsByUniqueSymbol = <TradeSymbol, int>{};
   final totalSurveys = surveys.length;
   var totalDeposits = 0;
   for (final survey in surveys) {
@@ -33,12 +33,12 @@ Future<void> command(Database db, ArgResults argResults) async {
   }
   logger.info('$totalSurveys surveys with $totalDeposits deposits');
   final symbols =
-      Set<String>.from(surveyBySymbol.keys)
+      Set<TradeSymbol>.from(surveyBySymbol.keys)
         ..addAll(depositBySymbol.keys)
         ..toList()
-        ..sorted((a, b) => a.compareTo(b));
+        ..sorted((a, b) => a.value.compareTo(b.value));
 
-  final symbolLength = symbols.map((e) => e.length).max;
+  final symbolLength = symbols.map((e) => e.value.length).max;
   const countLength = 5;
   const percentLength = 4;
   String percent(double value) =>
@@ -58,7 +58,7 @@ Future<void> command(Database db, ArgResults argResults) async {
     final depositOverallPercent = depositCount / totalDeposits;
     final depositPerSurveyPercent = depositCount / depositCountInSurveys;
     logger.info(
-      '${symbol.padRight(symbolLength)} '
+      '${symbol.value.padRight(symbolLength)} '
       '${count(surveyCount)} ${percent(surveyPercent)}% '
       '${count(depositCount)} ${percent(depositOverallPercent)}% '
       '(${percent(depositPerSurveyPercent)}%)',

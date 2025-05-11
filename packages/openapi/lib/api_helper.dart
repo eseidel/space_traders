@@ -89,6 +89,9 @@ String parameterToString(dynamic value) {
   if (value is SupplyLevel) {
     return SupplyLevelTypeTransformer().encode(value).toString();
   }
+  if (value is SurveySize) {
+    return SurveySizeTypeTransformer().encode(value).toString();
+  }
   if (value is SystemType) {
     return SystemTypeTypeTransformer().encode(value).toString();
   }

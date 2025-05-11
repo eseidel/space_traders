@@ -15,9 +15,9 @@ class ShipFrame {
   ShipFrame({
     required this.symbol,
     required this.name,
-    required this.description,
     required this.condition,
     required this.integrity,
+    required this.description,
     required this.moduleSlots,
     required this.mountingPoints,
     required this.fuelCapacity,
@@ -31,20 +31,20 @@ class ShipFrame {
   /// Name of the frame.
   String name;
 
-  /// Description of the frame.
-  String description;
-
   /// The repairable condition of a component. A value of 0 indicates the component needs significant repairs, while a value of 1 indicates the component is in near perfect condition. As the condition of a component is repaired, the overall integrity of the component decreases.
   ///
   /// Minimum value: 0
   /// Maximum value: 1
-  num condition;
+  double condition;
 
   /// The overall integrity of the component, which determines the performance of the component. A value of 0 indicates that the component is almost completely degraded, while a value of 1 indicates that the component is in near perfect condition. The integrity of the component is non-repairable, and represents permanent wear over time.
   ///
   /// Minimum value: 0
   /// Maximum value: 1
-  num integrity;
+  double integrity;
+
+  /// Description of the frame.
+  String description;
 
   /// The amount of slots that can be dedicated to modules installed in the ship. Each installed module take up a number of slots, and once there are no more slots, no new modules can be installed.
   ///
@@ -72,9 +72,9 @@ class ShipFrame {
       other is ShipFrame &&
           other.symbol == symbol &&
           other.name == name &&
-          other.description == description &&
           other.condition == condition &&
           other.integrity == integrity &&
+          other.description == description &&
           other.moduleSlots == moduleSlots &&
           other.mountingPoints == mountingPoints &&
           other.fuelCapacity == fuelCapacity &&
@@ -86,9 +86,9 @@ class ShipFrame {
       // ignore: unnecessary_parenthesis
       (symbol.hashCode) +
       (name.hashCode) +
-      (description.hashCode) +
       (condition.hashCode) +
       (integrity.hashCode) +
+      (description.hashCode) +
       (moduleSlots.hashCode) +
       (mountingPoints.hashCode) +
       (fuelCapacity.hashCode) +
@@ -97,15 +97,15 @@ class ShipFrame {
 
   @override
   String toString() =>
-      'ShipFrame[symbol=$symbol, name=$name, description=$description, condition=$condition, integrity=$integrity, moduleSlots=$moduleSlots, mountingPoints=$mountingPoints, fuelCapacity=$fuelCapacity, requirements=$requirements, quality=$quality]';
+      'ShipFrame[symbol=$symbol, name=$name, condition=$condition, integrity=$integrity, description=$description, moduleSlots=$moduleSlots, mountingPoints=$mountingPoints, fuelCapacity=$fuelCapacity, requirements=$requirements, quality=$quality]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
     json[r'symbol'] = this.symbol;
     json[r'name'] = this.name;
-    json[r'description'] = this.description;
     json[r'condition'] = this.condition;
     json[r'integrity'] = this.integrity;
+    json[r'description'] = this.description;
     json[r'moduleSlots'] = this.moduleSlots;
     json[r'mountingPoints'] = this.mountingPoints;
     json[r'fuelCapacity'] = this.fuelCapacity;
@@ -137,9 +137,9 @@ class ShipFrame {
       return ShipFrame(
         symbol: ShipFrameSymbolEnum.fromJson(json[r'symbol'])!,
         name: mapValueOfType<String>(json, r'name')!,
+        condition: mapValueOfType<double>(json, r'condition')!,
+        integrity: mapValueOfType<double>(json, r'integrity')!,
         description: mapValueOfType<String>(json, r'description')!,
-        condition: num.parse('${json[r'condition']}'),
-        integrity: num.parse('${json[r'integrity']}'),
         moduleSlots: mapValueOfType<int>(json, r'moduleSlots')!,
         mountingPoints: mapValueOfType<int>(json, r'mountingPoints')!,
         fuelCapacity: mapValueOfType<int>(json, r'fuelCapacity')!,
@@ -203,9 +203,9 @@ class ShipFrame {
   static const requiredKeys = <String>{
     'symbol',
     'name',
-    'description',
     'condition',
     'integrity',
+    'description',
     'moduleSlots',
     'mountingPoints',
     'fuelCapacity',

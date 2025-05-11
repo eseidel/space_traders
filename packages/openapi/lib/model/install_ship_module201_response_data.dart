@@ -25,7 +25,7 @@ class InstallShipModule201ResponseData {
 
   ShipCargo cargo;
 
-  InstallShipModule201ResponseDataTransaction transaction;
+  ShipModificationTransaction transaction;
 
   @override
   bool operator ==(Object other) =>
@@ -81,8 +81,8 @@ class InstallShipModule201ResponseData {
         agent: Agent.fromJson(json[r'agent'])!,
         modules: ShipModule.listFromJson(json[r'modules']),
         cargo: ShipCargo.fromJson(json[r'cargo'])!,
-        transaction: InstallShipModule201ResponseDataTransaction.fromJson(
-            json[r'transaction'])!,
+        transaction:
+            ShipModificationTransaction.fromJson(json[r'transaction'])!,
       );
     }
     return null;

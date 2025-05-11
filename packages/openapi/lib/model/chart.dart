@@ -13,37 +13,19 @@ part of openapi;
 class Chart {
   /// Returns a new [Chart] instance.
   Chart({
-    this.waypointSymbol,
-    this.submittedBy,
-    this.submittedOn,
+    required this.waypointSymbol,
+    required this.submittedBy,
+    required this.submittedOn,
   });
 
   /// The symbol of the waypoint.
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? waypointSymbol;
+  String waypointSymbol;
 
   /// The agent that submitted the chart for this waypoint.
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  String? submittedBy;
+  String submittedBy;
 
   /// The time the chart for this waypoint was submitted.
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
-  DateTime? submittedOn;
+  DateTime submittedOn;
 
   @override
   bool operator ==(Object other) =>
@@ -56,9 +38,9 @@ class Chart {
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (waypointSymbol == null ? 0 : waypointSymbol!.hashCode) +
-      (submittedBy == null ? 0 : submittedBy!.hashCode) +
-      (submittedOn == null ? 0 : submittedOn!.hashCode);
+      (waypointSymbol.hashCode) +
+      (submittedBy.hashCode) +
+      (submittedOn.hashCode);
 
   @override
   String toString() =>
@@ -66,21 +48,9 @@ class Chart {
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    if (this.waypointSymbol != null) {
-      json[r'waypointSymbol'] = this.waypointSymbol;
-    } else {
-      json[r'waypointSymbol'] = null;
-    }
-    if (this.submittedBy != null) {
-      json[r'submittedBy'] = this.submittedBy;
-    } else {
-      json[r'submittedBy'] = null;
-    }
-    if (this.submittedOn != null) {
-      json[r'submittedOn'] = this.submittedOn!.toUtc().toIso8601String();
-    } else {
-      json[r'submittedOn'] = null;
-    }
+    json[r'waypointSymbol'] = this.waypointSymbol;
+    json[r'submittedBy'] = this.submittedBy;
+    json[r'submittedOn'] = this.submittedOn.toUtc().toIso8601String();
     return json;
   }
 
@@ -105,9 +75,9 @@ class Chart {
       }());
 
       return Chart(
-        waypointSymbol: mapValueOfType<String>(json, r'waypointSymbol'),
-        submittedBy: mapValueOfType<String>(json, r'submittedBy'),
-        submittedOn: mapDateTime(json, r'submittedOn', r''),
+        waypointSymbol: mapValueOfType<String>(json, r'waypointSymbol')!,
+        submittedBy: mapValueOfType<String>(json, r'submittedBy')!,
+        submittedOn: mapDateTime(json, r'submittedOn', r'')!,
       );
     }
     return null;
@@ -163,5 +133,9 @@ class Chart {
   }
 
   /// The list of required keys that must be present in a JSON.
-  static const requiredKeys = <String>{};
+  static const requiredKeys = <String>{
+    'waypointSymbol',
+    'submittedBy',
+    'submittedOn',
+  };
 }

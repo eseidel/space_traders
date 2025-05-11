@@ -59,7 +59,7 @@ void main() {
     when(() => chartingStore.chartingRecord(any())).thenAnswer(
       (_) async => ChartingRecord(
         waypointSymbol: waypointSymbol,
-        values: ChartedValues.test(),
+        values: ChartedValues.test(waypointSymbol: waypointSymbol),
         timestamp: DateTime.now(),
       ),
     );

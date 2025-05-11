@@ -8,8 +8,8 @@ import 'package:openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**cooldown** | [**Cooldown**](Cooldown.md) |  | 
 **siphon** | [**Siphon**](Siphon.md) |  | 
+**cooldown** | [**Cooldown**](Cooldown.md) |  | 
 **cargo** | [**ShipCargo**](ShipCargo.md) |  | 
 **events** | [**List<ShipConditionEvent>**](ShipConditionEvent.md) |  | [default to const []]
 

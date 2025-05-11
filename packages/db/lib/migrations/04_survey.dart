@@ -10,7 +10,7 @@ class CreateSurveyMigration implements Migration {
     CREATE TABLE IF NOT EXISTS "survey_" (
       "signature" text NOT NULL PRIMARY KEY,
       "waypoint_symbol" text NOT NULL,
-      "deposits" text NOT NULL,
+      "deposits" text[] NOT NULL,
       "expiration" timestamp NOT NULL,
       "size" text NOT NULL,
       "timestamp" timestamp NULL DEFAULT CURRENT_TIMESTAMP,

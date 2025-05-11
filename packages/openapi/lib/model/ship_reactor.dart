@@ -15,9 +15,9 @@ class ShipReactor {
   ShipReactor({
     required this.symbol,
     required this.name,
-    required this.description,
     required this.condition,
     required this.integrity,
+    required this.description,
     required this.powerOutput,
     required this.requirements,
     required this.quality,
@@ -29,20 +29,20 @@ class ShipReactor {
   /// Name of the reactor.
   String name;
 
-  /// Description of the reactor.
-  String description;
-
   /// The repairable condition of a component. A value of 0 indicates the component needs significant repairs, while a value of 1 indicates the component is in near perfect condition. As the condition of a component is repaired, the overall integrity of the component decreases.
   ///
   /// Minimum value: 0
   /// Maximum value: 1
-  num condition;
+  double condition;
 
   /// The overall integrity of the component, which determines the performance of the component. A value of 0 indicates that the component is almost completely degraded, while a value of 1 indicates that the component is in near perfect condition. The integrity of the component is non-repairable, and represents permanent wear over time.
   ///
   /// Minimum value: 0
   /// Maximum value: 1
-  num integrity;
+  double integrity;
+
+  /// Description of the reactor.
+  String description;
 
   /// The amount of power provided by this reactor. The more power a reactor provides to the ship, the lower the cooldown it gets when using a module or mount that taxes the ship's power.
   ///
@@ -60,9 +60,9 @@ class ShipReactor {
       other is ShipReactor &&
           other.symbol == symbol &&
           other.name == name &&
-          other.description == description &&
           other.condition == condition &&
           other.integrity == integrity &&
+          other.description == description &&
           other.powerOutput == powerOutput &&
           other.requirements == requirements &&
           other.quality == quality;
@@ -72,24 +72,24 @@ class ShipReactor {
       // ignore: unnecessary_parenthesis
       (symbol.hashCode) +
       (name.hashCode) +
-      (description.hashCode) +
       (condition.hashCode) +
       (integrity.hashCode) +
+      (description.hashCode) +
       (powerOutput.hashCode) +
       (requirements.hashCode) +
       (quality.hashCode);
 
   @override
   String toString() =>
-      'ShipReactor[symbol=$symbol, name=$name, description=$description, condition=$condition, integrity=$integrity, powerOutput=$powerOutput, requirements=$requirements, quality=$quality]';
+      'ShipReactor[symbol=$symbol, name=$name, condition=$condition, integrity=$integrity, description=$description, powerOutput=$powerOutput, requirements=$requirements, quality=$quality]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
     json[r'symbol'] = this.symbol;
     json[r'name'] = this.name;
-    json[r'description'] = this.description;
     json[r'condition'] = this.condition;
     json[r'integrity'] = this.integrity;
+    json[r'description'] = this.description;
     json[r'powerOutput'] = this.powerOutput;
     json[r'requirements'] = this.requirements;
     json[r'quality'] = this.quality;
@@ -119,9 +119,9 @@ class ShipReactor {
       return ShipReactor(
         symbol: ShipReactorSymbolEnum.fromJson(json[r'symbol'])!,
         name: mapValueOfType<String>(json, r'name')!,
+        condition: mapValueOfType<double>(json, r'condition')!,
+        integrity: mapValueOfType<double>(json, r'integrity')!,
         description: mapValueOfType<String>(json, r'description')!,
-        condition: num.parse('${json[r'condition']}'),
-        integrity: num.parse('${json[r'integrity']}'),
         powerOutput: mapValueOfType<int>(json, r'powerOutput')!,
         requirements: ShipRequirements.fromJson(json[r'requirements'])!,
         quality: num.parse('${json[r'quality']}'),
@@ -183,9 +183,9 @@ class ShipReactor {
   static const requiredKeys = <String>{
     'symbol',
     'name',
-    'description',
     'condition',
     'integrity',
+    'description',
     'powerOutput',
     'requirements',
     'quality',

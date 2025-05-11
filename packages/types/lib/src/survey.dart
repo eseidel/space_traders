@@ -26,9 +26,9 @@ class HistoricalSurvey {
       survey: Survey(
         signature: 'signature',
         symbol: const WaypointSymbol.fallbackValue().waypoint,
-        deposits: [SurveyDeposit(symbol: TradeSymbol.DIAMONDS.value)],
+        deposits: [SurveyDeposit(symbol: TradeSymbol.DIAMONDS)],
         expiration: DateTime.now(),
-        size: SurveySizeEnum.SMALL,
+        size: SurveySize.SMALL,
       ),
       exhausted: false,
     );
@@ -50,7 +50,13 @@ class HistoricalSurvey {
     final surveyJson = survey.toJson();
     // Hack around openapi codegen not having recursive toJson.
     surveyJson['size'] = survey.size.toJson();
-    surveyJson['deposits'] = survey.deposits.map((e) => e.toJson()).toList();
+    Json depositToJson(SurveyDeposit deposit) {
+      final json = deposit.toJson();
+      json['symbol'] = deposit.symbol.toJson();
+      return json;
+    }
+
+    surveyJson['deposits'] = survey.deposits.map(depositToJson).toList();
     return {
       'timestamp': timestamp.toUtc().toIso8601String(),
       'survey': surveyJson,

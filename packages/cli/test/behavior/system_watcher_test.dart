@@ -29,6 +29,8 @@ class _MockWaypointCache extends Mock implements WaypointCache {}
 
 class _MockWaypointTraitStore extends Mock implements WaypointTraitStore {}
 
+class _MockTransactionStore extends Mock implements TransactionStore {}
+
 void main() {
   test('advanceSystemWatcher smoke test', () async {
     final api = _MockApi();
@@ -56,22 +58,33 @@ void main() {
       () => caches.systems.systemBySymbol(waypointSymbol.system),
     ).thenReturn(system);
     registerFallbackValue(waypointSymbol.system);
+    final shipSymbol = ShipSymbol.fromString('S-A');
 
     when(() => api.fleet).thenReturn(fleetApi);
     when(() => fleetApi.createChart(any())).thenAnswer(
       (invocation) => Future.value(
         CreateChart201Response(
           data: CreateChart201ResponseData(
-            chart: Chart(),
+            chart: Chart(
+              waypointSymbol: waypointSymbol.waypoint,
+              submittedBy: 'foo',
+              submittedOn: DateTime(2021),
+            ),
+            agent: Agent.test().toOpenApi(),
+            transaction: ChartTransaction(
+              waypointSymbol: waypointSymbol.waypoint,
+              shipSymbol: shipSymbol.symbol,
+              totalPrice: 100,
+              timestamp: DateTime(2021),
+            ),
             waypoint: waypoint.toOpenApi(),
           ),
         ),
       ),
     );
 
-    when(() => ship.fleetRole).thenReturn(FleetRole.command);
-    const shipSymbol = ShipSymbol('S', 1);
     when(() => ship.symbol).thenReturn(shipSymbol);
+    when(() => ship.fleetRole).thenReturn(FleetRole.command);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
@@ -121,6 +134,14 @@ void main() {
     final waypointTraitStore = _MockWaypointTraitStore();
     when(() => db.waypointTraits).thenReturn(waypointTraitStore);
     when(() => waypointTraitStore.addAll(any())).thenAnswer((_) async {});
+
+    final transactionStore = _MockTransactionStore();
+    when(() => db.transactions).thenReturn(transactionStore);
+    registerFallbackValue(Transaction.fallbackValue());
+    when(() => transactionStore.insert(any())).thenAnswer((_) async {});
+
+    registerFallbackValue(Agent.test());
+    when(() => db.upsertAgent(any())).thenAnswer((_) async {});
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(

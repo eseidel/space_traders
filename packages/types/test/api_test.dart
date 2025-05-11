@@ -95,40 +95,4 @@ void main() {
       WaypointTraitSymbol.RARE_METAL_DEPOSITS,
     ]);
   });
-
-  test('updateCacheWithTransferredCargo', () {
-    final ship = _MockShip();
-    when(() => ship.cargo).thenReturn(ShipCargo(capacity: 100, units: 0));
-
-    void add(TradeSymbol symbol, int units) {
-      ship.updateCacheWithAddedCargo(
-        tradeSymbol: symbol,
-        units: units,
-        name: symbol.value,
-        description: '',
-      );
-    }
-
-    add(TradeSymbol.ADVANCED_CIRCUITRY, 2);
-    expect(ship.cargo.units, 2);
-    expect(ship.cargo.inventory.length, 1);
-    expect(ship.cargo.inventory.first.symbol, TradeSymbol.ADVANCED_CIRCUITRY);
-    expect(ship.cargo.inventory.first.units, 2);
-
-    add(TradeSymbol.ADVANCED_CIRCUITRY, 3);
-    expect(ship.cargo.units, 5);
-    expect(ship.cargo.inventory.length, 1);
-    expect(ship.cargo.inventory.first.symbol, TradeSymbol.ADVANCED_CIRCUITRY);
-    expect(ship.cargo.inventory.first.units, 5);
-
-    add(TradeSymbol.ALUMINUM, 3);
-    expect(ship.cargo.units, 8);
-    expect(ship.cargo.inventory.length, 2);
-    expect(ship.cargo.inventory.first.symbol, TradeSymbol.ADVANCED_CIRCUITRY);
-    expect(ship.cargo.inventory.first.units, 5);
-    expect(ship.cargo.inventory.last.symbol, TradeSymbol.ALUMINUM);
-    expect(ship.cargo.inventory.last.units, 3);
-
-    expect(() => add(TradeSymbol.ALUMINUM, 100), throwsArgumentError);
-  });
 }

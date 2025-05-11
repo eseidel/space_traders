@@ -49,6 +49,7 @@ void main() {
       ShipMount(
         symbol: ShipMountSymbolEnum.SURVEYOR_I,
         name: '',
+        description: '',
         requirements: ShipRequirements(),
       ),
     ]);
