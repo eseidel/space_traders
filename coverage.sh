@@ -19,7 +19,10 @@ do
     dart pub global run coverage:format_coverage --lcov --in=coverage \
         --out=coverage/lcov.info --packages=.dart_tool/package_config.json \
         --report-on=../cli/lib/ \
+        --report-on=../client/lib/ \
         --report-on=../db/lib/ \
+        --report-on=../gen/lib/ \
+        --report-on=../protocol/lib/ \
         --report-on=../server/lib/ \
         --report-on=../types/lib/ \
         --check-ignore
