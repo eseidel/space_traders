@@ -139,7 +139,12 @@ class NetExecutor {
         if (serverErrorRetryLimit-- > 0) {
           continue;
         }
-        logger.err('Too many server errors, giving up.');
+        logger
+          ..err('Too many server errors, giving up.')
+          ..err('Request:')
+          ..err(request.request.method)
+          ..err(request.request.url)
+          ..err(request.request.body);
       }
 
       await queue.deleteRequest(request);

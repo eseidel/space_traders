@@ -396,7 +396,7 @@ Future<RefuelShip200ResponseData?> refuelAndLog(
     }
   }
 
-  // shipInfo(ship, 'Refueling (${ship.fuel.current} / ${ship.fuel.capacity})');
+  shipInfo(ship, 'Refueling (${ship.fuel.current} / ${ship.fuel.capacity})');
   final data = await refuelShip(db, api, ship, fromCargo: fromCargo);
   final marketTransaction = data.transaction;
   final agent = Agent.fromOpenApi(data.agent);

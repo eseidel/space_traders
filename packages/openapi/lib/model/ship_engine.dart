@@ -119,8 +119,8 @@ class ShipEngine {
       return ShipEngine(
         symbol: ShipEngineSymbolEnum.fromJson(json[r'symbol'])!,
         name: mapValueOfType<String>(json, r'name')!,
-        condition: mapValueOfType<double>(json, r'condition')!,
-        integrity: mapValueOfType<double>(json, r'integrity')!,
+        condition: mapValueOfType<num>(json, r'condition')!.toDouble(),
+        integrity: mapValueOfType<num>(json, r'integrity')!.toDouble(),
         description: mapValueOfType<String>(json, r'description')!,
         speed: mapValueOfType<int>(json, r'speed')!,
         requirements: ShipRequirements.fromJson(json[r'requirements'])!,

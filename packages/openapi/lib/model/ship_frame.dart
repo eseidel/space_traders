@@ -137,8 +137,8 @@ class ShipFrame {
       return ShipFrame(
         symbol: ShipFrameSymbolEnum.fromJson(json[r'symbol'])!,
         name: mapValueOfType<String>(json, r'name')!,
-        condition: mapValueOfType<double>(json, r'condition')!,
-        integrity: mapValueOfType<double>(json, r'integrity')!,
+        condition: mapValueOfType<num>(json, r'condition')!.toDouble(),
+        integrity: mapValueOfType<num>(json, r'integrity')!.toDouble(),
         description: mapValueOfType<String>(json, r'description')!,
         moduleSlots: mapValueOfType<int>(json, r'moduleSlots')!,
         mountingPoints: mapValueOfType<int>(json, r'mountingPoints')!,
