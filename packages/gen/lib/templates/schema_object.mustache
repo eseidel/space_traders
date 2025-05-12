@@ -1,0 +1,29 @@
+class {{ schemaName }} {
+    {{ schemaName }}(
+        {{#hasProperties}}{ {{/hasProperties}}
+        {{#properties}}
+        required this.{{ propertyName }},
+        {{/properties}}
+        {{#hasProperties}} }{{/hasProperties}}
+    );
+
+    factory {{ schemaName }}.fromJson(Map<String, dynamic> json) {
+        return {{ schemaName }}(
+            {{#properties}}
+            {{ propertyName }}: {{{ propertyFromJson }}},
+            {{/properties}}
+        );
+    }
+
+    {{#properties}}
+    final {{{ propertyType }}} {{ propertyName }};
+    {{/properties}}
+
+    Map<String, dynamic> toJson() {
+        return {
+            {{#properties}}
+            '{{ propertyName }}': {{{ propertyToJson }}},
+            {{/properties}}
+        };
+    }
+}
