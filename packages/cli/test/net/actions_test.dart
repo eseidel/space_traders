@@ -423,7 +423,12 @@ void main() {
         medianFuelPurchasePrice: 100,
       ),
     );
-    verify(() => fleetApi.refuelShip(shipSymbol.symbol)).called(1);
+    verify(
+      () => fleetApi.refuelShip(
+        shipSymbol.symbol,
+        refuelShipRequest: RefuelShipRequest(),
+      ),
+    ).called(1);
     verifyNever(
       () => fleetApi.patchShipNav(
         any(),
@@ -504,7 +509,12 @@ void main() {
         medianFuelPurchasePrice: 100,
       ),
     );
-    verify(() => fleetApi.refuelShip(shipSymbol.symbol)).called(1);
+    verify(
+      () => fleetApi.refuelShip(
+        shipSymbol.symbol,
+        refuelShipRequest: RefuelShipRequest(),
+      ),
+    ).called(1);
 
     // It does refuel if our recent trip data has a large trip
     clearInteractions(fleetApi);
@@ -527,7 +537,12 @@ void main() {
         medianFuelPurchasePrice: 100,
       ),
     );
-    verify(() => fleetApi.refuelShip(shipSymbol.symbol)).called(1);
+    verify(
+      () => fleetApi.refuelShip(
+        shipSymbol.symbol,
+        refuelShipRequest: RefuelShipRequest(),
+      ),
+    ).called(1);
 
     // It will also refuel if our fuel is < 50% of capacity
     clearInteractions(fleetApi);
@@ -550,7 +565,12 @@ void main() {
         medianFuelPurchasePrice: 100,
       ),
     );
-    verify(() => fleetApi.refuelShip(shipSymbol.symbol)).called(1);
+    verify(
+      () => fleetApi.refuelShip(
+        shipSymbol.symbol,
+        refuelShipRequest: RefuelShipRequest(),
+      ),
+    ).called(1);
   });
 
   test('sellAllCargoAndLog', () async {

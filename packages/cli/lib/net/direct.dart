@@ -248,7 +248,10 @@ Future<RefuelShip200ResponseData> refuelShip(
   // We used to have logic to avoid filling to full, but our route planner
   // doesn't account for non-full tanks, so for now we just always
   // refill to full.
-  final request = fromCargo ? RefuelShipRequest(fromCargo: fromCargo) : null;
+  // Always send an explicit request to avoid the server being confused
+  // about an empty body with application/json as content type.
+  // https://discord.com/channels/792864705139048469/1371193425348526100
+  final request = RefuelShipRequest(fromCargo: fromCargo);
   final responseWrapper = await api.fleet.refuelShip(
     ship.symbol.symbol,
     refuelShipRequest: request,
