@@ -211,14 +211,14 @@ of other tools for viewing lcov.info files, including extensions for
 VSCode.  Mostly I just use codecov for viewing coverage.
 
 ## Reset day checklist
-```
-cd packages/cli
-dart run bin/reset.dart
-cd ../db
-docker exec space_traders-db-1 /scripts/init_db.sh spacetraders
-```
+* docker compose down (to shut down all services)
+* sudo chown eseidel db_data
+* mv db_data saved_db_data
 * Update `open_api_config.yaml` to have the latest git hash.
 * regenerate space_traders_api
+* get a new token from my.spacetraders.io
+* import the token via cli/bin/import_token.
+* cli will fail until waypoints have been poulated by idle.
 
 ### Generating `openapi` package
 ```
