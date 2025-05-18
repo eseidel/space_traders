@@ -423,10 +423,11 @@ void main() {
         medianFuelPurchasePrice: 100,
       ),
     );
+    registerFallbackValue(RefuelShipRequest(units: 336));
     verify(
       () => fleetApi.refuelShip(
         shipSymbol.symbol,
-        refuelShipRequest: RefuelShipRequest(),
+        refuelShipRequest: any(named: 'refuelShipRequest'),
       ),
     ).called(1);
     verifyNever(
@@ -512,7 +513,7 @@ void main() {
     verify(
       () => fleetApi.refuelShip(
         shipSymbol.symbol,
-        refuelShipRequest: RefuelShipRequest(),
+        refuelShipRequest: any(named: 'refuelShipRequest'),
       ),
     ).called(1);
 
@@ -540,7 +541,7 @@ void main() {
     verify(
       () => fleetApi.refuelShip(
         shipSymbol.symbol,
-        refuelShipRequest: RefuelShipRequest(),
+        refuelShipRequest: any(named: 'refuelShipRequest'),
       ),
     ).called(1);
 
@@ -568,7 +569,7 @@ void main() {
     verify(
       () => fleetApi.refuelShip(
         shipSymbol.symbol,
-        refuelShipRequest: RefuelShipRequest(),
+        refuelShipRequest: any(named: 'refuelShipRequest'),
       ),
     ).called(1);
   });

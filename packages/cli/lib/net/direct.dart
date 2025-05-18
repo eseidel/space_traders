@@ -250,8 +250,13 @@ Future<RefuelShip200ResponseData> refuelShip(
   // refill to full.
   // Always send an explicit request to avoid the server being confused
   // about an empty body with application/json as content type.
+  // Remove this once the server is fixed.
   // https://discord.com/channels/792864705139048469/1371193425348526100
-  final request = RefuelShipRequest(fromCargo: fromCargo);
+  final fullRefuel = RefuelShipRequest(
+    units: ship.fuel.capacity - ship.fuel.current,
+  );
+  final request =
+      fromCargo ? RefuelShipRequest(fromCargo: fromCargo) : fullRefuel;
   final responseWrapper = await api.fleet.refuelShip(
     ship.symbol.symbol,
     refuelShipRequest: request,
