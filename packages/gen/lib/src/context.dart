@@ -5,7 +5,9 @@ import 'package:mustache_template/mustache_template.dart';
 import 'package:path/path.dart' as p;
 import 'package:space_gen/space_gen.dart';
 import 'package:space_gen/src/logger.dart';
+import 'package:space_gen/src/resolver.dart';
 import 'package:space_gen/src/string.dart';
+
 
 Template loadTemplate(FileSystem fs, String name) {
   // I'm not sure how to load a template relative to the package root
@@ -22,17 +24,36 @@ String _apiPath(Api api) {
   return 'lib/api/${api.fileName}.dart';
 }
 
-String _modelPath(Schema schema) {
-  // openapi generator does not use /src/ in the path.
-  return 'lib/model/${schema.fileName}.dart';
-}
+// String _modelPath(ResolvedSchema schema) {
+//   // openapi generator does not use /src/ in the path.
+//   return 'lib/model/${schema.fileName}.dart';
+// }
 
-extension ApiGeneration on Api {
+/// The spec calls these tags, but the Dart openapi generator groups endpoints
+/// by tag into an API class so we do too.
+class Api {
+  const Api({required this.name, required this.endpoints});
+
+  final String name;
+  final List<ResolvedEndpoint> endpoints;
+
   String get className => '${name.capitalize()}Api';
   String get fileName => '${name.toLowerCase()}_api';
 }
 
-extension EndpointGeneration on Endpoint {
+extension ResolvedSpecGeneration on ResolvedSpec {
+  List<Api> get apis =>
+      tags
+          .map(
+            (tag) => Api(
+              name: tag,
+              endpoints: endpoints.where((e) => e.tag == tag).toList(),
+            ),
+          )
+          .toList();
+}
+
+extension EndpointGeneration on ResolvedEndpoint {
   String get methodName {
     final name = snakeName.splitMapJoin(
       '-',
@@ -45,22 +66,17 @@ extension EndpointGeneration on Endpoint {
   Uri uri(Context context) => Uri.parse('${context.spec.serverUrl}$path');
 
   Map<String, dynamic> toTemplateContext(Context context) {
-    final resolver = context.resolver;
-    final parameters = this
-        .parameters
-        .map(
-          (param) => param.toTemplateContext(resolver),
-        )
-        .toList();
-    if (requestBody != null) {
-      final bodySchema = resolver.resolve(requestBody!);
-      final typeName = bodySchema.typeName(resolver);
+    final parameters =
+        this.parameters.map((param) => param.toTemplateContext()).toList();
+    final body = requestBody;
+    if (body != null) {
+      final typeName = body.typeName();
       final paramName = typeName[0].toLowerCase() + typeName.substring(1);
       parameters.add({
         'paramName': paramName,
         'paramType': typeName,
-        'paramToJson': bodySchema.toJsonExpression(resolver, paramName),
-        'paramFromJson': bodySchema.fromJsonExpression(resolver, 'json'),
+        'paramToJson': body.toJsonExpression(paramName),
+        'paramFromJson': body.fromJsonExpression('json'),
       });
     }
     return {
@@ -69,16 +85,12 @@ extension EndpointGeneration on Endpoint {
       'path': path,
       'url': uri(context),
       'parameters': parameters,
-      'returnType':
-          responses.responses.first.content.schema!.typeName(resolver),
+      'returnType': responses.first.content.typeName(),
     };
   }
 }
 
-extension SchemaGeneration on Schema {
-  // Some Schema don't have names.
-  String get fileName => snakeFromCamel(name);
-
+extension SchemaGeneration on ResolvedSchema {
   bool get needsRender => type == SchemaType.object || isEnum;
 
   bool get isDateTime {
@@ -89,7 +101,7 @@ extension SchemaGeneration on Schema {
     return type == SchemaType.string && enumValues.isNotEmpty;
   }
 
-  String typeName(RefResolver resolver) {
+  String typeName() {
     switch (type) {
       case SchemaType.string:
         if (isDateTime) {
@@ -107,12 +119,12 @@ extension SchemaGeneration on Schema {
       case SchemaType.object:
         return name;
       case SchemaType.array:
-        return 'List<${resolver.resolve(items!).typeName(resolver)}>';
+        return 'List<${items!.typeName()}>';
     }
     // throw UnimplementedError('Unknown type $type');
   }
 
-  String toJsonExpression(RefResolver resolver, String name) {
+  String toJsonExpression(String name) {
     switch (type) {
       case SchemaType.string:
         if (isDateTime) {
@@ -128,7 +140,7 @@ extension SchemaGeneration on Schema {
       case SchemaType.object:
         return '$name.toJson()';
       case SchemaType.array:
-        final itemsSchema = resolver.resolve(items!);
+        final itemsSchema = items!;
         switch (itemsSchema.type) {
           case SchemaType.string:
           case SchemaType.integer:
@@ -143,7 +155,7 @@ extension SchemaGeneration on Schema {
     }
   }
 
-  String fromJsonExpression(RefResolver resolver, String jsonValue) {
+  String fromJsonExpression(String jsonValue) {
     switch (type) {
       case SchemaType.string:
         if (isDateTime) {
@@ -161,8 +173,8 @@ extension SchemaGeneration on Schema {
       case SchemaType.object:
         return '$name.fromJson($jsonValue as Map<String, dynamic>)';
       case SchemaType.array:
-        final itemsSchema = resolver.resolve(items!);
-        final itemTypeName = itemsSchema.typeName(resolver);
+        final itemsSchema = items!;
+        final itemTypeName = itemsSchema.typeName();
         if (itemsSchema.type == SchemaType.object) {
           return '($jsonValue as List<dynamic>).map<$itemTypeName>((e) => '
               '$itemTypeName.fromJson(e as Map<String, dynamic>)).toList()';
@@ -172,20 +184,19 @@ extension SchemaGeneration on Schema {
     }
   }
 
-  Map<String, dynamic> objectToTemplateContext(RefResolver resolver) {
-    final renderProperties = properties.entries.map(
-      (entry) {
-        final name = entry.key;
-        final schema = resolver.resolve(entry.value);
-        return {
-          'propertyName': name,
-          'propertyType': schema.typeName(resolver),
-          'propertyToJson': schema.toJsonExpression(resolver, name),
-          'propertyFromJson':
-              schema.fromJsonExpression(resolver, "json['$name']"),
-        };
-      },
-    );
+  Map<String, dynamic> objectToTemplateContext() {
+    final renderProperties = properties.entries.map((entry) {
+      final name = entry.key;
+      final schema = entry.value;
+      return {
+        'propertyName': name,
+        'propertyType': schema.typeName(),
+        'propertyToJson': schema.toJsonExpression(, name),
+        'propertyFromJson': schema.fromJsonExpression(
+          "json['$name']",
+        ),
+      };
+    });
     return {
       'schemaName': name,
       'hasProperties': renderProperties.isNotEmpty,
@@ -193,16 +204,13 @@ extension SchemaGeneration on Schema {
     };
   }
 
-  Map<String, dynamic> _enumToTemplateContext(RefResolver resolver) {
+  Map<String, dynamic> _enumToTemplateContext() {
     Map<String, dynamic> enumValueToTemplateContext(String value) {
       var dartName = camelFromScreamingCaps(value);
       if (isReservedWord(dartName)) {
         dartName = '${dartName}_';
       }
-      return {
-        'enumValueName': dartName,
-        'enumValue': value,
-      };
+      return {'enumValueName': dartName, 'enumValue': value};
     }
 
     return {
@@ -211,11 +219,11 @@ extension SchemaGeneration on Schema {
     };
   }
 
-  Map<String, dynamic> toTemplateContext(RefResolver resolver) {
+  Map<String, dynamic> toTemplateContext() {
     if (isEnum) {
-      return _enumToTemplateContext(resolver);
+      return _enumToTemplateContext();
     } else {
-      return objectToTemplateContext(resolver);
+      return objectToTemplateContext();
     }
   }
 
@@ -225,25 +233,14 @@ extension SchemaGeneration on Schema {
   }
 }
 
-extension ParameterGeneration on Parameter {
-  Map<String, dynamic> toTemplateContext(
-    RefResolver resolver,
-  ) {
-    final schema = resolver.resolve(type);
+extension ParameterGeneration on ResolvedParameter {
+  Map<String, dynamic> toTemplateContext() {
     return {
       'paramName': name,
-      'paramType': schema.typeName(resolver),
-      'paramToJson': schema.toJsonExpression(resolver, name),
-      'paramFromJson': schema.fromJsonExpression(resolver, "json['$name']"),
+      'paramType': type.typeName(),
+      'paramToJson': type.toJsonExpression(name),
+      'paramFromJson': type.fromJsonExpression("json['$name']"),
     };
-  }
-}
-
-extension SchemaRefGeneration on SchemaRef {
-  String packageImport(Context context) {
-    final name = p.basenameWithoutExtension(uri!.path);
-    final snakeName = snakeFromCamel(name);
-    return 'package:${context.packageName}/model/$snakeName.dart';
   }
 }
 
@@ -254,27 +251,17 @@ class Context {
     required this.spec,
     required this.outDir,
     required this.packageName,
-    required this.fileSystem,
-  }) : resolver = RefResolver(fileSystem, specUrl);
+    required this.fs,
+  });
 
   final Uri specUrl;
-  final Spec spec;
+  final ResolvedSpec spec;
   final Directory outDir;
   final String packageName;
-  final RefResolver resolver;
-  final FileSystem fileSystem;
-
-  Schema resolve(SchemaRef ref) => resolver.resolve(ref);
-
-  static Future<Spec> loadSpec(Uri specUrl, FileSystem fileSystem) async {
-    final content = fileSystem.file(specUrl.toFilePath()).readAsStringSync();
-    final spec = await Spec.load(content, specUrl);
-    // Crawl the spec and load all the schemas?
-    return spec;
-  }
+  final FileSystem fs;
 
   File _ensureFile(String path) {
-    final file = fileSystem.file(p.join(outDir.path, path));
+    final file = fs.file(p.join(outDir.path, path));
     file.parent.createSync(recursive: true);
     return file;
   }
@@ -288,7 +275,7 @@ class Context {
     required String outPath,
     Map<String, dynamic> context = const {},
   }) {
-    final output = loadTemplate(fileSystem, template).renderString(context);
+    final output = loadTemplate(fs, template).renderString(context);
     writeFile(path: outPath, content: output);
   }
 
@@ -297,23 +284,18 @@ class Context {
     renderTemplate(
       template: 'pubspec',
       outPath: 'pubspec.yaml',
-      context: {
-        'packageName': packageName,
-      },
+      context: {'packageName': packageName},
     );
     renderTemplate(
       template: 'analysis_options',
       outPath: 'analysis_options.yaml',
     );
-    renderTemplate(
-      template: 'gitignore',
-      outPath: '.gitignore',
-    );
+    renderTemplate(template: 'gitignore', outPath: '.gitignore');
   }
 
   void renderApis() {
-    final rendered = <Uri>{};
-    final renderQueue = <SchemaRef>{};
+    // final rendered = <ResolvedSchema>{};
+    // final renderQueue = <ResolvedSchema>{};
     for (final api in spec.apis) {
       final renderContext = RenderContext();
       renderApi(renderContext, this, api);
@@ -322,27 +304,25 @@ class Context {
       for (final schema in renderContext.inlineSchemas) {
         renderRootSchema(this, schema);
       }
-      renderQueue.addAll(renderContext.imported);
     }
 
-    // Render all the schemas that were collected while rendering the API.
-    while (renderQueue.isNotEmpty) {
-      final ref = renderQueue.first;
-      renderQueue.remove(ref);
-      if (rendered.contains(ref.uri)) {
-        continue;
-      }
-      rendered.add(ref.uri!);
-      final schema = resolver.resolve(ref);
-      // Only render objects and enums for now.
-      // Otherwise we render an empty file for ship_condition.dart
-      // which is an int type with min/max values.
-      // if (schema.type != SchemaType.object && !schema.isEnum) {
-      //   continue;
-      // }
-      final renderContext = renderRootSchema(this, schema);
-      renderQueue.addAll(renderContext.imported);
-    }
+    // // Render all the schemas that were collected while rendering the API.
+    // while (renderQueue.isNotEmpty) {
+    //   final schema = renderQueue.first;
+    //   renderQueue.remove(schema);
+    //   if (rendered.contains(schema)) {
+    //     continue;
+    //   }
+    //   rendered.add(schema);
+    //   // Only render objects and enums for now.
+    //   // Otherwise we render an empty file for ship_condition.dart
+    //   // which is an int type with min/max values.
+    //   // if (schema.type != SchemaType.object && !schema.isEnum) {
+    //   //   continue;
+    //   // }
+    //   final renderContext = renderRootSchema(this, schema);
+    //   // renderQueue.addAll(renderContext.imported);
+    // }
   }
 
   void runDart(List<String> args) {
@@ -355,43 +335,18 @@ class Context {
     logger.detail(result.stdout as String);
   }
 
-  // void renderModelFile(String path) {
-  //   final file = File(path);
-  //   final contents = file.readAsStringSync();
-  //   final name = p.basenameWithoutExtension(file.path);
-  //   final uri = Uri.parse(file.path);
-  //   final schema = parseSchema(
-  //     current: uri,
-  //     name: name,
-  //     json: jsonDecode(contents) as Map<String, dynamic>,
-  //   );
-  //   renderRootSchema(this, schema);
-  // }
-
-  // void renderModels() {
-  //   // This is a hack.
-  //   const modelsPath = '../api-docs/models';
-  //   final dir = Directory(modelsPath);
-  //   for (final entity in dir.listSync()) {
-  //     if (entity is! File) {
-  //       continue;
-  //     }
-  //     renderModelFile(entity.path);
-  //   }
-  // }
-
   void renderPublicApi() {
-    final exports = spec.apis
-        .map((api) => 'package:$packageName/api/${api.fileName}.dart')
-        .toList()
-      ..sort();
+    final exports =
+        spec.apis
+            .map(
+              (api) => 'package:$packageName/api/${api.fileName}.dart',
+            )
+            .toList()
+          ..sort();
     renderTemplate(
       template: 'public_api',
       outPath: 'lib/api.dart',
-      context: {
-        'imports': <String>[],
-        'exports': exports,
-      },
+      context: {'imports': <String>[], 'exports': exports},
     );
   }
 
@@ -410,44 +365,41 @@ class Context {
   }
 }
 
+/// This appears to be per-file rendering context which differs from Context
+/// which is global for the entire render?
 class RenderContext {
+  // TODO(eseidel): This is the wrong way to determine where to render a
+  // schema.
   /// Schemas to render in this file.
-  List<Schema> inlineSchemas = [];
+  List<ResolvedSchema> inlineSchemas = [];
 
-  /// Schemas to import and render in other files.
-  List<SchemaRef> imported = [];
-
-  void visitRef(SchemaRef ref) {
-    if (ref.schema != null) {
-      collectSchema(ref.schema!);
-    } else {
-      imported.add(ref);
-    }
+  void visitSchema(ResolvedSchema schema) {
+      collectSchema(schema);
   }
 
   void collectApi(Api api) {
     for (final endpoint in api.endpoints) {
-      for (final response in endpoint.responses.responses) {
-        visitRef(response.content);
+      for (final response in endpoint.responses) {
+        visitSchema(response.content);
       }
       for (final param in endpoint.parameters) {
-        visitRef(param.type);
+        visitSchema(param.type);
       }
       if (endpoint.requestBody != null) {
-        visitRef(endpoint.requestBody!);
+        visitSchema(endpoint.requestBody!);
       }
     }
   }
 
-  void collectSchema(Schema schema) {
+  void collectSchema(ResolvedSchema schema) {
     if (schema.needsRender) {
       inlineSchemas.add(schema);
     }
     for (final entry in schema.properties.entries) {
-      visitRef(entry.value);
+      visitSchema(entry.value);
     }
     if (schema.type == SchemaType.array) {
-      visitRef(schema.items!);
+      visitSchema(schema.items!);
     }
   }
 
@@ -456,9 +408,6 @@ class RenderContext {
     bool includeInlineSchema = false,
   }) {
     final imports = <String>{};
-    for (final ref in imported) {
-      imports.add(ref.packageImport(context));
-    }
     if (includeInlineSchema) {
       for (final schema in inlineSchemas) {
         imports.add(schema.packageImport(context));
@@ -467,27 +416,23 @@ class RenderContext {
     return imports.toList()..sort();
   }
 
-  List<Map<String, dynamic>> objectContexts(RefResolver resolver) {
+  List<Map<String, dynamic>> objectContexts() {
     return inlineSchemas
         .where((schema) => schema.type == SchemaType.object)
-        .map(
-          (schema) => schema.toTemplateContext(resolver),
-        )
+        .map((schema) => schema.toTemplateContext())
         .toList();
   }
 
-  List<Map<String, dynamic>> enumContexts(RefResolver resolver) {
+  List<Map<String, dynamic>> enumContexts() {
     return inlineSchemas
         .where((schema) => schema.isEnum)
-        .map(
-          (schema) => schema.toTemplateContext(resolver),
-        )
+        .map((schema) => schema.toTemplateContext())
         .toList();
   }
 }
 
 /// Starts a new RenderContext for rendering a new schema file.
-RenderContext renderRootSchema(Context context, Schema schema) {
+RenderContext renderRootSchema(Context context, ResolvedSchema schema) {
   // logger.info('Rendering ${schema.name}');
 
   final renderContext = RenderContext()..collectSchema(schema);
@@ -496,17 +441,13 @@ RenderContext renderRootSchema(Context context, Schema schema) {
   //   ..info('To render: ${renderContext.inlineSchemas}');
 
   final imports = renderContext.sortedPackageImports(context);
-  final objects = renderContext.objectContexts(context.resolver);
-  final enums = renderContext.enumContexts(context.resolver);
+  final objects = renderContext.objectContexts();
+  final enums = renderContext.enumContexts();
 
   context.renderTemplate(
     template: 'model',
     outPath: _modelPath(schema),
-    context: {
-      'imports': imports,
-      'objects': objects,
-      'enums': enums,
-    },
+    context: {'imports': imports, 'objects': objects, 'enums': enums},
   );
   return renderContext;
 }
@@ -516,8 +457,10 @@ void renderApi(RenderContext renderContext, Context context, Api api) {
       api.endpoints.map((e) => e.toTemplateContext(context)).toList();
   renderContext.collectApi(api);
 
-  final imports =
-      renderContext.sortedPackageImports(context, includeInlineSchema: true);
+  final imports = renderContext.sortedPackageImports(
+    context,
+    includeInlineSchema: true,
+  );
 
   // The OpenAPI generator only includes the APIs in the api/ directory
   // all other classes and enums go in the model/ directory even ones
