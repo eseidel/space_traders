@@ -252,11 +252,10 @@ Future<RefuelShip200ResponseData> refuelShip(
   // about an empty body with application/json as content type.
   // Remove this once the server is fixed.
   // https://discord.com/channels/792864705139048469/1371193425348526100
-  final fullRefuel = RefuelShipRequest(
-    units: ship.fuel.capacity - ship.fuel.current,
-  );
-  final request =
-      fromCargo ? RefuelShipRequest(fromCargo: fromCargo) : fullRefuel;
+  // and
+  // https://discord.com/channels/792864705139048469/1373743083799187558
+  final refuelAmount = ship.fuel.capacity - ship.fuel.current;
+  final request = RefuelShipRequest(fromCargo: fromCargo, units: refuelAmount);
   final responseWrapper = await api.fleet.refuelShip(
     ship.symbol.symbol,
     refuelShipRequest: request,
