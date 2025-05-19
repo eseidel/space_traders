@@ -35,8 +35,10 @@ Config loadFromFile(File config) {
   // Using the same names as openapi-generator-cli
   // https://github.com/OpenAPITools/openapi-generator/blob/master/docs/configuration.md
   // https://github.com/OpenAPITools/openapi-generator/blob/master/docs/generators/dart.md
-  final inputSpec =
-      resolveRelativeUri(config, _requiredValue(yaml, 'inputSpec'));
+  final inputSpec = resolveRelativeUri(
+    config,
+    _requiredValue(yaml, 'inputSpec'),
+  );
   final outputDir = config.fileSystem.directory(
     resolveRelativePath(config, _requiredValue(yaml, 'outputDir')),
   );

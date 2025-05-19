@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
-import 'package:space_gen/src/string.dart';
+import 'package:space_gen/src/logger.dart';
 
 enum SentIn {
   query,
@@ -32,12 +32,12 @@ class Parameter {
     required this.sentIn,
   });
 
-  factory Parameter.fromJson(Map<String, dynamic> json) {
+  factory Parameter.parse(Map<String, dynamic> json, ParseContext context) {
     final name = json['name'] as String;
     final required = json['required'] as bool? ?? false;
     final sentIn = json['in'] as String;
     final schema = json['schema'] as Map<String, dynamic>;
-    final type = parseSchemaOrRef(json: schema);
+    final type = parseSchemaOrRef(json: schema, context: context.key('schema'));
     return Parameter(
       name: name,
       isRequired: required,
@@ -119,15 +119,16 @@ class Schema {
     required this.format,
   });
 
-  factory Schema.fromJson(Map<String, dynamic> json) {
-    final type = json['type'] as String;
+  factory Schema.parse(Map<String, dynamic> json, ParseContext context) {
+    final type = json['type'] as String? ?? 'object';
     final properties = parseProperties(
       json: json['properties'] as Map<String, dynamic>?,
+      context: context.key('properties'),
     );
     final items = json['items'] as Map<String, dynamic>?;
     SchemaRef? itemSchema;
     if (items != null) {
-      itemSchema = parseSchemaOrRef(json: items);
+      itemSchema = parseSchemaOrRef(json: items, context: context.key('items'));
     }
 
     final required = json['required'] as List<dynamic>? ?? [];
@@ -135,7 +136,7 @@ class Schema {
     final enumValues = json['enum'] as List<dynamic>? ?? [];
     final format = json['format'] as String?;
 
-    return Schema(
+    final schema = Schema(
       type: SchemaType.fromJson(type),
       properties: properties,
       required: required.cast<String>(),
@@ -144,6 +145,8 @@ class Schema {
       enumValues: enumValues.cast<String>(),
       format: format,
     );
+    context.addSchema(schema);
+    return schema;
   }
 
   final SchemaType type;
@@ -153,27 +156,27 @@ class Schema {
   final SchemaRef? items;
   final List<String> enumValues;
   final String? format;
+
+  @override
+  String toString() {
+    return 'Schema(type: $type, properties: $properties, '
+        'required: $required, description: $description, '
+        'items: $items, enumValues: $enumValues, format: $format)';
+  }
 }
 
 /// Parse a schema or a reference to a schema.
-SchemaRef parseSchemaOrRef({required Map<String, dynamic> json}) {
+SchemaRef parseSchemaOrRef({
+  required Map<String, dynamic> json,
+  required ParseContext context,
+}) {
   if (json.containsKey(r'$ref')) {
     return SchemaRef.fromPath(ref: json[r'$ref'] as String);
   }
 
   if (json.containsKey('oneOf')) {
     // TODO(eseidel): Support oneOf
-    return const SchemaRef.schema(
-      Schema(
-        description: 'OneOf',
-        type: SchemaType.object,
-        properties: {},
-        required: [],
-        items: null,
-        enumValues: [],
-        format: null,
-      ),
-    );
+    throw UnimplementedError('OneOf not supported');
   }
 
   if (json.containsKey('allOf')) {
@@ -181,13 +184,19 @@ SchemaRef parseSchemaOrRef({required Map<String, dynamic> json}) {
     if (allOf.length != 1) {
       throw UnimplementedError('AllOf with ${allOf.length} items');
     }
-    return parseSchemaOrRef(json: allOf.first as Map<String, dynamic>);
+    return parseSchemaOrRef(
+      json: allOf.first as Map<String, dynamic>,
+      context: context.key('allOf'),
+    );
   }
 
-  return SchemaRef.schema(Schema.fromJson(json));
+  return SchemaRef.schema(Schema.parse(json, context));
 }
 
-Map<String, SchemaRef> parseProperties({required Map<String, dynamic>? json}) {
+Map<String, SchemaRef> parseProperties({
+  required Map<String, dynamic>? json,
+  required ParseContext context,
+}) {
   if (json == null) {
     return {};
   }
@@ -198,7 +207,10 @@ Map<String, SchemaRef> parseProperties({required Map<String, dynamic>? json}) {
   for (final entry in json.entries) {
     final name = entry.key;
     final value = entry.value as Map<String, dynamic>;
-    properties[name] = parseSchemaOrRef(json: value);
+    properties[name] = parseSchemaOrRef(
+      json: value,
+      context: context.key(name),
+    );
   }
   return properties;
 }
@@ -245,34 +257,18 @@ class Response {
   final SchemaRef content;
 }
 
-List<Response> parseResponses(Map<String, dynamic> json, String camelName) {
+List<Response> parseResponses(Map<String, dynamic> json, ParseContext context) {
   // Hack to make get cooldown compile.
   final responseCodes = json.keys.toList()..remove('204');
   if (responseCodes.length != 1) {
-    throw UnimplementedError('Multiple responses not supported, $camelName');
+    throw UnimplementedError('Multiple responses not supported');
   }
 
   final responseCode = responseCodes.first;
   final responseTypes = json[responseCode] as Map<String, dynamic>;
   final content = responseTypes['content'] as Map<String, dynamic>?;
   if (content == null) {
-    return [
-      Response(
-        code: int.parse(responseCode),
-        content: const SchemaRef.schema(
-          // This is a hack, this should just be a string.
-          Schema(
-            type: SchemaType.object,
-            properties: {},
-            required: [],
-            description: '',
-            items: null,
-            enumValues: [],
-            format: null,
-          ),
-        ),
-      ),
-    ];
+    return [];
   }
   final jsonResponse = content['application/json'] as Map<String, dynamic>;
   return [
@@ -280,29 +276,25 @@ List<Response> parseResponses(Map<String, dynamic> json, String camelName) {
       code: int.parse(responseCode),
       content: parseSchemaOrRef(
         json: jsonResponse['schema'] as Map<String, dynamic>,
+        context: context.key('response'),
       ),
     ),
   ];
 }
 
-Endpoint parseEndpoint(
-  Map<String, dynamic> methodValue,
-  String path,
-  Method method,
-) {
+Endpoint parseEndpoint({
+  required Map<String, dynamic> methodValue,
+  required String path,
+  required Method method,
+  required ParseContext context,
+}) {
   final snakeName =
       methodValue['operationId'] as String? ??
       Uri.parse(path).pathSegments.last;
 
-  final camelName = snakeName.splitMapJoin(
-    '-',
-    onMatch: (m) => '',
-    onNonMatch: (n) => n.capitalize(),
-  );
-
   final responses = parseResponses(
     methodValue['responses'] as Map<String, dynamic>,
-    camelName,
+    context,
   );
   final tags = methodValue['tags'] as List<dynamic>?;
   final tag = tags?.firstOrNull as String? ?? 'Default';
@@ -310,7 +302,7 @@ Endpoint parseEndpoint(
   final parameters =
       parametersJson
           .cast<Map<String, dynamic>>()
-          .map(Parameter.fromJson)
+          .map((json) => Parameter.parse(json, context))
           .toList();
   final requestBodyJson = methodValue['requestBody'] as Map<String, dynamic>?;
   SchemaRef? requestBody;
@@ -319,6 +311,7 @@ Endpoint parseEndpoint(
     final json = content['application/json'] as Map<String, dynamic>;
     requestBody = parseSchemaOrRef(
       json: json['schema'] as Map<String, dynamic>,
+      context: context.key('requestBody'),
     );
   }
   return Endpoint(
@@ -332,12 +325,61 @@ Endpoint parseEndpoint(
   );
 }
 
+class Components {
+  const Components({required this.schemas});
+
+  final Map<String, Schema> schemas;
+  // final Map<String, Parameter> parameters;
+  // final Map<String, SecurityScheme> securitySchemes;
+  // final Map<String, RequestBody> requestBodies;
+  // final Map<String, Response> responses;
+  // final Map<String, Header> headers;
+  // final Map<String, Example> examples;
+  // final Map<String, Link> links;
+  // final Map<String, Callback> callbacks;
+}
+
+Components parseComponents(Map<String, dynamic>? json, ParseContext context) {
+  if (json == null) {
+    return const Components(schemas: {});
+  }
+  final keys = json.keys.toList();
+  final supportedKeys = ['schemas', 'securitySchemes'];
+
+  for (final key in keys) {
+    if (!supportedKeys.contains(key)) {
+      final value = json[key] as Map<String, dynamic>;
+      if (value.isNotEmpty) {
+        throw UnimplementedError('Components key not supported: $key');
+      }
+    }
+  }
+
+  final securitySchemesJson = json['securitySchemes'] as Map<String, dynamic>?;
+  if (securitySchemesJson != null) {
+    logger.warn('Ignoring securitySchemes.');
+  }
+
+  final schemasJson = json['schemas'] as Map<String, dynamic>?;
+  final schemas = <String, Schema>{};
+  if (schemasJson != null) {
+    for (final entry in schemasJson.entries) {
+      final name = entry.key;
+      print(name);
+      final value = entry.value as Map<String, dynamic>;
+      schemas[name] = Schema.parse(value, context.key('schemas').key(name));
+    }
+  }
+
+  return Components(schemas: schemas);
+}
+
 // Spec calls this the "OpenAPI Object"
 // https://spec.openapis.org/oas/v3.1.0#openapi-object
 class Spec {
-  Spec(this.serverUrl, this.endpoints);
+  Spec(this.serverUrl, this.endpoints, this.components);
 
-  factory Spec.fromJson(Map<String, dynamic> json) {
+  factory Spec.parse(Map<String, dynamic> json, ParseContext context) {
     final servers = json['servers'] as List<dynamic>;
     final firstServer = servers.first as Map<String, dynamic>;
     final serverUrl = firstServer['url'] as String;
@@ -352,14 +394,104 @@ class Spec {
         if (methodValue == null) {
           continue;
         }
-        endpoints.add(parseEndpoint(methodValue, path, method));
+        endpoints.add(
+          parseEndpoint(
+            methodValue: methodValue,
+            path: path,
+            method: method,
+            context: context.key(path),
+          ),
+        );
       }
     }
-    return Spec(Uri.parse(serverUrl), endpoints);
+    final components = parseComponents(
+      json['components'] as Map<String, dynamic>?,
+      context.key('components'),
+    );
+    return Spec(Uri.parse(serverUrl), endpoints, components);
   }
 
   final Uri serverUrl;
   final List<Endpoint> endpoints;
+  final Components components;
 
   List<String> get tags => endpoints.map((e) => e.tag).toSet().sorted();
+}
+
+class SchemaRegistry {
+  SchemaRegistry();
+
+  final Map<Uri, Schema> schemas = {};
+
+  Schema get(Uri uri) {
+    final schema = schemas[uri];
+    if (schema == null) {
+      throw Exception('Schema not found: $uri');
+    }
+    return schema;
+  }
+
+  Schema operator [](Uri uri) => get(uri);
+
+  void register(Uri uri, Schema schema) {
+    schemas[uri] = schema;
+  }
+
+  Uri lookupUri(Schema schema) {
+    final entry = schemas.entries.firstWhereOrNull((e) => e.value == schema);
+    if (entry == null) {
+      throw Exception('Url not found for schema: $schema');
+    }
+    return entry.key;
+  }
+}
+
+/// Immutable context for parsing a spec.
+/// SchemaRegistry is internally mutable, so this is not truly immutable.
+class ParseContext {
+  ParseContext({
+    required this.baseUrl,
+    required this.location,
+    required this.schemas,
+  }) {
+    if (baseUrl.hasFragment) {
+      throw ArgumentError.value(
+        baseUrl,
+        'baseUrl',
+        'Base url cannot have a fragment',
+      );
+    }
+  }
+  ParseContext.initial(this.baseUrl)
+    : location = '',
+      schemas = SchemaRegistry();
+
+  /// The base url of the spec being parsed.
+  final Uri baseUrl;
+
+  /// Json pointer location of the current schema.
+  final String location;
+
+  // Registry of all the schemas we've parsed so far.
+  // SchemaRegistry is internally mutable.
+  final SchemaRegistry schemas;
+
+  ParseContext _withLocation(String location) =>
+      ParseContext(baseUrl: baseUrl, location: location, schemas: schemas);
+
+  ParseContext key(String key) => _withLocation('$location/$key');
+  ParseContext index(int index) => _withLocation('$location/$index');
+
+  void addSchema(Schema schema) {
+    final uri = baseUrl.replace(fragment: location);
+    schemas.register(uri, schema);
+  }
+}
+
+/// We use a parse method rather than just fromJson since we need to maintain
+/// the location (json pointer) information for each schema we parse and
+/// write that information down somewhere (currently in the schema registry).
+Spec parseSpec(Map<String, dynamic> json, ParseContext context) {
+  final spec = Spec.parse(json, context);
+  return spec;
 }

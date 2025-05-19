@@ -1,60 +1,140 @@
-import 'dart:convert';
-
 import 'package:collection/collection.dart';
-import 'package:file/file.dart';
+import 'package:meta/meta.dart';
 import 'package:space_gen/src/loader.dart';
 import 'package:space_gen/src/spec.dart';
 
 export 'package:space_gen/src/spec.dart' show SchemaType;
 
-/// A registry of all the specs that have been resolved.
-class SchemaRegistry {
-  SchemaRegistry(this.fs, this.baseUrl);
-
-  final FileSystem fs;
-  final Uri baseUrl;
-
-  final Map<Uri, Schema> _schemas = {};
-
-  Schema get(Uri uri) {
-    if (_schemas.containsKey(uri)) {
-      return _schemas[uri]!;
-    }
-    final file = fs.file(uri.toFilePath());
-    final contents = file.readAsStringSync();
-    final schema = Schema.fromJson(
-      jsonDecode(contents) as Map<String, dynamic>,
-    );
-    _schemas[uri] = schema;
-    return schema;
+/// Resolves a JSON pointer into a JSON object.
+///
+/// The pointer is a string of the form `/path/to/object`.
+/// The object is the root object of the JSON document.
+/// The pointer is the path to the object in the JSON document.
+Json resolvePointerToObject(Json json, String pointer) {
+  // If the pointer is empty, split will return a list with an empty string.
+  final parts = pointer.split('/');
+  if (pointer.isEmpty || parts.isEmpty) {
+    return json;
   }
+  var i = 0;
+  dynamic current = json;
+  while (i < parts.length) {
+    final part = parts[i];
+    // Expect the first part to be empty and skip it.
+    if (i == 0) {
+      if (part != '') {
+        throw Exception('Pointer must start with a slash: $pointer');
+      }
+      i++;
+      continue;
+    }
+    // Handle the part based on the type of the current object.
+    if (current is Json) {
+      current = current[part];
+    } else if (current is List) {
+      current = current[int.parse(part)];
+    } else {
+      throw Exception('Invalid pointer: $pointer');
+    }
+    i++;
+  }
+  if (current is! Json) {
+    throw Exception('Invalid pointer: $pointer');
+  }
+  return current;
+}
+
+@immutable
+class _NamingContext {
+  const _NamingContext(this.stack);
+
+  final List<String> stack;
+
+  _NamingContext append(String name) => _NamingContext(stack + [name]);
+
+  String get name => stack.join('_');
 }
 
 /// Takes a Spec object and resolves it into a ResolvedSpec object.
 class Resolver {
-  Resolver(this.fs, this.baseUrl, this.cache);
+  Resolver({required this.baseUrl, required SchemaRegistry registry})
+    : _schemas = registry;
 
-  final FileSystem fs;
   final Uri baseUrl;
-  final Cache cache;
+  final SchemaRegistry _schemas;
+  final Map<Uri, ResolvedSchema> _resolvedByUri = {};
+  final Map<Schema, ResolvedSchema> _resolvedByContent = {};
+
+  ResolvedSchema? _byUri(Uri uri) {
+    final cached = _resolvedByUri[uri];
+    if (cached != null) {
+      return cached;
+    }
+    final schema = _schemas[uri];
+    return _byContent(schema);
+  }
+
+  ResolvedSchema? _byContent(Schema schema) {
+    return _resolvedByContent[schema];
+  }
+
+  /// Resolve a schema from a URI.
+  ResolvedSchema _schema(Uri uri, _NamingContext parentNaming) {
+    final cached = _byUri(uri);
+    if (cached != null) {
+      return cached;
+    }
+
+    final schema = _schemas.schemas[uri];
+    if (schema == null) {
+      throw Exception('Schema not found in registry: $uri');
+    }
+    final resolved = _createSchema(schema, parentNaming);
+    _resolvedByUri[uri] = resolved;
+    _resolvedByContent[schema] = resolved;
+    return resolved;
+  }
+
+  /// Callers should always use _schema rather than calling this directly.
+  ResolvedSchema _createSchema(Schema schema, _NamingContext parentNaming) {
+    final naming = parentNaming.append('inner');
+    return ResolvedSchema(
+      // TODO(eseidel): This should be "inner" right?
+      name: naming.name,
+      type: schema.type,
+      properties: Map<String, ResolvedSchema>.fromEntries(
+        schema.properties.entries.map(
+          (e) => MapEntry(e.key, _ref(e.value, naming)),
+        ),
+      ),
+      required: schema.required,
+      description: schema.description,
+      items: _maybeRef(schema.items, naming),
+      enumValues: schema.enumValues,
+      format: schema.format,
+    );
+  }
 
   ResolvedSpec resolveSpec(Spec spec) {
     // References could be circular, so we should walk them all and put them
     // into a queue.  However SpaceTraders has no circular references, so we
     // don't bother.
-    final schemas = SchemaRegistry(fs, baseUrl);
+    const naming = _NamingContext([]);
     return ResolvedSpec(
-      schemas: schemas,
       serverUrl: spec.serverUrl,
-      endpoints: spec.endpoints.map(_endpoint).toList(),
+      endpoints: spec.endpoints.map((e) => _endpoint(e, naming)).toList(),
     );
   }
 
-  ResolvedSchema? _maybeRef(SchemaRef? ref) => ref == null ? null : _ref(ref);
+  ResolvedSchema? _maybeRef(SchemaRef? ref, _NamingContext parentNaming) =>
+      ref == null ? null : _ref(ref, parentNaming);
 
-  ResolvedSchema _ref(SchemaRef ref) {
-    if (ref.schema != null) {
-      return _schema(ref.schema!);
+  ResolvedSchema _ref(SchemaRef ref, _NamingContext parentNaming) {
+    final maybeSchema = ref.schema;
+    if (maybeSchema != null) {
+      print(parentNaming.name);
+      final uri = _schemas.lookupUri(maybeSchema);
+      return _schema(uri, parentNaming);
     }
     final uri = ref.uri;
     if (uri == null) {
@@ -62,68 +142,50 @@ class Resolver {
     }
     // TODO(eseidel): This isn't correct for multi-file specs.
     final parsed = baseUrl.resolve(uri);
-    final json = cache.get(parsed);
-    if (json == null) {
-      throw Exception('Schema not found in cache: $parsed');
-    }
-    return _schema(Schema.fromJson(json));
+    return _schema(parsed, parentNaming);
   }
 
-  ResolvedSchema _schema(Schema schema) {
-    return ResolvedSchema(
-      type: schema.type,
-      properties: Map<String, ResolvedSchema>.fromEntries(
-        schema.properties.entries.map((e) => MapEntry(e.key, _ref(e.value))),
-      ),
-      required: schema.required,
-      description: schema.description,
-      items: _maybeRef(schema.items),
-      enumValues: schema.enumValues,
-      format: schema.format,
-    );
-  }
-
-  ResolvedParameter _parameter(Parameter parameter) {
+  ResolvedParameter _parameter(
+    Parameter parameter,
+    _NamingContext parentNaming,
+  ) {
     final p = parameter;
     return ResolvedParameter(
       isRequired: p.isRequired,
       sentIn: p.sentIn,
       name: p.name,
-      type: _ref(p.type),
+      type: _ref(p.type, parentNaming),
     );
   }
 
-  ResolvedResponse _response(Response response) {
+  ResolvedResponse _response(Response response, _NamingContext parentNaming) {
+    final naming = parentNaming.append(response.code.toString());
     return ResolvedResponse(
       code: response.code,
-      content: _ref(response.content),
+      content: _ref(response.content, naming),
     );
   }
 
-  ResolvedEndpoint _endpoint(Endpoint endpoint) {
+  ResolvedEndpoint _endpoint(Endpoint endpoint, _NamingContext parentNaming) {
     final e = endpoint;
+    final naming = parentNaming.append(e.snakeName);
     return ResolvedEndpoint(
       path: e.path,
       method: e.method,
       tag: e.tag,
-      responses: e.responses.map(_response).toList(),
+      responses: e.responses.map((r) => _response(r, naming)).toList(),
       snakeName: e.snakeName,
-      parameters: e.parameters.map(_parameter).toList(),
-      requestBody: _maybeRef(e.requestBody),
+      parameters: e.parameters.map((p) => _parameter(p, naming)).toList(),
+      requestBody: _maybeRef(e.requestBody, naming),
     );
   }
 }
 
 /// Top level object in an OpenAPI spec.
 class ResolvedSpec {
-  ResolvedSpec({
-    required this.serverUrl,
-    required this.schemas,
-    required this.endpoints,
-  });
+  ResolvedSpec({required this.serverUrl, required this.endpoints});
 
   final Uri serverUrl;
-  final SchemaRegistry schemas;
   final List<ResolvedEndpoint> endpoints;
 
   List<String> get tags => endpoints.map((e) => e.tag).toSet().sorted();
@@ -156,6 +218,7 @@ class ResolvedResponse {
 /// These are typically rendered as classes.
 class ResolvedSchema {
   ResolvedSchema({
+    required this.name,
     required this.type,
     required this.properties,
     required this.required,
@@ -164,6 +227,9 @@ class ResolvedSchema {
     required this.enumValues,
     required this.format,
   });
+
+  /// Name is inferred during the resolve process.
+  final String name;
 
   final SchemaType type;
   final Map<String, ResolvedSchema> properties;

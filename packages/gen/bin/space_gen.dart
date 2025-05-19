@@ -5,6 +5,8 @@ import 'package:space_gen/src/config.dart';
 import 'package:space_gen/src/loader.dart';
 import 'package:space_gen/src/logger.dart';
 import 'package:space_gen/src/resolver.dart';
+import 'package:space_gen/src/spec.dart';
+import 'package:space_gen/src/visitor.dart';
 
 Future<int> main(List<String> arguments) async {
   const fs = LocalFileSystem();
@@ -39,12 +41,15 @@ Future<int> main(List<String> arguments) async {
     outDir.deleteSync(recursive: true);
   }
 
-  // First we want to load the spec.
-  // Then we want to walk and resolve all the references.
-  // Then we hand a fully resolved spec to the renderer.
-
   final cache = Cache(fs);
-  final spec = await cache.loadSpec(config.specUri);
+  final parseContext = ParseContext.initial(config.specUri);
+  final specJson = await cache.load(config.specUri);
+  final spec = parseSpec(specJson, parseContext);
+
+  logger.info('Registered schemas:');
+  for (final uri in parseContext.schemas.schemas.keys) {
+    logger.info('  - $uri');
+  }
 
   // Print stats about the spec.
   logger.info('Spec:');
@@ -56,9 +61,18 @@ Future<int> main(List<String> arguments) async {
     }
   }
 
-  await cache.precacheRefs(config.specUri, spec);
+  // Pre-warm the cache. Resolver assumes all refs are present in the cache.
+  for (final ref in collectRefs(spec)) {
+    // If any of the refs are network urls, we need to fetch them.
+    // The cache does not handle fragments, so we need to remove them.
+    final resolved = config.specUri.resolve(ref).removeFragment();
+    await cache.load(resolved);
+  }
 
-  final resolver = Resolver(fs, config.specUri, cache);
+  final resolver = Resolver(
+    baseUrl: config.specUri,
+    registry: parseContext.schemas,
+  );
   final resolvedSpec = resolver.resolveSpec(spec);
 
   Context(

@@ -8,7 +8,6 @@ import 'package:space_gen/src/logger.dart';
 import 'package:space_gen/src/resolver.dart';
 import 'package:space_gen/src/string.dart';
 
-
 Template loadTemplate(FileSystem fs, String name) {
   // I'm not sure how to load a template relative to the package root
   // for when this is installed via pub.  I'm sure it's possible.
@@ -24,10 +23,10 @@ String _apiPath(Api api) {
   return 'lib/api/${api.fileName}.dart';
 }
 
-// String _modelPath(ResolvedSchema schema) {
-//   // openapi generator does not use /src/ in the path.
-//   return 'lib/model/${schema.fileName}.dart';
-// }
+String _modelPath(ResolvedSchema schema) {
+  // openapi generator does not use /src/ in the path.
+  return 'lib/model/${schema.fileName}.dart';
+}
 
 /// The spec calls these tags, but the Dart openapi generator groups endpoints
 /// by tag into an API class so we do too.
@@ -91,6 +90,8 @@ extension EndpointGeneration on ResolvedEndpoint {
 }
 
 extension SchemaGeneration on ResolvedSchema {
+  String get fileName => snakeFromCamel(name);
+
   bool get needsRender => type == SchemaType.object || isEnum;
 
   bool get isDateTime {
@@ -191,10 +192,8 @@ extension SchemaGeneration on ResolvedSchema {
       return {
         'propertyName': name,
         'propertyType': schema.typeName(),
-        'propertyToJson': schema.toJsonExpression(, name),
-        'propertyFromJson': schema.fromJsonExpression(
-          "json['$name']",
-        ),
+        'propertyToJson': schema.toJsonExpression(name),
+        'propertyFromJson': schema.fromJsonExpression("json['$name']"),
       };
     });
     return {
@@ -338,9 +337,7 @@ class Context {
   void renderPublicApi() {
     final exports =
         spec.apis
-            .map(
-              (api) => 'package:$packageName/api/${api.fileName}.dart',
-            )
+            .map((api) => 'package:$packageName/api/${api.fileName}.dart')
             .toList()
           ..sort();
     renderTemplate(
@@ -374,7 +371,7 @@ class RenderContext {
   List<ResolvedSchema> inlineSchemas = [];
 
   void visitSchema(ResolvedSchema schema) {
-      collectSchema(schema);
+    collectSchema(schema);
   }
 
   void collectApi(Api api) {
