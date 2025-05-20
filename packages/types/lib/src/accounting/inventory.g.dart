@@ -65,7 +65,10 @@ PricedShip _$PricedShipFromJson(Map<String, dynamic> json) => $checkedCreate(
     final val = PricedShip(
       shipType: $checkedConvert(
         'ship_type',
-        (v) => const ShipTypeConverter().fromJson(v as String),
+        (v) => _$JsonConverterFromJson<String, ShipType>(
+          v,
+          const ShipTypeConverter().fromJson,
+        ),
       ),
       count: $checkedConvert('count', (v) => (v as num).toInt()),
       pricePerUnit: $checkedConvert(
@@ -83,10 +86,23 @@ PricedShip _$PricedShipFromJson(Map<String, dynamic> json) => $checkedCreate(
 
 Map<String, dynamic> _$PricedShipToJson(PricedShip instance) =>
     <String, dynamic>{
-      'ship_type': const ShipTypeConverter().toJson(instance.shipType),
+      'ship_type': _$JsonConverterToJson<String, ShipType>(
+        instance.shipType,
+        const ShipTypeConverter().toJson,
+      ),
       'count': instance.count,
       'price_per_unit': instance.pricePerUnit,
     };
+
+Value? _$JsonConverterFromJson<Json, Value>(
+  Object? json,
+  Value? Function(Json json) fromJson,
+) => json == null ? null : fromJson(json as Json);
+
+Json? _$JsonConverterToJson<Json, Value>(
+  Value? value,
+  Json? Function(Value value) toJson,
+) => value == null ? null : toJson(value);
 
 PricedFleet _$PricedFleetFromJson(Map<String, dynamic> json) =>
     $checkedCreate('PricedFleet', json, ($checkedConvert) {

@@ -87,8 +87,9 @@ class PricedShip {
       _$PricedShipFromJson(json);
 
   /// Type of the ship.
+  /// Can be null if the ship type is unknown.
   @ShipTypeConverter()
-  final ShipType shipType;
+  final ShipType? shipType;
 
   /// Number of ships of this type.
   final int count;
@@ -117,7 +118,7 @@ class PricedFleet {
   Map<String, dynamic> toJson() => _$PricedFleetToJson(this);
 
   /// Set of ship types in the fleet missing prices.
-  Set<ShipType> get missingPrices {
+  Set<ShipType?> get missingPrices {
     return ships
         .where((s) => s.pricePerUnit == null)
         .map((s) => s.shipType)
