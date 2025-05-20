@@ -52,7 +52,17 @@ class _NamingContext {
 
   _NamingContext append(String name) => _NamingContext(stack + [name]);
 
-  String get name => stack.join('_');
+  String get snakeName {
+    // To match OpenAPI, we don't put a _ before numbers.
+    final buf = StringBuffer();
+    for (final e in stack) {
+      if (buf.isNotEmpty && (e.isNotEmpty && int.tryParse(e[0]) == null)) {
+        buf.write('_');
+      }
+      buf.write(e);
+    }
+    return buf.toString();
+  }
 }
 
 /// Takes a Spec object and resolves it into a ResolvedSpec object.
@@ -79,7 +89,11 @@ class Resolver {
   }
 
   /// Resolve a schema from a URI.
-  ResolvedSchema _schema(Uri uri, _NamingContext parentNaming) {
+  ResolvedSchema _schema(
+    Uri uri,
+    _NamingContext parentNaming,
+    String thisName,
+  ) {
     final cached = _byUri(uri);
     if (cached != null) {
       return cached;
@@ -89,27 +103,30 @@ class Resolver {
     if (schema == null) {
       throw Exception('Schema not found in registry: $uri');
     }
-    final resolved = _createSchema(schema, parentNaming);
+    final resolved = _createSchema(schema, parentNaming, thisName);
     _resolvedByUri[uri] = resolved;
     _resolvedByContent[schema] = resolved;
     return resolved;
   }
 
   /// Callers should always use _schema rather than calling this directly.
-  ResolvedSchema _createSchema(Schema schema, _NamingContext parentNaming) {
-    final naming = parentNaming.append('inner');
+  ResolvedSchema _createSchema(
+    Schema schema,
+    _NamingContext parentNaming,
+    String thisName,
+  ) {
+    final naming = parentNaming.append(thisName);
     return ResolvedSchema(
-      // TODO(eseidel): This should be "inner" right?
-      name: naming.name,
+      snakeName: naming.snakeName,
       type: schema.type,
       properties: Map<String, ResolvedSchema>.fromEntries(
         schema.properties.entries.map(
-          (e) => MapEntry(e.key, _ref(e.value, naming)),
+          (e) => MapEntry(e.key, _ref(ref: e.value, parentNaming: naming)),
         ),
       ),
       required: schema.required,
       description: schema.description,
-      items: _maybeRef(schema.items, naming),
+      items: _maybeRef(ref: schema.items, parentNaming: naming),
       enumValues: schema.enumValues,
       format: schema.format,
     );
@@ -126,15 +143,24 @@ class Resolver {
     );
   }
 
-  ResolvedSchema? _maybeRef(SchemaRef? ref, _NamingContext parentNaming) =>
-      ref == null ? null : _ref(ref, parentNaming);
+  ResolvedSchema? _maybeRef({
+    required SchemaRef? ref,
+    required _NamingContext parentNaming,
+    String thisName = 'inner',
+  }) =>
+      ref == null
+          ? null
+          : _ref(ref: ref, parentNaming: parentNaming, thisName: thisName);
 
-  ResolvedSchema _ref(SchemaRef ref, _NamingContext parentNaming) {
+  ResolvedSchema _ref({
+    required SchemaRef ref,
+    required _NamingContext parentNaming,
+    String thisName = 'inner',
+  }) {
     final maybeSchema = ref.schema;
     if (maybeSchema != null) {
-      print(parentNaming.name);
       final uri = _schemas.lookupUri(maybeSchema);
-      return _schema(uri, parentNaming);
+      return _schema(uri, parentNaming, thisName);
     }
     final uri = ref.uri;
     if (uri == null) {
@@ -142,7 +168,7 @@ class Resolver {
     }
     // TODO(eseidel): This isn't correct for multi-file specs.
     final parsed = baseUrl.resolve(uri);
-    return _schema(parsed, parentNaming);
+    return _schema(parsed, parentNaming, thisName);
   }
 
   ResolvedParameter _parameter(
@@ -154,7 +180,7 @@ class Resolver {
       isRequired: p.isRequired,
       sentIn: p.sentIn,
       name: p.name,
-      type: _ref(p.type, parentNaming),
+      type: _ref(ref: p.type, parentNaming: parentNaming),
     );
   }
 
@@ -162,7 +188,11 @@ class Resolver {
     final naming = parentNaming.append(response.code.toString());
     return ResolvedResponse(
       code: response.code,
-      content: _ref(response.content, naming),
+      content: _ref(
+        ref: response.content,
+        parentNaming: naming,
+        thisName: 'response',
+      ),
     );
   }
 
@@ -176,7 +206,11 @@ class Resolver {
       responses: e.responses.map((r) => _response(r, naming)).toList(),
       snakeName: e.snakeName,
       parameters: e.parameters.map((p) => _parameter(p, naming)).toList(),
-      requestBody: _maybeRef(e.requestBody, naming),
+      requestBody: _maybeRef(
+        ref: e.requestBody,
+        parentNaming: naming,
+        thisName: 'request',
+      ),
     );
   }
 }
@@ -218,7 +252,7 @@ class ResolvedResponse {
 /// These are typically rendered as classes.
 class ResolvedSchema {
   ResolvedSchema({
-    required this.name,
+    required this.snakeName,
     required this.type,
     required this.properties,
     required this.required,
@@ -229,7 +263,7 @@ class ResolvedSchema {
   });
 
   /// Name is inferred during the resolve process.
-  final String name;
+  final String snakeName;
 
   final SchemaType type;
   final Map<String, ResolvedSchema> properties;
@@ -262,30 +296,3 @@ class ResolvedEndpoint {
   final List<ResolvedParameter> parameters;
   final ResolvedSchema? requestBody;
 }
-
-// class RefResolver {
-//   RefResolver(FileSystem fs, this.baseUrl) : _fs = fs;
-//   final Uri baseUrl;
-//   final FileSystem _fs;
-//   final Map<Uri, Schema> _schemas = {};
-
-//   Schema resolve(SchemaRef ref) {
-//     if (ref.schema != null) {
-//       return ref.schema!;
-//     }
-//     final uri = ref.uri!;
-//     if (_schemas.containsKey(uri)) {
-//       return _schemas[uri]!;
-//     }
-//     print(uri);
-//     final file = _fs.file(uri.toFilePath());
-//     final contents = file.readAsStringSync();
-//     final schema = parseSchema(
-//       current: uri,
-//       name: p.basenameWithoutExtension(uri.path),
-//       json: jsonDecode(contents) as Map<String, dynamic>,
-//     );
-//     _schemas[uri] = schema;
-//     return schema;
-//   }
-// }

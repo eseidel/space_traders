@@ -54,11 +54,7 @@ extension ResolvedSpecGeneration on ResolvedSpec {
 
 extension EndpointGeneration on ResolvedEndpoint {
   String get methodName {
-    final name = snakeName.splitMapJoin(
-      '-',
-      onMatch: (m) => '',
-      onNonMatch: (n) => n.capitalize(),
-    );
+    final name = camelFromSnake(snakeName);
     return name[0].toLowerCase() + name.substring(1);
   }
 
@@ -78,19 +74,23 @@ extension EndpointGeneration on ResolvedEndpoint {
         'paramFromJson': body.fromJsonExpression('json'),
       });
     }
+    final returnType = responses.firstOrNull?.content.typeName() ?? 'void';
     return {
       'methodName': methodName,
       'httpMethod': method,
       'path': path,
       'url': uri(context),
       'parameters': parameters,
-      'returnType': responses.first.content.typeName(),
+      'returnIsVoid': returnType == 'void',
+      'returnType': returnType,
     };
   }
 }
 
 extension SchemaGeneration on ResolvedSchema {
-  String get fileName => snakeFromCamel(name);
+  String get fileName => snakeName;
+
+  String get className => camelFromSnake(snakeName);
 
   bool get needsRender => type == SchemaType.object || isEnum;
 
@@ -108,7 +108,7 @@ extension SchemaGeneration on ResolvedSchema {
         if (isDateTime) {
           return 'DateTime';
         } else if (isEnum) {
-          return name;
+          return className;
         }
         return 'String';
       case SchemaType.integer:
@@ -118,7 +118,7 @@ extension SchemaGeneration on ResolvedSchema {
       case SchemaType.boolean:
         return 'bool';
       case SchemaType.object:
-        return name;
+        return className;
       case SchemaType.array:
         return 'List<${items!.typeName()}>';
     }
@@ -162,7 +162,7 @@ extension SchemaGeneration on ResolvedSchema {
         if (isDateTime) {
           return 'DateTime.parse($jsonValue as String)';
         } else if (isEnum) {
-          return '$name.fromJson($jsonValue as String)';
+          return '$className.fromJson($jsonValue as String)';
         }
         return '$jsonValue as String';
       case SchemaType.integer:
@@ -172,7 +172,7 @@ extension SchemaGeneration on ResolvedSchema {
       case SchemaType.boolean:
         return '$jsonValue as bool';
       case SchemaType.object:
-        return '$name.fromJson($jsonValue as Map<String, dynamic>)';
+        return '$className.fromJson($jsonValue as Map<String, dynamic>)';
       case SchemaType.array:
         final itemsSchema = items!;
         final itemTypeName = itemsSchema.typeName();
@@ -197,7 +197,7 @@ extension SchemaGeneration on ResolvedSchema {
       };
     });
     return {
-      'schemaName': name,
+      'schemaName': className,
       'hasProperties': renderProperties.isNotEmpty,
       'properties': renderProperties,
     };
@@ -213,7 +213,7 @@ extension SchemaGeneration on ResolvedSchema {
     }
 
     return {
-      'schemaName': name,
+      'schemaName': className,
       'enumValues': enumValues.map(enumValueToTemplateContext).toList(),
     };
   }
@@ -227,7 +227,6 @@ extension SchemaGeneration on ResolvedSchema {
   }
 
   String packageImport(Context context) {
-    final snakeName = snakeFromCamel(name);
     return 'package:${context.packageName}/model/$snakeName.dart';
   }
 }

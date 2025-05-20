@@ -32,7 +32,10 @@ class Parameter {
     required this.sentIn,
   });
 
-  factory Parameter.parse(Map<String, dynamic> json, ParseContext context) {
+  factory Parameter.parse({
+    required Map<String, dynamic> json,
+    required ParseContext context,
+  }) {
     final name = json['name'] as String;
     final required = json['required'] as bool? ?? false;
     final sentIn = json['in'] as String;
@@ -276,7 +279,11 @@ List<Response> parseResponses(Map<String, dynamic> json, ParseContext context) {
       code: int.parse(responseCode),
       content: parseSchemaOrRef(
         json: jsonResponse['schema'] as Map<String, dynamic>,
-        context: context.key('response'),
+        context: context
+            .key(responseCode)
+            .key('content')
+            .key('application/json')
+            .key('schema'),
       ),
     ),
   ];
@@ -288,13 +295,13 @@ Endpoint parseEndpoint({
   required Method method,
   required ParseContext context,
 }) {
-  final snakeName =
-      methodValue['operationId'] as String? ??
-      Uri.parse(path).pathSegments.last;
+  final snakeName = (methodValue['operationId'] as String? ??
+          Uri.parse(path).pathSegments.last)
+      .replaceAll('-', '_');
 
   final responses = parseResponses(
     methodValue['responses'] as Map<String, dynamic>,
-    context,
+    context.key('responses'),
   );
   final tags = methodValue['tags'] as List<dynamic>?;
   final tag = tags?.firstOrNull as String? ?? 'Default';
@@ -302,7 +309,13 @@ Endpoint parseEndpoint({
   final parameters =
       parametersJson
           .cast<Map<String, dynamic>>()
-          .map((json) => Parameter.parse(json, context))
+          .indexed
+          .map(
+            (indexed) => Parameter.parse(
+              json: indexed.$2,
+              context: context.key('parameters').index(indexed.$1),
+            ),
+          )
           .toList();
   final requestBodyJson = methodValue['requestBody'] as Map<String, dynamic>?;
   SchemaRef? requestBody;
@@ -365,7 +378,6 @@ Components parseComponents(Map<String, dynamic>? json, ParseContext context) {
   if (schemasJson != null) {
     for (final entry in schemasJson.entries) {
       final name = entry.key;
-      print(name);
       final value = entry.value as Map<String, dynamic>;
       schemas[name] = Schema.parse(value, context.key('schemas').key(name));
     }
@@ -399,7 +411,7 @@ class Spec {
             methodValue: methodValue,
             path: path,
             method: method,
-            context: context.key(path),
+            context: context.key('paths').key(path).key(method.key),
           ),
         );
       }
@@ -446,12 +458,29 @@ class SchemaRegistry {
   }
 }
 
+class JsonPointer {
+  JsonPointer(this.parts);
+
+  final List<String> parts;
+
+  String get location {
+    return '/${parts.map(urlEncode).join('/')}';
+  }
+
+  String urlEncode(String part) {
+    return part.replaceAll('~', '~0').replaceAll('/', '~1');
+  }
+
+  @override
+  String toString() => location;
+}
+
 /// Immutable context for parsing a spec.
 /// SchemaRegistry is internally mutable, so this is not truly immutable.
 class ParseContext {
   ParseContext({
     required this.baseUrl,
-    required this.location,
+    required this.parts,
     required this.schemas,
   }) {
     if (baseUrl.hasFragment) {
@@ -462,28 +491,28 @@ class ParseContext {
       );
     }
   }
-  ParseContext.initial(this.baseUrl)
-    : location = '',
-      schemas = SchemaRegistry();
+  ParseContext.initial(this.baseUrl) : parts = [], schemas = SchemaRegistry();
 
   /// The base url of the spec being parsed.
   final Uri baseUrl;
 
   /// Json pointer location of the current schema.
-  final String location;
+  final List<String> parts;
+
+  JsonPointer get pointer => JsonPointer(parts);
 
   // Registry of all the schemas we've parsed so far.
   // SchemaRegistry is internally mutable.
   final SchemaRegistry schemas;
 
-  ParseContext _withLocation(String location) =>
-      ParseContext(baseUrl: baseUrl, location: location, schemas: schemas);
+  ParseContext _addPart(String part) =>
+      ParseContext(baseUrl: baseUrl, parts: [...parts, part], schemas: schemas);
 
-  ParseContext key(String key) => _withLocation('$location/$key');
-  ParseContext index(int index) => _withLocation('$location/$index');
+  ParseContext key(String key) => _addPart(key);
+  ParseContext index(int index) => _addPart(index.toString());
 
   void addSchema(Schema schema) {
-    final uri = baseUrl.replace(fragment: location);
+    final uri = baseUrl.replace(fragment: pointer.toString());
     schemas.register(uri, schema);
   }
 }
