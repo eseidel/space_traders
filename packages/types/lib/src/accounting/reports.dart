@@ -1,12 +1,13 @@
+import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'reports.g.dart';
 
 /// A class representing the assets of the agent.
 @JsonSerializable()
-class BalanceSheet {
+class BalanceSheet extends Equatable {
   /// Creates an instance of [BalanceSheet].
-  BalanceSheet({
+  const BalanceSheet({
     required this.time,
     required this.cash,
     required this.loans,
@@ -50,13 +51,16 @@ class BalanceSheet {
 
   /// Converts the [BalanceSheet] to a JSON object.
   Map<String, dynamic> toJson() => _$BalanceSheetToJson(this);
+
+  @override
+  List<Object?> get props => [time, cash, inventory, ships, loans];
 }
 
 /// A class representing an income statement.
 @JsonSerializable()
-class IncomeStatement {
+class IncomeStatement extends Equatable {
   /// Creates an instance of [IncomeStatement].
-  IncomeStatement({
+  const IncomeStatement({
     required this.start,
     required this.end,
     required this.goodsRevenue,
@@ -150,4 +154,19 @@ class IncomeStatement {
 
   /// Converts the [IncomeStatement] to a JSON object.
   Map<String, dynamic> toJson() => _$IncomeStatementToJson(this);
+
+  @override
+  List<Object?> get props => [
+    start,
+    end,
+    numberOfTransactions,
+    goodsRevenue,
+    contractsRevenue,
+    chartingRevenue,
+    goodsPurchase,
+    assetSale,
+    constructionMaterials,
+    fuelPurchase,
+    capEx,
+  ];
 }
