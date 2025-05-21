@@ -61,6 +61,7 @@ class IncomeStatement {
     required this.end,
     required this.goodsRevenue,
     required this.contractsRevenue,
+    required this.chartingRevenue,
     required this.goodsPurchase,
     required this.assetSale,
     required this.constructionMaterials,
@@ -91,8 +92,11 @@ class IncomeStatement {
   /// The total revenue from contracts for the period.
   final int contractsRevenue;
 
-  /// The total income from asset sales for the period (one-offs).
+  /// The total revenue from asset sales for the period (one-offs).
   final int assetSale;
+
+  /// Total revenue from charting services performed.
+  final int chartingRevenue;
 
   /// Total cost of goods purchased for resale.
   final int goodsPurchase;
@@ -114,7 +118,8 @@ class IncomeStatement {
   /// The total income for the period.
   /// There seems to be some debate as to if fuel counts as COGS or not,
   /// for now we're counting it as such.
-  int get revenue => goodsRevenue + contractsRevenue + assetSale;
+  int get revenue =>
+      goodsRevenue + contractsRevenue + assetSale + chartingRevenue;
 
   /// Net sales for the period, does not include asset sales.
   int get netSales => goodsRevenue + contractsRevenue;

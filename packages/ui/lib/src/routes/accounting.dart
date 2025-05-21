@@ -92,6 +92,7 @@ class IncomeStatementView extends StatelessWidget {
           _row('Sales', c(i.goodsRevenue)),
           _row('Contracts', c(i.contractsRevenue)),
           _row('Asset Sales', c(i.assetSale)),
+          _row('Charting', c(i.chartingRevenue)),
           _row('Total Revenues', c(i.revenue), isBold: true),
           const Divider(),
           _row('Goods', c(i.goodsPurchase)),

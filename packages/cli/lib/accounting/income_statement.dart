@@ -7,6 +7,7 @@ class _IncomeStatementBuilderResults {
   int goodsSale = 0;
   int assetSale = 0;
   int contracts = 0;
+  int charts = 0;
 
   int goodsPurchase = 0;
   int constructionPurchase = 0;
@@ -209,7 +210,7 @@ class _IncomeStatementBuilder {
 
   void _processChartTransaction(Transaction transaction) {
     _expectAccounting(transaction, AccountingType.services, 'Charting');
-    _zero(transaction, 'Charting');
+    results.charts += _positive(transaction, 'Charting');
   }
 
   void processTransaction(Transaction transaction) {
@@ -258,6 +259,7 @@ class _IncomeStatementBuilder {
       numberOfTransactions: transactions.length,
       goodsRevenue: r.goodsSale,
       contractsRevenue: r.contracts,
+      chartingRevenue: r.charts,
       assetSale: r.assetSale,
       goodsPurchase: -r.goodsPurchase,
       fuelPurchase: -r.fuelPurchase,
