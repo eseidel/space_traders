@@ -125,6 +125,8 @@ extension SchemaGeneration on Schema {
       case SchemaType.array:
         final itemsSchema = context.maybeResolve(items)!;
         return 'List<${itemsSchema.typeName(context)}>';
+      case SchemaType.unknown:
+        return 'dynamic';
     }
     // throw UnimplementedError('Unknown type $type');
   }
@@ -147,6 +149,7 @@ extension SchemaGeneration on Schema {
       case SchemaType.array:
         final itemsSchema = context.maybeResolve(items)!;
         switch (itemsSchema.type) {
+          case SchemaType.unknown:
           case SchemaType.string:
           case SchemaType.integer:
           case SchemaType.number:
@@ -157,6 +160,8 @@ extension SchemaGeneration on Schema {
           case SchemaType.array:
             return '$name.map((e) => e.toJson()).toList()';
         }
+      case SchemaType.unknown:
+        return name;
     }
   }
 
@@ -186,6 +191,8 @@ extension SchemaGeneration on Schema {
         } else {
           return '($jsonValue as List<dynamic>).cast<$itemTypeName>()';
         }
+      case SchemaType.unknown:
+        return jsonValue;
     }
   }
 
@@ -244,6 +251,14 @@ extension ParameterGeneration on Parameter {
       'paramToJson': typeSchema.toJsonExpression(name, context),
       'paramFromJson': typeSchema.fromJsonExpression("json['$name']", context),
     };
+  }
+}
+
+extension SchemaRefGeneration on SchemaRef {
+  String packageImport(Context context) {
+    final name = p.basenameWithoutExtension(uri!);
+    final snakeName = snakeFromCamel(name);
+    return 'package:${context.packageName}/model/$snakeName.dart';
   }
 }
 
@@ -314,8 +329,8 @@ class Context {
   }
 
   void renderApis() {
-    // final rendered = <Schema>{};
-    // final renderQueue = <Schema>{};
+    final rendered = <String>{};
+    final renderQueue = <SchemaRef>{};
     for (final api in spec.apis) {
       final renderContext = RenderContext(specUri: specUrl);
       renderApi(renderContext, this, api);
@@ -324,25 +339,21 @@ class Context {
       for (final schema in renderContext.inlineSchemas) {
         renderRootSchema(this, schema);
       }
+      renderQueue.addAll(renderContext.importedSchemas);
     }
 
-    // // Render all the schemas that were collected while rendering the API.
-    // while (renderQueue.isNotEmpty) {
-    //   final schema = renderQueue.first;
-    //   renderQueue.remove(schema);
-    //   if (rendered.contains(schema)) {
-    //     continue;
-    //   }
-    //   rendered.add(schema);
-    //   // Only render objects and enums for now.
-    //   // Otherwise we render an empty file for ship_condition.dart
-    //   // which is an int type with min/max values.
-    //   // if (schema.type != SchemaType.object && !schema.isEnum) {
-    //   //   continue;
-    //   // }
-    //   final renderContext = renderRootSchema(this, schema);
-    //   // renderQueue.addAll(renderContext.imported);
-    // }
+    // Render all the schemas that were collected while rendering the API.
+    while (renderQueue.isNotEmpty) {
+      final ref = renderQueue.first;
+      renderQueue.remove(ref);
+      if (rendered.contains(ref.uri)) {
+        continue;
+      }
+      rendered.add(ref.uri!);
+      final schema = resolve(ref);
+      final renderContext = renderRootSchema(this, schema);
+      renderQueue.addAll(renderContext.importedSchemas);
+    }
   }
 
   void runDart(List<String> args) {
@@ -394,7 +405,7 @@ class RenderContext {
   List<Schema> inlineSchemas = [];
 
   /// Schemas imported by this file.
-  Set<Uri> importedSchemas = {};
+  Set<SchemaRef> importedSchemas = {};
 
   void visitSchema(SchemaRef? ref) {
     if (ref == null) {
@@ -403,8 +414,7 @@ class RenderContext {
     if (ref.schema != null) {
       collectSchema(ref.schema!);
     } else {
-      final uri = specUri.resolve(ref.uri!);
-      importedSchemas.add(uri);
+      importedSchemas.add(ref);
     }
   }
 
@@ -439,6 +449,9 @@ class RenderContext {
     bool includeInlineSchema = false,
   }) {
     final imports = <String>{};
+    for (final ref in importedSchemas) {
+      imports.add(ref.packageImport(context));
+    }
     if (includeInlineSchema) {
       for (final schema in inlineSchemas) {
         imports.add(schema.packageImport(context));

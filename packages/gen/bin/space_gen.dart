@@ -45,22 +45,22 @@ Future<int> main(List<String> arguments) async {
   final specJson = await cache.load(config.specUri);
   final spec = parseSpec(specJson, parseContext);
 
-  logger.info('Registered schemas:');
+  logger.detail('Registered schemas:');
   for (final uri in parseContext.schemas.schemas.keys) {
-    logger.info('  - $uri');
+    logger.detail('  - $uri');
   }
 
   // Print stats about the spec.
-  logger.info('Spec:');
+  logger.detail('Spec:');
   for (final api in spec.tags) {
-    logger.info('  - $api');
+    logger.detail('  - $api');
     final endpoints = spec.endpoints.where((e) => e.tag == api);
     for (final endpoint in endpoints) {
-      logger.info('    - ${endpoint.method.key} ${endpoint.path}');
+      logger.detail('    - ${endpoint.method.key} ${endpoint.path}');
     }
   }
 
-  // Pre-warm the cache. Resolver assumes all refs are present in the cache.
+  // Pre-warm the cache. Rendering assumes all refs are present in the cache.
   for (final ref in collectRefs(spec)) {
     // If any of the refs are network urls, we need to fetch them.
     // The cache does not handle fragments, so we need to remove them.

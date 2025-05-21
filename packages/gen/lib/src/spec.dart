@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 import 'package:space_gen/src/logger.dart';
+import 'package:space_gen/src/string.dart';
 
 enum SentIn {
   query,
@@ -68,7 +69,8 @@ enum SchemaType {
   integer,
   boolean,
   array,
-  object;
+  object,
+  unknown; // if 'type' is missing.
 
   static SchemaType fromJson(String json) {
     switch (json) {
@@ -84,6 +86,8 @@ enum SchemaType {
         return array;
       case 'object':
         return object;
+      case 'unknown':
+        return unknown;
       default:
         throw ArgumentError.value(json, 'json', 'Unknown SchemaType');
     }
@@ -133,7 +137,7 @@ class Schema {
   }
 
   factory Schema.parse(Map<String, dynamic> json, ParseContext context) {
-    final type = json['type'] as String? ?? 'object';
+    final type = json['type'] as String? ?? 'unknown';
     final properties = parseProperties(
       json: json['properties'] as Map<String, dynamic>?,
       context: context.key('properties'),
@@ -230,7 +234,7 @@ Map<String, SchemaRef> parseProperties({
     final value = entry.value as Map<String, dynamic>;
     properties[name] = parseSchemaOrRef(
       json: value,
-      context: context.key(name),
+      context: context.addName(name).key(name),
     );
   }
   return properties;
@@ -403,10 +407,11 @@ Components parseComponents(Map<String, dynamic>? json, ParseContext context) {
   if (schemasJson != null) {
     for (final entry in schemasJson.entries) {
       final name = entry.key;
+      final snakeName = snakeFromCamel(name);
       final value = entry.value as Map<String, dynamic>;
       schemas[name] = Schema.parse(
         value,
-        context.addName(name).key('schemas').key(name),
+        context.addName(snakeName).key('schemas').key(name),
       );
     }
   }
