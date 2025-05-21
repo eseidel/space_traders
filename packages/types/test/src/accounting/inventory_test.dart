@@ -52,6 +52,11 @@ void main() {
       const fleet = PricedFleet(
         ships: [
           PricedShip(shipType: ShipType.PROBE, count: 100, pricePerUnit: 50),
+          // Null shipType means we were unable to guess the type of the ship
+          // from its current setup, hence will also have an unknown price.
+          // Although unknown prices can also occur when we don't have
+          // price data for the ship type.
+          PricedShip(shipType: null, count: 200, pricePerUnit: null),
         ],
       );
 
