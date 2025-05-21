@@ -4,7 +4,6 @@ import 'package:space_gen/space_gen.dart';
 import 'package:space_gen/src/config.dart';
 import 'package:space_gen/src/loader.dart';
 import 'package:space_gen/src/logger.dart';
-import 'package:space_gen/src/resolver.dart';
 import 'package:space_gen/src/spec.dart';
 import 'package:space_gen/src/visitor.dart';
 
@@ -69,14 +68,9 @@ Future<int> main(List<String> arguments) async {
     await cache.load(resolved);
   }
 
-  final resolver = Resolver(
-    baseUrl: config.specUri,
-    registry: parseContext.schemas,
-  );
-  final resolvedSpec = resolver.resolveSpec(spec);
-
   Context(
-    spec: resolvedSpec,
+    spec: spec,
+    schemaRegistry: parseContext.schemas,
     specUrl: config.specUri,
     fs: fs,
     outDir: outDir,

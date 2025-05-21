@@ -112,7 +112,9 @@ class SchemaRef {
 
 // https://spec.openapis.org/oas/v3.0.0#schemaObject
 class Schema {
-  const Schema({
+  Schema({
+    required this.pointer,
+    required this.snakeName,
     required this.type,
     required this.properties,
     required this.required,
@@ -120,7 +122,15 @@ class Schema {
     required this.items,
     required this.enumValues,
     required this.format,
-  });
+  }) {
+    if (type == SchemaType.object && snakeName.isEmpty) {
+      throw ArgumentError.value(
+        snakeName,
+        'snakeName',
+        'Schema name cannot be empty',
+      );
+    }
+  }
 
   factory Schema.parse(Map<String, dynamic> json, ParseContext context) {
     final type = json['type'] as String? ?? 'object';
@@ -140,6 +150,8 @@ class Schema {
     final format = json['format'] as String?;
 
     final schema = Schema(
+      pointer: context.pointer.toString(),
+      snakeName: context.snakeName,
       type: SchemaType.fromJson(type),
       properties: properties,
       required: required.cast<String>(),
@@ -151,6 +163,12 @@ class Schema {
     context.addSchema(schema);
     return schema;
   }
+
+  /// Json pointer location of this schema.
+  final String pointer;
+
+  /// Name of this schema based on parse location.
+  final String snakeName;
 
   final SchemaType type;
   final Map<String, SchemaRef> properties;
@@ -260,7 +278,10 @@ class Response {
   final SchemaRef content;
 }
 
-List<Response> parseResponses(Map<String, dynamic> json, ParseContext context) {
+List<Response> parseResponses(
+  Map<String, dynamic> json,
+  ParseContext parentContext,
+) {
   // Hack to make get cooldown compile.
   final responseCodes = json.keys.toList()..remove('204');
   if (responseCodes.length != 1) {
@@ -279,7 +300,9 @@ List<Response> parseResponses(Map<String, dynamic> json, ParseContext context) {
       code: int.parse(responseCode),
       content: parseSchemaOrRef(
         json: jsonResponse['schema'] as Map<String, dynamic>,
-        context: context
+        context: parentContext
+            .addName(responseCode)
+            .addName('response')
             .key(responseCode)
             .key('content')
             .key('application/json')
@@ -293,11 +316,13 @@ Endpoint parseEndpoint({
   required Map<String, dynamic> methodValue,
   required String path,
   required Method method,
-  required ParseContext context,
+  required ParseContext parentContext,
 }) {
   final snakeName = (methodValue['operationId'] as String? ??
           Uri.parse(path).pathSegments.last)
       .replaceAll('-', '_');
+
+  final context = parentContext.addName(snakeName);
 
   final responses = parseResponses(
     methodValue['responses'] as Map<String, dynamic>,
@@ -324,7 +349,7 @@ Endpoint parseEndpoint({
     final json = content['application/json'] as Map<String, dynamic>;
     requestBody = parseSchemaOrRef(
       json: json['schema'] as Map<String, dynamic>,
-      context: context.key('requestBody'),
+      context: context.addName('request').key('requestBody'),
     );
   }
   return Endpoint(
@@ -379,7 +404,10 @@ Components parseComponents(Map<String, dynamic>? json, ParseContext context) {
     for (final entry in schemasJson.entries) {
       final name = entry.key;
       final value = entry.value as Map<String, dynamic>;
-      schemas[name] = Schema.parse(value, context.key('schemas').key(name));
+      schemas[name] = Schema.parse(
+        value,
+        context.addName(name).key('schemas').key(name),
+      );
     }
   }
 
@@ -411,7 +439,7 @@ class Spec {
             methodValue: methodValue,
             path: path,
             method: method,
-            context: context.key('paths').key(path).key(method.key),
+            parentContext: context.key('paths').key(path).key(method.key),
           ),
         );
       }
@@ -480,7 +508,8 @@ class JsonPointer {
 class ParseContext {
   ParseContext({
     required this.baseUrl,
-    required this.parts,
+    required this.pointerParts,
+    required this.nameStack,
     required this.schemas,
   }) {
     if (baseUrl.hasFragment) {
@@ -491,22 +520,40 @@ class ParseContext {
       );
     }
   }
-  ParseContext.initial(this.baseUrl) : parts = [], schemas = SchemaRegistry();
+  ParseContext.initial(this.baseUrl)
+    : pointerParts = [],
+      nameStack = [],
+      schemas = SchemaRegistry();
 
   /// The base url of the spec being parsed.
   final Uri baseUrl;
 
   /// Json pointer location of the current schema.
-  final List<String> parts;
+  final List<String> pointerParts;
 
-  JsonPointer get pointer => JsonPointer(parts);
+  /// Stack of name parts for the current schema.
+  final List<String> nameStack;
+
+  JsonPointer get pointer => JsonPointer(pointerParts);
+
+  String get snakeName {
+    // To match OpenAPI, we don't put a _ before numbers.
+    final buf = StringBuffer();
+    for (final e in nameStack) {
+      if (buf.isNotEmpty && (e.isNotEmpty && int.tryParse(e[0]) == null)) {
+        buf.write('_');
+      }
+      buf.write(e);
+    }
+    return buf.toString();
+  }
 
   // Registry of all the schemas we've parsed so far.
   // SchemaRegistry is internally mutable.
   final SchemaRegistry schemas;
 
   ParseContext _addPart(String part) =>
-      ParseContext(baseUrl: baseUrl, parts: [...parts, part], schemas: schemas);
+      copyWith(pointerParts: [...pointerParts, part]);
 
   ParseContext key(String key) => _addPart(key);
   ParseContext index(int index) => _addPart(index.toString());
@@ -514,6 +561,18 @@ class ParseContext {
   void addSchema(Schema schema) {
     final uri = baseUrl.replace(fragment: pointer.toString());
     schemas.register(uri, schema);
+  }
+
+  ParseContext addName(String name) =>
+      copyWith(nameStack: [...nameStack, name]);
+
+  ParseContext copyWith({List<String>? pointerParts, List<String>? nameStack}) {
+    return ParseContext(
+      baseUrl: baseUrl,
+      pointerParts: pointerParts ?? this.pointerParts,
+      nameStack: nameStack ?? this.nameStack,
+      schemas: schemas,
+    );
   }
 }
 

@@ -5,7 +5,7 @@ import 'package:mustache_template/mustache_template.dart';
 import 'package:path/path.dart' as p;
 import 'package:space_gen/space_gen.dart';
 import 'package:space_gen/src/logger.dart';
-import 'package:space_gen/src/resolver.dart';
+import 'package:space_gen/src/spec.dart';
 import 'package:space_gen/src/string.dart';
 
 Template loadTemplate(FileSystem fs, String name) {
@@ -23,7 +23,7 @@ String _apiPath(Api api) {
   return 'lib/api/${api.fileName}.dart';
 }
 
-String _modelPath(ResolvedSchema schema) {
+String _modelPath(Schema schema) {
   // openapi generator does not use /src/ in the path.
   return 'lib/model/${schema.fileName}.dart';
 }
@@ -34,13 +34,13 @@ class Api {
   const Api({required this.name, required this.endpoints});
 
   final String name;
-  final List<ResolvedEndpoint> endpoints;
+  final List<Endpoint> endpoints;
 
   String get className => '${name.capitalize()}Api';
   String get fileName => '${name.toLowerCase()}_api';
 }
 
-extension ResolvedSpecGeneration on ResolvedSpec {
+extension SpecGeneration on Spec {
   List<Api> get apis =>
       tags
           .map(
@@ -52,7 +52,7 @@ extension ResolvedSpecGeneration on ResolvedSpec {
           .toList();
 }
 
-extension EndpointGeneration on ResolvedEndpoint {
+extension EndpointGeneration on Endpoint {
   String get methodName {
     final name = camelFromSnake(snakeName);
     return name[0].toLowerCase() + name.substring(1);
@@ -62,19 +62,22 @@ extension EndpointGeneration on ResolvedEndpoint {
 
   Map<String, dynamic> toTemplateContext(Context context) {
     final parameters =
-        this.parameters.map((param) => param.toTemplateContext()).toList();
-    final body = requestBody;
+        this.parameters
+            .map((param) => param.toTemplateContext(context))
+            .toList();
+    final body = context.maybeResolve(requestBody);
     if (body != null) {
-      final typeName = body.typeName();
+      final typeName = body.typeName(context);
       final paramName = typeName[0].toLowerCase() + typeName.substring(1);
       parameters.add({
         'paramName': paramName,
         'paramType': typeName,
-        'paramToJson': body.toJsonExpression(paramName),
-        'paramFromJson': body.fromJsonExpression('json'),
+        'paramToJson': body.toJsonExpression(paramName, context),
+        'paramFromJson': body.fromJsonExpression('json', context),
       });
     }
-    final returnType = responses.firstOrNull?.content.typeName() ?? 'void';
+    final firstResponse = context.maybeResolve(responses.firstOrNull?.content);
+    final returnType = firstResponse?.typeName(context) ?? 'void';
     return {
       'methodName': methodName,
       'httpMethod': method,
@@ -87,7 +90,7 @@ extension EndpointGeneration on ResolvedEndpoint {
   }
 }
 
-extension SchemaGeneration on ResolvedSchema {
+extension SchemaGeneration on Schema {
   String get fileName => snakeName;
 
   String get className => camelFromSnake(snakeName);
@@ -102,7 +105,7 @@ extension SchemaGeneration on ResolvedSchema {
     return type == SchemaType.string && enumValues.isNotEmpty;
   }
 
-  String typeName() {
+  String typeName(Context context) {
     switch (type) {
       case SchemaType.string:
         if (isDateTime) {
@@ -120,12 +123,13 @@ extension SchemaGeneration on ResolvedSchema {
       case SchemaType.object:
         return className;
       case SchemaType.array:
-        return 'List<${items!.typeName()}>';
+        final itemsSchema = context.maybeResolve(items)!;
+        return 'List<${itemsSchema.typeName(context)}>';
     }
     // throw UnimplementedError('Unknown type $type');
   }
 
-  String toJsonExpression(String name) {
+  String toJsonExpression(String name, Context context) {
     switch (type) {
       case SchemaType.string:
         if (isDateTime) {
@@ -141,7 +145,7 @@ extension SchemaGeneration on ResolvedSchema {
       case SchemaType.object:
         return '$name.toJson()';
       case SchemaType.array:
-        final itemsSchema = items!;
+        final itemsSchema = context.maybeResolve(items)!;
         switch (itemsSchema.type) {
           case SchemaType.string:
           case SchemaType.integer:
@@ -156,7 +160,7 @@ extension SchemaGeneration on ResolvedSchema {
     }
   }
 
-  String fromJsonExpression(String jsonValue) {
+  String fromJsonExpression(String jsonValue, Context context) {
     switch (type) {
       case SchemaType.string:
         if (isDateTime) {
@@ -174,8 +178,8 @@ extension SchemaGeneration on ResolvedSchema {
       case SchemaType.object:
         return '$className.fromJson($jsonValue as Map<String, dynamic>)';
       case SchemaType.array:
-        final itemsSchema = items!;
-        final itemTypeName = itemsSchema.typeName();
+        final itemsSchema = context.maybeResolve(items)!;
+        final itemTypeName = itemsSchema.typeName(context);
         if (itemsSchema.type == SchemaType.object) {
           return '($jsonValue as List<dynamic>).map<$itemTypeName>((e) => '
               '$itemTypeName.fromJson(e as Map<String, dynamic>)).toList()';
@@ -185,15 +189,15 @@ extension SchemaGeneration on ResolvedSchema {
     }
   }
 
-  Map<String, dynamic> objectToTemplateContext() {
+  Map<String, dynamic> objectToTemplateContext(Context context) {
     final renderProperties = properties.entries.map((entry) {
       final name = entry.key;
-      final schema = entry.value;
+      final schema = context.maybeResolve(entry.value)!;
       return {
         'propertyName': name,
-        'propertyType': schema.typeName(),
-        'propertyToJson': schema.toJsonExpression(name),
-        'propertyFromJson': schema.fromJsonExpression("json['$name']"),
+        'propertyType': schema.typeName(context),
+        'propertyToJson': schema.toJsonExpression(name, context),
+        'propertyFromJson': schema.fromJsonExpression("json['$name']", context),
       };
     });
     return {
@@ -218,11 +222,11 @@ extension SchemaGeneration on ResolvedSchema {
     };
   }
 
-  Map<String, dynamic> toTemplateContext() {
+  Map<String, dynamic> toTemplateContext(Context context) {
     if (isEnum) {
       return _enumToTemplateContext();
     } else {
-      return objectToTemplateContext();
+      return objectToTemplateContext(context);
     }
   }
 
@@ -231,13 +235,14 @@ extension SchemaGeneration on ResolvedSchema {
   }
 }
 
-extension ParameterGeneration on ResolvedParameter {
-  Map<String, dynamic> toTemplateContext() {
+extension ParameterGeneration on Parameter {
+  Map<String, dynamic> toTemplateContext(Context context) {
+    final typeSchema = context.maybeResolve(type)!;
     return {
       'paramName': name,
-      'paramType': type.typeName(),
-      'paramToJson': type.toJsonExpression(name),
-      'paramFromJson': type.fromJsonExpression("json['$name']"),
+      'paramType': typeSchema.typeName(context),
+      'paramToJson': typeSchema.toJsonExpression(name, context),
+      'paramFromJson': typeSchema.fromJsonExpression("json['$name']", context),
     };
   }
 }
@@ -250,13 +255,30 @@ class Context {
     required this.outDir,
     required this.packageName,
     required this.fs,
+    required this.schemaRegistry,
   });
 
   final Uri specUrl;
-  final ResolvedSpec spec;
+  final Spec spec;
   final Directory outDir;
   final String packageName;
   final FileSystem fs;
+  final SchemaRegistry schemaRegistry;
+
+  Schema? maybeResolve(SchemaRef? ref) {
+    if (ref == null) {
+      return null;
+    }
+    return resolve(ref);
+  }
+
+  Schema resolve(SchemaRef ref) {
+    if (ref.schema != null) {
+      return ref.schema!;
+    }
+    final uri = specUrl.resolve(ref.uri!);
+    return schemaRegistry.get(uri);
+  }
 
   File _ensureFile(String path) {
     final file = fs.file(p.join(outDir.path, path));
@@ -292,10 +314,10 @@ class Context {
   }
 
   void renderApis() {
-    // final rendered = <ResolvedSchema>{};
-    // final renderQueue = <ResolvedSchema>{};
+    // final rendered = <Schema>{};
+    // final renderQueue = <Schema>{};
     for (final api in spec.apis) {
-      final renderContext = RenderContext();
+      final renderContext = RenderContext(specUri: specUrl);
       renderApi(renderContext, this, api);
       // Api files only contain the API class, any inline schemas
       // end up in the model files.
@@ -364,13 +386,26 @@ class Context {
 /// This appears to be per-file rendering context which differs from Context
 /// which is global for the entire render?
 class RenderContext {
-  // TODO(eseidel): This is the wrong way to determine where to render a
-  // schema.
-  /// Schemas to render in this file.
-  List<ResolvedSchema> inlineSchemas = [];
+  RenderContext({required this.specUri});
 
-  void visitSchema(ResolvedSchema schema) {
-    collectSchema(schema);
+  final Uri specUri;
+
+  /// Schemas to render in this file.
+  List<Schema> inlineSchemas = [];
+
+  /// Schemas imported by this file.
+  Set<Uri> importedSchemas = {};
+
+  void visitSchema(SchemaRef? ref) {
+    if (ref == null) {
+      return;
+    }
+    if (ref.schema != null) {
+      collectSchema(ref.schema!);
+    } else {
+      final uri = specUri.resolve(ref.uri!);
+      importedSchemas.add(uri);
+    }
   }
 
   void collectApi(Api api) {
@@ -382,12 +417,12 @@ class RenderContext {
         visitSchema(param.type);
       }
       if (endpoint.requestBody != null) {
-        visitSchema(endpoint.requestBody!);
+        visitSchema(endpoint.requestBody);
       }
     }
   }
 
-  void collectSchema(ResolvedSchema schema) {
+  void collectSchema(Schema schema) {
     if (schema.needsRender) {
       inlineSchemas.add(schema);
     }
@@ -395,7 +430,7 @@ class RenderContext {
       visitSchema(entry.value);
     }
     if (schema.type == SchemaType.array) {
-      visitSchema(schema.items!);
+      visitSchema(schema.items);
     }
   }
 
@@ -412,33 +447,34 @@ class RenderContext {
     return imports.toList()..sort();
   }
 
-  List<Map<String, dynamic>> objectContexts() {
+  List<Map<String, dynamic>> objectContexts(Context context) {
     return inlineSchemas
         .where((schema) => schema.type == SchemaType.object)
-        .map((schema) => schema.toTemplateContext())
+        .map((schema) => schema.toTemplateContext(context))
         .toList();
   }
 
-  List<Map<String, dynamic>> enumContexts() {
+  List<Map<String, dynamic>> enumContexts(Context context) {
     return inlineSchemas
         .where((schema) => schema.isEnum)
-        .map((schema) => schema.toTemplateContext())
+        .map((schema) => schema.toTemplateContext(context))
         .toList();
   }
 }
 
 /// Starts a new RenderContext for rendering a new schema file.
-RenderContext renderRootSchema(Context context, ResolvedSchema schema) {
+RenderContext renderRootSchema(Context context, Schema schema) {
   // logger.info('Rendering ${schema.name}');
 
-  final renderContext = RenderContext()..collectSchema(schema);
+  final renderContext = RenderContext(specUri: context.specUrl)
+    ..collectSchema(schema);
   // logger
   //   ..info('To import: ${renderContext.imported}')
   //   ..info('To render: ${renderContext.inlineSchemas}');
 
   final imports = renderContext.sortedPackageImports(context);
-  final objects = renderContext.objectContexts();
-  final enums = renderContext.enumContexts();
+  final objects = renderContext.objectContexts(context);
+  final enums = renderContext.enumContexts(context);
 
   context.renderTemplate(
     template: 'model',
