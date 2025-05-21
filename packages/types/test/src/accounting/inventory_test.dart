@@ -4,7 +4,7 @@ import 'package:types/types.dart';
 void main() {
   group('PricedInventory', () {
     test('round-trips through JSON', () {
-      final inventory = PricedInventory(
+      const inventory = PricedInventory(
         items: [
           PricedItemStack(
             tradeSymbol: TradeSymbol.IRON,
@@ -24,25 +24,11 @@ void main() {
 
       // Convert back from JSON
       final reconstructedInventory = PricedInventory.fromJson(json);
-
-      // Verify the reconstructed object matches the original
-      expect(
-        reconstructedInventory.items.length,
-        equals(inventory.items.length),
-      );
-
-      for (var i = 0; i < inventory.items.length; i++) {
-        final original = inventory.items[i];
-        final reconstructed = reconstructedInventory.items[i];
-
-        expect(reconstructed.tradeSymbol, equals(original.tradeSymbol));
-        expect(reconstructed.count, equals(original.count));
-        expect(reconstructed.pricePerUnit, equals(original.pricePerUnit));
-      }
+      expect(reconstructedInventory, equals(inventory));
     });
 
     test('handles items with null prices', () {
-      final inventory = PricedInventory(
+      const inventory = PricedInventory(
         items: [
           PricedItemStack(
             tradeSymbol: TradeSymbol.IRON,
@@ -58,6 +44,25 @@ void main() {
       expect(reconstructedInventory.items.length, equals(1));
       expect(reconstructedInventory.items[0].pricePerUnit, isNull);
       expect(reconstructedInventory.items[0].totalValue, isNull);
+    });
+  });
+
+  group('PricedFleet', () {
+    test('round-trips through JSON', () {
+      const fleet = PricedFleet(
+        ships: [
+          PricedShip(shipType: ShipType.PROBE, count: 100, pricePerUnit: 50),
+          // Null shipType means we were unable to guess the type of the ship
+          // from its current setup, hence will also have an unknown price.
+          // Although unknown prices can also occur when we don't have
+          // price data for the ship type.
+          PricedShip(shipType: null, count: 200, pricePerUnit: null),
+        ],
+      );
+
+      final json = fleet.toJson();
+      final reconstructedFleet = PricedFleet.fromJson(json);
+      expect(reconstructedFleet, equals(fleet));
     });
   });
 }

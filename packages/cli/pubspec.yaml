@@ -17,7 +17,7 @@ dependencies:
     path: ../db
   equatable: ^2.0.5
   file: ^7.0.0
-  http: ^0.13.6
+  http: ^1.4.0
   intl: ^0.20.2
   json_diff:
     git:
