@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:types/api_converters.dart';
 import 'package:types/types.dart';
@@ -6,9 +7,9 @@ part 'inventory.g.dart';
 
 /// A class representing the value of an item in the inventory.
 @JsonSerializable()
-class PricedItemStack {
+class PricedItemStack extends Equatable {
   /// Creates an instance of [PricedItemStack].
-  PricedItemStack({
+  const PricedItemStack({
     required this.tradeSymbol,
     required this.count,
     required this.pricePerUnit,
@@ -38,13 +39,16 @@ class PricedItemStack {
 
   /// Converts the [PricedItemStack] to a JSON object.
   Map<String, dynamic> toJson() => _$PricedItemStackToJson(this);
+
+  @override
+  List<Object?> get props => [tradeSymbol, count, pricePerUnit];
 }
 
 /// A class representing the value of the inventory.
 @JsonSerializable()
-class PricedInventory {
+class PricedInventory extends Equatable {
   /// Creates an instance of [PricedInventory].
-  PricedInventory({required this.items});
+  const PricedInventory({required this.items});
 
   /// Creates an instance of [PricedInventory] from a JSON object.
   factory PricedInventory.fromJson(Map<String, dynamic> json) =>
@@ -70,13 +74,16 @@ class PricedInventory {
 
   /// List of items in the inventory.
   final List<PricedItemStack> items;
+
+  @override
+  List<Object?> get props => [items];
 }
 
 /// A class representing the value of an ship in the fleet.
 @JsonSerializable()
-class PricedShip {
+class PricedShip extends Equatable {
   /// Creates an instance of [PricedShip].
-  PricedShip({
+  const PricedShip({
     required this.shipType,
     required this.count,
     required this.pricePerUnit,
@@ -102,13 +109,16 @@ class PricedShip {
 
   /// Converts the [PricedShip] to a JSON object.
   Map<String, dynamic> toJson() => _$PricedShipToJson(this);
+
+  @override
+  List<Object?> get props => [shipType, count, pricePerUnit];
 }
 
 /// A class representing the value of the inventory.
 @JsonSerializable()
-class PricedFleet {
+class PricedFleet extends Equatable {
   /// Creates an instance of [PricedFleet].
-  PricedFleet({required this.ships});
+  const PricedFleet({required this.ships});
 
   /// Creates an instance of [PricedFleet] from a JSON object.
   factory PricedFleet.fromJson(Map<String, dynamic> json) =>
@@ -135,4 +145,7 @@ class PricedFleet {
 
   /// List of ships in the fleet.
   final List<PricedShip> ships;
+
+  @override
+  List<Object?> get props => [ships];
 }
