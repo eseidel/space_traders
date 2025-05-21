@@ -16,7 +16,7 @@ dependencies:
   flutter:
     sdk: flutter
   go_router: ^15.1.2
-  http: ^0.13.6
+  http: ^1.4.0
   protocol:
     path: ../protocol
   types:
