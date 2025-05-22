@@ -161,4 +161,28 @@ void main() {
     expect(transaction.quantity, 100);
     expect(transaction.tradeType, null);
   });
+
+  test('Transaction.fromChartTransaction', () {
+    final chartTransaction = ChartTransaction(
+      waypointSymbol: 'A-B-C',
+      shipSymbol: 'S-1',
+      totalPrice: 100,
+      timestamp: DateTime(2021),
+    );
+    final transaction = Transaction.fromChartTransaction(chartTransaction, 100);
+    expect(transaction.transactionType, TransactionType.chart);
+    expect(transaction.waypointSymbol, WaypointSymbol.fromString('A-B-C'));
+    expect(transaction.shipSymbol, const ShipSymbol('S', 1));
+    expect(transaction.tradeSymbol, null);
+    expect(transaction.shipType, null);
+    expect(transaction.quantity, 1);
+    expect(transaction.tradeType, null);
+    expect(transaction.perUnitPrice, 100);
+    expect(transaction.timestamp, DateTime(2021));
+    expect(transaction.agentCredits, 100);
+    expect(transaction.accounting, AccountingType.services);
+    expect(transaction.contractId, null);
+    expect(transaction.contractAction, null);
+    expect(transaction.creditsChange, 100);
+  });
 }

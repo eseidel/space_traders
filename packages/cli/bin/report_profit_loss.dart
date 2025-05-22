@@ -27,6 +27,7 @@ void printIncomeStatement(IncomeStatement report) {
     ['  Sales', c(report.goodsRevenue)],
     ['  Contracts', c(report.contractsRevenue)],
     ['  Asset Sales', c(report.assetSale)],
+    ['  Charting', c(report.chartingRevenue)],
     ['Total Revenues', c(report.revenue)],
     [subhead('Cost of Goods Sold')],
     ['  Goods', c(report.goodsPurchase)],

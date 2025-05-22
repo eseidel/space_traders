@@ -46,10 +46,10 @@ Future<PricedFleet> computeShipValue(
   ShipyardShipSnapshot shipyardShips,
   ShipyardPriceSnapshot shipyardPrices,
 ) async {
-  ShipType shipTypeForShip(Ship ship) {
+  ShipType? shipTypeForShip(Ship ship) {
     final type = shipyardShips.guessShipType(ship);
     if (type == null) {
-      throw StateError('Unknown ship type for frame: ${ship.frame.symbol}');
+      logger.warn('Unknown ship type for frame: ${ship.frame.symbol}');
     }
     return type;
   }
@@ -63,7 +63,10 @@ Future<PricedFleet> computeShipValue(
           count: count,
           // Note this is using purchase price rather than scrap price
           // which is likely over-estimating the value.
-          pricePerUnit: shipyardPrices.medianPurchasePrice(symbol),
+          pricePerUnit:
+              symbol != null
+                  ? shipyardPrices.medianPurchasePrice(symbol)
+                  : null,
         );
       }).toList();
 

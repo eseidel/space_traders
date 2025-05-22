@@ -43,6 +43,10 @@ IncomeStatement _$IncomeStatementFromJson(
         'contracts_revenue',
         (v) => (v as num).toInt(),
       ),
+      chartingRevenue: $checkedConvert(
+        'charting_revenue',
+        (v) => (v as num).toInt(),
+      ),
       goodsPurchase: $checkedConvert(
         'goods_purchase',
         (v) => (v as num).toInt(),
@@ -64,6 +68,7 @@ IncomeStatement _$IncomeStatementFromJson(
   fieldKeyMap: const {
     'goodsRevenue': 'goods_revenue',
     'contractsRevenue': 'contracts_revenue',
+    'chartingRevenue': 'charting_revenue',
     'goodsPurchase': 'goods_purchase',
     'assetSale': 'asset_sale',
     'constructionMaterials': 'construction_materials',
@@ -81,6 +86,7 @@ Map<String, dynamic> _$IncomeStatementToJson(IncomeStatement instance) =>
       'goods_revenue': instance.goodsRevenue,
       'contracts_revenue': instance.contractsRevenue,
       'asset_sale': instance.assetSale,
+      'charting_revenue': instance.chartingRevenue,
       'goods_purchase': instance.goodsPurchase,
       'fuel_purchase': instance.fuelPurchase,
       'construction_materials': instance.constructionMaterials,

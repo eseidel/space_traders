@@ -98,23 +98,11 @@ class ApiClient {
 
       switch (method) {
         case 'POST':
-          {
-            if (nullableHeaderParams?['Content-Type'] == 'application/json' &&
-                json.encode(msgBody).isEmpty) {
-              final headers = {...?nullableHeaderParams, 'Content-Length': '0'};
-              return await _client.post(
-                uri,
-                headers: headers,
-                body: msgBody,
-              );
-            } else {
-              return await _client.post(
-                uri,
-                headers: nullableHeaderParams,
-                body: msgBody,
-              );
-            }
-          }
+          return await _client.post(
+            uri,
+            headers: nullableHeaderParams,
+            body: msgBody,
+          );
         case 'PUT':
           return await _client.put(
             uri,

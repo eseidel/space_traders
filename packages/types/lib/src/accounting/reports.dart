@@ -1,12 +1,13 @@
+import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'reports.g.dart';
 
 /// A class representing the assets of the agent.
 @JsonSerializable()
-class BalanceSheet {
+class BalanceSheet extends Equatable {
   /// Creates an instance of [BalanceSheet].
-  BalanceSheet({
+  const BalanceSheet({
     required this.time,
     required this.cash,
     required this.loans,
@@ -50,17 +51,21 @@ class BalanceSheet {
 
   /// Converts the [BalanceSheet] to a JSON object.
   Map<String, dynamic> toJson() => _$BalanceSheetToJson(this);
+
+  @override
+  List<Object?> get props => [time, cash, inventory, ships, loans];
 }
 
 /// A class representing an income statement.
 @JsonSerializable()
-class IncomeStatement {
+class IncomeStatement extends Equatable {
   /// Creates an instance of [IncomeStatement].
-  IncomeStatement({
+  const IncomeStatement({
     required this.start,
     required this.end,
     required this.goodsRevenue,
     required this.contractsRevenue,
+    required this.chartingRevenue,
     required this.goodsPurchase,
     required this.assetSale,
     required this.constructionMaterials,
@@ -91,8 +96,11 @@ class IncomeStatement {
   /// The total revenue from contracts for the period.
   final int contractsRevenue;
 
-  /// The total income from asset sales for the period (one-offs).
+  /// The total revenue from asset sales for the period (one-offs).
   final int assetSale;
+
+  /// Total revenue from charting services performed.
+  final int chartingRevenue;
 
   /// Total cost of goods purchased for resale.
   final int goodsPurchase;
@@ -114,7 +122,8 @@ class IncomeStatement {
   /// The total income for the period.
   /// There seems to be some debate as to if fuel counts as COGS or not,
   /// for now we're counting it as such.
-  int get revenue => goodsRevenue + contractsRevenue + assetSale;
+  int get revenue =>
+      goodsRevenue + contractsRevenue + assetSale + chartingRevenue;
 
   /// Net sales for the period, does not include asset sales.
   int get netSales => goodsRevenue + contractsRevenue;
@@ -145,4 +154,19 @@ class IncomeStatement {
 
   /// Converts the [IncomeStatement] to a JSON object.
   Map<String, dynamic> toJson() => _$IncomeStatementToJson(this);
+
+  @override
+  List<Object?> get props => [
+    start,
+    end,
+    numberOfTransactions,
+    goodsRevenue,
+    contractsRevenue,
+    chartingRevenue,
+    goodsPurchase,
+    assetSale,
+    constructionMaterials,
+    fuelPurchase,
+    capEx,
+  ];
 }

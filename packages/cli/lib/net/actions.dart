@@ -555,7 +555,11 @@ Future<void> chartWaypointAndLog(Api api, Database db, Ship ship) async {
     await db.upsertAgent(agent);
 
     // Powershell needs the space after the emoji.
-    shipInfo(ship, '🗺️  ${waypointDescription(waypoint)}');
+    shipInfo(
+      ship,
+      '🗺️  ${waypointDescription(waypoint)} '
+      '${creditsString(transaction.creditsChange)}',
+    );
   } on ApiException catch (e) {
     if (!isWaypointAlreadyChartedException(e)) {
       rethrow;
