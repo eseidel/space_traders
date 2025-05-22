@@ -126,6 +126,7 @@ class Schema {
     required this.items,
     required this.enumValues,
     required this.format,
+    required this.additionalProperties,
   }) {
     if (type == SchemaType.object && snakeName.isEmpty) {
       throw ArgumentError.value(
@@ -152,6 +153,18 @@ class Schema {
     final description = json['description'] as String? ?? '';
     final enumValues = json['enum'] as List<dynamic>? ?? [];
     final format = json['format'] as String?;
+    final additionalPropertiesJson = json['additionalProperties'];
+    SchemaRef? additionalProperties;
+    if (additionalPropertiesJson is Map<String, dynamic>) {
+      additionalProperties = parseSchemaOrRef(
+        json: additionalPropertiesJson,
+        context: context.key('additionalProperties'),
+      );
+    } else if (additionalPropertiesJson is bool) {
+      throw UnimplementedError('additionalProperties is bool');
+    } else if (additionalPropertiesJson != null) {
+      throw UnimplementedError('additionalProperties is not a map or bool');
+    }
 
     final schema = Schema(
       pointer: context.pointer.toString(),
@@ -163,6 +176,7 @@ class Schema {
       items: itemSchema,
       enumValues: enumValues.cast<String>(),
       format: format,
+      additionalProperties: additionalProperties,
     );
     context.addSchema(schema);
     return schema;
@@ -181,6 +195,7 @@ class Schema {
   final SchemaRef? items;
   final List<String> enumValues;
   final String? format;
+  final SchemaRef? additionalProperties;
 
   @override
   String toString() {
@@ -231,10 +246,11 @@ Map<String, SchemaRef> parseProperties({
   }
   for (final entry in json.entries) {
     final name = entry.key;
+    final snakeName = snakeFromCamel(name);
     final value = entry.value as Map<String, dynamic>;
     properties[name] = parseSchemaOrRef(
       json: value,
-      context: context.addName(name).key(name),
+      context: context.addSnakeName(snakeName).key(name),
     );
   }
   return properties;
@@ -305,8 +321,8 @@ List<Response> parseResponses(
       content: parseSchemaOrRef(
         json: jsonResponse['schema'] as Map<String, dynamic>,
         context: parentContext
-            .addName(responseCode)
-            .addName('response')
+            .addSnakeName(responseCode)
+            .addSnakeName('response')
             .key(responseCode)
             .key('content')
             .key('application/json')
@@ -326,7 +342,7 @@ Endpoint parseEndpoint({
           Uri.parse(path).pathSegments.last)
       .replaceAll('-', '_');
 
-  final context = parentContext.addName(snakeName);
+  final context = parentContext.addSnakeName(snakeName);
 
   final responses = parseResponses(
     methodValue['responses'] as Map<String, dynamic>,
@@ -353,7 +369,7 @@ Endpoint parseEndpoint({
     final json = content['application/json'] as Map<String, dynamic>;
     requestBody = parseSchemaOrRef(
       json: json['schema'] as Map<String, dynamic>,
-      context: context.addName('request').key('requestBody'),
+      context: context.addSnakeName('request').key('requestBody'),
     );
   }
   return Endpoint(
@@ -411,7 +427,7 @@ Components parseComponents(Map<String, dynamic>? json, ParseContext context) {
       final value = entry.value as Map<String, dynamic>;
       schemas[name] = Schema.parse(
         value,
-        context.addName(snakeName).key('schemas').key(name),
+        context.addSnakeName(snakeName).key('schemas').key(name),
       );
     }
   }
@@ -514,7 +530,7 @@ class ParseContext {
   ParseContext({
     required this.baseUrl,
     required this.pointerParts,
-    required this.nameStack,
+    required this.snakeNameStack,
     required this.schemas,
   }) {
     if (baseUrl.hasFragment) {
@@ -527,7 +543,7 @@ class ParseContext {
   }
   ParseContext.initial(this.baseUrl)
     : pointerParts = [],
-      nameStack = [],
+      snakeNameStack = [],
       schemas = SchemaRegistry();
 
   /// The base url of the spec being parsed.
@@ -537,14 +553,14 @@ class ParseContext {
   final List<String> pointerParts;
 
   /// Stack of name parts for the current schema.
-  final List<String> nameStack;
+  final List<String> snakeNameStack;
 
   JsonPointer get pointer => JsonPointer(pointerParts);
 
   String get snakeName {
     // To match OpenAPI, we don't put a _ before numbers.
     final buf = StringBuffer();
-    for (final e in nameStack) {
+    for (final e in snakeNameStack) {
       if (buf.isNotEmpty && (e.isNotEmpty && int.tryParse(e[0]) == null)) {
         buf.write('_');
       }
@@ -568,14 +584,17 @@ class ParseContext {
     schemas.register(uri, schema);
   }
 
-  ParseContext addName(String name) =>
-      copyWith(nameStack: [...nameStack, name]);
+  ParseContext addSnakeName(String snakeName) =>
+      copyWith(snakeNameStack: [...snakeNameStack, snakeName]);
 
-  ParseContext copyWith({List<String>? pointerParts, List<String>? nameStack}) {
+  ParseContext copyWith({
+    List<String>? pointerParts,
+    List<String>? snakeNameStack,
+  }) {
     return ParseContext(
       baseUrl: baseUrl,
       pointerParts: pointerParts ?? this.pointerParts,
-      nameStack: nameStack ?? this.nameStack,
+      snakeNameStack: snakeNameStack ?? this.snakeNameStack,
       schemas: schemas,
     );
   }

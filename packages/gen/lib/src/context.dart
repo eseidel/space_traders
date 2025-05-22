@@ -105,6 +105,14 @@ extension SchemaGeneration on Schema {
     return type == SchemaType.string && enumValues.isNotEmpty;
   }
 
+  // Is a Map with a specified value type.
+  Schema? valueSchema(Context context) {
+    if (type != SchemaType.object) {
+      return null;
+    }
+    return context.maybeResolve(additionalProperties);
+  }
+
   String typeName(Context context) {
     switch (type) {
       case SchemaType.string:
@@ -207,10 +215,15 @@ extension SchemaGeneration on Schema {
         'propertyFromJson': schema.fromJsonExpression("json['$name']", context),
       };
     });
+    final valueSchema = this.valueSchema(context);
     return {
       'schemaName': className,
       'hasProperties': renderProperties.isNotEmpty,
       'properties': renderProperties,
+      'hasAdditionalProperties': valueSchema != null,
+      'valueSchema': valueSchema?.typeName(context),
+      'valueToJson': valueSchema?.toJsonExpression('value', context),
+      'valueFromJson': valueSchema?.fromJsonExpression('value', context),
     };
   }
 
