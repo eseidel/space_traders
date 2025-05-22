@@ -65,15 +65,15 @@ extension EndpointGeneration on Endpoint {
         this.parameters
             .map((param) => param.toTemplateContext(context))
             .toList();
-    final body = context.maybeResolve(requestBody);
-    if (body != null) {
-      final typeName = body.typeName(context);
+    final bodySchema = context.maybeResolve(requestBody);
+    if (bodySchema != null) {
+      final typeName = bodySchema.typeName(context);
       final paramName = typeName[0].toLowerCase() + typeName.substring(1);
       parameters.add({
         'paramName': paramName,
         'paramType': typeName,
-        'paramToJson': body.toJsonExpression(paramName, context),
-        'paramFromJson': body.fromJsonExpression('json', context),
+        'paramToJson': bodySchema.toJsonExpression(paramName, context),
+        'paramFromJson': bodySchema.fromJsonExpression('json', context),
       });
     }
     final firstResponse = context.maybeResolve(responses.firstOrNull?.content);
