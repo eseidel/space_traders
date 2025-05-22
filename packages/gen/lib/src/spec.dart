@@ -274,6 +274,57 @@ class Endpoint {
     required this.requestBody,
   });
 
+  factory Endpoint.parse({
+    required Map<String, dynamic> methodValue,
+    required String path,
+    required Method method,
+    required ParseContext parentContext,
+  }) {
+    final snakeName = (methodValue['operationId'] as String? ??
+            Uri.parse(path).pathSegments.last)
+        .replaceAll('-', '_');
+
+    final context = parentContext.addSnakeName(snakeName);
+
+    final responses = parseResponses(
+      methodValue['responses'] as Map<String, dynamic>,
+      context.key('responses'),
+    );
+    final tags = methodValue['tags'] as List<dynamic>?;
+    final tag = tags?.firstOrNull as String? ?? 'Default';
+    final parametersJson = methodValue['parameters'] as List<dynamic>? ?? [];
+    final parameters =
+        parametersJson
+            .cast<Map<String, dynamic>>()
+            .indexed
+            .map(
+              (indexed) => Parameter.parse(
+                json: indexed.$2,
+                context: context.key('parameters').index(indexed.$1),
+              ),
+            )
+            .toList();
+    final requestBodyJson = methodValue['requestBody'] as Map<String, dynamic>?;
+    SchemaRef? requestBody;
+    if (requestBodyJson != null) {
+      final content = requestBodyJson['content'] as Map<String, dynamic>;
+      final json = content['application/json'] as Map<String, dynamic>;
+      requestBody = parseSchemaOrRef(
+        json: json['schema'] as Map<String, dynamic>,
+        context: context.addSnakeName('request').key('requestBody'),
+      );
+    }
+    return Endpoint(
+      path: path,
+      method: method,
+      tag: tag,
+      responses: responses,
+      snakeName: snakeName,
+      parameters: parameters,
+      requestBody: requestBody,
+    );
+  }
+
   final String path;
   final Method method;
   final String tag;
@@ -323,57 +374,6 @@ List<Response> parseResponses(
       ),
     ),
   ];
-}
-
-Endpoint parseEndpoint({
-  required Map<String, dynamic> methodValue,
-  required String path,
-  required Method method,
-  required ParseContext parentContext,
-}) {
-  final snakeName = (methodValue['operationId'] as String? ??
-          Uri.parse(path).pathSegments.last)
-      .replaceAll('-', '_');
-
-  final context = parentContext.addSnakeName(snakeName);
-
-  final responses = parseResponses(
-    methodValue['responses'] as Map<String, dynamic>,
-    context.key('responses'),
-  );
-  final tags = methodValue['tags'] as List<dynamic>?;
-  final tag = tags?.firstOrNull as String? ?? 'Default';
-  final parametersJson = methodValue['parameters'] as List<dynamic>? ?? [];
-  final parameters =
-      parametersJson
-          .cast<Map<String, dynamic>>()
-          .indexed
-          .map(
-            (indexed) => Parameter.parse(
-              json: indexed.$2,
-              context: context.key('parameters').index(indexed.$1),
-            ),
-          )
-          .toList();
-  final requestBodyJson = methodValue['requestBody'] as Map<String, dynamic>?;
-  SchemaRef? requestBody;
-  if (requestBodyJson != null) {
-    final content = requestBodyJson['content'] as Map<String, dynamic>;
-    final json = content['application/json'] as Map<String, dynamic>;
-    requestBody = parseSchemaOrRef(
-      json: json['schema'] as Map<String, dynamic>,
-      context: context.addSnakeName('request').key('requestBody'),
-    );
-  }
-  return Endpoint(
-    path: path,
-    method: method,
-    tag: tag,
-    responses: responses,
-    snakeName: snakeName,
-    parameters: parameters,
-    requestBody: requestBody,
-  );
 }
 
 class Components {
@@ -449,11 +449,11 @@ class Spec {
           continue;
         }
         endpoints.add(
-          parseEndpoint(
-            methodValue: methodValue,
-            path: path,
-            method: method,
+          Endpoint.parse(
             parentContext: context.key('paths').key(path).key(method.key),
+            path: path,
+            methodValue: methodValue,
+            method: method,
           ),
         );
       }
