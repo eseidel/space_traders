@@ -12,7 +12,8 @@ enum ShipRole {
   patrol('PATROL'),
   satellite('SATELLITE'),
   explorer('EXPLORER'),
-  refinery('REFINERY');
+  refinery('REFINERY'),
+  ;
 
   const ShipRole(this.value);
 

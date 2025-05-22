@@ -1,6 +1,5 @@
 import 'package:spacetraders/model/cooldown.dart';
 import 'package:spacetraders/model/ship_cargo.dart';
-import 'package:spacetraders/model/trade_symbol.dart';
 
 class ShipRefine201ResponseData {
   ShipRefine201ResponseData({
@@ -14,29 +13,27 @@ class ShipRefine201ResponseData {
     return ShipRefine201ResponseData(
       cargo: ShipCargo.fromJson(json['cargo'] as Map<String, dynamic>),
       cooldown: Cooldown.fromJson(json['cooldown'] as Map<String, dynamic>),
-      produced:
-          (json['produced'] as List<dynamic>)
-              .map<ShipRefine201ResponseDataProduced>(
-                (e) => ShipRefine201ResponseDataProduced.fromJson(
-                  e as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
-      consumed:
-          (json['consumed'] as List<dynamic>)
-              .map<ShipRefine201ResponseDataConsumed>(
-                (e) => ShipRefine201ResponseDataConsumed.fromJson(
-                  e as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
+      produced: (json['produced'] as List<dynamic>)
+          .map<ShipRefine201ResponseDataProducedInner>(
+            (e) => ShipRefine201ResponseDataProducedInner.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList(),
+      consumed: (json['consumed'] as List<dynamic>)
+          .map<ShipRefine201ResponseDataConsumedInner>(
+            (e) => ShipRefine201ResponseDataConsumedInner.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList(),
     );
   }
 
   final ShipCargo cargo;
   final Cooldown cooldown;
-  final List<ShipRefine201ResponseDataProduced> produced;
-  final List<ShipRefine201ResponseDataConsumed> consumed;
+  final List<ShipRefine201ResponseDataProducedInner> produced;
+  final List<ShipRefine201ResponseDataConsumedInner> consumed;
 
   Map<String, dynamic> toJson() {
     return {
@@ -48,48 +45,54 @@ class ShipRefine201ResponseData {
   }
 }
 
-class ShipRefine201ResponseDataProduced {
-  ShipRefine201ResponseDataProduced({
+class ShipRefine201ResponseDataProducedInner {
+  ShipRefine201ResponseDataProducedInner({
     required this.tradeSymbol,
     required this.units,
   });
 
-  factory ShipRefine201ResponseDataProduced.fromJson(
+  factory ShipRefine201ResponseDataProducedInner.fromJson(
     Map<String, dynamic> json,
   ) {
-    return ShipRefine201ResponseDataProduced(
-      tradeSymbol: TradeSymbol.fromJson(json['tradeSymbol'] as String),
+    return ShipRefine201ResponseDataProducedInner(
+      tradeSymbol: json['tradeSymbol'] as String,
       units: json['units'] as int,
     );
   }
 
-  final TradeSymbol tradeSymbol;
+  final String tradeSymbol;
   final int units;
 
   Map<String, dynamic> toJson() {
-    return {'tradeSymbol': tradeSymbol.toJson(), 'units': units};
+    return {
+      'tradeSymbol': tradeSymbol,
+      'units': units,
+    };
   }
 }
 
-class ShipRefine201ResponseDataConsumed {
-  ShipRefine201ResponseDataConsumed({
+class ShipRefine201ResponseDataConsumedInner {
+  ShipRefine201ResponseDataConsumedInner({
     required this.tradeSymbol,
     required this.units,
   });
 
-  factory ShipRefine201ResponseDataConsumed.fromJson(
+  factory ShipRefine201ResponseDataConsumedInner.fromJson(
     Map<String, dynamic> json,
   ) {
-    return ShipRefine201ResponseDataConsumed(
-      tradeSymbol: TradeSymbol.fromJson(json['tradeSymbol'] as String),
+    return ShipRefine201ResponseDataConsumedInner(
+      tradeSymbol: json['tradeSymbol'] as String,
       units: json['units'] as int,
     );
   }
 
-  final TradeSymbol tradeSymbol;
+  final String tradeSymbol;
   final int units;
 
   Map<String, dynamic> toJson() {
-    return {'tradeSymbol': tradeSymbol.toJson(), 'units': units};
+    return {
+      'tradeSymbol': tradeSymbol,
+      'units': units,
+    };
   }
 }

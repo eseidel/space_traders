@@ -1,7 +1,9 @@
 import 'package:spacetraders/model/construction.dart';
 
 class GetConstruction200Response {
-  GetConstruction200Response({required this.data});
+  GetConstruction200Response({
+    required this.data,
+  });
 
   factory GetConstruction200Response.fromJson(Map<String, dynamic> json) {
     return GetConstruction200Response(
@@ -12,6 +14,8 @@ class GetConstruction200Response {
   final Construction data;
 
   Map<String, dynamic> toJson() {
-    return {'data': data.toJson()};
+    return {
+      'data': data.toJson(),
+    };
   }
 }

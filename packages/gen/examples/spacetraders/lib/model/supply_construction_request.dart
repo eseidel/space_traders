@@ -1,5 +1,3 @@
-import 'package:spacetraders/model/trade_symbol.dart';
-
 class SupplyConstructionRequest {
   SupplyConstructionRequest({
     required this.shipSymbol,
@@ -10,19 +8,19 @@ class SupplyConstructionRequest {
   factory SupplyConstructionRequest.fromJson(Map<String, dynamic> json) {
     return SupplyConstructionRequest(
       shipSymbol: json['shipSymbol'] as String,
-      tradeSymbol: TradeSymbol.fromJson(json['tradeSymbol'] as String),
+      tradeSymbol: json['tradeSymbol'] as String,
       units: json['units'] as int,
     );
   }
 
   final String shipSymbol;
-  final TradeSymbol tradeSymbol;
+  final String tradeSymbol;
   final int units;
 
   Map<String, dynamic> toJson() {
     return {
       'shipSymbol': shipSymbol,
-      'tradeSymbol': tradeSymbol.toJson(),
+      'tradeSymbol': tradeSymbol,
       'units': units,
     };
   }

@@ -1,7 +1,10 @@
 import 'package:spacetraders/model/ship_type.dart';
 
 class PurchaseShipRequest {
-  PurchaseShipRequest({required this.shipType, required this.waypointSymbol});
+  PurchaseShipRequest({
+    required this.shipType,
+    required this.waypointSymbol,
+  });
 
   factory PurchaseShipRequest.fromJson(Map<String, dynamic> json) {
     return PurchaseShipRequest(
@@ -14,6 +17,9 @@ class PurchaseShipRequest {
   final String waypointSymbol;
 
   Map<String, dynamic> toJson() {
-    return {'shipType': shipType.toJson(), 'waypointSymbol': waypointSymbol};
+    return {
+      'shipType': shipType.toJson(),
+      'waypointSymbol': waypointSymbol,
+    };
   }
 }

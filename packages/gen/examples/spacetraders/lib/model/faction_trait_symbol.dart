@@ -57,7 +57,8 @@ enum FactionTraitSymbol {
   fragmented('FRAGMENTED'),
   commercial('COMMERCIAL'),
   freeMarkets('FREE_MARKETS'),
-  entrepreneurial('ENTREPRENEURIAL');
+  entrepreneurial('ENTREPRENEURIAL'),
+  ;
 
   const FactionTraitSymbol(this.value);
 

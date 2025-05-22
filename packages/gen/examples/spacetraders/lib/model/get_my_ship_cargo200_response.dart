@@ -1,7 +1,9 @@
 import 'package:spacetraders/model/ship_cargo.dart';
 
 class GetMyShipCargo200Response {
-  GetMyShipCargo200Response({required this.data});
+  GetMyShipCargo200Response({
+    required this.data,
+  });
 
   factory GetMyShipCargo200Response.fromJson(Map<String, dynamic> json) {
     return GetMyShipCargo200Response(
@@ -12,6 +14,8 @@ class GetMyShipCargo200Response {
   final ShipCargo data;
 
   Map<String, dynamic> toJson() {
-    return {'data': data.toJson()};
+    return {
+      'data': data.toJson(),
+    };
   }
 }

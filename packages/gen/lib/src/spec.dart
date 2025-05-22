@@ -56,13 +56,6 @@ class Parameter {
   final SchemaRef type;
 }
 
-class Tag {
-  const Tag({required this.name, required this.endpoints});
-
-  final String name;
-  final List<Endpoint> endpoints;
-}
-
 enum SchemaType {
   string,
   number,

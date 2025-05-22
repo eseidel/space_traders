@@ -1,9 +1,10 @@
-import 'package:spacetraders/model/ship_condition_event.dart';
 import 'package:spacetraders/model/ship_fuel.dart';
 import 'package:spacetraders/model/ship_nav.dart';
 
 class WarpShip200Response {
-  WarpShip200Response({required this.data});
+  WarpShip200Response({
+    required this.data,
+  });
 
   factory WarpShip200Response.fromJson(Map<String, dynamic> json) {
     return WarpShip200Response(
@@ -16,39 +17,32 @@ class WarpShip200Response {
   final WarpShip200ResponseData data;
 
   Map<String, dynamic> toJson() {
-    return {'data': data.toJson()};
+    return {
+      'data': data.toJson(),
+    };
   }
 }
 
 class WarpShip200ResponseData {
   WarpShip200ResponseData({
-    required this.nav,
     required this.fuel,
-    required this.events,
+    required this.nav,
   });
 
   factory WarpShip200ResponseData.fromJson(Map<String, dynamic> json) {
     return WarpShip200ResponseData(
-      nav: ShipNav.fromJson(json['nav'] as Map<String, dynamic>),
       fuel: ShipFuel.fromJson(json['fuel'] as Map<String, dynamic>),
-      events:
-          (json['events'] as List<dynamic>)
-              .map<ShipConditionEvent>(
-                (e) => ShipConditionEvent.fromJson(e as Map<String, dynamic>),
-              )
-              .toList(),
+      nav: ShipNav.fromJson(json['nav'] as Map<String, dynamic>),
     );
   }
 
-  final ShipNav nav;
   final ShipFuel fuel;
-  final List<ShipConditionEvent> events;
+  final ShipNav nav;
 
   Map<String, dynamic> toJson() {
     return {
-      'nav': nav.toJson(),
       'fuel': fuel.toJson(),
-      'events': events.map((e) => e.toJson()).toList(),
+      'nav': nav.toJson(),
     };
   }
 }

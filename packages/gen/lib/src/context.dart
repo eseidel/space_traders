@@ -420,7 +420,7 @@ class RenderContext {
   /// Schemas imported by this file.
   Set<SchemaRef> importedSchemas = {};
 
-  void visitSchema(SchemaRef? ref) {
+  void visitRef(SchemaRef? ref) {
     if (ref == null) {
       return;
     }
@@ -434,13 +434,13 @@ class RenderContext {
   void collectApi(Api api) {
     for (final endpoint in api.endpoints) {
       for (final response in endpoint.responses) {
-        visitSchema(response.content);
+        visitRef(response.content);
       }
       for (final param in endpoint.parameters) {
-        visitSchema(param.type);
+        visitRef(param.type);
       }
       if (endpoint.requestBody != null) {
-        visitSchema(endpoint.requestBody);
+        visitRef(endpoint.requestBody);
       }
     }
   }
@@ -450,10 +450,10 @@ class RenderContext {
       inlineSchemas.add(schema);
     }
     for (final entry in schema.properties.entries) {
-      visitSchema(entry.value);
+      visitRef(entry.value);
     }
     if (schema.type == SchemaType.array) {
-      visitSchema(schema.items);
+      visitRef(schema.items);
     }
   }
 

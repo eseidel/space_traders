@@ -1,7 +1,9 @@
 import 'package:spacetraders/model/jump_gate.dart';
 
 class GetJumpGate200Response {
-  GetJumpGate200Response({required this.data});
+  GetJumpGate200Response({
+    required this.data,
+  });
 
   factory GetJumpGate200Response.fromJson(Map<String, dynamic> json) {
     return GetJumpGate200Response(
@@ -12,6 +14,8 @@ class GetJumpGate200Response {
   final JumpGate data;
 
   Map<String, dynamic> toJson() {
-    return {'data': data.toJson()};
+    return {
+      'data': data.toJson(),
+    };
   }
 }

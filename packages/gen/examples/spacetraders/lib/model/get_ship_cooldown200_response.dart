@@ -1,7 +1,9 @@
 import 'package:spacetraders/model/cooldown.dart';
 
 class GetShipCooldown200Response {
-  GetShipCooldown200Response({required this.data});
+  GetShipCooldown200Response({
+    required this.data,
+  });
 
   factory GetShipCooldown200Response.fromJson(Map<String, dynamic> json) {
     return GetShipCooldown200Response(
@@ -12,6 +14,8 @@ class GetShipCooldown200Response {
   final Cooldown data;
 
   Map<String, dynamic> toJson() {
-    return {'data': data.toJson()};
+    return {
+      'data': data.toJson(),
+    };
   }
 }

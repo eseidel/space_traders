@@ -4,65 +4,59 @@ class ShipReactor {
   ShipReactor({
     required this.symbol,
     required this.name,
-    required this.condition,
-    required this.integrity,
     required this.description,
+    required this.condition,
     required this.powerOutput,
     required this.requirements,
-    required this.quality,
   });
 
   factory ShipReactor.fromJson(Map<String, dynamic> json) {
     return ShipReactor(
-      symbol: ShipReactorSymbol.fromJson(json['symbol'] as String),
+      symbol: ShipReactorSymbolInner.fromJson(json['symbol'] as String),
       name: json['name'] as String,
-      condition: json['condition'] as double,
-      integrity: json['integrity'] as double,
       description: json['description'] as String,
+      condition: json['condition'] as int,
       powerOutput: json['powerOutput'] as int,
       requirements: ShipRequirements.fromJson(
         json['requirements'] as Map<String, dynamic>,
       ),
-      quality: json['quality'] as double,
     );
   }
 
-  final ShipReactorSymbol symbol;
+  final ShipReactorSymbolInner symbol;
   final String name;
-  final double condition;
-  final double integrity;
   final String description;
+  final int condition;
   final int powerOutput;
   final ShipRequirements requirements;
-  final double quality;
 
   Map<String, dynamic> toJson() {
     return {
       'symbol': symbol.toJson(),
       'name': name,
-      'condition': condition,
-      'integrity': integrity,
       'description': description,
+      'condition': condition,
       'powerOutput': powerOutput,
       'requirements': requirements.toJson(),
-      'quality': quality,
     };
   }
 }
 
-enum ShipReactorSymbol {
+enum ShipReactorSymbolInner {
   reactorSolarI('REACTOR_SOLAR_I'),
   reactorFusionI('REACTOR_FUSION_I'),
   reactorFissionI('REACTOR_FISSION_I'),
   reactorChemicalI('REACTOR_CHEMICAL_I'),
-  reactorAntimatterI('REACTOR_ANTIMATTER_I');
+  reactorAntimatterI('REACTOR_ANTIMATTER_I'),
+  ;
 
-  const ShipReactorSymbol(this.value);
+  const ShipReactorSymbolInner(this.value);
 
-  factory ShipReactorSymbol.fromJson(String json) {
-    return ShipReactorSymbol.values.firstWhere(
+  factory ShipReactorSymbolInner.fromJson(String json) {
+    return ShipReactorSymbolInner.values.firstWhere(
       (value) => value.value == json,
-      orElse: () => throw Exception('Unknown ShipReactorSymbol value: $json'),
+      orElse: () =>
+          throw Exception('Unknown ShipReactorSymbolInner value: $json'),
     );
   }
 

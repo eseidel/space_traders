@@ -1,5 +1,4 @@
 import 'package:spacetraders/model/survey_deposit.dart';
-import 'package:spacetraders/model/survey_size.dart';
 
 class Survey {
   Survey({
@@ -14,14 +13,13 @@ class Survey {
     return Survey(
       signature: json['signature'] as String,
       symbol: json['symbol'] as String,
-      deposits:
-          (json['deposits'] as List<dynamic>)
-              .map<SurveyDeposit>(
-                (e) => SurveyDeposit.fromJson(e as Map<String, dynamic>),
-              )
-              .toList(),
+      deposits: (json['deposits'] as List<dynamic>)
+          .map<SurveyDeposit>(
+            (e) => SurveyDeposit.fromJson(e as Map<String, dynamic>),
+          )
+          .toList(),
       expiration: DateTime.parse(json['expiration'] as String),
-      size: SurveySize.fromJson(json['size'] as String),
+      size: SurveySizeInner.fromJson(json['size'] as String),
     );
   }
 
@@ -29,7 +27,7 @@ class Survey {
   final String symbol;
   final List<SurveyDeposit> deposits;
   final DateTime expiration;
-  final SurveySize size;
+  final SurveySizeInner size;
 
   Map<String, dynamic> toJson() {
     return {
@@ -40,4 +38,24 @@ class Survey {
       'size': size.toJson(),
     };
   }
+}
+
+enum SurveySizeInner {
+  small('SMALL'),
+  moderate('MODERATE'),
+  large('LARGE'),
+  ;
+
+  const SurveySizeInner(this.value);
+
+  factory SurveySizeInner.fromJson(String json) {
+    return SurveySizeInner.values.firstWhere(
+      (value) => value.value == json,
+      orElse: () => throw Exception('Unknown SurveySizeInner value: $json'),
+    );
+  }
+
+  final String value;
+
+  String toJson() => value;
 }

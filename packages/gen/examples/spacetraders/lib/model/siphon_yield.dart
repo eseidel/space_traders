@@ -1,7 +1,10 @@
 import 'package:spacetraders/model/trade_symbol.dart';
 
 class SiphonYield {
-  SiphonYield({required this.symbol, required this.units});
+  SiphonYield({
+    required this.symbol,
+    required this.units,
+  });
 
   factory SiphonYield.fromJson(Map<String, dynamic> json) {
     return SiphonYield(
@@ -14,6 +17,9 @@ class SiphonYield {
   final int units;
 
   Map<String, dynamic> toJson() {
-    return {'symbol': symbol.toJson(), 'units': units};
+    return {
+      'symbol': symbol.toJson(),
+      'units': units,
+    };
   }
 }

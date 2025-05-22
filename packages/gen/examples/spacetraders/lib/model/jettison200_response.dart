@@ -1,7 +1,9 @@
 import 'package:spacetraders/model/ship_cargo.dart';
 
 class Jettison200Response {
-  Jettison200Response({required this.data});
+  Jettison200Response({
+    required this.data,
+  });
 
   factory Jettison200Response.fromJson(Map<String, dynamic> json) {
     return Jettison200Response(
@@ -14,12 +16,16 @@ class Jettison200Response {
   final Jettison200ResponseData data;
 
   Map<String, dynamic> toJson() {
-    return {'data': data.toJson()};
+    return {
+      'data': data.toJson(),
+    };
   }
 }
 
 class Jettison200ResponseData {
-  Jettison200ResponseData({required this.cargo});
+  Jettison200ResponseData({
+    required this.cargo,
+  });
 
   factory Jettison200ResponseData.fromJson(Map<String, dynamic> json) {
     return Jettison200ResponseData(
@@ -30,6 +36,8 @@ class Jettison200ResponseData {
   final ShipCargo cargo;
 
   Map<String, dynamic> toJson() {
-    return {'cargo': cargo.toJson()};
+    return {
+      'cargo': cargo.toJson(),
+    };
   }
 }

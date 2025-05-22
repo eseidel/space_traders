@@ -13,7 +13,7 @@ class ShipCrew {
       current: json['current'] as int,
       required: json['required'] as int,
       capacity: json['capacity'] as int,
-      rotation: ShipCrewRotation.fromJson(json['rotation'] as String),
+      rotation: ShipCrewRotationInner.fromJson(json['rotation'] as String),
       morale: json['morale'] as int,
       wages: json['wages'] as int,
     );
@@ -22,7 +22,7 @@ class ShipCrew {
   final int current;
   final int required;
   final int capacity;
-  final ShipCrewRotation rotation;
+  final ShipCrewRotationInner rotation;
   final int morale;
   final int wages;
 
@@ -38,16 +38,18 @@ class ShipCrew {
   }
 }
 
-enum ShipCrewRotation {
+enum ShipCrewRotationInner {
   strict('STRICT'),
-  relaxed('RELAXED');
+  relaxed('RELAXED'),
+  ;
 
-  const ShipCrewRotation(this.value);
+  const ShipCrewRotationInner(this.value);
 
-  factory ShipCrewRotation.fromJson(String json) {
-    return ShipCrewRotation.values.firstWhere(
+  factory ShipCrewRotationInner.fromJson(String json) {
+    return ShipCrewRotationInner.values.firstWhere(
       (value) => value.value == json,
-      orElse: () => throw Exception('Unknown ShipCrewRotation value: $json'),
+      orElse: () =>
+          throw Exception('Unknown ShipCrewRotationInner value: $json'),
     );
   }
 

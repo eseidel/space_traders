@@ -1,7 +1,9 @@
 import 'package:spacetraders/model/waypoint.dart';
 
 class GetWaypoint200Response {
-  GetWaypoint200Response({required this.data});
+  GetWaypoint200Response({
+    required this.data,
+  });
 
   factory GetWaypoint200Response.fromJson(Map<String, dynamic> json) {
     return GetWaypoint200Response(
@@ -12,6 +14,8 @@ class GetWaypoint200Response {
   final Waypoint data;
 
   Map<String, dynamic> toJson() {
-    return {'data': data.toJson()};
+    return {
+      'data': data.toJson(),
+    };
   }
 }

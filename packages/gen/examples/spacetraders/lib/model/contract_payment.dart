@@ -1,5 +1,8 @@
 class ContractPayment {
-  ContractPayment({required this.onAccepted, required this.onFulfilled});
+  ContractPayment({
+    required this.onAccepted,
+    required this.onFulfilled,
+  });
 
   factory ContractPayment.fromJson(Map<String, dynamic> json) {
     return ContractPayment(
@@ -12,6 +15,9 @@ class ContractPayment {
   final int onFulfilled;
 
   Map<String, dynamic> toJson() {
-    return {'onAccepted': onAccepted, 'onFulfilled': onFulfilled};
+    return {
+      'onAccepted': onAccepted,
+      'onFulfilled': onFulfilled,
+    };
   }
 }

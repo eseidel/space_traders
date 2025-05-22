@@ -1,7 +1,9 @@
 import 'package:spacetraders/model/faction_symbol.dart';
 
 class SystemFaction {
-  SystemFaction({required this.symbol});
+  SystemFaction({
+    required this.symbol,
+  });
 
   factory SystemFaction.fromJson(Map<String, dynamic> json) {
     return SystemFaction(
@@ -12,6 +14,8 @@ class SystemFaction {
   final FactionSymbol symbol;
 
   Map<String, dynamic> toJson() {
-    return {'symbol': symbol.toJson()};
+    return {
+      'symbol': symbol.toJson(),
+    };
   }
 }

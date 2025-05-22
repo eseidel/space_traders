@@ -18,6 +18,10 @@ class ShipRequirements {
   final int slots;
 
   Map<String, dynamic> toJson() {
-    return {'power': power, 'crew': crew, 'slots': slots};
+    return {
+      'power': power,
+      'crew': crew,
+      'slots': slots,
+    };
   }
 }

@@ -1,7 +1,9 @@
 import 'package:spacetraders/model/faction_symbol.dart';
 
 class WaypointFaction {
-  WaypointFaction({required this.symbol});
+  WaypointFaction({
+    required this.symbol,
+  });
 
   factory WaypointFaction.fromJson(Map<String, dynamic> json) {
     return WaypointFaction(
@@ -12,6 +14,8 @@ class WaypointFaction {
   final FactionSymbol symbol;
 
   Map<String, dynamic> toJson() {
-    return {'symbol': symbol.toJson()};
+    return {
+      'symbol': symbol.toJson(),
+    };
   }
 }

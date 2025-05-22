@@ -67,7 +67,8 @@ enum WaypointTraitSymbol {
   shallowCraters('SHALLOW_CRATERS'),
   unstableComposition('UNSTABLE_COMPOSITION'),
   hollowedInterior('HOLLOWED_INTERIOR'),
-  stripped('STRIPPED');
+  stripped('STRIPPED'),
+  ;
 
   const WaypointTraitSymbol(this.value);
 

@@ -15,7 +15,7 @@ class MarketTransaction {
       waypointSymbol: json['waypointSymbol'] as String,
       shipSymbol: json['shipSymbol'] as String,
       tradeSymbol: json['tradeSymbol'] as String,
-      type: MarketTransactionType.fromJson(json['type'] as String),
+      type: MarketTransactionTypeInner.fromJson(json['type'] as String),
       units: json['units'] as int,
       pricePerUnit: json['pricePerUnit'] as int,
       totalPrice: json['totalPrice'] as int,
@@ -26,7 +26,7 @@ class MarketTransaction {
   final String waypointSymbol;
   final String shipSymbol;
   final String tradeSymbol;
-  final MarketTransactionType type;
+  final MarketTransactionTypeInner type;
   final int units;
   final int pricePerUnit;
   final int totalPrice;
@@ -46,17 +46,18 @@ class MarketTransaction {
   }
 }
 
-enum MarketTransactionType {
+enum MarketTransactionTypeInner {
   purchase('PURCHASE'),
-  sell('SELL');
+  sell('SELL'),
+  ;
 
-  const MarketTransactionType(this.value);
+  const MarketTransactionTypeInner(this.value);
 
-  factory MarketTransactionType.fromJson(String json) {
-    return MarketTransactionType.values.firstWhere(
+  factory MarketTransactionTypeInner.fromJson(String json) {
+    return MarketTransactionTypeInner.values.firstWhere(
       (value) => value.value == json,
-      orElse:
-          () => throw Exception('Unknown MarketTransactionType value: $json'),
+      orElse: () =>
+          throw Exception('Unknown MarketTransactionTypeInner value: $json'),
     );
   }
 

@@ -1,20 +1,25 @@
 class ShipRefineRequest {
-  ShipRefineRequest({required this.produce});
+  ShipRefineRequest({
+    required this.produce,
+  });
 
   factory ShipRefineRequest.fromJson(Map<String, dynamic> json) {
     return ShipRefineRequest(
-      produce: ShipRefineRequestProduce.fromJson(json['produce'] as String),
+      produce:
+          ShipRefineRequestProduceInner.fromJson(json['produce'] as String),
     );
   }
 
-  final ShipRefineRequestProduce produce;
+  final ShipRefineRequestProduceInner produce;
 
   Map<String, dynamic> toJson() {
-    return {'produce': produce.toJson()};
+    return {
+      'produce': produce.toJson(),
+    };
   }
 }
 
-enum ShipRefineRequestProduce {
+enum ShipRefineRequestProduceInner {
   iron('IRON'),
   copper('COPPER'),
   silver('SILVER'),
@@ -23,16 +28,17 @@ enum ShipRefineRequestProduce {
   platinum('PLATINUM'),
   uranite('URANITE'),
   meritium('MERITIUM'),
-  fuel('FUEL');
+  fuel('FUEL'),
+  ;
 
-  const ShipRefineRequestProduce(this.value);
+  const ShipRefineRequestProduceInner(this.value);
 
-  factory ShipRefineRequestProduce.fromJson(String json) {
-    return ShipRefineRequestProduce.values.firstWhere(
+  factory ShipRefineRequestProduceInner.fromJson(String json) {
+    return ShipRefineRequestProduceInner.values.firstWhere(
       (value) => value.value == json,
-      orElse:
-          () =>
-              throw Exception('Unknown ShipRefineRequestProduce value: $json'),
+      orElse: () => throw Exception(
+        'Unknown ShipRefineRequestProduceInner value: $json',
+      ),
     );
   }
 

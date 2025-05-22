@@ -1,7 +1,9 @@
 import 'package:spacetraders/model/contract.dart';
 
 class NegotiateContract201ResponseData {
-  NegotiateContract201ResponseData({required this.contract});
+  NegotiateContract201ResponseData({
+    required this.contract,
+  });
 
   factory NegotiateContract201ResponseData.fromJson(Map<String, dynamic> json) {
     return NegotiateContract201ResponseData(
@@ -12,6 +14,8 @@ class NegotiateContract201ResponseData {
   final Contract contract;
 
   Map<String, dynamic> toJson() {
-    return {'contract': contract.toJson()};
+    return {
+      'contract': contract.toJson(),
+    };
   }
 }

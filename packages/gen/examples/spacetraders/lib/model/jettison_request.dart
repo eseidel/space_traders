@@ -1,7 +1,10 @@
 import 'package:spacetraders/model/trade_symbol.dart';
 
 class JettisonRequest {
-  JettisonRequest({required this.symbol, required this.units});
+  JettisonRequest({
+    required this.symbol,
+    required this.units,
+  });
 
   factory JettisonRequest.fromJson(Map<String, dynamic> json) {
     return JettisonRequest(
@@ -14,6 +17,9 @@ class JettisonRequest {
   final int units;
 
   Map<String, dynamic> toJson() {
-    return {'symbol': symbol.toJson(), 'units': units};
+    return {
+      'symbol': symbol.toJson(),
+      'units': units,
+    };
   }
 }

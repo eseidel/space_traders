@@ -8,7 +8,8 @@ enum SystemType {
   blackHole('BLACK_HOLE'),
   hypergiant('HYPERGIANT'),
   nebula('NEBULA'),
-  unstable('UNSTABLE');
+  unstable('UNSTABLE'),
+  ;
 
   const SystemType(this.value);
 

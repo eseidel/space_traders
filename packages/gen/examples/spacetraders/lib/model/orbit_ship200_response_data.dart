@@ -1,7 +1,9 @@
 import 'package:spacetraders/model/ship_nav.dart';
 
 class OrbitShip200ResponseData {
-  OrbitShip200ResponseData({required this.nav});
+  OrbitShip200ResponseData({
+    required this.nav,
+  });
 
   factory OrbitShip200ResponseData.fromJson(Map<String, dynamic> json) {
     return OrbitShip200ResponseData(
@@ -12,6 +14,8 @@ class OrbitShip200ResponseData {
   final ShipNav nav;
 
   Map<String, dynamic> toJson() {
-    return {'nav': nav.toJson()};
+    return {
+      'nav': nav.toJson(),
+    };
   }
 }

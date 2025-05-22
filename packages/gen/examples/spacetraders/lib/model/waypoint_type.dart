@@ -12,7 +12,8 @@ enum WaypointType {
   debrisField('DEBRIS_FIELD'),
   gravityWell('GRAVITY_WELL'),
   artificialGravityWell('ARTIFICIAL_GRAVITY_WELL'),
-  fuelStation('FUEL_STATION');
+  fuelStation('FUEL_STATION'),
+  ;
 
   const WaypointType(this.value);
 

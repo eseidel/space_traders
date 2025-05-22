@@ -1,7 +1,9 @@
 import 'package:spacetraders/model/system.dart';
 
 class GetSystem200Response {
-  GetSystem200Response({required this.data});
+  GetSystem200Response({
+    required this.data,
+  });
 
   factory GetSystem200Response.fromJson(Map<String, dynamic> json) {
     return GetSystem200Response(
@@ -12,6 +14,8 @@ class GetSystem200Response {
   final System data;
 
   Map<String, dynamic> toJson() {
-    return {'data': data.toJson()};
+    return {
+      'data': data.toJson(),
+    };
   }
 }
