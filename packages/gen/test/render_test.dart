@@ -99,6 +99,15 @@ void main() {
                 'operationId': 'get-my-account',
                 'summary': 'Get Account',
                 'description': 'Fetch your account details.',
+                'parameters': [
+                  {
+                    'schema': {'type': 'string', 'default': 'John Doe'},
+                    'in': 'query',
+                    'name': 'name',
+                    'required': true,
+                    'description': 'The name of the user to fetch.',
+                  },
+                ],
                 'responses': {
                   '200': {
                     'description': 'Default Response',
