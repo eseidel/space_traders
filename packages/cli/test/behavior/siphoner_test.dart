@@ -47,7 +47,7 @@ void main() {
     when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.systemString);
     when(() => ship.mounts).thenReturn([
       ShipMount(
-        symbol: ShipMountSymbolEnum.GAS_SIPHON_II,
+        symbol: ShipMountSymbol.GAS_SIPHON_II,
         name: '',
         description: '',
         requirements: ShipRequirements(),

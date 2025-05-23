@@ -20,7 +20,7 @@ void main() {
 
     final shipFrame = _MockShipFrame();
     when(() => ship.frame).thenReturn(shipFrame);
-    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbolEnum.CARRIER);
+    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbol.CARRIER);
     expect(ship.isExplorer, isFalse);
 
     when(() => ship.modules).thenReturn([]);
@@ -78,7 +78,7 @@ void main() {
   });
 
   test('tradeSymbolForMountSymbol', () {
-    for (final mountSymbol in ShipMountSymbolEnum.values) {
+    for (final mountSymbol in ShipMountSymbol.values) {
       final tradeSymbol = tradeSymbolForMountSymbol(mountSymbol);
       expect(mountSymbolForTradeSymbol(tradeSymbol), mountSymbol);
     }

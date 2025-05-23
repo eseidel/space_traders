@@ -4,6 +4,17 @@ import 'package:types/types.dart';
 export 'package:openapi/api.dart'
     hide Agent, Contract, JumpGate, Ship, System, SystemWaypoint, Waypoint;
 
+/// Compatibility mappings for the openapi generator.
+typedef ShipModuleSymbol = ShipModuleSymbolEnum;
+typedef ShipMountSymbol = ShipMountSymbolEnum;
+typedef ShipFrameSymbol = ShipFrameSymbolEnum;
+typedef ShipReactorSymbol = ShipReactorSymbolEnum;
+typedef MarketTransactionType = MarketTransactionTypeEnum;
+typedef ContractType = ContractTypeEnum;
+typedef ShipEngineSymbol = ShipEngineSymbolEnum;
+typedef MarketTradeGoodType = MarketTradeGoodTypeEnum;
+typedef ShipConditionEventSymbol = ShipConditionEventSymbolEnum;
+
 /// The default implementation of getNow for production.
 /// Used for tests for overriding the current time.
 DateTime defaultGetNow() => DateTime.timestamp();
@@ -49,7 +60,7 @@ extension ShipyardShipUtils on ShipyardShip {
     cargoCapacity: cargoCapacity,
     fuelCapacity: frame.fuelCapacity,
     speed: engine.speed,
-    canWarp: modules.any((m) => m.symbol == ShipModuleSymbolEnum.WARP_DRIVE_I),
+    canWarp: modules.any((m) => m.symbol == ShipModuleSymbol.WARP_DRIVE_I),
   );
 
   /// Compute the current crew of the ship.
@@ -273,14 +284,14 @@ extension FactionUtils on Faction {
 
 /// Compute the trade symbol for the given mount symbol.
 /// TradeSymbols are a superset of ShipMountSymbols so this should never fail.
-TradeSymbol tradeSymbolForMountSymbol(ShipMountSymbolEnum mountSymbol) {
+TradeSymbol tradeSymbolForMountSymbol(ShipMountSymbol mountSymbol) {
   return TradeSymbol.fromJson(mountSymbol.value)!;
 }
 
 /// Compute the mount symbol for the given trade symbol.
 /// This will return null if the trade symbol is not a mount symbol.
-ShipMountSymbolEnum? mountSymbolForTradeSymbol(TradeSymbol tradeSymbol) {
-  return ShipMountSymbolEnum.fromJson(tradeSymbol.value);
+ShipMountSymbol? mountSymbolForTradeSymbol(TradeSymbol tradeSymbol) {
+  return ShipMountSymbol.fromJson(tradeSymbol.value);
 }
 
 /// Extensions onto SupplyLevel to make it easier to work with.

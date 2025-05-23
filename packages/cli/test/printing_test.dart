@@ -34,7 +34,7 @@ void main() {
     final contract = Contract(
       id: 'id',
       factionSymbol: 'faction',
-      type: ContractTypeEnum.PROCUREMENT,
+      type: ContractType.PROCUREMENT,
       terms: ContractTerms(
         deadline: deadline,
         payment: ContractPayment(onAccepted: 1000, onFulfilled: 1000),
@@ -65,7 +65,7 @@ void main() {
         a,
         price: 0,
         median: null,
-        MarketTransactionTypeEnum.PURCHASE,
+        MarketTransactionType.PURCHASE,
       ),
       '            🤷',
     );

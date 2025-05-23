@@ -92,7 +92,7 @@ class Transaction extends Equatable {
         tradeSymbol: TradeSymbol.FUEL,
         shipType: ShipType.EXPLORER,
         quantity: 1,
-        tradeType: MarketTransactionTypeEnum.PURCHASE,
+        tradeType: MarketTransactionType.PURCHASE,
         perUnitPrice: 2,
         timestamp: DateTime(2021).toUtc(),
         agentCredits: 3,
@@ -113,7 +113,7 @@ class Transaction extends Equatable {
       tradeSymbol: TradeSymbol.fromJson(json['tradeSymbol'] as String?),
       shipType: ShipType.fromJson(json['shipType'] as String?),
       quantity: json['quantity'] as int,
-      tradeType: MarketTransactionTypeEnum.values.firstWhere(
+      tradeType: MarketTransactionType.values.firstWhere(
         (e) => e.value == json['tradeType'] as String?,
       ),
       perUnitPrice: json['perUnitPrice'] as int,
@@ -171,7 +171,7 @@ class Transaction extends Equatable {
       shipType: transaction.shipTypeObject,
       tradeSymbol: null,
       quantity: 1,
-      tradeType: MarketTransactionTypeEnum.PURCHASE,
+      tradeType: MarketTransactionType.PURCHASE,
       perUnitPrice: transaction.price,
       timestamp: transaction.timestamp,
       agentCredits: agentCredits,
@@ -197,7 +197,7 @@ class Transaction extends Equatable {
       shipType: null, // Could use guessShipType.
       tradeSymbol: null,
       quantity: 1,
-      tradeType: MarketTransactionTypeEnum.SELL,
+      tradeType: MarketTransactionType.SELL,
       perUnitPrice: transaction.totalPrice,
       timestamp: transaction.timestamp,
       agentCredits: agentCredits,
@@ -227,7 +227,7 @@ class Transaction extends Equatable {
       shipType: null,
       quantity: 1,
       // This is more a service than a purchase.
-      tradeType: MarketTransactionTypeEnum.PURCHASE,
+      tradeType: MarketTransactionType.PURCHASE,
       perUnitPrice: transaction.totalPrice,
       timestamp: transaction.timestamp,
       agentCredits: agentCredits,
@@ -332,7 +332,7 @@ class Transaction extends Equatable {
   final int quantity;
 
   /// Market transaction type (e.g. PURCHASE, SELL)
-  final MarketTransactionTypeEnum? tradeType;
+  final MarketTransactionType? tradeType;
 
   /// Per-unit price of the transaction.
   final int perUnitPrice;
@@ -380,15 +380,15 @@ class Transaction extends Equatable {
         'Transaction with zero quantity and non-zero price: $this',
       );
     }
-    final sign = tradeType == MarketTransactionTypeEnum.PURCHASE ? -1 : 1;
+    final sign = tradeType == MarketTransactionType.PURCHASE ? -1 : 1;
     return sign * perUnitPrice * quantity;
   }
 
   /// Purchase from market.  tradeType can be null for non-market transactions.
-  bool get isPurchase => tradeType == MarketTransactionTypeEnum.PURCHASE;
+  bool get isPurchase => tradeType == MarketTransactionType.PURCHASE;
 
   /// Sale to market. tradeType can be null for non-market transactions.
-  bool get isSale => tradeType == MarketTransactionTypeEnum.SELL;
+  bool get isSale => tradeType == MarketTransactionType.SELL;
 
   /// Convert the transaction to json.
   /// This only exists to support CostedDeal.toJson and should be removed.

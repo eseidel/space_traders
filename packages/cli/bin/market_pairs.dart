@@ -77,7 +77,7 @@ Future<void> command(Database db, ArgResults argResults) async {
       exportWaypoint,
       importWaypoint,
     )!;
-    String deviance(int price, MarketTransactionTypeEnum type) {
+    String deviance(int price, MarketTransactionType type) {
       final median = marketPrices.medianPrice(tradeSymbol, type);
       final deviance = stringForPriceDeviance(
         tradeSymbol,
@@ -103,16 +103,14 @@ Future<void> command(Database db, ArgResults argResults) async {
       rightAlign(exportPrice.activity),
       rightAlign(creditsString(exportPrice.purchasePrice)),
       rightAlign(
-        deviance(exportPrice.purchasePrice, MarketTransactionTypeEnum.PURCHASE),
+        deviance(exportPrice.purchasePrice, MarketTransactionType.PURCHASE),
       ),
       importWaypoint.sectorLocalName,
       rightAlign(importPrice.tradeVolume),
       rightAlign(importPrice.supply),
       rightAlign(importPrice.activity),
       rightAlign(creditsString(importPrice.sellPrice)),
-      rightAlign(
-        deviance(importPrice.sellPrice, MarketTransactionTypeEnum.SELL),
-      ),
+      rightAlign(deviance(importPrice.sellPrice, MarketTransactionType.SELL)),
       distance,
       creditsString(spread),
     ]);

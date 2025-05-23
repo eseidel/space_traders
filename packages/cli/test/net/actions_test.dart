@@ -324,7 +324,7 @@ void main() {
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
     final shipFrame = _MockShipFrame();
     when(() => ship.frame).thenReturn(shipFrame);
-    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbolEnum.CARRIER);
+    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbol.CARRIER);
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
@@ -351,7 +351,7 @@ void main() {
       waypointSymbol: waypointSymbol.waypoint,
       shipSymbol: shipSymbol.symbol,
       tradeSymbol: tradeSymbol.value,
-      type: MarketTransactionTypeEnum.PURCHASE,
+      type: MarketTransactionType.PURCHASE,
       units: 100,
       pricePerUnit: 10,
       totalPrice: 1000,
@@ -405,7 +405,7 @@ void main() {
         symbol: tradeSymbol,
         tradeVolume: 100,
         supply: SupplyLevel.ABUNDANT,
-        type: MarketTradeGoodTypeEnum.EXCHANGE,
+        type: MarketTradeGoodType.EXCHANGE,
         purchasePrice: 10,
         sellPrice: 11,
       ),
@@ -468,7 +468,7 @@ void main() {
 
     // Verify our "don't refuel for short miner trips" logic.
     clearInteractions(fleetApi);
-    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbolEnum.MINER);
+    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbol.MINER);
     when(() => ship.fuel).thenReturn(
       ShipFuel(
         capacity: 1000,
@@ -497,7 +497,7 @@ void main() {
 
     // It does refuel if our recent trip data is missing
     clearInteractions(fleetApi);
-    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbolEnum.MINER);
+    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbol.MINER);
     when(() => ship.fuel).thenReturn(ShipFuel(capacity: 1000, current: 501));
     await runWithLogger(
       logger,
@@ -519,7 +519,7 @@ void main() {
 
     // It does refuel if our recent trip data has a large trip
     clearInteractions(fleetApi);
-    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbolEnum.MINER);
+    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbol.MINER);
     when(() => ship.fuel).thenReturn(
       ShipFuel(
         capacity: 1000,
@@ -547,7 +547,7 @@ void main() {
 
     // It will also refuel if our fuel is < 50% of capacity
     clearInteractions(fleetApi);
-    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbolEnum.MINER);
+    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbol.MINER);
     when(() => ship.fuel).thenReturn(
       ShipFuel(
         capacity: 1000,
@@ -594,7 +594,7 @@ void main() {
         symbol: TradeSymbol.ADVANCED_CIRCUITRY,
         tradeVolume: 100,
         supply: SupplyLevel.ABUNDANT,
-        type: MarketTradeGoodTypeEnum.EXCHANGE,
+        type: MarketTradeGoodType.EXCHANGE,
         purchasePrice: 10,
         sellPrice: 11,
       ),
@@ -602,7 +602,7 @@ void main() {
         symbol: TradeSymbol.FABRICS,
         tradeVolume: 100,
         supply: SupplyLevel.ABUNDANT,
-        type: MarketTradeGoodTypeEnum.EXCHANGE,
+        type: MarketTradeGoodType.EXCHANGE,
         purchasePrice: 10,
         sellPrice: 11,
       ),
@@ -640,7 +640,7 @@ void main() {
               waypointSymbol: 'S-A-W',
               shipSymbol: shipSymbol.symbol,
               tradeSymbol: TradeSymbol.ADVANCED_CIRCUITRY.value,
-              type: MarketTransactionTypeEnum.SELL,
+              type: MarketTransactionType.SELL,
               units: 5,
               pricePerUnit: 10,
               totalPrice: 50,
@@ -996,7 +996,7 @@ void main() {
               waypointSymbol: startSymbol.waypoint,
               shipSymbol: shipSymbol.symbol,
               tradeSymbol: TradeSymbol.ANTIMATTER.value,
-              type: MarketTransactionTypeEnum.PURCHASE,
+              type: MarketTransactionType.PURCHASE,
               units: 1,
               pricePerUnit: 10000,
               totalPrice: 10000,
@@ -1095,7 +1095,7 @@ void main() {
       waypointSymbol: waypointSymbol.waypoint,
       shipSymbol: shipSymbol.symbol,
       tradeSymbol: TradeSymbol.FUEL.value,
-      type: MarketTransactionTypeEnum.PURCHASE,
+      type: MarketTransactionType.PURCHASE,
       units: 1,
       pricePerUnit: 100,
       totalPrice: 100,
@@ -1230,7 +1230,7 @@ void main() {
         MarketTradeGood(
           symbol: TradeSymbol.FUEL,
           supply: SupplyLevel.ABUNDANT,
-          type: MarketTradeGoodTypeEnum.IMPORT,
+          type: MarketTradeGoodType.IMPORT,
           purchasePrice: 1,
           sellPrice: 1,
           tradeVolume: 1,

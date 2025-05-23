@@ -104,10 +104,7 @@ final mountPrices = <TradeSymbol, int>{
   TradeSymbol.MOUNT_MINING_LASER_II: 58000,
 };
 
-int mountPrice(
-  MarketPriceSnapshot marketPrices,
-  ShipMountSymbolEnum mountSymbol,
-) {
+int mountPrice(MarketPriceSnapshot marketPrices, ShipMountSymbol mountSymbol) {
   final tradeSymbol = tradeSymbolForMountSymbol(mountSymbol);
   final defaultPrice = mountPrices[tradeSymbol];
   if (defaultPrice == null) {

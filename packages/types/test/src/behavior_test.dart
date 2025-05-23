@@ -36,7 +36,7 @@ void main() {
         waypointSymbol: WaypointSymbol.fromString('S-A-W'),
       ),
       mountJob: MountJob(
-        mountSymbol: ShipMountSymbolEnum.GAS_SIPHON_I,
+        mountSymbol: ShipMountSymbol.GAS_SIPHON_I,
         shipyardSymbol: WaypointSymbol.fromString('S-A-W'),
       ),
       shipBuyJob: ShipBuyJob(

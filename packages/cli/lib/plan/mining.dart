@@ -5,43 +5,43 @@ import 'package:types/types.dart';
 
 /// This is mostly used for reference.
 final kOreHoundDefault = ShipTemplate(
-  frameSymbol: ShipFrameSymbolEnum.MINER,
+  frameSymbol: ShipFrameSymbol.MINER,
   mounts: MountSymbolSet.from([
-    ShipMountSymbolEnum.MINING_LASER_I,
-    ShipMountSymbolEnum.SURVEYOR_I,
+    ShipMountSymbol.MINING_LASER_I,
+    ShipMountSymbol.SURVEYOR_I,
   ]),
 );
 
 // According to SAF: Surveyor = 2x mk2s,  miner = 2x mk2 + 1x mk1
 /// A template for a ship which mines and surveys.
 final kMineAndSurveyTemplate = ShipTemplate(
-  frameSymbol: ShipFrameSymbolEnum.MINER,
+  frameSymbol: ShipFrameSymbol.MINER,
   mounts: MountSymbolSet.from([
-    ShipMountSymbolEnum.MINING_LASER_II,
-    ShipMountSymbolEnum.MINING_LASER_II,
-    ShipMountSymbolEnum.SURVEYOR_I,
+    ShipMountSymbol.MINING_LASER_II,
+    ShipMountSymbol.MINING_LASER_II,
+    ShipMountSymbol.SURVEYOR_I,
   ]),
 );
 
 /// A template for a ship which only surveys.
 /// Only available after we've found SURVEYOR_II modules to buy.
 final kSurveyOnlyTemplate = ShipTemplate(
-  frameSymbol: ShipFrameSymbolEnum.MINER,
+  frameSymbol: ShipFrameSymbol.MINER,
   mounts: MountSymbolSet.from([
-    ShipMountSymbolEnum.SURVEYOR_II,
-    ShipMountSymbolEnum.SURVEYOR_II,
-    ShipMountSymbolEnum.SURVEYOR_II,
+    ShipMountSymbol.SURVEYOR_II,
+    ShipMountSymbol.SURVEYOR_II,
+    ShipMountSymbol.SURVEYOR_II,
   ]),
 );
 
 /// A template for a ship which only mines.
 /// Only used after we have dedicated surveyors.
 final kMineOnlyTemplate = ShipTemplate(
-  frameSymbol: ShipFrameSymbolEnum.MINER,
+  frameSymbol: ShipFrameSymbol.MINER,
   mounts: MountSymbolSet.from([
-    ShipMountSymbolEnum.MINING_LASER_II,
-    ShipMountSymbolEnum.MINING_LASER_II,
-    ShipMountSymbolEnum.MINING_LASER_I,
+    ShipMountSymbol.MINING_LASER_II,
+    ShipMountSymbol.MINING_LASER_II,
+    ShipMountSymbol.MINING_LASER_I,
   ]),
 );
 
@@ -53,12 +53,12 @@ class ExtractionSquad {
   /// Determines the template to use for [ship].
   ShipTemplate? templateForShip(
     Ship ship, {
-    required Set<ShipMountSymbolEnum> availableMounts,
+    required Set<ShipMountSymbol> availableMounts,
   }) {
     if (!ships.any((s) => s.symbol == ship.symbol)) {
       throw ArgumentError('Ship ${ship.symbol} not in squad.');
     }
-    if (ship.frame.symbol != ShipFrameSymbolEnum.MINER) {
+    if (ship.frame.symbol != ShipFrameSymbol.MINER) {
       return null;
     }
     // If we're the only ship in this squad, we need to both mine and survey.
@@ -68,7 +68,7 @@ class ExtractionSquad {
     // If we have SURVEYOR_II, our first ship should be a surveyor.
     final surveyor = ships.first;
     if (surveyor.symbol == ship.symbol) {
-      if (availableMounts.contains(ShipMountSymbolEnum.SURVEYOR_II)) {
+      if (availableMounts.contains(ShipMountSymbol.SURVEYOR_II)) {
         return kSurveyOnlyTemplate;
       } else {
         return kMineAndSurveyTemplate;
@@ -76,9 +76,7 @@ class ExtractionSquad {
     }
     // If our first ship has already mounted at least one surveyor, we should
     // only mine.
-    if (surveyor.mountedMountSymbols.contains(
-      ShipMountSymbolEnum.SURVEYOR_II,
-    )) {
+    if (surveyor.mountedMountSymbols.contains(ShipMountSymbol.SURVEYOR_II)) {
       return kMineOnlyTemplate;
     }
     // Otherwise we also need to survey.

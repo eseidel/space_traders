@@ -96,7 +96,7 @@ void main() {
           symbol: TradeSymbol.ADVANCED_CIRCUITRY,
           tradeVolume: 100,
           supply: SupplyLevel.ABUNDANT,
-          type: MarketTradeGoodTypeEnum.EXCHANGE,
+          type: MarketTradeGoodType.EXCHANGE,
           purchasePrice: 100,
           sellPrice: 101,
         ),
@@ -208,7 +208,7 @@ void main() {
               units: 10,
               totalPrice: 100,
               pricePerUnit: 10,
-              type: MarketTransactionTypeEnum.PURCHASE,
+              type: MarketTransactionType.PURCHASE,
               timestamp: DateTime(2021),
             ),
           ),
@@ -276,9 +276,7 @@ void main() {
     when(() => ship.nav).thenReturn(shipNav);
     final shipFrame = _MockShipFrame();
     when(() => ship.frame).thenReturn(shipFrame);
-    when(
-      () => shipFrame.symbol,
-    ).thenReturn(ShipFrameSymbolEnum.LIGHT_FREIGHTER);
+    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbol.LIGHT_FREIGHTER);
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
 
     final start = WaypointSymbol.fromString('S-A-B');
@@ -381,7 +379,7 @@ void main() {
           symbol: TradeSymbol.ADVANCED_CIRCUITRY,
           tradeVolume: 10,
           supply: SupplyLevel.ABUNDANT,
-          type: MarketTradeGoodTypeEnum.EXCHANGE,
+          type: MarketTradeGoodType.EXCHANGE,
           purchasePrice: 10,
           sellPrice: 20,
         ),
@@ -390,7 +388,7 @@ void main() {
           symbol: TradeSymbol.FUEL,
           tradeVolume: 100,
           supply: SupplyLevel.ABUNDANT,
-          type: MarketTradeGoodTypeEnum.EXCHANGE,
+          type: MarketTradeGoodType.EXCHANGE,
           purchasePrice: 100,
           sellPrice: 110,
         ),
@@ -422,7 +420,7 @@ void main() {
       pricePerUnit: 100,
       units: 1,
       totalPrice: 100,
-      type: MarketTransactionTypeEnum.PURCHASE,
+      type: MarketTransactionType.PURCHASE,
       tradeSymbol: TradeSymbol.FUEL.value,
       waypointSymbol: start.waypoint,
       shipSymbol: shipSymbol.symbol,
@@ -464,7 +462,7 @@ void main() {
               units: 10,
               totalPrice: 100,
               pricePerUnit: 10,
-              type: MarketTransactionTypeEnum.SELL,
+              type: MarketTransactionType.SELL,
               timestamp: DateTime(2021),
             ),
           ),
@@ -576,7 +574,7 @@ void main() {
     final contract = Contract(
       id: 'id',
       factionSymbol: 'factionSymbol',
-      type: ContractTypeEnum.PROCUREMENT,
+      type: ContractType.PROCUREMENT,
       deadlineToAccept: DateTime(2021),
       terms: ContractTerms(
         deadline: DateTime(2021),
@@ -1073,7 +1071,7 @@ void main() {
           symbol: TradeSymbol.ADVANCED_CIRCUITRY,
           tradeVolume: 100,
           supply: SupplyLevel.ABUNDANT,
-          type: MarketTradeGoodTypeEnum.EXCHANGE,
+          type: MarketTradeGoodType.EXCHANGE,
           purchasePrice: 100,
           sellPrice: 101,
         ),
@@ -1169,7 +1167,7 @@ void main() {
     final contract = Contract(
       id: 'contract_id',
       factionSymbol: 'factionSymbol',
-      type: ContractTypeEnum.PROCUREMENT,
+      type: ContractType.PROCUREMENT,
       deadlineToAccept: DateTime(2021),
       terms: ContractTerms(
         deadline: DateTime(2021),
@@ -1241,7 +1239,7 @@ void main() {
           symbol: TradeSymbol.ADVANCED_CIRCUITRY,
           tradeVolume: 100,
           supply: SupplyLevel.ABUNDANT,
-          type: MarketTradeGoodTypeEnum.EXCHANGE,
+          type: MarketTradeGoodType.EXCHANGE,
           purchasePrice: 100,
           sellPrice: 101,
         ),
@@ -1426,7 +1424,7 @@ void main() {
           symbol: TradeSymbol.ADVANCED_CIRCUITRY,
           tradeVolume: 100,
           supply: SupplyLevel.ABUNDANT,
-          type: MarketTradeGoodTypeEnum.EXCHANGE,
+          type: MarketTradeGoodType.EXCHANGE,
           purchasePrice: 100,
           sellPrice: 101,
         ),

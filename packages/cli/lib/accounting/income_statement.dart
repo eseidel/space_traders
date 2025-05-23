@@ -149,9 +149,9 @@ class _IncomeStatementBuilder {
     switch (t.accounting) {
       case AccountingType.goods:
         switch (t.tradeType) {
-          case MarketTransactionTypeEnum.PURCHASE:
+          case MarketTransactionType.PURCHASE:
             _purchase(t);
-          case MarketTransactionTypeEnum.SELL:
+          case MarketTransactionType.SELL:
             _sale(t);
           case null:
             _fail(t, 'Unknown market transaction type: null');

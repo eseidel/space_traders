@@ -17,7 +17,7 @@ class SyntheticDeal {
   List<Transaction> get goodsBuys => transactions
       .where(
         (t) =>
-            t.tradeType == MarketTransactionTypeEnum.PURCHASE &&
+            t.tradeType == MarketTransactionType.PURCHASE &&
             t.accounting == AccountingType.goods,
       )
       .toList();
@@ -25,7 +25,7 @@ class SyntheticDeal {
   List<Transaction> get goodsSells => transactions
       .where(
         (t) =>
-            t.tradeType == MarketTransactionTypeEnum.SELL &&
+            t.tradeType == MarketTransactionType.SELL &&
             t.accounting == AccountingType.goods,
       )
       .toList();
@@ -47,13 +47,13 @@ class SyntheticDeal {
       goodsBuys.fold<int>(0, (sum, t) => sum + t.creditsChange);
 
   int get revenue => transactions
-      .where((t) => t.tradeType == MarketTransactionTypeEnum.SELL)
+      .where((t) => t.tradeType == MarketTransactionType.SELL)
       .fold<int>(0, (sum, t) => sum + t.creditsChange);
 
   int get operatingExpenses => transactions
       .where(
         (t) =>
-            t.tradeType == MarketTransactionTypeEnum.PURCHASE &&
+            t.tradeType == MarketTransactionType.PURCHASE &&
             t.accounting == AccountingType.fuel,
       )
       .fold<int>(0, (sum, t) => sum + t.creditsChange);
@@ -127,19 +127,18 @@ Future<void> command(Database db, ArgResults argResults) async {
       ignoredTransactions.add(transaction);
       continue;
     }
-    if (transaction.tradeType == MarketTransactionTypeEnum.PURCHASE &&
+    if (transaction.tradeType == MarketTransactionType.PURCHASE &&
         transaction.accounting == AccountingType.goods) {
       final openDeal = openDeals[transaction.shipSymbol];
       if (openDeal == null) {
         openDeals[transaction.shipSymbol] = [transaction];
-      } else if (openDeal.last.tradeType ==
-          MarketTransactionTypeEnum.PURCHASE) {
+      } else if (openDeal.last.tradeType == MarketTransactionType.PURCHASE) {
         openDeal.add(transaction);
       } else {
         recordDeal(openDeal);
         openDeals[transaction.shipSymbol] = [transaction];
       }
-    } else if (transaction.tradeType == MarketTransactionTypeEnum.SELL ||
+    } else if (transaction.tradeType == MarketTransactionType.SELL ||
         transaction.accounting == AccountingType.fuel) {
       final openDeal = openDeals[transaction.shipSymbol];
       if (openDeal == null) {

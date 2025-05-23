@@ -78,7 +78,7 @@ void main() {
     when(() => ship.modules).thenReturn([]);
     when(() => ship.reactor).thenReturn(
       ShipReactor(
-        symbol: ShipReactorSymbolEnum.ANTIMATTER_I,
+        symbol: ShipReactorSymbol.ANTIMATTER_I,
         name: 'name',
         description: 'description',
         powerOutput: 0,

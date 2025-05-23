@@ -38,7 +38,7 @@ String contractDescription(
 /// the median price of a given [tradeSymbol].
 String stringForPriceDeviance(
   TradeSymbol tradeSymbol,
-  MarketTransactionTypeEnum type, {
+  MarketTransactionType type, {
   required int price,
   required int? median,
 }) {
@@ -55,12 +55,8 @@ String stringForPriceDeviance(
   final percentOff = '$signString${(diff / median * 100).round()}'.padLeft(4);
   final creditsDiff = '$signString${creditsString(diff)} per'.padLeft(8);
 
-  final lowColor = type == MarketTransactionTypeEnum.SELL
-      ? lightRed
-      : lightGreen;
-  final highColor = type == MarketTransactionTypeEnum.SELL
-      ? lightGreen
-      : lightRed;
+  final lowColor = type == MarketTransactionType.SELL ? lightRed : lightGreen;
+  final highColor = type == MarketTransactionType.SELL ? lightGreen : lightRed;
 
   if (diff < 0) {
     return lowColor.wrap('$percentOff% $creditsDiff')!;
@@ -84,10 +80,10 @@ void logMarketTransaction(
   );
   final labelEmoji =
       transactionEmoji ??
-      (transaction.type == MarketTransactionTypeEnum.SELL ? '🤝' : '💸');
+      (transaction.type == MarketTransactionType.SELL ? '🤝' : '💸');
   // creditsSign shows which way our bank account moves.
   // When it was a sell, we got paid, so we add.
-  final creditsSign = transaction.type == MarketTransactionTypeEnum.SELL
+  final creditsSign = transaction.type == MarketTransactionType.SELL
       ? '+'
       : '-';
   // Fuel commonly has a 3 digit price with a credit marker and sign

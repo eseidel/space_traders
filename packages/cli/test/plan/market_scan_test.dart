@@ -9,7 +9,7 @@ void main() {
       MarketPrice.fromMarketTradeGood(
         MarketTradeGood(
           symbol: TradeSymbol.ADVANCED_CIRCUITRY,
-          type: MarketTradeGoodTypeEnum.EXPORT,
+          type: MarketTradeGoodType.EXPORT,
           tradeVolume: 100,
           purchasePrice: 100,
           sellPrice: 10,
@@ -21,7 +21,7 @@ void main() {
       MarketPrice.fromMarketTradeGood(
         MarketTradeGood(
           symbol: TradeSymbol.ADVANCED_CIRCUITRY,
-          type: MarketTradeGoodTypeEnum.EXPORT,
+          type: MarketTradeGoodType.EXPORT,
           tradeVolume: 100,
           purchasePrice: 300,
           sellPrice: 200,

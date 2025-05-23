@@ -4,8 +4,8 @@ import 'package:types/types.dart';
 
 /// Extensions for ShipyardShipSnapshot.
 extension ShipTypeToFrame on ShipyardShipSnapshot {
-  /// Attempts to determine the ShipType from a ShipFrameSymbolEnum.
-  ShipType? shipTypeFromFrame(ShipFrameSymbolEnum frameSymbol) {
+  /// Attempts to determine the ShipType from a ShipFrameSymbol.
+  ShipType? shipTypeFromFrame(ShipFrameSymbol frameSymbol) {
     ShipType? shipType;
     for (final ship in records) {
       if (ship.frame.symbol != frameSymbol) {
@@ -89,7 +89,7 @@ extension ShipTypeToFrame on ShipyardShipSnapshot {
     if (type != null) {
       return type;
     }
-    if (frame.symbol == ShipFrameSymbolEnum.DRONE) {
+    if (frame.symbol == ShipFrameSymbol.DRONE) {
       if (ship.hasMiningLaser) {
         return ShipType.MINING_DRONE;
       }
@@ -100,7 +100,7 @@ extension ShipTypeToFrame on ShipyardShipSnapshot {
         return ShipType.SURVEYOR;
       }
     }
-    if (frame.symbol == ShipFrameSymbolEnum.HEAVY_FREIGHTER) {
+    if (frame.symbol == ShipFrameSymbol.HEAVY_FREIGHTER) {
       if (ship.hasOreRefinery) {
         return ShipType.REFINING_FREIGHTER;
       }

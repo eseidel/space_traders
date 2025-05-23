@@ -4,36 +4,36 @@ import 'package:types/types.dart';
 
 /// Symbols of all cargo modules.
 final kCargoModules = {
-  ShipModuleSymbolEnum.CARGO_HOLD_I,
-  ShipModuleSymbolEnum.CARGO_HOLD_II,
-  ShipModuleSymbolEnum.CARGO_HOLD_III,
+  ShipModuleSymbol.CARGO_HOLD_I,
+  ShipModuleSymbol.CARGO_HOLD_II,
+  ShipModuleSymbol.CARGO_HOLD_III,
 };
 
 /// The symbols of all laser mounts.
 final kLaserMountSymbols = {
-  ShipMountSymbolEnum.MINING_LASER_I,
-  ShipMountSymbolEnum.MINING_LASER_II,
-  ShipMountSymbolEnum.MINING_LASER_III,
+  ShipMountSymbol.MINING_LASER_I,
+  ShipMountSymbol.MINING_LASER_II,
+  ShipMountSymbol.MINING_LASER_III,
 };
 
 /// The symbols of all gas siphon mounts.
 final kSiphonMountSymbols = {
-  ShipMountSymbolEnum.GAS_SIPHON_I,
-  ShipMountSymbolEnum.GAS_SIPHON_II,
-  ShipMountSymbolEnum.GAS_SIPHON_III,
+  ShipMountSymbol.GAS_SIPHON_I,
+  ShipMountSymbol.GAS_SIPHON_II,
+  ShipMountSymbol.GAS_SIPHON_III,
 };
 
 /// The symbols of all survey mounts.
 final kSurveyMountSymbols = {
-  ShipMountSymbolEnum.SURVEYOR_I,
-  ShipMountSymbolEnum.SURVEYOR_II,
-  ShipMountSymbolEnum.SURVEYOR_III,
+  ShipMountSymbol.SURVEYOR_I,
+  ShipMountSymbol.SURVEYOR_II,
+  ShipMountSymbol.SURVEYOR_III,
 };
 
 /// Set of ship mount symbols.
 /// Caution: equals and hashCode are not defined for this type.
 /// Use [ShipTemplate.mountsSymbolSetEquals] instead.
-typedef MountSymbolSet = Multiset<ShipMountSymbolEnum>;
+typedef MountSymbolSet = Multiset<ShipMountSymbol>;
 
 /// Mounts template for a ship.
 @immutable
@@ -42,13 +42,13 @@ class ShipTemplate {
   const ShipTemplate({required this.frameSymbol, required this.mounts});
 
   /// Frame type that this template is for.
-  final ShipFrameSymbolEnum frameSymbol;
+  final ShipFrameSymbol frameSymbol;
 
   /// Mounts that this template has.
   final MountSymbolSet mounts;
 
   /// Returns true if we know how to purchase all needed mounts.
-  bool canPurchaseAllMounts(Set<ShipMountSymbolEnum> availableMounts) {
+  bool canPurchaseAllMounts(Set<ShipMountSymbol> availableMounts) {
     for (final mountSymbol in mounts) {
       if (!availableMounts.contains(mountSymbol)) {
         return false;
@@ -139,7 +139,7 @@ class MountRequest {
   final ShipSymbol shipSymbol;
 
   /// The mount we need to buy.
-  final ShipMountSymbolEnum mountSymbol;
+  final ShipMountSymbol mountSymbol;
 
   /// The market we need to buy the mount from.
   final WaypointSymbol marketSymbol;
@@ -164,7 +164,7 @@ class MountRequest {
 
 /// Compute the total strength of all mounts on [ship]
 /// with symbols in [mountSymbols].
-int strengthOfMounts(Ship ship, Set<ShipMountSymbolEnum> mountSymbols) {
+int strengthOfMounts(Ship ship, Set<ShipMountSymbol> mountSymbols) {
   return ship.mounts.fold(0, (sum, m) {
     final strength = m.strength ?? 0;
     return mountSymbols.contains(m.symbol) ? sum + strength : sum;
@@ -180,7 +180,7 @@ int siphonMountStrength(Ship ship) =>
 
 /// Compute the total power of all mounts on [ship]
 /// with symbols in [mountSymbols].
-int powerUsedByMounts(Ship ship, Set<ShipMountSymbolEnum> mountSymbols) {
+int powerUsedByMounts(Ship ship, Set<ShipMountSymbol> mountSymbols) {
   return ship.mounts.fold(0, (sum, m) {
     final power = m.requirements.power ?? 0;
     return mountSymbols.contains(m.symbol) ? sum + power : sum;

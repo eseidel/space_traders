@@ -80,14 +80,14 @@ void main() {
     when(() => ship.mounts).thenReturn([
       // A mount in our template, we will leave it be.
       ShipMount(
-        symbol: ShipMountSymbolEnum.SURVEYOR_I,
+        symbol: ShipMountSymbol.SURVEYOR_I,
         name: '',
         description: '',
         requirements: ShipRequirements(),
       ),
       // A mount not in our template (we will remove it)
       ShipMount(
-        symbol: ShipMountSymbolEnum.LASER_CANNON_I,
+        symbol: ShipMountSymbol.LASER_CANNON_I,
         name: '',
         description: '',
         requirements: ShipRequirements(),
@@ -96,7 +96,7 @@ void main() {
     when(() => ship.modules).thenReturn([]);
     when(() => ship.reactor).thenReturn(
       ShipReactor(
-        symbol: ShipReactorSymbolEnum.ANTIMATTER_I,
+        symbol: ShipReactorSymbol.ANTIMATTER_I,
         name: 'name',
         description: 'description',
         powerOutput: 0,
@@ -121,7 +121,7 @@ void main() {
     when(() => ship.cargo).thenReturn(shipCargo);
 
     final tradeGood = MarketTradeGood(
-      type: MarketTradeGoodTypeEnum.EXCHANGE,
+      type: MarketTradeGoodType.EXCHANGE,
       symbol: toMount,
       tradeVolume: 100,
       supply: SupplyLevel.ABUNDANT,
@@ -168,10 +168,10 @@ void main() {
 
     when(() => centralCommand.templateForShip(ship)).thenReturn(
       ShipTemplate(
-        frameSymbol: ShipFrameSymbolEnum.CARRIER,
+        frameSymbol: ShipFrameSymbol.CARRIER,
         mounts: MountSymbolSet.from([
-          ShipMountSymbolEnum.SURVEYOR_I,
-          ShipMountSymbolEnum.SURVEYOR_II,
+          ShipMountSymbol.SURVEYOR_I,
+          ShipMountSymbol.SURVEYOR_II,
         ]),
       ),
     );
@@ -221,7 +221,7 @@ void main() {
     when(
       () => fleetApi.removeMount(
         shipSymbol.symbol,
-        RemoveMountRequest(symbol: ShipMountSymbolEnum.LASER_CANNON_I.value),
+        RemoveMountRequest(symbol: ShipMountSymbol.LASER_CANNON_I.value),
       ),
     ).thenAnswer(
       (_) => Future.value(
@@ -348,10 +348,10 @@ void main() {
     final shipyardListings = _MockShipyardListingSnapshot();
 
     final template = ShipTemplate(
-      frameSymbol: ShipFrameSymbolEnum.CARRIER,
+      frameSymbol: ShipFrameSymbol.CARRIER,
       mounts: MountSymbolSet.from([
-        ShipMountSymbolEnum.SURVEYOR_I,
-        ShipMountSymbolEnum.SURVEYOR_II,
+        ShipMountSymbol.SURVEYOR_I,
+        ShipMountSymbol.SURVEYOR_II,
       ]),
     );
 

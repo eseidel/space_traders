@@ -70,8 +70,8 @@ Future<void> command(Database db, ArgResults argResults) async {
 
   final roleCounts = <FleetRole, int>{};
   final roleCreditPerSecondTotals = <FleetRole, double>{};
-  final frameCounts = <ShipFrameSymbolEnum, int>{};
-  final frameCreditPerSecondTotals = <ShipFrameSymbolEnum, double>{};
+  final frameCounts = <ShipFrameSymbol, int>{};
+  final frameCreditPerSecondTotals = <ShipFrameSymbol, double>{};
 
   final startTime = DateTime.timestamp().subtract(lookback);
   final transactions = (await db.transactions.after(startTime)).where(

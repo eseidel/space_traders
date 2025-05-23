@@ -20,7 +20,7 @@ class MarketPriceSnapshot extends PriceSnapshot<TradeSymbol, MarketPrice> {
     final maybePrice = _priceAtPercentile(
       symbol,
       50,
-      MarketTransactionTypeEnum.PURCHASE,
+      MarketTransactionType.PURCHASE,
     );
     return maybePrice?.purchasePrice;
   }
@@ -48,8 +48,8 @@ class MarketPriceSnapshot extends PriceSnapshot<TradeSymbol, MarketPrice> {
   }
 
   /// Get the median price for a trade good based on transaction type.
-  int? medianPrice(TradeSymbol tradeSymbol, MarketTransactionTypeEnum type) {
-    return type == MarketTransactionTypeEnum.SELL
+  int? medianPrice(TradeSymbol tradeSymbol, MarketTransactionType type) {
+    return type == MarketTransactionType.SELL
         ? medianSellPrice(tradeSymbol)
         : medianPurchasePrice(tradeSymbol);
   }
@@ -63,7 +63,7 @@ class MarketPriceSnapshot extends PriceSnapshot<TradeSymbol, MarketPrice> {
     final maybePrice = _priceAtPercentile(
       symbol,
       percentile,
-      MarketTransactionTypeEnum.SELL,
+      MarketTransactionType.SELL,
     );
     return maybePrice?.sellPrice;
   }
@@ -71,7 +71,7 @@ class MarketPriceSnapshot extends PriceSnapshot<TradeSymbol, MarketPrice> {
   MarketPrice? _priceAtPercentile(
     TradeSymbol symbol,
     int percentile,
-    MarketTransactionTypeEnum action,
+    MarketTransactionType action,
   ) {
     if (percentile > 100 || percentile < 0) {
       throw ArgumentError.value(
@@ -84,7 +84,7 @@ class MarketPriceSnapshot extends PriceSnapshot<TradeSymbol, MarketPrice> {
     if (pricesForSymbol.isEmpty) {
       return null;
     }
-    final compareTo = action == MarketTransactionTypeEnum.PURCHASE
+    final compareTo = action == MarketTransactionType.PURCHASE
         ? _purchasePriceAscending
         : _sellPriceAscending;
     // Sort the prices in ascending order.

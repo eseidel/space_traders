@@ -14,11 +14,11 @@ void _printMissing<K extends Object, V extends Object>(
 }
 
 Future<void> command(Database db, ArgResults argResults) async {
-  _printMissing(ShipMountSymbolEnum.values, await db.shipMounts.snapshot());
-  _printMissing(ShipModuleSymbolEnum.values, await db.shipModules.snapshot());
+  _printMissing(ShipMountSymbol.values, await db.shipMounts.snapshot());
+  _printMissing(ShipModuleSymbol.values, await db.shipModules.snapshot());
   _printMissing(ShipType.values, await db.shipyardShips.snapshot());
-  _printMissing(ShipEngineSymbolEnum.values, await db.shipEngines.snapshot());
-  _printMissing(ShipReactorSymbolEnum.values, await db.shipReactors.snapshot());
+  _printMissing(ShipEngineSymbol.values, await db.shipEngines.snapshot());
+  _printMissing(ShipReactorSymbol.values, await db.shipReactors.snapshot());
   _printMissing(WaypointTraitSymbol.values, await db.waypointTraits.snapshot());
 }
 

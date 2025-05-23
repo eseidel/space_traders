@@ -205,7 +205,7 @@ void main() {
             waypointSymbol: startSymbol.waypoint,
             shipSymbol: shipSymbol.symbol,
             tradeSymbol: TradeSymbol.ANTIMATTER.value,
-            type: MarketTransactionTypeEnum.PURCHASE,
+            type: MarketTransactionType.PURCHASE,
             units: 1,
             pricePerUnit: 10000,
             totalPrice: 10000,

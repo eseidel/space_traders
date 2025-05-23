@@ -41,7 +41,7 @@ void addSymbols(
             price.tradeSymbol,
             price: price.purchasePrice,
             median: marketPrices.medianPurchasePrice(price.tradeSymbol),
-            MarketTransactionTypeEnum.PURCHASE,
+            MarketTransactionType.PURCHASE,
           ),
         ),
         rightAlign(price.sellPrice),
@@ -50,7 +50,7 @@ void addSymbols(
             price.tradeSymbol,
             price: price.sellPrice,
             median: marketPrices.medianSellPrice(price.tradeSymbol),
-            MarketTransactionTypeEnum.SELL,
+            MarketTransactionType.SELL,
           ),
         ),
       ]);
