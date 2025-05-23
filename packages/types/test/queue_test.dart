@@ -10,7 +10,7 @@ void main() {
   });
 
   test('QueuedResponse roundtrip', () {
-    final request = QueuedResponse(
+    const request = QueuedResponse(
       body: 'foo',
       headers: {'Content-Type': 'text/plain'},
       statusCode: 200,
