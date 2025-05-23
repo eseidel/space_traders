@@ -61,7 +61,7 @@ class FleetApi {
 
   final ApiClient client;
 
-  Future<GetMyShips200Response> getMyShips(int page, int limit) async {
+  Future<GetMyShips200Response> getMyShips({int? page, int? limit}) async {
     final response = await client.invokeApi(
       method: Method.get,
       path: '/my/ships',

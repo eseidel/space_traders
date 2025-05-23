@@ -14,7 +14,7 @@ class ContractsApi {
 
   final ApiClient client;
 
-  Future<GetContracts200Response> getContracts(int page, int limit) async {
+  Future<GetContracts200Response> getContracts({int? page, int? limit}) async {
     final response = await client.invokeApi(
       method: Method.get,
       path: '/my/contracts',

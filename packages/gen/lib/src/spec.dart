@@ -34,6 +34,7 @@ class Parameter {
     required this.type,
     required this.isRequired,
     required this.sendIn,
+    required this.defaultValue,
   });
 
   factory Parameter.parse({
@@ -51,6 +52,7 @@ class Parameter {
     final sendIn = SendIn.fromJson(_required<String>(json, 'in'));
     _ignored(json, 'deprecated');
     _ignored(json, 'allowEmptyValue');
+    final defaultValue = _optional<String>(json, 'default');
 
     final SchemaRef type;
     if (hasSchema) {
@@ -91,6 +93,7 @@ class Parameter {
       isRequired: required,
       sendIn: sendIn,
       type: type,
+      defaultValue: defaultValue,
     );
   }
   final String name;
@@ -98,6 +101,7 @@ class Parameter {
   final bool isRequired;
   final SendIn sendIn;
   final SchemaRef type;
+  final String? defaultValue;
 }
 
 enum SchemaType {
@@ -504,7 +508,11 @@ void _expect(bool condition, Json json, String message) {
 }
 
 T? _optional<T>(Map<String, dynamic> json, String key) {
-  return json[key] as T?;
+  final value = json[key];
+  if (value is T?) {
+    return value;
+  }
+  throw FormatException('Key $key is not of type $T: $value (from $json)');
 }
 
 // void _unimplemented(Json json, String key) {
