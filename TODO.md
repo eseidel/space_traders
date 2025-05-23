@@ -1549,3 +1549,6 @@ Our existing logic (including manual removal of the db) no longer works well.
 
 Could run the cache from within the CLI?  Or teach it to fetch just the
 systems that it needs for its ships?
+
+### Remove Transactions from CostedDeal
+Just add deals and a deal_id to the db and associate transactions with a deal.
