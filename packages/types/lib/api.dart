@@ -4,32 +4,7 @@ import 'package:types/types.dart';
 export 'package:openapi/api.dart'
     hide Agent, Contract, JumpGate, Ship, System, SystemWaypoint, Waypoint;
 
-/// Convenience typedef for the openapi generator.
-typedef ShipModuleSymbol = ShipModuleSymbolEnum;
-
-/// Convenience typedef for the openapi generator.
-typedef ShipMountSymbol = ShipMountSymbolEnum;
-
-/// Convenience typedef for the openapi generator.
-typedef ShipFrameSymbol = ShipFrameSymbolEnum;
-
-/// Convenience typedef for the openapi generator.
-typedef ShipReactorSymbol = ShipReactorSymbolEnum;
-
-/// Convenience typedef for the openapi generator.
-typedef MarketTransactionType = MarketTransactionTypeEnum;
-
-/// Convenience typedef for the openapi generator.
-typedef ContractType = ContractTypeEnum;
-
-/// Convenience typedef for the openapi generator.
-typedef ShipEngineSymbol = ShipEngineSymbolEnum;
-
-/// Convenience typedef for the openapi generator.
-typedef MarketTradeGoodType = MarketTradeGoodTypeEnum;
-
-/// Convenience typedef for the openapi generator.
-typedef ShipConditionEventSymbol = ShipConditionEventSymbolEnum;
+export 'api_compat.dart';
 
 /// The default implementation of getNow for production.
 /// Used for tests for overriding the current time.
