@@ -13,7 +13,6 @@ class DataApi {
     final response = await client.invokeApi(
       method: Method.get,
       path: '/market/supply-chain',
-      parameters: {},
     );
 
     if (response.statusCode == 200) {
@@ -29,7 +28,6 @@ class DataApi {
     final response = await client.invokeApi(
       method: Method.get,
       path: '/my/socket.io',
-      parameters: {},
     );
 
     if (response.statusCode == 200) {

@@ -10,11 +10,7 @@ class GlobalApi {
   final ApiClient client;
 
   Future<GetStatus200Response> getStatus() async {
-    final response = await client.invokeApi(
-      method: Method.get,
-      path: '/',
-      parameters: {},
-    );
+    final response = await client.invokeApi(method: Method.get, path: '/');
 
     if (response.statusCode == 200) {
       return GetStatus200Response.fromJson(

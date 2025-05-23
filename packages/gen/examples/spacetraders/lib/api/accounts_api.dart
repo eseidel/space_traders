@@ -15,7 +15,6 @@ class AccountsApi {
     final response = await client.invokeApi(
       method: Method.get,
       path: '/my/account',
-      parameters: {},
     );
 
     if (response.statusCode == 200) {

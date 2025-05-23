@@ -48,7 +48,6 @@ class AgentsApi {
     final response = await client.invokeApi(
       method: Method.get,
       path: '/my/agent',
-      parameters: {},
     );
 
     if (response.statusCode == 200) {
@@ -64,7 +63,6 @@ class AgentsApi {
     final response = await client.invokeApi(
       method: Method.get,
       path: '/my/agent/events',
-      parameters: {},
     );
 
     if (response.statusCode == 200) {

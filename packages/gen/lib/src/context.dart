@@ -83,6 +83,7 @@ extension EndpointGeneration on Endpoint {
       'httpMethod': method.name,
       'path': path,
       'url': uri(context),
+      'hasParameters': parameters.isNotEmpty,
       'parameters': parameters,
       'returnIsVoid': returnType == 'void',
       'returnType': returnType,

@@ -21,11 +21,13 @@ class {{ className }} {
         final response = await client.invokeApi(
             method: Method.{{{httpMethod}}},
             path: '{{{path}}}',
+            {{#hasParameters}}
             parameters: {
                 {{#parameters}}
                 '{{{ paramName}}}': {{{ paramToJson }}},
                 {{/parameters}}
             },
+            {{/hasParameters}}
         );
 
         if (response.statusCode == 200) {

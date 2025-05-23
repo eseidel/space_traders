@@ -11,7 +11,6 @@ class DefaultApi {
     final response = await client.invokeApi(
       method: Method.get,
       path: '/health',
-      parameters: {},
     );
 
     if (response.statusCode == 200) {
@@ -25,7 +24,6 @@ class DefaultApi {
     final response = await client.invokeApi(
       method: Method.get,
       path: '/metrics',
-      parameters: {},
     );
 
     if (response.statusCode == 200) {
