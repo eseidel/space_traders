@@ -72,7 +72,7 @@ extension CostedDealPrediction on CostedDeal {
   int get unitsPurchased => transactions
       .where(
         (t) =>
-            t.tradeType == MarketTransactionTypeEnum.PURCHASE &&
+            t.tradeType == MarketTransactionType.PURCHASE &&
             t.accounting == AccountingType.goods,
       )
       .fold(0, (a, b) => a + b.quantity);
@@ -107,14 +107,14 @@ extension CostedDealPrediction on CostedDeal {
   /// The actual revenue of the deal.
   int get actualRevenue {
     return transactions
-        .where((t) => t.tradeType == MarketTransactionTypeEnum.SELL)
+        .where((t) => t.tradeType == MarketTransactionType.SELL)
         .fold(0, (a, b) => a + b.creditsChange);
   }
 
   /// The actual cost of goods sold.
   int get actualCostOfGoodsSold {
     return transactions
-        .where((t) => t.tradeType == MarketTransactionTypeEnum.PURCHASE)
+        .where((t) => t.tradeType == MarketTransactionType.PURCHASE)
         .where((t) => t.accounting == AccountingType.goods)
         .fold(0, (a, b) => a + -b.creditsChange);
   }
@@ -122,7 +122,7 @@ extension CostedDealPrediction on CostedDeal {
   /// The actual operational expenses of the deal.
   int get actualOperationalExpenses {
     return transactions
-        .where((t) => t.tradeType == MarketTransactionTypeEnum.PURCHASE)
+        .where((t) => t.tradeType == MarketTransactionType.PURCHASE)
         .where((t) => t.accounting == AccountingType.fuel)
         .fold(0, (a, b) => a + -b.creditsChange);
   }
@@ -223,7 +223,7 @@ int expectedPriceMovement({
   required int tradeVolume,
   required int units,
   // required int medianPrice,
-  required MarketTransactionTypeEnum action,
+  required MarketTransactionType action,
 }) {
   // I'm confident that price movements are quadratic in nature.
   // When I've attempted to fit the curve across multiple repeated buys,
@@ -234,7 +234,7 @@ int expectedPriceMovement({
   // These price changes most notably affect "shallow" markets, where the
   // trade volume is low.
   // I don't have good data for tradeVolume = 1, it likely moves faster?
-  final sign = action == MarketTransactionTypeEnum.PURCHASE ? 1 : -1;
+  final sign = action == MarketTransactionType.PURCHASE ? 1 : -1;
   final percentChange = _expectedPercentageChangeByVolume(tradeVolume);
   return sign * (percentChange * currentPrice).round();
 }
@@ -251,7 +251,7 @@ extension MarketPricePredications on MarketPrice {
         currentPrice: predictedPrice,
         tradeVolume: tradeVolume,
         units: unit,
-        action: MarketTransactionTypeEnum.PURCHASE,
+        action: MarketTransactionType.PURCHASE,
       );
       predictedPrice += expectedMovement;
     }
@@ -286,7 +286,7 @@ extension MarketPricePredications on MarketPrice {
         currentPrice: predictedPrice,
         tradeVolume: tradeVolume,
         units: unit,
-        action: MarketTransactionTypeEnum.SELL,
+        action: MarketTransactionType.SELL,
       );
       predictedPrice += expectedMovement;
     }

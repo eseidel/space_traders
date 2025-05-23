@@ -69,9 +69,7 @@ Transaction transactionFromColumnMap(Map<String, dynamic> values) {
     tradeSymbol: TradeSymbol.fromJson(values['trade_symbol'] as String?),
     shipType: ShipType.fromJson(values['ship_type'] as String?),
     quantity: values['quantity'] as int,
-    tradeType: MarketTransactionTypeEnum.fromJson(
-      values['trade_type'] as String?,
-    ),
+    tradeType: MarketTransactionType.fromJson(values['trade_type'] as String?),
     perUnitPrice: values['per_unit_price'] as int,
     timestamp: values['timestamp'] as DateTime,
     agentCredits: values['agent_credits'] as int,

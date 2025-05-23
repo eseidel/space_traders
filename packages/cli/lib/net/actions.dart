@@ -283,7 +283,7 @@ bool _shouldRefuelAfterCheckingPrice(
       fuelSymbol,
       price: price,
       median: median,
-      MarketTransactionTypeEnum.PURCHASE,
+      MarketTransactionType.PURCHASE,
     );
     final fuelString = creditsString(price);
 
@@ -704,7 +704,7 @@ Future<InstallMount201ResponseData> installMountAndLog(
   Api api,
   Database db,
   Ship ship,
-  ShipMountSymbolEnum tradeSymbol,
+  ShipMountSymbol tradeSymbol,
 ) async {
   final response = await api.fleet.installMount(
     ship.symbol.symbol,
@@ -731,7 +731,7 @@ Future<RemoveMount201ResponseData> removeMountAndLog(
   Api api,
   Database db,
   Ship ship,
-  ShipMountSymbolEnum tradeSymbol,
+  ShipMountSymbol tradeSymbol,
 ) async {
   final response = await api.fleet.removeMount(
     ship.symbol.symbol,

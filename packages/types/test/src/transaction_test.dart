@@ -11,7 +11,7 @@ void main() {
       tradeSymbol: TradeSymbol.FUEL,
       shipType: null,
       quantity: 1,
-      tradeType: MarketTransactionTypeEnum.PURCHASE,
+      tradeType: MarketTransactionType.PURCHASE,
       perUnitPrice: 2,
       timestamp: moonLanding,
       agentCredits: 3,
@@ -40,7 +40,7 @@ void main() {
       tradeSymbol: TradeSymbol.FUEL,
       shipType: null,
       quantity: 1,
-      tradeType: MarketTransactionTypeEnum.PURCHASE,
+      tradeType: MarketTransactionType.PURCHASE,
       perUnitPrice: 2,
       timestamp: moonLanding,
       agentCredits: 3,
@@ -55,7 +55,7 @@ void main() {
       tradeSymbol: TradeSymbol.FUEL,
       shipType: null,
       quantity: 3,
-      tradeType: MarketTransactionTypeEnum.PURCHASE,
+      tradeType: MarketTransactionType.PURCHASE,
       perUnitPrice: 2,
       timestamp: moonLanding,
       agentCredits: 1,
@@ -72,7 +72,7 @@ void main() {
       waypointSymbol: 'A-B-C',
       shipSymbol: 'S-1',
       tradeSymbol: 'FUEL',
-      type: MarketTransactionTypeEnum.PURCHASE,
+      type: MarketTransactionType.PURCHASE,
       units: 10,
       pricePerUnit: 10,
       totalPrice: 100,
@@ -89,7 +89,7 @@ void main() {
     expect(transaction.tradeSymbol, TradeSymbol.FUEL);
     expect(transaction.shipType, null);
     expect(transaction.quantity, 10);
-    expect(transaction.tradeType, MarketTransactionTypeEnum.PURCHASE);
+    expect(transaction.tradeType, MarketTransactionType.PURCHASE);
     expect(transaction.perUnitPrice, 10);
     expect(transaction.timestamp, DateTime(2021));
     expect(transaction.agentCredits, 100);
@@ -116,7 +116,7 @@ void main() {
     expect(transaction.tradeSymbol, null);
     expect(transaction.shipType, ShipType.EXPLORER);
     expect(transaction.quantity, 1);
-    expect(transaction.tradeType, MarketTransactionTypeEnum.PURCHASE);
+    expect(transaction.tradeType, MarketTransactionType.PURCHASE);
     expect(transaction.perUnitPrice, 100);
     expect(transaction.timestamp, DateTime(2021));
     expect(transaction.agentCredits, 100);
@@ -127,7 +127,7 @@ void main() {
     final shipModificationTransaction = ShipModificationTransaction(
       waypointSymbol: 'A-B-C',
       shipSymbol: 'S-1',
-      tradeSymbol: ShipMountSymbolEnum.GAS_SIPHON_I.value,
+      tradeSymbol: ShipMountSymbol.GAS_SIPHON_I.value,
       totalPrice: 100,
       timestamp: DateTime(2021),
     );
@@ -141,7 +141,7 @@ void main() {
     expect(transaction.tradeSymbol, TradeSymbol.MOUNT_GAS_SIPHON_I);
     expect(transaction.shipType, null);
     expect(transaction.quantity, 1);
-    expect(transaction.tradeType, MarketTransactionTypeEnum.PURCHASE);
+    expect(transaction.tradeType, MarketTransactionType.PURCHASE);
   });
 
   test('Transaction.fromConstructionDelivery', () {

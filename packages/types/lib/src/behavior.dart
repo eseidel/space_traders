@@ -300,7 +300,7 @@ class MountJob {
 
   /// Create a new mount job from JSON.
   factory MountJob.fromJson(Map<String, dynamic> json) {
-    final mountSymbol = ShipMountSymbolEnum.fromJson(
+    final mountSymbol = ShipMountSymbol.fromJson(
       json['mountSymbol'] as String,
     )!;
     final shipyardSymbol = WaypointSymbol.fromJson(
@@ -315,7 +315,7 @@ class MountJob {
 
   /// The item we plan to mount (needs to be in inventory).
   // Should this support multiple mounts?
-  final ShipMountSymbolEnum mountSymbol;
+  final ShipMountSymbol mountSymbol;
 
   /// What shipyard we plan to use for doing the mounting.
   final WaypointSymbol shipyardSymbol;

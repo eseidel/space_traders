@@ -58,7 +58,7 @@ abstract class StaticStore<Symbol extends Object, Record extends Object> {
 }
 
 /// A Store of ship mounts.
-class ShipMountStore extends StaticStore<ShipMountSymbolEnum, ShipMount> {
+class ShipMountStore extends StaticStore<ShipMountSymbol, ShipMount> {
   /// Creates a new ship mount Store.
   ShipMountStore(Database db) : super(db, ShipMountTraits());
 
@@ -67,7 +67,7 @@ class ShipMountStore extends StaticStore<ShipMountSymbolEnum, ShipMount> {
 }
 
 /// A Store of ship modules.
-class ShipModuleStore extends StaticStore<ShipModuleSymbolEnum, ShipModule> {
+class ShipModuleStore extends StaticStore<ShipModuleSymbol, ShipModule> {
   /// Creates a new ship module Store.
   ShipModuleStore(Database db) : super(db, ShipModuleTraits());
 
@@ -87,7 +87,7 @@ class ShipyardShipStore extends StaticStore<ShipType, ShipyardShip> {
 }
 
 /// A Store of ship engines.
-class ShipEngineStore extends StaticStore<ShipEngineSymbolEnum, ShipEngine> {
+class ShipEngineStore extends StaticStore<ShipEngineSymbol, ShipEngine> {
   /// Creates a new ship engine Store.
   ShipEngineStore(Database db) : super(db, ShipEngineTraits());
 
@@ -97,7 +97,7 @@ class ShipEngineStore extends StaticStore<ShipEngineSymbolEnum, ShipEngine> {
 }
 
 /// A Store of ship reactors.
-class ShipReactorStore extends StaticStore<ShipReactorSymbolEnum, ShipReactor> {
+class ShipReactorStore extends StaticStore<ShipReactorSymbol, ShipReactor> {
   /// Creates a new ship reactor Store.
   ShipReactorStore(Database db) : super(db, ShipReactorTraits());
 
@@ -138,7 +138,7 @@ class TradeExportStore extends StaticStore<TradeSymbol, TradeExport> {
 
 /// A Store of events.
 class EventStore
-    extends StaticStore<ShipConditionEventSymbolEnum, ShipConditionEvent> {
+    extends StaticStore<ShipConditionEventSymbol, ShipConditionEvent> {
   /// Creates a new waypoint trait Store.
   EventStore(Database db) : super(db, EventTraits());
 

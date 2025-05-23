@@ -51,10 +51,10 @@ class ShipSnapshot {
 
   /// Returns a map of ship frame type to count in fleet.
   // TODO(eseidel): Unclear if this is still needed.
-  Map<ShipFrameSymbolEnum, int> get frameCounts => countFrames(ships);
+  Map<ShipFrameSymbol, int> get frameCounts => countFrames(ships);
 
   /// Returns the number of ships with the given [frame].
-  int countOfFrame(ShipFrameSymbolEnum frame) {
+  int countOfFrame(ShipFrameSymbol frame) {
     // Frame is always a valid way to look up a ship, so null means 0 here.
     return countFrames(ships)[frame] ?? 0;
   }
@@ -109,8 +109,8 @@ class ShipSnapshot {
 }
 
 /// Returns a map of ship frame type to count in fleet.
-Map<ShipFrameSymbolEnum, int> countFrames(List<Ship> ships) {
-  final frameCounts = <ShipFrameSymbolEnum, int>{};
+Map<ShipFrameSymbol, int> countFrames(List<Ship> ships) {
+  final frameCounts = <ShipFrameSymbol, int>{};
   for (final ship in ships) {
     final type = ship.frame.symbol;
     frameCounts[type] = (frameCounts[type] ?? 0) + 1;

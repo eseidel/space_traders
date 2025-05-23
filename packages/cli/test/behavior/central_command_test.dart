@@ -181,7 +181,7 @@ void main() {
     final contract1 = Contract(
       id: '1',
       factionSymbol: 'faction',
-      type: ContractTypeEnum.PROCUREMENT,
+      type: ContractType.PROCUREMENT,
       terms: ContractTerms(
         deadline: hourFromNow,
         payment: ContractPayment(onAccepted: 100000, onFulfilled: 100000),
@@ -202,7 +202,7 @@ void main() {
     final contract2 = Contract(
       id: '2',
       factionSymbol: 'faction',
-      type: ContractTypeEnum.PROCUREMENT,
+      type: ContractType.PROCUREMENT,
       terms: ContractTerms(
         deadline: hourFromNow,
         payment: ContractPayment(onAccepted: 1000, onFulfilled: 1000),
@@ -314,9 +314,7 @@ void main() {
     final ship = _MockShip();
     final shipFrame = _MockShipFrame();
     when(() => ship.frame).thenReturn(shipFrame);
-    when(
-      () => shipFrame.symbol,
-    ).thenReturn(ShipFrameSymbolEnum.LIGHT_FREIGHTER);
+    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbol.LIGHT_FREIGHTER);
     when(() => ship.frame).thenReturn(shipFrame);
     final shipSymbol = ShipSymbol.fromString('X-A');
     when(() => ship.symbol).thenReturn(shipSymbol);
@@ -406,7 +404,7 @@ void main() {
         final miner = _MockShip();
         when(() => miner.symbol).thenReturn(ShipSymbol.fromJson(shipSymbol));
         final minerFrame = _MockShipFrame();
-        when(() => minerFrame.symbol).thenReturn(ShipFrameSymbolEnum.MINER);
+        when(() => minerFrame.symbol).thenReturn(ShipFrameSymbol.MINER);
         when(() => miner.frame).thenReturn(minerFrame);
         when(() => miner.mounts).thenReturn([]);
         return miner;
@@ -422,11 +420,11 @@ void main() {
 
       // Miners should have a standard laser1, laser2, surveyor1 setup.
       final surveyAndMine = ShipTemplate(
-        frameSymbol: ShipFrameSymbolEnum.MINER,
+        frameSymbol: ShipFrameSymbol.MINER,
         mounts: MountSymbolSet.from([
-          ShipMountSymbolEnum.MINING_LASER_II,
-          ShipMountSymbolEnum.MINING_LASER_II,
-          ShipMountSymbolEnum.SURVEYOR_I,
+          ShipMountSymbol.MINING_LASER_II,
+          ShipMountSymbol.MINING_LASER_II,
+          ShipMountSymbol.SURVEYOR_I,
         ]),
       );
       final shipCache = _MockShipCache();
@@ -439,15 +437,15 @@ void main() {
       }
 
       final surveyor = ShipTemplate(
-        frameSymbol: ShipFrameSymbolEnum.MINER,
+        frameSymbol: ShipFrameSymbol.MINER,
         mounts: MountSymbolSet.from([
-          ShipMountSymbolEnum.SURVEYOR_II,
-          ShipMountSymbolEnum.SURVEYOR_II,
-          ShipMountSymbolEnum.SURVEYOR_II,
+          ShipMountSymbol.SURVEYOR_II,
+          ShipMountSymbol.SURVEYOR_II,
+          ShipMountSymbol.SURVEYOR_II,
         ]),
       );
       // Move to survey2s once we have found survey2s
-      centralCommand.setAvailableMounts(ShipMountSymbolEnum.values);
+      centralCommand.setAvailableMounts(ShipMountSymbol.values);
       // Every 5th miner should be a surveyor.
       for (var i = 0; i < tenMiners.length; i++) {
         final template = centralCommand.templateForShip(tenMiners[i]);
@@ -462,7 +460,7 @@ void main() {
       final surveyorOne = tenMiners[0];
       final surveyorTwo = tenMiners[5];
       final surveyorMount = ShipMount(
-        symbol: ShipMountSymbolEnum.SURVEYOR_II,
+        symbol: ShipMountSymbol.SURVEYOR_II,
         name: '',
         description: '',
         requirements: ShipRequirements(),
@@ -471,11 +469,11 @@ void main() {
       when(() => surveyorOne.mounts).thenReturn(surveyorOnlyMounts);
       when(() => surveyorTwo.mounts).thenReturn(surveyorOnlyMounts);
       final mineOnly = ShipTemplate(
-        frameSymbol: ShipFrameSymbolEnum.MINER,
+        frameSymbol: ShipFrameSymbol.MINER,
         mounts: MountSymbolSet.from([
-          ShipMountSymbolEnum.MINING_LASER_I,
-          ShipMountSymbolEnum.MINING_LASER_II,
-          ShipMountSymbolEnum.MINING_LASER_II,
+          ShipMountSymbol.MINING_LASER_I,
+          ShipMountSymbol.MINING_LASER_II,
+          ShipMountSymbol.MINING_LASER_II,
         ]),
       );
       // Every 5th miner should be a surveyor.
@@ -620,7 +618,7 @@ void main() {
     final contract = Contract(
       id: '2',
       factionSymbol: 'faction',
-      type: ContractTypeEnum.PROCUREMENT,
+      type: ContractType.PROCUREMENT,
       terms: ContractTerms(
         deadline: DateTime(2021),
         payment: ContractPayment(onAccepted: 1000, onFulfilled: 1000),
@@ -701,9 +699,7 @@ void main() {
     final ship = _MockShip();
     when(() => ship.symbol).thenReturn(shipSymbol);
     final shipFrame = _MockShipFrame();
-    when(
-      () => shipFrame.symbol,
-    ).thenReturn(ShipFrameSymbolEnum.LIGHT_FREIGHTER);
+    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbol.LIGHT_FREIGHTER);
     when(() => ship.frame).thenReturn(shipFrame);
     when(() => ship.registration).thenReturn(
       ShipRegistration(

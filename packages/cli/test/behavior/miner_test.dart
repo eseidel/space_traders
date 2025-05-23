@@ -148,7 +148,7 @@ void main() {
     when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.systemString);
     when(() => ship.mounts).thenReturn([
       ShipMount(
-        symbol: ShipMountSymbolEnum.MINING_LASER_II,
+        symbol: ShipMountSymbol.MINING_LASER_II,
         name: '',
         description: '',
         requirements: ShipRequirements(),
@@ -274,21 +274,21 @@ void main() {
     final ship = _MockShip();
     when(() => ship.cargo).thenReturn(ShipCargo(capacity: 60, units: 0));
     final laser1 = ShipMount(
-      symbol: ShipMountSymbolEnum.MINING_LASER_I,
+      symbol: ShipMountSymbol.MINING_LASER_I,
       name: '',
       description: '',
       strength: 10,
       requirements: ShipRequirements(),
     );
     final laser2 = ShipMount(
-      symbol: ShipMountSymbolEnum.MINING_LASER_II,
+      symbol: ShipMountSymbol.MINING_LASER_II,
       name: '',
       description: '',
       strength: 25,
       requirements: ShipRequirements(),
     );
     final laser3 = ShipMount(
-      symbol: ShipMountSymbolEnum.MINING_LASER_III,
+      symbol: ShipMountSymbol.MINING_LASER_III,
       name: '',
       description: '',
       strength: 60,
@@ -311,14 +311,14 @@ void main() {
   test('cooldownTimeForExtraction', () {
     final ship = _MockShip();
     final laser1 = ShipMount(
-      symbol: ShipMountSymbolEnum.MINING_LASER_I,
+      symbol: ShipMountSymbol.MINING_LASER_I,
       name: '',
       description: '',
       strength: 10,
       requirements: ShipRequirements(power: 1),
     );
     final laser2 = ShipMount(
-      symbol: ShipMountSymbolEnum.MINING_LASER_II,
+      symbol: ShipMountSymbol.MINING_LASER_II,
       name: '',
       description: '',
       strength: 10,
@@ -443,7 +443,7 @@ void main() {
     when(() => shipEngine.speed).thenReturn(10);
     final shipFrame = _MockShipFrame();
     when(() => ship.frame).thenReturn(shipFrame);
-    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbolEnum.MINER);
+    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbol.MINER);
 
     when(() => caches.marketPrices.pricesFor(tradeSymbol)).thenReturn([]);
 
@@ -459,7 +459,7 @@ void main() {
     final hauler = _MockShip();
     final haulerFrame = _MockShipFrame();
     when(() => hauler.frame).thenReturn(haulerFrame);
-    when(() => haulerFrame.symbol).thenReturn(ShipFrameSymbolEnum.SHUTTLE);
+    when(() => haulerFrame.symbol).thenReturn(ShipFrameSymbol.SHUTTLE);
     final haulerNav = _MockShipNav();
     when(() => hauler.nav).thenReturn(haulerNav);
     final haulerCargo = ShipCargo(capacity: 60, units: 0, inventory: []);
@@ -557,7 +557,7 @@ void main() {
     when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.systemString);
     when(() => ship.mounts).thenReturn([
       ShipMount(
-        symbol: ShipMountSymbolEnum.MINING_LASER_II,
+        symbol: ShipMountSymbol.MINING_LASER_II,
         name: '',
         description: '',
         requirements: ShipRequirements(),
@@ -586,7 +586,7 @@ void main() {
     when(() => shipEngine.speed).thenReturn(10);
     final shipFrame = _MockShipFrame();
     when(() => ship.frame).thenReturn(shipFrame);
-    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbolEnum.MINER);
+    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbol.MINER);
 
     when(() => caches.marketPrices.pricesFor(tradeSymbol)).thenReturn([]);
 
@@ -615,7 +615,7 @@ void main() {
       tradeGoods: [
         MarketTradeGood(
           symbol: tradeSymbol,
-          type: MarketTradeGoodTypeEnum.IMPORT,
+          type: MarketTradeGoodType.IMPORT,
           tradeVolume: 100,
           supply: SupplyLevel.ABUNDANT,
           purchasePrice: 100,
@@ -638,7 +638,7 @@ void main() {
       units: cargoCapacity,
       pricePerUnit: 100,
       totalPrice: cargoCapacity * 100,
-      type: MarketTransactionTypeEnum.SELL,
+      type: MarketTransactionType.SELL,
       shipSymbol: shipSymbol.symbol,
       waypointSymbol: waypointSymbol.waypoint,
       timestamp: now,

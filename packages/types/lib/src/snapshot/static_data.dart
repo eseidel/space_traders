@@ -66,7 +66,7 @@ class StaticSnapshot<Symbol extends Object, Record extends Object> {
 }
 
 /// Traits for ShipMounts.
-class ShipMountTraits extends Traits<ShipMountSymbolEnum, ShipMount> {
+class ShipMountTraits extends Traits<ShipMountSymbol, ShipMount> {
   @override
   ShipMount fromJson(Map<String, dynamic> json) => ShipMount.fromJson(json)!;
 
@@ -78,18 +78,18 @@ class ShipMountTraits extends Traits<ShipMountSymbolEnum, ShipMount> {
       a.symbol.value.compareTo(b.symbol.value);
 
   @override
-  ShipMountSymbolEnum keyFor(ShipMount record) => record.symbol;
+  ShipMountSymbol keyFor(ShipMount record) => record.symbol;
 }
 
 /// A snapshot of ship mounts.
-class ShipMountSnapshot extends StaticSnapshot<ShipMountSymbolEnum, ShipMount> {
+class ShipMountSnapshot extends StaticSnapshot<ShipMountSymbol, ShipMount> {
   /// Creates a new ship mount snapshot.
   ShipMountSnapshot(List<ShipMount> records)
     : super(records, ShipMountTraits());
 }
 
 /// A cache of ship modules.
-class ShipModuleTraits extends Traits<ShipModuleSymbolEnum, ShipModule> {
+class ShipModuleTraits extends Traits<ShipModuleSymbol, ShipModule> {
   @override
   ShipModule fromJson(Map<String, dynamic> json) {
     return ShipModule.fromJson(json)!;
@@ -103,12 +103,11 @@ class ShipModuleTraits extends Traits<ShipModuleSymbolEnum, ShipModule> {
       a.symbol.value.compareTo(b.symbol.value);
 
   @override
-  ShipModuleSymbolEnum keyFor(ShipModule record) => record.symbol;
+  ShipModuleSymbol keyFor(ShipModule record) => record.symbol;
 }
 
 /// A snapshot of ship modules.
-class ShipModuleSnapshot
-    extends StaticSnapshot<ShipModuleSymbolEnum, ShipModule> {
+class ShipModuleSnapshot extends StaticSnapshot<ShipModuleSymbol, ShipModule> {
   /// Creates a new ship module snapshot.
   ShipModuleSnapshot(List<ShipModule> records)
     : super(records, ShipModuleTraits());
@@ -148,7 +147,7 @@ class ShipyardShipSnapshot extends StaticSnapshot<ShipType, ShipyardShip> {
 }
 
 /// Traits for ShipEngines.
-class ShipEngineTraits extends Traits<ShipEngineSymbolEnum, ShipEngine> {
+class ShipEngineTraits extends Traits<ShipEngineSymbol, ShipEngine> {
   @override
   Json toJson(ShipEngine record) => record.toJson();
 
@@ -164,19 +163,18 @@ class ShipEngineTraits extends Traits<ShipEngineSymbolEnum, ShipEngine> {
       a.symbol.value.compareTo(b.symbol.value);
 
   @override
-  ShipEngineSymbolEnum keyFor(ShipEngine record) => record.symbol;
+  ShipEngineSymbol keyFor(ShipEngine record) => record.symbol;
 }
 
 /// A snapshot of ship engines.
-class ShipEngineSnapshot
-    extends StaticSnapshot<ShipEngineSymbolEnum, ShipEngine> {
+class ShipEngineSnapshot extends StaticSnapshot<ShipEngineSymbol, ShipEngine> {
   /// Creates a new ship engine snapshot.
   ShipEngineSnapshot(List<ShipEngine> records)
     : super(records, ShipEngineTraits());
 }
 
 /// Traits for ShipReactors.
-class ShipReactorTraits extends Traits<ShipReactorSymbolEnum, ShipReactor> {
+class ShipReactorTraits extends Traits<ShipReactorSymbol, ShipReactor> {
   @override
   ShipReactor fromJson(Map<String, dynamic> json) =>
       ShipReactor.fromJson(json)!;
@@ -193,12 +191,12 @@ class ShipReactorTraits extends Traits<ShipReactorSymbolEnum, ShipReactor> {
       a.symbol.value.compareTo(b.symbol.value);
 
   @override
-  ShipReactorSymbolEnum keyFor(ShipReactor record) => record.symbol;
+  ShipReactorSymbol keyFor(ShipReactor record) => record.symbol;
 }
 
 /// A snapshot of ship reactors.
 class ShipReactorSnapshot
-    extends StaticSnapshot<ShipReactorSymbolEnum, ShipReactor> {
+    extends StaticSnapshot<ShipReactorSymbol, ShipReactor> {
   /// Creates a new ship reactor snapshot.
   ShipReactorSnapshot(List<ShipReactor> records)
     : super(records, ShipReactorTraits());
@@ -274,8 +272,7 @@ class TradeExportSnapshot extends StaticSnapshot<TradeSymbol, TradeExport> {
 }
 
 /// Traits for ShipConditionEvents.
-class EventTraits
-    extends Traits<ShipConditionEventSymbolEnum, ShipConditionEvent> {
+class EventTraits extends Traits<ShipConditionEventSymbol, ShipConditionEvent> {
   @override
   ShipConditionEvent fromJson(Map<String, dynamic> json) =>
       ShipConditionEvent.fromJson(json)!;
@@ -287,13 +284,12 @@ class EventTraits
       a.symbol.value.compareTo(b.symbol.value);
 
   @override
-  ShipConditionEventSymbolEnum keyFor(ShipConditionEvent record) =>
-      record.symbol;
+  ShipConditionEventSymbol keyFor(ShipConditionEvent record) => record.symbol;
 }
 
 /// A snapshot of events.
 class EventSnapshot
-    extends StaticSnapshot<ShipConditionEventSymbolEnum, ShipConditionEvent> {
+    extends StaticSnapshot<ShipConditionEventSymbol, ShipConditionEvent> {
   /// Creates a new event snapshot.
   EventSnapshot(List<ShipConditionEvent> records)
     : super(records, EventTraits());

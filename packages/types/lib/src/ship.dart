@@ -104,7 +104,7 @@ extension ShipUtils on Ship {
     cargoCapacity: cargo.capacity,
     fuelCapacity: fuel.capacity,
     speed: engine.speed,
-    canWarp: modules.any((m) => m.symbol == ShipModuleSymbolEnum.WARP_DRIVE_I),
+    canWarp: modules.any((m) => m.symbol == ShipModuleSymbol.WARP_DRIVE_I),
   );
 
   /// Returns the amount of the given trade good the ship has.
@@ -139,20 +139,20 @@ extension ShipUtils on Ship {
   bool get isCommand => registration.role == ShipRole.COMMAND;
 
   /// Returns true if the ship is a miner frame.
-  bool get isMiner => frame.symbol == ShipFrameSymbolEnum.MINER;
+  bool get isMiner => frame.symbol == ShipFrameSymbol.MINER;
 
   /// Returns true if the ship is a probe.
-  bool get isProbe => frame.symbol == ShipFrameSymbolEnum.PROBE;
+  bool get isProbe => frame.symbol == ShipFrameSymbol.PROBE;
 
   /// Returns true if the ship is an explorer.
-  bool get isExplorer => frame.symbol == ShipFrameSymbolEnum.EXPLORER;
+  bool get isExplorer => frame.symbol == ShipFrameSymbol.EXPLORER;
 
   /// Returns true if the ship is a hauler.
   bool get isHauler =>
-      frame.symbol == ShipFrameSymbolEnum.LIGHT_FREIGHTER ||
-      frame.symbol == ShipFrameSymbolEnum.HEAVY_FREIGHTER ||
-      frame.symbol == ShipFrameSymbolEnum.EXPLORER ||
-      frame.symbol == ShipFrameSymbolEnum.SHUTTLE;
+      frame.symbol == ShipFrameSymbol.LIGHT_FREIGHTER ||
+      frame.symbol == ShipFrameSymbol.HEAVY_FREIGHTER ||
+      frame.symbol == ShipFrameSymbol.EXPLORER ||
+      frame.symbol == ShipFrameSymbol.SHUTTLE;
 
   /// Returns true if the ship has a mining mount.
   bool get hasMiningLaser => mountedMiningLasers.isNotEmpty;
@@ -171,7 +171,7 @@ extension ShipUtils on Ship {
 
   /// Returns true if the ship has a refinery mount.
   bool get hasOreRefinery =>
-      modules.any((m) => m.symbol == ShipModuleSymbolEnum.ORE_REFINERY_I);
+      modules.any((m) => m.symbol == ShipModuleSymbol.ORE_REFINERY_I);
 
   /// Returns true if the ship is in transit.
   bool get isInTransit => nav.status == ShipNavStatus.IN_TRANSIT;
@@ -303,39 +303,39 @@ class Ship {
         morale: 0,
         wages: 0,
       ),
-      frame: openapi.ShipFrame(
-        symbol: openapi.ShipFrameSymbolEnum.SHUTTLE,
+      frame: ShipFrame(
+        symbol: ShipFrameSymbol.SHUTTLE,
         name: '',
         description: '',
         moduleSlots: 0,
         mountingPoints: 0,
         fuelCapacity: 0,
-        requirements: openapi.ShipRequirements(),
+        requirements: ShipRequirements(),
         condition: 1,
         integrity: 1,
         quality: 1,
       ),
-      reactor: openapi.ShipReactor(
-        symbol: openapi.ShipReactorSymbolEnum.SOLAR_I,
+      reactor: ShipReactor(
+        symbol: ShipReactorSymbol.SOLAR_I,
         name: '',
         description: '',
         powerOutput: 0,
-        requirements: openapi.ShipRequirements(),
+        requirements: ShipRequirements(),
         condition: 1,
         integrity: 1,
         quality: 1,
       ),
-      engine: openapi.ShipEngine(
-        symbol: openapi.ShipEngineSymbolEnum.HYPER_DRIVE_I,
+      engine: ShipEngine(
+        symbol: ShipEngineSymbol.HYPER_DRIVE_I,
         name: '',
         description: '',
         speed: 0,
-        requirements: openapi.ShipRequirements(),
+        requirements: ShipRequirements(),
         condition: 1,
         integrity: 1,
         quality: 1,
       ),
-      cooldown: openapi.Cooldown(
+      cooldown: Cooldown(
         shipSymbol: 'A',
         totalSeconds: 0,
         remainingSeconds: 0,
@@ -426,7 +426,7 @@ class Ship {
 @visibleForTesting
 ShipFrame testShipFrame() {
   return ShipFrame(
-    symbol: ShipFrameSymbolEnum.PROBE,
+    symbol: ShipFrameSymbol.PROBE,
     name: 'name',
     description: 'description',
     condition: 100,
@@ -443,7 +443,7 @@ ShipFrame testShipFrame() {
 @visibleForTesting
 ShipReactor testShipReactor() {
   return ShipReactor(
-    symbol: ShipReactorSymbolEnum.SOLAR_I,
+    symbol: ShipReactorSymbol.SOLAR_I,
     name: 'name',
     description: 'description',
     condition: 100,
@@ -458,7 +458,7 @@ ShipReactor testShipReactor() {
 @visibleForTesting
 ShipEngine testShipEngine() {
   return ShipEngine(
-    symbol: ShipEngineSymbolEnum.ION_DRIVE_I,
+    symbol: ShipEngineSymbol.ION_DRIVE_I,
     name: 'name',
     description: 'description',
     condition: 100,
@@ -473,7 +473,7 @@ ShipEngine testShipEngine() {
 @visibleForTesting
 ShipModule testShipModule() {
   return ShipModule(
-    symbol: ShipModuleSymbolEnum.MINERAL_PROCESSOR_I,
+    symbol: ShipModuleSymbol.MINERAL_PROCESSOR_I,
     name: 'name',
     description: 'description',
     requirements: ShipRequirements(power: 100, crew: 100, slots: 100),
@@ -484,7 +484,7 @@ ShipModule testShipModule() {
 @visibleForTesting
 ShipMount testShipMount() {
   return ShipMount(
-    symbol: ShipMountSymbolEnum.GAS_SIPHON_I,
+    symbol: ShipMountSymbol.GAS_SIPHON_I,
     name: 'name',
     description: 'description',
     strength: 100,
@@ -514,7 +514,7 @@ ShipyardShip testShipyardShip() {
 @visibleForTesting
 ShipConditionEvent testShipConditionEvent() {
   return ShipConditionEvent(
-    symbol: ShipConditionEventSymbolEnum.REACTOR_OVERLOAD,
+    symbol: ShipConditionEventSymbol.REACTOR_OVERLOAD,
     name: 'name',
     description: 'description',
     component: ShipConditionEventComponentEnum.REACTOR,

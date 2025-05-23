@@ -61,7 +61,7 @@ class CentralCommand {
   List<ExtractionSquad> miningSquads = [];
 
   /// Mounts we know of a place we can buy.
-  final Set<ShipMountSymbolEnum> _availableMounts = {};
+  final Set<ShipMountSymbol> _availableMounts = {};
 
   final Map<ShipSymbol, SystemSymbol> _assignedSystemsForSatellites = {};
 
@@ -76,7 +76,7 @@ class CentralCommand {
 
   /// Sets the available mounts for testing.
   @visibleForTesting
-  void setAvailableMounts(Iterable<ShipMountSymbolEnum> mounts) {
+  void setAvailableMounts(Iterable<ShipMountSymbol> mounts) {
     _availableMounts
       ..clear()
       ..addAll(mounts);
@@ -527,7 +527,7 @@ class CentralCommand {
 
   /// Updates _availableMounts with any mounts we know of a place to buy.
   Future<void> updateAvailableMounts(Database db) async {
-    for (final mountSymbol in ShipMountSymbolEnum.values) {
+    for (final mountSymbol in ShipMountSymbol.values) {
       if (_availableMounts.contains(mountSymbol)) {
         continue;
       }
@@ -623,7 +623,7 @@ class CentralCommand {
     // A hack to advance the global config to the construction phase.
     if (jumpGateComplete) {
       return GamePhase.exploration;
-    } else if (ships.countOfFrame(ShipFrameSymbolEnum.LIGHT_FREIGHTER) >= 2) {
+    } else if (ships.countOfFrame(ShipFrameSymbol.LIGHT_FREIGHTER) >= 2) {
       return GamePhase.construction;
     }
     return GamePhase.bootstrap;
@@ -1030,7 +1030,7 @@ int _maxContractUnitPurchasePrice(Contract contract, ContractDeliverGood good) {
 /// Returns the minimum float required to complete this contract.
 int _minimumFloatRequired(Contract contract) {
   assert(
-    contract.type == ContractTypeEnum.PROCUREMENT,
+    contract.type == ContractType.PROCUREMENT,
     'Only procurement contracts are supported',
   );
   assert(

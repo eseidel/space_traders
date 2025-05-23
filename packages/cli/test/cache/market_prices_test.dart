@@ -33,7 +33,7 @@ void main() {
       supply: SupplyLevel.ABUNDANT,
       purchasePrice: 1,
       sellPrice: 2,
-      type: MarketTradeGoodTypeEnum.EXCHANGE,
+      type: MarketTradeGoodType.EXCHANGE,
     );
     final now = DateTime(2021);
     final waypointSymbol = WaypointSymbol.fromString('S-A-W');

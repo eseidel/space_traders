@@ -16,7 +16,7 @@ void main() {
       final now = DateTime.timestamp();
 
       const faction = 'faction';
-      const type = ContractTypeEnum.PROCUREMENT;
+      const type = ContractType.PROCUREMENT;
 
       // Not yet accepted, counts as active and unaccepted.
       final unaccepted = Contract(

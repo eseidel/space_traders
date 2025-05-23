@@ -8,7 +8,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   final centralCommand = CentralCommand();
 
   final symbolWidth =
-      ShipMountSymbolEnum.values.fold(0, (s, e) => max(s, e.value.length)) + 1;
+      ShipMountSymbol.values.fold(0, (s, e) => max(s, e.value.length)) + 1;
 
   // Must be called before we can call templateForShip.
   await centralCommand.updateAvailableMounts(db);

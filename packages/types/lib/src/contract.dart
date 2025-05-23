@@ -24,13 +24,13 @@ class Contract {
     required this.id,
     required this.terms,
     String? factionSymbol,
-    openapi.ContractTypeEnum? type,
+    ContractType? type,
     DateTime? deadlineToAccept,
     bool? accepted,
     bool? fulfilled,
     DateTime? timestamp,
   }) : factionSymbol = factionSymbol ?? 'faction',
-       type = type ?? openapi.ContractTypeEnum.PROCUREMENT,
+       type = type ?? ContractType.PROCUREMENT,
        deadlineToAccept =
            deadlineToAccept ??
            DateTime.timestamp().add(const Duration(days: 1)),
@@ -43,8 +43,8 @@ class Contract {
   Contract.fallbackValue()
     : id = 'fallback',
       factionSymbol = 'faction',
-      type = openapi.ContractTypeEnum.PROCUREMENT,
-      terms = openapi.ContractTerms(
+      type = ContractType.PROCUREMENT,
+      terms = ContractTerms(
         payment: ContractPayment(onFulfilled: 0, onAccepted: 0),
         deadline: DateTime.timestamp(),
         deliver: [],
@@ -68,10 +68,8 @@ class Contract {
   Contract.fromJson(Map<String, dynamic> json)
     : id = json['id'] as String,
       factionSymbol = json['factionSymbol'] as String,
-      type = openapi.ContractTypeEnum.fromJson(json['type'] as String)!,
-      terms = openapi.ContractTerms.fromJson(
-        json['terms'] as Map<String, dynamic>,
-      )!,
+      type = ContractType.fromJson(json['type'] as String)!,
+      terms = ContractTerms.fromJson(json['terms'] as Map<String, dynamic>)!,
       deadlineToAccept = DateTime.parse(json['deadlineToAccept'] as String),
       accepted = json['accepted'] as bool,
       fulfilled = json['fulfilled'] as bool,
@@ -102,10 +100,10 @@ class Contract {
   String factionSymbol;
 
   /// Type of contract.
-  openapi.ContractTypeEnum type;
+  ContractType type;
 
   /// The terms of the contract.
-  openapi.ContractTerms terms;
+  ContractTerms terms;
 
   /// Whether the contract has been accepted by the agent
   bool accepted;

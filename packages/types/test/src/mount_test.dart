@@ -37,19 +37,19 @@ void main() {
     );
     when(() => ship.mounts).thenReturn([
       ShipMount(
-        symbol: ShipMountSymbolEnum.MINING_LASER_II,
+        symbol: ShipMountSymbol.MINING_LASER_II,
         name: '',
         description: '',
         requirements: ShipRequirements(),
       ),
       ShipMount(
-        symbol: ShipMountSymbolEnum.SENSOR_ARRAY_II,
+        symbol: ShipMountSymbol.SENSOR_ARRAY_II,
         name: '',
         description: '',
         requirements: ShipRequirements(),
       ),
       ShipMount(
-        symbol: ShipMountSymbolEnum.SENSOR_ARRAY_II,
+        symbol: ShipMountSymbol.SENSOR_ARRAY_II,
         name: '',
         description: '',
         requirements: ShipRequirements(),
@@ -58,47 +58,47 @@ void main() {
     expect(
       ship.mountSymbolsInInventory,
       MountSymbolSet.from([
-        ShipMountSymbolEnum.GAS_SIPHON_I,
-        ShipMountSymbolEnum.GAS_SIPHON_I,
-        ShipMountSymbolEnum.LASER_CANNON_I,
-        ShipMountSymbolEnum.LASER_CANNON_I,
-        ShipMountSymbolEnum.LASER_CANNON_I,
+        ShipMountSymbol.GAS_SIPHON_I,
+        ShipMountSymbol.GAS_SIPHON_I,
+        ShipMountSymbol.LASER_CANNON_I,
+        ShipMountSymbol.LASER_CANNON_I,
+        ShipMountSymbol.LASER_CANNON_I,
       ]),
     );
     expect(
       ship.mountedMountSymbols,
       MountSymbolSet.from([
-        ShipMountSymbolEnum.MINING_LASER_II,
-        ShipMountSymbolEnum.SENSOR_ARRAY_II,
-        ShipMountSymbolEnum.SENSOR_ARRAY_II,
+        ShipMountSymbol.MINING_LASER_II,
+        ShipMountSymbol.SENSOR_ARRAY_II,
+        ShipMountSymbol.SENSOR_ARRAY_II,
       ]),
     );
 
     final template = ShipTemplate(
-      frameSymbol: ShipFrameSymbolEnum.FIGHTER,
+      frameSymbol: ShipFrameSymbol.FIGHTER,
       mounts: MountSymbolSet.from([
-        ShipMountSymbolEnum.MINING_LASER_II,
-        ShipMountSymbolEnum.SENSOR_ARRAY_III,
+        ShipMountSymbol.MINING_LASER_II,
+        ShipMountSymbol.SENSOR_ARRAY_III,
       ]),
     );
     expect(
       mountsToAddToShip(ship, template),
-      MountSymbolSet.from([ShipMountSymbolEnum.SENSOR_ARRAY_III]),
+      MountSymbolSet.from([ShipMountSymbol.SENSOR_ARRAY_III]),
     );
     expect(
       mountsToRemoveFromShip(ship, template),
       MountSymbolSet.from([
-        ShipMountSymbolEnum.SENSOR_ARRAY_II,
-        ShipMountSymbolEnum.SENSOR_ARRAY_II,
+        ShipMountSymbol.SENSOR_ARRAY_II,
+        ShipMountSymbol.SENSOR_ARRAY_II,
       ]),
     );
 
     expect(template.canPurchaseAllMounts({}), isFalse);
     expect(
       template.canPurchaseAllMounts({
-        ShipMountSymbolEnum.MINING_LASER_I,
-        ShipMountSymbolEnum.MINING_LASER_II,
-        ShipMountSymbolEnum.SENSOR_ARRAY_III,
+        ShipMountSymbol.MINING_LASER_I,
+        ShipMountSymbol.MINING_LASER_II,
+        ShipMountSymbol.SENSOR_ARRAY_III,
       }),
       isTrue,
     );
@@ -107,11 +107,11 @@ void main() {
   test('mountsToRemoveFromShip', () {
     final ship = _MockShip();
     final mountSymbols = [
-      ShipMountSymbolEnum.MINING_LASER_II,
-      ShipMountSymbolEnum.SURVEYOR_I,
-      ShipMountSymbolEnum.MINING_LASER_II,
+      ShipMountSymbol.MINING_LASER_II,
+      ShipMountSymbol.SURVEYOR_I,
+      ShipMountSymbol.MINING_LASER_II,
     ];
-    ShipMount mountForSymbol(ShipMountSymbolEnum symbol) {
+    ShipMount mountForSymbol(ShipMountSymbol symbol) {
       return ShipMount(
         symbol: symbol,
         name: '',
@@ -124,55 +124,55 @@ void main() {
       () => ship.mounts,
     ).thenReturn(mountSymbols.map(mountForSymbol).toList());
     final template = ShipTemplate(
-      frameSymbol: ShipFrameSymbolEnum.MINER,
+      frameSymbol: ShipFrameSymbol.MINER,
       mounts: MountSymbolSet.from([
-        ShipMountSymbolEnum.MINING_LASER_II,
-        ShipMountSymbolEnum.MINING_LASER_II,
-        ShipMountSymbolEnum.MINING_LASER_I,
+        ShipMountSymbol.MINING_LASER_II,
+        ShipMountSymbol.MINING_LASER_II,
+        ShipMountSymbol.MINING_LASER_I,
       ]),
     );
     final toRemove = mountsToRemoveFromShip(ship, template);
     expect(toRemove, isNotEmpty);
-    expect(toRemove, MountSymbolSet.from([ShipMountSymbolEnum.SURVEYOR_I]));
+    expect(toRemove, MountSymbolSet.from([ShipMountSymbol.SURVEYOR_I]));
   });
 
   test('ShipTemplate.matches', () {
     final template = ShipTemplate(
-      frameSymbol: ShipFrameSymbolEnum.FIGHTER,
+      frameSymbol: ShipFrameSymbol.FIGHTER,
       mounts: MountSymbolSet.from([
-        ShipMountSymbolEnum.MINING_LASER_II,
-        ShipMountSymbolEnum.SENSOR_ARRAY_III,
+        ShipMountSymbol.MINING_LASER_II,
+        ShipMountSymbol.SENSOR_ARRAY_III,
       ]),
     );
     final ship = _MockShip();
     final shipFrame = _MockShipFrame();
     when(() => ship.frame).thenReturn(shipFrame);
-    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbolEnum.FIGHTER);
+    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbol.FIGHTER);
 
     when(() => ship.mounts).thenReturn([
       ShipMount(
-        symbol: ShipMountSymbolEnum.MINING_LASER_II,
+        symbol: ShipMountSymbol.MINING_LASER_II,
         name: '',
         description: '',
         requirements: ShipRequirements(),
       ),
       ShipMount(
-        symbol: ShipMountSymbolEnum.SENSOR_ARRAY_III,
+        symbol: ShipMountSymbol.SENSOR_ARRAY_III,
         name: '',
         description: '',
         requirements: ShipRequirements(),
       ),
     ]);
     expect(template.matches(ship), isTrue);
-    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbolEnum.EXPLORER);
+    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbol.EXPLORER);
     expect(template.matches(ship), isFalse);
 
-    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbolEnum.FIGHTER);
+    when(() => shipFrame.symbol).thenReturn(ShipFrameSymbol.FIGHTER);
     final otherTemplate = ShipTemplate(
-      frameSymbol: ShipFrameSymbolEnum.FIGHTER,
+      frameSymbol: ShipFrameSymbol.FIGHTER,
       mounts: MountSymbolSet.from([
-        ShipMountSymbolEnum.MINING_LASER_II,
-        ShipMountSymbolEnum.SENSOR_ARRAY_II,
+        ShipMountSymbol.MINING_LASER_II,
+        ShipMountSymbol.SENSOR_ARRAY_II,
       ]),
     );
     expect(otherTemplate.matches(ship), isFalse);
@@ -185,17 +185,17 @@ void main() {
 
   test('ShipTemplate equality', () {
     final a = ShipTemplate(
-      frameSymbol: ShipFrameSymbolEnum.FIGHTER,
+      frameSymbol: ShipFrameSymbol.FIGHTER,
       mounts: MountSymbolSet.from([
-        ShipMountSymbolEnum.MINING_LASER_II,
-        ShipMountSymbolEnum.SENSOR_ARRAY_III,
+        ShipMountSymbol.MINING_LASER_II,
+        ShipMountSymbol.SENSOR_ARRAY_III,
       ]),
     );
     final b = ShipTemplate(
-      frameSymbol: ShipFrameSymbolEnum.FIGHTER,
+      frameSymbol: ShipFrameSymbol.FIGHTER,
       mounts: MountSymbolSet.from([
-        ShipMountSymbolEnum.SENSOR_ARRAY_III,
-        ShipMountSymbolEnum.MINING_LASER_II,
+        ShipMountSymbol.SENSOR_ARRAY_III,
+        ShipMountSymbol.MINING_LASER_II,
       ]),
     );
     expect(a, equals(a));
@@ -206,33 +206,33 @@ void main() {
 
   test('ShipTemplate.mountsSymbolSetEquals', () {
     final a = MountSymbolSet.from([
-      ShipMountSymbolEnum.MINING_LASER_II,
-      ShipMountSymbolEnum.SENSOR_ARRAY_III,
+      ShipMountSymbol.MINING_LASER_II,
+      ShipMountSymbol.SENSOR_ARRAY_III,
     ]);
     final b = MountSymbolSet.from([
-      ShipMountSymbolEnum.SENSOR_ARRAY_III,
-      ShipMountSymbolEnum.MINING_LASER_II,
+      ShipMountSymbol.SENSOR_ARRAY_III,
+      ShipMountSymbol.MINING_LASER_II,
     ]);
     expect(ShipTemplate.mountsSymbolSetEquals(a, b), isTrue);
     expect(ShipTemplate.mountsSymbolSetEquals(a, MountSymbolSet()), isFalse);
     expect(ShipTemplate.mountsSymbolSetEquals(MountSymbolSet(), a), isFalse);
 
     final c = MountSymbolSet.from([
-      ShipMountSymbolEnum.GAS_SIPHON_I,
-      ShipMountSymbolEnum.MINING_LASER_II,
+      ShipMountSymbol.GAS_SIPHON_I,
+      ShipMountSymbol.MINING_LASER_II,
     ]);
     expect(ShipTemplate.mountsSymbolSetEquals(a, c), isFalse);
     final d = MountSymbolSet.from([
-      ShipMountSymbolEnum.MINING_LASER_II,
-      ShipMountSymbolEnum.SENSOR_ARRAY_III,
-      ShipMountSymbolEnum.SENSOR_ARRAY_III,
+      ShipMountSymbol.MINING_LASER_II,
+      ShipMountSymbol.SENSOR_ARRAY_III,
+      ShipMountSymbol.SENSOR_ARRAY_III,
     ]);
     expect(ShipTemplate.mountsSymbolSetEquals(a, d), isFalse);
   });
 
   test('MountRequest', () {
     const shipSymbol = ShipSymbol('S', 1);
-    const mountSymbol = ShipMountSymbolEnum.MINING_LASER_II;
+    const mountSymbol = ShipMountSymbol.MINING_LASER_II;
     final marketSymbol = WaypointSymbol.fromString('M-A-R');
     final shipyardSymbol = WaypointSymbol.fromString('S-A-B');
     const creditsNeeded = 100000;
