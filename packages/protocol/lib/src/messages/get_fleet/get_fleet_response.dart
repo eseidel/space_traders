@@ -1,52 +1,11 @@
+import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'get_fleet_response.g.dart';
 
-// void logShip(
-//   SystemsCache systemsCache,
-//   MarketPriceSnapshot marketPrices,
-//   Ship ship,
-//   BehaviorState? behavior,
-// ) {
-//   const indent = '   ';
-//   final waypoint = systemsCache.waypoint(ship.waypointSymbol);
-//   final cargoStatus =
-//       ship.cargo.capacity == 0
-//           ? ''
-//           : '${ship.cargo.units}/${ship.cargo.capacity}';
-//   logger.info(
-//     '${ship.symbol.hexNumber} '
-//     '${_behaviorOrTypeString(ship, behavior)} $cargoStatus',
-//   );
-//   if (ship.cargo.isNotEmpty) {
-//     logger.info(
-//       describeInventory(marketPrices, ship.cargo.inventory, indent: indent),
-//     );
-//   }
-//   final routePlan = behavior?.routePlan;
-//   if (routePlan != null) {
-//     final timeLeft = ship.timeToArrival(routePlan);
-//     final destination = routePlan.endSymbol.sectorLocalName;
-//     final destinationType = systemsCache.waypoint(routePlan.endSymbol).type;
-//     final arrival = approximateDuration(timeLeft);
-//     logger.info(
-//       '${indent}en route to $destination $destinationType '
-//       'in $arrival',
-//     );
-//   } else {
-//     logger.info('$indent${describeShipNav(ship.nav)} ${waypoint.type}');
-//   }
-//   final deal = behavior?.deal;
-//   if (deal != null) {
-//     logger.info('$indent${describeCostedDeal(deal)}');
-//     final since = DateTime.timestamp().difference(deal.startTime);
-//     logger.info('${indent}duration: ${approximateDuration(since)}');
-//   }
-// }
-
 @JsonSerializable()
-class PricedItem {
-  PricedItem({
+class PricedItem extends Equatable {
+  const PricedItem({
     required this.symbol,
     required this.pricePerUnit,
     required this.units,
@@ -55,59 +14,89 @@ class PricedItem {
 
   factory PricedItem.fromJson(Map<String, dynamic> json) =>
       _$PricedItemFromJson(json);
-  String symbol;
-  int pricePerUnit;
-  int units;
-  int totalPrice;
+
+  final String symbol;
+  final int pricePerUnit;
+  final int units;
+  final int totalPrice;
 
   Map<String, dynamic> toJson() => _$PricedItemToJson(this);
+
+  @override
+  List<Object?> get props => [symbol, pricePerUnit, units, totalPrice];
 }
 
 @JsonSerializable()
-class Cargo {
-  Cargo({required this.capacity, required this.units, required this.inventory});
+class Cargo extends Equatable {
+  const Cargo({
+    required this.capacity,
+    required this.units,
+    required this.inventory,
+  });
 
   factory Cargo.fromJson(Map<String, dynamic> json) => _$CargoFromJson(json);
-  int capacity;
-  int units;
-  List<PricedItem> inventory;
+
+  final int capacity;
+  final int units;
+  final List<PricedItem> inventory;
 
   Map<String, dynamic> toJson() => _$CargoToJson(this);
+
+  @override
+  List<Object?> get props => [capacity, units, inventory];
 }
 
 @JsonSerializable()
-class ShipRoutePlan {
-  ShipRoutePlan({required this.waypointSymbol, required this.timeToArrival});
+class ShipRoutePlan extends Equatable {
+  const ShipRoutePlan({
+    required this.waypointSymbol,
+    required this.timeToArrival,
+  });
 
   factory ShipRoutePlan.fromJson(Map<String, dynamic> json) =>
       _$ShipRoutePlanFromJson(json);
-  String waypointSymbol;
-  int timeToArrival;
+
+  final String waypointSymbol;
+  final int timeToArrival;
 
   Map<String, dynamic> toJson() => _$ShipRoutePlanToJson(this);
+
+  @override
+  List<Object?> get props => [waypointSymbol, timeToArrival];
 }
 
 @JsonSerializable()
-class FleetShip {
-  FleetShip({required this.symbol, required this.route, required this.cargo});
+class FleetShip extends Equatable {
+  const FleetShip({
+    required this.symbol,
+    required this.route,
+    required this.cargo,
+  });
 
   factory FleetShip.fromJson(Map<String, dynamic> json) =>
       _$FleetShipFromJson(json);
-  String symbol;
-  ShipRoutePlan route;
-  Cargo cargo;
+
+  final String symbol;
+  final ShipRoutePlan route;
+  final Cargo cargo;
 
   Map<String, dynamic> toJson() => _$FleetShipToJson(this);
+
+  @override
+  List<Object?> get props => [symbol, route, cargo];
 }
 
 @JsonSerializable()
-class GetFleetResponse {
-  GetFleetResponse({required this.ships});
+class GetFleetResponse extends Equatable {
+  const GetFleetResponse({required this.ships});
 
   factory GetFleetResponse.fromJson(Map<String, dynamic> json) =>
       _$GetFleetResponseFromJson(json);
 
-  List<FleetShip> ships;
+  final List<FleetShip> ships;
 
   Map<String, dynamic> toJson() => _$GetFleetResponseToJson(this);
+
+  @override
+  List<Object?> get props => [ships];
 }
