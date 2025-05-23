@@ -107,15 +107,31 @@ void main() {
                         'schema': {
                           'type': 'object',
                           'properties': {
-                            'id': {'type': 'string'},
-                            'email': {'type': 'string', 'nullable': true},
+                            'data': {r'$ref': '#/components/schemas/Account'},
                           },
-                          'required': ['id'],
+                          'required': ['data'],
                         },
                       },
                     },
                   },
                 },
+              },
+            },
+          },
+          'components': {
+            'schemas': {
+              'Account': {
+                'type': 'object',
+                'properties': {
+                  'role': {
+                    'type': 'object',
+                    'enumValues': ['admin', 'user'],
+                    'description': 'The role of the account.',
+                  },
+                  'id': {'type': 'string'},
+                  'email': {'type': 'string', 'nullable': true},
+                },
+                'required': ['role', 'id'],
               },
             },
           },
@@ -143,5 +159,7 @@ void main() {
       out.childFile('lib/model/get_my_account200_response.dart').existsSync(),
       isTrue,
     );
+    expect(out.childFile('lib/model/account.dart').existsSync(), isTrue);
+    expect(out.childFile('lib/model/account_role.dart').existsSync(), isTrue);
   });
 }
