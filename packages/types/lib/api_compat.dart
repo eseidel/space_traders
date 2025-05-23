@@ -13,3 +13,4 @@ typedef ContractType = ContractTypeEnum;
 typedef ShipEngineSymbol = ShipEngineSymbolEnum;
 typedef MarketTradeGoodType = MarketTradeGoodTypeEnum;
 typedef ShipConditionEventSymbol = ShipConditionEventSymbolEnum;
+// typedef WarpShipRequest = NavigateShipRequest;
