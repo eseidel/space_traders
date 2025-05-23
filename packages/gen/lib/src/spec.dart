@@ -34,7 +34,6 @@ class Parameter {
     required this.type,
     required this.isRequired,
     required this.sendIn,
-    required this.defaultValue,
   });
 
   factory Parameter.parse({
@@ -52,7 +51,6 @@ class Parameter {
     final sendIn = SendIn.fromJson(_required<String>(json, 'in'));
     _ignored(json, 'deprecated');
     _ignored(json, 'allowEmptyValue');
-    final defaultValue = _optional<String>(json, 'default');
 
     final SchemaRef type;
     if (hasSchema) {
@@ -93,7 +91,6 @@ class Parameter {
       isRequired: required,
       sendIn: sendIn,
       type: type,
-      defaultValue: defaultValue,
     );
   }
   final String name;
@@ -101,7 +98,6 @@ class Parameter {
   final bool isRequired;
   final SendIn sendIn;
   final SchemaRef type;
-  final String? defaultValue;
 }
 
 enum SchemaType {
@@ -168,6 +164,7 @@ class Schema {
     required this.enumValues,
     required this.format,
     required this.additionalProperties,
+    required this.defaultValue,
   }) {
     if (type == SchemaType.object && snakeName.isEmpty) {
       throw ArgumentError.value(
@@ -202,6 +199,8 @@ class Schema {
     _ignored(json, 'examples');
     _ignored(json, 'externalDocs');
 
+    final defaultValue = _optional<dynamic>(json, 'default');
+
     final required = json['required'] as List<dynamic>? ?? [];
     final description = json['description'] as String? ?? '';
     final enumValues = json['enum'] as List<dynamic>? ?? [];
@@ -230,6 +229,7 @@ class Schema {
       enumValues: enumValues.cast<String>(),
       format: format,
       additionalProperties: additionalProperties,
+      defaultValue: defaultValue,
     );
     context.addSchema(schema);
     return schema;
@@ -249,6 +249,7 @@ class Schema {
   final List<String> enumValues;
   final String? format;
   final SchemaRef? additionalProperties;
+  final dynamic defaultValue;
 
   @override
   String toString() {

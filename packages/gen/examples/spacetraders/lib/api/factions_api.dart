@@ -11,7 +11,10 @@ class FactionsApi {
 
   final ApiClient client;
 
-  Future<GetFactions200Response> getFactions({int? page, int? limit}) async {
+  Future<GetFactions200Response> getFactions({
+    int? page = 1,
+    int? limit = 10,
+  }) async {
     final response = await client.invokeApi(
       method: Method.get,
       path: '/factions',
@@ -44,8 +47,8 @@ class FactionsApi {
   }
 
   Future<GetMyFactions200Response> getMyFactions({
-    int? page,
-    int? limit,
+    int? page = 1,
+    int? limit = 10,
   }) async {
     final response = await client.invokeApi(
       method: Method.get,

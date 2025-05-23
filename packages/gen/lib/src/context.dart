@@ -327,7 +327,7 @@ extension ParameterGeneration on Parameter {
     return {
       'name': name,
       'required': isRequired,
-      'defaultValue': defaultValue,
+      'defaultValue': typeSchema.defaultValue,
       'type': typeSchema.typeName(context),
       'nullableType': typeSchema.nullableTypeName(context),
       'toJson': typeSchema.toJsonExpression(

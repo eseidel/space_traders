@@ -19,7 +19,10 @@ class SystemsApi {
 
   final ApiClient client;
 
-  Future<GetSystems200Response> getSystems({int? page, int? limit}) async {
+  Future<GetSystems200Response> getSystems({
+    int? page = 1,
+    int? limit = 10,
+  }) async {
     final response = await client.invokeApi(
       method: Method.get,
       path: '/systems',
@@ -53,8 +56,8 @@ class SystemsApi {
 
   Future<GetSystemWaypoints200Response> getSystemWaypoints(
     String systemSymbol, {
-    int? page,
-    int? limit,
+    int? page = 1,
+    int? limit = 10,
     WaypointType? type,
     dynamic traits,
   }) async {
