@@ -1,14 +1,17 @@
 import 'dart:async';
-import 'dart:convert';
 
-import 'package:http/http.dart' as http;
+import 'package:spacetraders/api_client.dart';
 
 class DefaultApi {
+  DefaultApi(ApiClient? client) : client = client ?? ApiClient();
+
+  final ApiClient client;
+
   Future<void> health() async {
-    final response = await http.post(
-      Uri.parse('https://api.spacetraders.io/v2/health'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({}),
+    final response = await client.invokeApi(
+      method: Method.get,
+      path: '/health',
+      parameters: {},
     );
 
     if (response.statusCode == 200) {
@@ -19,10 +22,10 @@ class DefaultApi {
   }
 
   Future<void> metrics() async {
-    final response = await http.post(
-      Uri.parse('https://api.spacetraders.io/v2/metrics'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({}),
+    final response = await client.invokeApi(
+      method: Method.get,
+      path: '/metrics',
+      parameters: {},
     );
 
     if (response.statusCode == 200) {
