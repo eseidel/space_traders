@@ -256,9 +256,8 @@ Future<JobResult> doSystemWatcher(
     caches.systems.systemBySymbol(systemSymbol),
     waypointCache: caches.waypoints,
     maxAge: maxAge,
-    filter:
-        (WaypointSymbol waypointSymbol) =>
-            !avoidWaypoints.contains(waypointSymbol),
+    filter: (WaypointSymbol waypointSymbol) =>
+        !avoidWaypoints.contains(waypointSymbol),
   );
 
   if (destinationSymbol != null) {
@@ -282,8 +281,7 @@ Future<JobResult> doSystemWatcher(
 }
 
 /// Advance the system watcher.
-final advanceSystemWatcher =
-    const MultiJob('SystemWatcher', [
-      _travelToAssignedSystem,
-      doSystemWatcher,
-    ]).run;
+final advanceSystemWatcher = const MultiJob('SystemWatcher', [
+  _travelToAssignedSystem,
+  doSystemWatcher,
+]).run;

@@ -24,10 +24,9 @@ Future<api.DealsNearbyResponse> dealsNearby({
   final contractSnapshot = await db.contracts.snapshotAll();
   final centralCommand = CentralCommand();
 
-  final startWaypoint =
-      maybeStart == null
-          ? systems.waypoint(agent!.headquarters)
-          : systems.waypoint(maybeStart);
+  final startWaypoint = maybeStart == null
+      ? systems.waypoint(agent!.headquarters)
+      : systems.waypoint(maybeStart);
 
   final construction = await centralCommand.computeActiveConstruction(
     db,
@@ -39,15 +38,15 @@ Future<api.DealsNearbyResponse> dealsNearby({
   final charting = await db.charting.snapshotAllRecords();
 
   if (construction != null) {
-    centralCommand
-        .subsidizedSellOpps = await computeConstructionMaterialSubsidies(
-      db,
-      systems,
-      exportSnapshot,
-      marketListings,
-      charting,
-      construction,
-    );
+    centralCommand.subsidizedSellOpps =
+        await computeConstructionMaterialSubsidies(
+          db,
+          systems,
+          exportSnapshot,
+          marketListings,
+          charting,
+          construction,
+        );
   }
 
   final behaviors = await BehaviorSnapshot.load(db);
@@ -118,12 +117,11 @@ Future<Response> onRequest(RequestContext context) async {
   } on Exception catch (e) {
     return Response.json(
       statusCode: HttpStatus.badRequest,
-      body:
-          api.ErrorResponse(
-            code: 'invalid_request',
-            message: 'Invalid request format.',
-            details: e.toString(),
-          ).toJson(),
+      body: api.ErrorResponse(
+        code: 'invalid_request',
+        message: 'Invalid request format.',
+        details: e.toString(),
+      ).toJson(),
     );
   }
 

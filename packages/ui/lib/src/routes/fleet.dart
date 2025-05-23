@@ -27,10 +27,9 @@ class FleetList extends StatelessWidget {
           itemCount: data.ships.length,
           itemBuilder: (BuildContext context, int index) {
             final ship = data.ships[index];
-            final cargoStatus =
-                ship.cargo.capacity == 0
-                    ? ''
-                    : '${ship.cargo.units}/${ship.cargo.capacity}';
+            final cargoStatus = ship.cargo.capacity == 0
+                ? ''
+                : '${ship.cargo.units}/${ship.cargo.capacity}';
 
             return ListTile(
               title: Text(ship.symbol.hexNumber),

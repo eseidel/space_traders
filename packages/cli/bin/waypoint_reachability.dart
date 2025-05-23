@@ -5,8 +5,9 @@ Future<void> command(Database db, ArgResults argResults) async {
   final shipyardShips = db.shipyardShips;
   final systemsCache = await db.systems.snapshotAllSystems();
   final hqSystem = await myHqSystemSymbol(db);
-  final fuelCapacity =
-      (await shipyardShips.get(ShipType.COMMAND_FRIGATE))!.frame.fuelCapacity;
+  final fuelCapacity = (await shipyardShips.get(
+    ShipType.COMMAND_FRIGATE,
+  ))!.frame.fuelCapacity;
 
   logger.info(
     'Exploring waypoint clusters in $hqSystem with $fuelCapacity fuel',

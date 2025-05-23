@@ -56,10 +56,9 @@ Future<void> logShip(
 ) async {
   const indent = '   ';
   final waypointType = await db.systems.waypointType(ship.waypointSymbol);
-  final cargoStatus =
-      ship.cargo.capacity == 0
-          ? ''
-          : '${ship.cargo.units}/${ship.cargo.capacity}';
+  final cargoStatus = ship.cargo.capacity == 0
+      ? ''
+      : '${ship.cargo.units}/${ship.cargo.capacity}';
   logger.info(
     '${ship.symbol.hexNumber} '
     '${_behaviorOrTypeString(ship, behavior)} $cargoStatus',
@@ -119,8 +118,10 @@ Future<void> command(Database db, ArgResults argResults) async {
   }
 
   final behaviors = await BehaviorSnapshot.load(db);
-  final idleHaulers =
-      behaviors.idleHaulerSymbols(ships).map((s) => s.hexNumber).toList();
+  final idleHaulers = behaviors
+      .idleHaulerSymbols(ships)
+      .map((s) => s.hexNumber)
+      .toList();
   if (idleHaulers.isNotEmpty) {
     logger.info('${idleHaulers.length} idle: ${idleHaulers.join(', ')}');
   }

@@ -84,10 +84,9 @@ class MarketPriceSnapshot extends PriceSnapshot<TradeSymbol, MarketPrice> {
     if (pricesForSymbol.isEmpty) {
       return null;
     }
-    final compareTo =
-        action == MarketTransactionTypeEnum.PURCHASE
-            ? _purchasePriceAscending
-            : _sellPriceAscending;
+    final compareTo = action == MarketTransactionTypeEnum.PURCHASE
+        ? _purchasePriceAscending
+        : _sellPriceAscending;
     // Sort the prices in ascending order.
     final pricesForSymbolSorted = pricesForSymbol.toList()..sort(compareTo);
     // Make sure that 100th percentile doesn't go out of bounds.

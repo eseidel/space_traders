@@ -146,9 +146,8 @@ Future<Map<TradeSymbol, WaypointSymbol>> findImportingMarketsForGoods(
     if (marketSymbols.isEmpty) {
       continue;
     }
-    final waypoints =
-        marketSymbols.map(systems.waypoint).toList()
-          ..sort((a, b) => a.distanceTo(start).compareTo(b.distanceTo(start)));
+    final waypoints = marketSymbols.map(systems.waypoint).toList()
+      ..sort((a, b) => a.distanceTo(start).compareTo(b.distanceTo(start)));
     final market = waypoints.firstOrNull;
     if (market != null) {
       markets[good] = market.symbol;

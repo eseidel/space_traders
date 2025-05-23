@@ -37,9 +37,8 @@ Map<String, dynamic> jumpGateToColumnMap(JumpGate jumpGate) {
 JumpGate jumpGateFromColumnMap(Map<String, dynamic> values) {
   return JumpGate(
     waypointSymbol: WaypointSymbol.fromJson(values['symbol'] as String),
-    connections:
-        (values['connections'] as List<String>)
-            .map(WaypointSymbol.fromJson)
-            .toSet(),
+    connections: (values['connections'] as List<String>)
+        .map(WaypointSymbol.fromJson)
+        .toSet(),
   );
 }

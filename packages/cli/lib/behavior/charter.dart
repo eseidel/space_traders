@@ -19,11 +19,10 @@ WaypointSymbol? waypointSymbolNeedingCharting(
   required bool Function(SystemWaypoint waypointSymbol)? filter,
 }) {
   final system = systems.systemBySymbol(systemSymbol);
-  final start =
-      ship.systemSymbol == system.symbol
-          ? ship.waypointSymbol
-          // This is only ever called with systems with jumpgates.
-          : system.jumpGateWaypoints.first.symbol;
+  final start = ship.systemSymbol == system.symbol
+      ? ship.waypointSymbol
+      // This is only ever called with systems with jumpgates.
+      : system.jumpGateWaypoints.first.symbol;
   final startWaypoint = systems.waypoint(start);
   final systemWaypoints = system.waypoints.sortedBy<num>(
     (w) => w.distanceTo(startWaypoint),

@@ -82,9 +82,8 @@ Future<void> command(Database db, ArgResults argResults) async {
   }
 
   logger.info('Deals above $minProfitPerSecond c/s by system:');
-  final systemSymbolsWithDealsSorted =
-      dealsBySystem.keys.toList()
-        ..sort((a, b) => dealsBySystem[b]!.length - dealsBySystem[a]!.length);
+  final systemSymbolsWithDealsSorted = dealsBySystem.keys.toList()
+    ..sort((a, b) => dealsBySystem[b]!.length - dealsBySystem[a]!.length);
   for (final system in systemSymbolsWithDealsSorted) {
     final deals = dealsBySystem[system]!;
     final haulers = haulersBySystem[system] ?? {};
@@ -96,14 +95,13 @@ Future<void> command(Database db, ArgResults argResults) async {
   }
   logger.info('Total deals: ${deals.length}');
 
-  final idleHaulers =
-      haulers
-          .where((ship) {
-            final state = behaviors[ship.symbol];
-            return state == null || state.behavior == Behavior.idle;
-          })
-          .map((e) => e.symbol)
-          .toList();
+  final idleHaulers = haulers
+      .where((ship) {
+        final state = behaviors[ship.symbol];
+        return state == null || state.behavior == Behavior.idle;
+      })
+      .map((e) => e.symbol)
+      .toList();
   logger.info('Idle haulers: ${idleHaulers.length}');
 
   // First figure out if we have any traders needing reassignment.

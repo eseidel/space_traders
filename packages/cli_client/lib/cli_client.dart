@@ -15,15 +15,9 @@ Future<void> runAsClient(
   void Function(ArgParser parser)? addArgs,
   @visibleForTesting Logger? overrideLogger,
 }) async {
-  final parser =
-      ArgParser()
-        ..addFlag(
-          'verbose',
-          abbr: 'v',
-          help: 'Verbose logging',
-          negatable: false,
-        )
-        ..addFlag('help', abbr: 'h', help: 'Show help', negatable: false);
+  final parser = ArgParser()
+    ..addFlag('verbose', abbr: 'v', help: 'Verbose logging', negatable: false)
+    ..addFlag('help', abbr: 'h', help: 'Show help', negatable: false);
   addArgs?.call(parser);
   final results = parser.parse(args);
   return runScoped(

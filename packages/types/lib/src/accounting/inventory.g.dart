@@ -44,12 +44,9 @@ PricedInventory _$PricedInventoryFromJson(Map<String, dynamic> json) =>
       final val = PricedInventory(
         items: $checkedConvert(
           'items',
-          (v) =>
-              (v as List<dynamic>)
-                  .map(
-                    (e) => PricedItemStack.fromJson(e as Map<String, dynamic>),
-                  )
-                  .toList(),
+          (v) => (v as List<dynamic>)
+              .map((e) => PricedItemStack.fromJson(e as Map<String, dynamic>))
+              .toList(),
         ),
       );
       return val;
@@ -109,10 +106,9 @@ PricedFleet _$PricedFleetFromJson(Map<String, dynamic> json) =>
       final val = PricedFleet(
         ships: $checkedConvert(
           'ships',
-          (v) =>
-              (v as List<dynamic>)
-                  .map((e) => PricedShip.fromJson(e as Map<String, dynamic>))
-                  .toList(),
+          (v) => (v as List<dynamic>)
+              .map((e) => PricedShip.fromJson(e as Map<String, dynamic>))
+              .toList(),
         ),
       );
       return val;

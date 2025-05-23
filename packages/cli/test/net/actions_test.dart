@@ -815,12 +815,11 @@ void main() {
 
     // Waypoint already charted exceptions are caught and logged.
     when(() => fleetApi.createChart(shipSymbol.symbol)).thenAnswer(
-      (invocation) =>
-          throw ApiException(
-            400,
-            '{"error":{"message":"Waypoint already charted: X1-ZY63-71980E" '
-            ',"code":4230,"data":{"waypointSymbol":"X1-ZY63-71980E"}}}',
-          ),
+      (invocation) => throw ApiException(
+        400,
+        '{"error":{"message":"Waypoint already charted: X1-ZY63-71980E" '
+        ',"code":4230,"data":{"waypointSymbol":"X1-ZY63-71980E"}}}',
+      ),
     );
     await runWithLogger(logger, () async {
       await chartWaypointAndLog(api, db, ship);

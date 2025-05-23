@@ -78,17 +78,18 @@ Future<void> cliMain(Database db, ArgResults argResults) async {
   logger.info(table.toString());
 
   final ships = await ShipSnapshot.load(db);
-  final idleHaulers =
-      behaviors.idleHaulerSymbols(ships).map((s) => s.hexNumber).toList();
+  final idleHaulers = behaviors
+      .idleHaulerSymbols(ships)
+      .map((s) => s.hexNumber)
+      .toList();
   if (idleHaulers.isNotEmpty) {
     logger.info('${idleHaulers.length} idle: ${idleHaulers.join(', ')}');
   }
 
-  final minerHaulers =
-      behaviors.states
-          .where((state) => state.behavior == Behavior.minerHauler)
-          .map((state) => state.shipSymbol.hexNumber)
-          .toList();
+  final minerHaulers = behaviors.states
+      .where((state) => state.behavior == Behavior.minerHauler)
+      .map((state) => state.shipSymbol.hexNumber)
+      .toList();
   if (minerHaulers.isNotEmpty) {
     logger.info(
       '${minerHaulers.length} miner haulers: ${minerHaulers.join(', ')}',

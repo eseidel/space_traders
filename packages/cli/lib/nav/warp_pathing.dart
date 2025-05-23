@@ -122,11 +122,10 @@ class _WarpPlanner {
         //   continue;
         // }
         if (fuelMarketsBySystem[next] == null) {
-          fuelMarketsBySystem[next] =
-              nextSystem.waypoints
-                  .map((w) => w.symbol)
-                  .where(sellsFuel)
-                  .toList();
+          fuelMarketsBySystem[next] = nextSystem.waypoints
+              .map((w) => w.symbol)
+              .where(sellsFuel)
+              .toList();
         }
         if (fuelMarketsBySystem[next]!.isEmpty) {
           continue;
@@ -209,21 +208,18 @@ List<RouteAction>? findRouteBetweenSystems(
   final routeActions = <RouteAction>[];
   for (final action in systemActions) {
     // TODO(eseidel): Fix this to have the right start/end symbols.
-    final type =
-        action.type == _ActionType.jump
-            ? RouteActionType.jump
-            : RouteActionType.warpCruise;
+    final type = action.type == _ActionType.jump
+        ? RouteActionType.jump
+        : RouteActionType.warpCruise;
     final start = systemsCache.systemRecordBySymbol(action.startSymbol);
     final end = systemsCache.systemRecordBySymbol(action.endSymbol);
     final distance = start.distanceTo(end);
-    final seconds =
-        action.type == _ActionType.jump
-            ? cooldownTimeForJumpBetweenSystems(start, end)
-            : warpTimeInSeconds(start, end, shipSpeed: shipSpec.speed);
-    final fuelUsed =
-        action.type == _ActionType.jump
-            ? 0
-            : fuelUsedByDistance(distance, ShipNavFlightMode.CRUISE);
+    final seconds = action.type == _ActionType.jump
+        ? cooldownTimeForJumpBetweenSystems(start, end)
+        : warpTimeInSeconds(start, end, shipSpeed: shipSpec.speed);
+    final fuelUsed = action.type == _ActionType.jump
+        ? 0
+        : fuelUsedByDistance(distance, ShipNavFlightMode.CRUISE);
     routeActions.add(
       RouteAction(
         startSymbol: planner.waypointForSystem(action.startSymbol),

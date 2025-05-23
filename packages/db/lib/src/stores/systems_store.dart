@@ -91,15 +91,14 @@ class SystemsStore {
     final systemRecords = await allSystemRecords();
     final waypoints = await allSystemWaypoints();
     final grouped = waypoints.groupListsBy((w) => w.system);
-    final systems =
-        systemRecords.map((r) {
-          final waypoints = grouped[r.symbol] ?? [];
-          // TODO(eseidel): Log once we have a logger.
-          // if (waypoints.length != r.waypointSymbols.length) {
-          //   logger.warn('Waypoints length mismatch for system ${r.symbol}');
-          // }
-          return System.fromRecord(r, waypoints);
-        }).toList();
+    final systems = systemRecords.map((r) {
+      final waypoints = grouped[r.symbol] ?? [];
+      // TODO(eseidel): Log once we have a logger.
+      // if (waypoints.length != r.waypointSymbols.length) {
+      //   logger.warn('Waypoints length mismatch for system ${r.symbol}');
+      // }
+      return System.fromRecord(r, waypoints);
+    }).toList();
     return SystemsSnapshot(systems);
   }
 

@@ -27,16 +27,15 @@ Future<PricedInventory> computeInventoryValue({required Database db}) async {
       .expand((ship) => ship.cargo.inventory)
       .countBy((item) => item.tradeSymbol, countOf: (item) => item.units);
 
-  final items =
-      countByTradeSymbol.entries.map((entry) {
-        final symbol = entry.key;
-        final count = entry.value;
-        return PricedItemStack(
-          tradeSymbol: symbol,
-          count: count,
-          pricePerUnit: marketPrices.medianSellPrice(symbol),
-        );
-      }).toList();
+  final items = countByTradeSymbol.entries.map((entry) {
+    final symbol = entry.key;
+    final count = entry.value;
+    return PricedItemStack(
+      tradeSymbol: symbol,
+      count: count,
+      pricePerUnit: marketPrices.medianSellPrice(symbol),
+    );
+  }).toList();
   return PricedInventory(items: items);
 }
 
@@ -54,21 +53,19 @@ Future<PricedFleet> computeShipValue(
     return type;
   }
 
-  final pricedShips =
-      ships.ships.countBy(shipTypeForShip).entries.map((entry) {
-        final symbol = entry.key;
-        final count = entry.value;
-        return PricedShip(
-          shipType: symbol,
-          count: count,
-          // Note this is using purchase price rather than scrap price
-          // which is likely over-estimating the value.
-          pricePerUnit:
-              symbol != null
-                  ? shipyardPrices.medianPurchasePrice(symbol)
-                  : null,
-        );
-      }).toList();
+  final pricedShips = ships.ships.countBy(shipTypeForShip).entries.map((entry) {
+    final symbol = entry.key;
+    final count = entry.value;
+    return PricedShip(
+      shipType: symbol,
+      count: count,
+      // Note this is using purchase price rather than scrap price
+      // which is likely over-estimating the value.
+      pricePerUnit: symbol != null
+          ? shipyardPrices.medianPurchasePrice(symbol)
+          : null,
+    );
+  }).toList();
 
   return PricedFleet(ships: pricedShips);
 }

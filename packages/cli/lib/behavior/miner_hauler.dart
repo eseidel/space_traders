@@ -97,11 +97,10 @@ Future<JobResult> goWaitForGoods(
 }
 
 /// Advance the miner hauler.
-final advanceMinerHauler =
-    const MultiJob('MinerHauler', [
-      emptyCargoIfNeededForMining,
-      goWaitForGoods,
-      // TODO(eseidel): travelAndSellCargo is likely wrong, it includes
-      // miner-specific logic like checking the reactor cooldown.
-      travelAndSellCargo,
-    ]).run;
+final advanceMinerHauler = const MultiJob('MinerHauler', [
+  emptyCargoIfNeededForMining,
+  goWaitForGoods,
+  // TODO(eseidel): travelAndSellCargo is likely wrong, it includes
+  // miner-specific logic like checking the reactor cooldown.
+  travelAndSellCargo,
+]).run;

@@ -723,5 +723,7 @@ Future<JobResult> transferOrSellCargo(
 }
 
 /// Advance the miner.
-final advanceMiner =
-    const MultiJob('Miner', [doMineJob, transferOrSellCargo]).run;
+final advanceMiner = const MultiJob('Miner', [
+  doMineJob,
+  transferOrSellCargo,
+]).run;

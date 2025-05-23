@@ -90,8 +90,9 @@ Future<void> cliMain(BackendClient client, ArgResults argResults) async {
     final sign = profit > 0 ? '+' : '';
     final profitPercent = (profit / costed.expectedCosts) * 100;
     final tradeSymbol = deal.tradeSymbol.value;
-    final name =
-        costed.isContractDeal ? '$tradeSymbol (contract)' : tradeSymbol;
+    final name = costed.isContractDeal
+        ? '$tradeSymbol (contract)'
+        : tradeSymbol;
 
     final inProgressMarker = !nearby.inProgress ? '' : '*';
 

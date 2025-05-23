@@ -174,8 +174,8 @@ class TopOfLoopUpdater {
         current: await db.contracts.snapshotAll(),
         server: await fetchContracts(db, api),
         // Use OpenAPI's toJson to restrict to only the fields the server sends.
-        toJsonList:
-            (e) => e.contracts.map((e) => e.toOpenApi().toJson()).toList(),
+        toJsonList: (e) =>
+            e.contracts.map((e) => e.toOpenApi().toJson()).toList(),
       );
       _checkForChanges(
         current: await ShipSnapshot.load(db)
@@ -183,8 +183,8 @@ class TopOfLoopUpdater {
         server: await fetchShips(db, api),
         // Ignore the cooldown field, since even with updateForServerTime, it's
         // hard to exactly match the server.
-        toJsonList:
-            (e) => e.ships.map((e) => e.toJson()..['cooldown'] = null).toList(),
+        toJsonList: (e) =>
+            e.ships.map((e) => e.toJson()..['cooldown'] = null).toList(),
       );
       // We could just upsert instead?
       await db.upsertAgent(

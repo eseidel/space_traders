@@ -85,15 +85,14 @@ Future<RoutePlan?> _routeToClosestSystemToSeed(
 }) async {
   final systemConnectivity = routePlanner.systemConnectivity;
   final starterSystems = findInterestingSystems(systemsCache);
-  final unreachableSystems =
-      starterSystems
-          .where(
-            (systemSymbol) => systemConnectivity.existsJumpPathBetween(
-              systemSymbol,
-              mainClusterSystemSymbol,
-            ),
-          )
-          .toList();
+  final unreachableSystems = starterSystems
+      .where(
+        (systemSymbol) => systemConnectivity.existsJumpPathBetween(
+          systemSymbol,
+          mainClusterSystemSymbol,
+        ),
+      )
+      .toList();
 
   final plans = <RoutePlan>[];
   for (final systemSymbol in unreachableSystems) {
@@ -136,8 +135,10 @@ Future<RoutePlan?> routeToNextSystemToSeed(
       systemSymbols.add(route.endSymbol.system);
     }
   }
-  final occupiedClusters =
-      systemSymbols.map(connectivity.clusterIdForSystem).nonNulls.toSet();
+  final occupiedClusters = systemSymbols
+      .map(connectivity.clusterIdForSystem)
+      .nonNulls
+      .toSet();
 
   final route = await _routeToClosestSystemToSeed(
     systems,

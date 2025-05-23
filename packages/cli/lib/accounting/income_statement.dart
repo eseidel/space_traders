@@ -234,9 +234,8 @@ class _IncomeStatementBuilder {
 
   static IncomeStatement build(Iterable<Transaction> transactions) {
     // Sort into reverse chronological order.
-    final sorted =
-        transactions.toList()
-          ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    final sorted = transactions.toList()
+      ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
     final builder = _IncomeStatementBuilder();
     final badTransactions = <BadTransaction>[];
     for (final transaction in sorted) {

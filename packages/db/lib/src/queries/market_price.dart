@@ -82,10 +82,9 @@ Query medianMarketPurchasePriceQuery(TradeSymbol trade) => Query(
 /// Build a market price from a column map.
 MarketPrice marketPriceFromColumnMap(Map<String, dynamic> values) {
   return MarketPrice(
-    activity:
-        values['activity'] == null
-            ? null
-            : ActivityLevel.fromJson(values['activity'] as String),
+    activity: values['activity'] == null
+        ? null
+        : ActivityLevel.fromJson(values['activity'] as String),
     waypointSymbol: WaypointSymbol.fromJson(
       values['waypoint_symbol'] as String,
     ),

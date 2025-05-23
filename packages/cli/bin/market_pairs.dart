@@ -72,8 +72,11 @@ Future<void> command(Database db, ArgResults argResults) async {
       // ]);
       continue;
     }
-    final distance =
-        distanceBetween(systemsCache, exportWaypoint, importWaypoint)!;
+    final distance = distanceBetween(
+      systemsCache,
+      exportWaypoint,
+      importWaypoint,
+    )!;
     String deviance(int price, MarketTransactionTypeEnum type) {
       final median = marketPrices.medianPrice(tradeSymbol, type);
       final deviance = stringForPriceDeviance(

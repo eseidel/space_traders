@@ -831,8 +831,9 @@ Future<JobResult> _initDeal(
 
   final ships = await ShipSnapshot.load(db);
   final systems = await db.systems.snapshotAllSystems();
-  final avoidSystems =
-      centralCommand.otherTraderSystems(ships, behaviors, ship.symbol).toSet();
+  final avoidSystems = centralCommand
+      .otherTraderSystems(ships, behaviors, ship.symbol)
+      .toSet();
 
   // If we don't have a deal, move to a better location and try again.
   final destinationSymbol = assertNotNull(
@@ -875,10 +876,9 @@ Future<JobResult> _initDeal(
 }
 
 /// Advance the trader.
-final advanceTrader =
-    const MultiJob('Trader', [
-      _initDeal,
-      sellUnwantedCargo,
-      doTraderGetCargo,
-      doTraderDeliverCargo,
-    ]).run;
+final advanceTrader = const MultiJob('Trader', [
+  _initDeal,
+  sellUnwantedCargo,
+  doTraderGetCargo,
+  doTraderDeliverCargo,
+]).run;

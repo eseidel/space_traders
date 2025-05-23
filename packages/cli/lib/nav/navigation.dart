@@ -17,10 +17,9 @@ extension ShipNavUtils on Ship {
     DateTime Function() getNow = defaultGetNow,
   }) {
     final now = getNow();
-    var timeLeft =
-        nav.status == ShipNavStatus.IN_TRANSIT
-            ? nav.route.arrival.difference(now)
-            : Duration.zero;
+    var timeLeft = nav.status == ShipNavStatus.IN_TRANSIT
+        ? nav.route.arrival.difference(now)
+        : Duration.zero;
     if (routePlan.endSymbol != waypointSymbol) {
       final newPlan = routePlan.subPlanStartingFrom(waypointSymbol);
       timeLeft += newPlan.duration;

@@ -32,16 +32,19 @@ Query marketsWithImportInSystemQuery(
   SystemSymbol system,
   TradeSymbol tradeSymbol,
 ) =>
-// TODO(eseidel): This should only be imports, but that currently breaks
-// the ability to find mining locations in starting systems.
-Query(
-  '''
+    // TODO(eseidel): This should only be imports, but that currently breaks
+    // the ability to find mining locations in starting systems.
+    Query(
+      '''
       SELECT symbol FROM market_listing_
       WHERE starts_with(symbol, @system) AND (@tradeSymbol = ANY(imports)
         OR @tradeSymbol = ANY(exchange))
       ''',
-  parameters: {'system': system.system, 'tradeSymbol': tradeSymbol.toJson()},
-);
+      parameters: {
+        'system': system.system,
+        'tradeSymbol': tradeSymbol.toJson(),
+      },
+    );
 
 /// Query to find all markets with a given export in the system.
 Query marketsWithExportInSystemQuery(
@@ -103,21 +106,18 @@ Map<String, dynamic> marketListingToColumnMap(MarketListing marketListing) => {
 MarketListing marketListingFromColumnMap(Map<String, dynamic> values) {
   return MarketListing(
     waypointSymbol: WaypointSymbol.fromString(values['symbol'] as String),
-    exports:
-        (values['exports'] as List<dynamic>)
-            .cast<String>()
-            .map((e) => TradeSymbol.fromJson(e)!)
-            .toSet(),
-    imports:
-        (values['imports'] as List<dynamic>)
-            .cast<String>()
-            .map((e) => TradeSymbol.fromJson(e)!)
-            .toSet(),
-    exchange:
-        (values['exchange'] as List<dynamic>)
-            .cast<String>()
-            .map((e) => TradeSymbol.fromJson(e)!)
-            .toSet(),
+    exports: (values['exports'] as List<dynamic>)
+        .cast<String>()
+        .map((e) => TradeSymbol.fromJson(e)!)
+        .toSet(),
+    imports: (values['imports'] as List<dynamic>)
+        .cast<String>()
+        .map((e) => TradeSymbol.fromJson(e)!)
+        .toSet(),
+    exchange: (values['exchange'] as List<dynamic>)
+        .cast<String>()
+        .map((e) => TradeSymbol.fromJson(e)!)
+        .toSet(),
   );
 }
 

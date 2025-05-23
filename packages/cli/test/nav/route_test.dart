@@ -180,8 +180,9 @@ void main() {
     const fs = LocalFileSystem();
     final file = fs.file(path);
     final json = jsonDecode(file.readAsStringSync()) as List<dynamic>;
-    final systems =
-        json.map((e) => System.fromJson(e as Map<String, dynamic>)).toList();
+    final systems = json
+        .map((e) => System.fromJson(e as Map<String, dynamic>))
+        .toList();
     return SystemsSnapshot(systems);
   }
 
@@ -245,13 +246,11 @@ void main() {
       // Also verify that our caching works:
       // This actually isn't triggered ever since we're only using local
       // navigation in this test so far.
-      final routeSymbols =
-          route.actions.map((w) => w.startSymbol).toList()
-            ..add(route.actions.last.endSymbol);
+      final routeSymbols = route.actions.map((w) => w.startSymbol).toList()
+        ..add(route.actions.last.endSymbol);
       final route2 = planRoute(start, end)!;
-      final routeSymbols2 =
-          route2.actions.map((w) => w.startSymbol).toList()
-            ..add(route.actions.last.endSymbol);
+      final routeSymbols2 = route2.actions.map((w) => w.startSymbol).toList()
+        ..add(route.actions.last.endSymbol);
       // Should be identical when coming from cache.
       expect(routeSymbols2, routeSymbols);
     }
@@ -261,8 +260,9 @@ void main() {
 
     // Within one system
     final system = systemsCache.systemBySymbol(waypoint1.system);
-    final waypoint2 =
-        system.waypoints.firstWhere((w) => w.symbol != waypoint1).symbol;
+    final waypoint2 = system.waypoints
+        .firstWhere((w) => w.symbol != waypoint1)
+        .symbol;
     expectRoute(waypoint1, waypoint2, 23);
 
     final route = planRoute(waypoint1, waypoint2);

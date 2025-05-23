@@ -212,12 +212,11 @@ class CentralCommand {
 
     final squad = squadForShip(ship);
     if (squad != null) {
-      var behavior =
-          {
-            FleetRole.miner: Behavior.miner,
-            FleetRole.surveyor: Behavior.surveyor,
-            FleetRole.siphoner: Behavior.siphoner,
-          }[ship.fleetRole];
+      var behavior = {
+        FleetRole.miner: Behavior.miner,
+        FleetRole.surveyor: Behavior.surveyor,
+        FleetRole.siphoner: Behavior.siphoner,
+      }[ship.fleetRole];
       if (behavior == null && ship.isHauler && enabled(Behavior.minerHauler)) {
         behavior = Behavior.minerHauler;
       }
@@ -382,8 +381,11 @@ class CentralCommand {
     Ship ship, {
     required int maxJumps,
   }) {
-    final charterSystems =
-        otherCharterSystems(ships, behaviors, ship.symbol).toSet();
+    final charterSystems = otherCharterSystems(
+      ships,
+      behaviors,
+      ship.symbol,
+    ).toSet();
 
     // Only probes should ever chart asteroids.
     final chartAsteroids =
@@ -790,22 +792,21 @@ class CentralCommand {
     // Get our main cluster id.
     final hqSystemSymbol = agent.headquarters.system;
     // List all systems with explorers in them.
-    final systemsWithExplorers =
-        ships.ships
-            .where((s) => s.fleetRole == FleetRole.explorer)
-            .map((s) => s.systemSymbol)
-            .toSet();
+    final systemsWithExplorers = ships.ships
+        .where((s) => s.fleetRole == FleetRole.explorer)
+        .map((s) => s.systemSymbol)
+        .toSet();
     // Any system which is not in our main cluster id.
-    final unreachableSystems =
-        systemsWithExplorers
-            .where(
-              (s) =>
-                  systemConnectivity.existsJumpPathBetween(s, hqSystemSymbol),
-            )
-            .toSet();
+    final unreachableSystems = systemsWithExplorers
+        .where(
+          (s) => systemConnectivity.existsJumpPathBetween(s, hqSystemSymbol),
+        )
+        .toSet();
     // And does not have a probe in it.
-    final probes =
-        ships.ships.where((s) => s.isProbe).map((s) => s.systemSymbol).toSet();
+    final probes = ships.ships
+        .where((s) => s.isProbe)
+        .map((s) => s.systemSymbol)
+        .toSet();
     final systemWithoutProbes = unreachableSystems
         .where((s) => !probes.contains(s))
         .sortedBy((s) => s.system);
@@ -817,11 +818,10 @@ class CentralCommand {
     const shipType = ShipType.PROBE;
     final systemSymbol = systemWithoutProbes.first;
     // TODO(eseidel): This should be a db query.
-    final shipyardSymbol =
-        shipyardListings
-            .inSystem(systemSymbol)
-            .firstWhereOrNull((s) => s.hasShip(shipType))
-            ?.waypointSymbol;
+    final shipyardSymbol = shipyardListings
+        .inSystem(systemSymbol)
+        .firstWhereOrNull((s) => s.hasShip(shipType))
+        ?.waypointSymbol;
     if (shipyardSymbol == null) {
       logger.info("Can't find shipyard to buy probe in $systemSymbol");
       return null;
@@ -941,12 +941,11 @@ class CentralCommand {
     Contract contract,
     TradeSymbol tradeSymbol,
   ) {
-    final unitsAssigned =
-        behaviors
-            .dealsInProgress()
-            .where((d) => d.contractId == contract.id)
-            .map((d) => d.maxUnitsToBuy)
-            .sum;
+    final unitsAssigned = behaviors
+        .dealsInProgress()
+        .where((d) => d.contractId == contract.id)
+        .map((d) => d.maxUnitsToBuy)
+        .sum;
     final neededGood = contract.goodNeeded(tradeSymbol);
     return neededGood!.remainingNeeded - unitsAssigned;
   }
@@ -959,15 +958,12 @@ class CentralCommand {
     Construction construction,
     TradeSymbol tradeSymbol,
   ) {
-    final unitsAssigned =
-        behaviors
-            .dealsInProgress()
-            .where((d) => d.isConstructionDeal)
-            .where(
-              (d) => d.deal.destinationSymbol == construction.waypointSymbol,
-            )
-            .map((d) => d.maxUnitsToBuy)
-            .sum;
+    final unitsAssigned = behaviors
+        .dealsInProgress()
+        .where((d) => d.isConstructionDeal)
+        .where((d) => d.deal.destinationSymbol == construction.waypointSymbol)
+        .map((d) => d.maxUnitsToBuy)
+        .sum;
     final material = construction.materialNeeded(tradeSymbol);
     return material!.remainingNeeded - unitsAssigned;
   }
@@ -998,12 +994,11 @@ class CentralCommand {
     Agent agent,
     Ship ship,
   ) async {
-    final score =
-        (await evaluateWaypointsForSiphoning(
-          db,
-          systems,
-          agent.headquarters.system,
-        )).firstOrNull;
+    final score = (await evaluateWaypointsForSiphoning(
+      db,
+      systems,
+      agent.headquarters.system,
+    )).firstOrNull;
     if (score == null) {
       return null;
     }
@@ -1159,13 +1154,10 @@ Future<List<ExtractionSquad>> assignShipsToSquads(
   required SystemSymbol systemSymbol,
 }) async {
   // Look at the top N mining scores.
-  final scores =
-      (await evaluateWaypointsForMining(db, systems, systemSymbol))
-          .where((m) => m.marketsTradeAllProducedGoods)
-          .where(
-            (m) => m.deliveryDistance < config.maxExtractionDeliveryDistance,
-          )
-          .toList();
+  final scores = (await evaluateWaypointsForMining(db, systems, systemSymbol))
+      .where((m) => m.marketsTradeAllProducedGoods)
+      .where((m) => m.deliveryDistance < config.maxExtractionDeliveryDistance)
+      .toList();
 
   // Sort by distance from center of the system.
   final origin = WaypointPosition(0, 0, systemSymbol);

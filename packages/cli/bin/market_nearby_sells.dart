@@ -10,11 +10,10 @@ Future<void> command(Database db, ArgResults argResults) async {
   const tradeSymbol = TradeSymbol.DIAMONDS;
 
   final hqSystem = await myHqSystemSymbol(db);
-  final hqMine =
-      systemsCache
-          .waypointsInSystem(hqSystem)
-          .firstWhere((w) => w.isAsteroid)
-          .symbol;
+  final hqMine = systemsCache
+      .waypointsInSystem(hqSystem)
+      .firstWhere((w) => w.isAsteroid)
+      .symbol;
 
   final miner = ships.ships.firstWhere((s) => s.isMiner);
   final ship = miner.deepCopy();

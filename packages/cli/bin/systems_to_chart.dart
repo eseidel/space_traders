@@ -55,14 +55,13 @@ Future<void> command(Database db, ArgResults argResults) async {
   final systemsSnapshot = await db.systems.snapshotAllSystems();
   final charts = await db.charting.snapshotAllRecords();
 
-  final connectedSystems =
-      systemConnectivity
-          .systemSymbolsInJumpRadius(
-            systemsSnapshot,
-            startSystem: startSystemSymbol,
-            maxJumps: 3,
-          )
-          .toList();
+  final connectedSystems = systemConnectivity
+      .systemSymbolsInJumpRadius(
+        systemsSnapshot,
+        startSystem: startSystemSymbol,
+        maxJumps: 3,
+      )
+      .toList();
   if (connectedSystems.isEmpty) {
     logger.info('No systems connected to $startSystemSymbol.');
     return;

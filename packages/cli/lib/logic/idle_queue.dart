@@ -216,12 +216,11 @@ class IdleQueue {
 
   @override
   String toString() {
-    final nextJumpDistance =
-        _systems.isNotEmpty
-            ? _systems.first.jumpDistance
-            : _jumpGates.isNotEmpty
-            ? _jumpGates.first.jumpDistance
-            : null;
+    final nextJumpDistance = _systems.isNotEmpty
+        ? _systems.first.jumpDistance
+        : _jumpGates.isNotEmpty
+        ? _jumpGates.first.jumpDistance
+        : null;
 
     return 'IdleQueue('
         'systems: ${_systems.length} queued, ${_systems.seenLength} seen; '

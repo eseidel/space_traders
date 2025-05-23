@@ -17,10 +17,9 @@ String contractDescription(
   var termsString = terms.deliver
       .map((d) {
         final unitsRemaining = d.unitsRequired - d.unitsFulfilled;
-        final remainingString =
-            d.unitsFulfilled == 0
-                ? ''
-                : '(${unitsRemaining.toString().padLeft(3)} remaining)';
+        final remainingString = d.unitsFulfilled == 0
+            ? ''
+            : '(${unitsRemaining.toString().padLeft(3)} remaining)';
         return '${d.unitsRequired} $remainingString '
             '${d.tradeSymbol} to ${d.destinationSymbol}';
       })
@@ -56,10 +55,12 @@ String stringForPriceDeviance(
   final percentOff = '$signString${(diff / median * 100).round()}'.padLeft(4);
   final creditsDiff = '$signString${creditsString(diff)} per'.padLeft(8);
 
-  final lowColor =
-      type == MarketTransactionTypeEnum.SELL ? lightRed : lightGreen;
-  final highColor =
-      type == MarketTransactionTypeEnum.SELL ? lightGreen : lightRed;
+  final lowColor = type == MarketTransactionTypeEnum.SELL
+      ? lightRed
+      : lightGreen;
+  final highColor = type == MarketTransactionTypeEnum.SELL
+      ? lightGreen
+      : lightRed;
 
   if (diff < 0) {
     return lowColor.wrap('$percentOff% $creditsDiff')!;
@@ -86,8 +87,9 @@ void logMarketTransaction(
       (transaction.type == MarketTransactionTypeEnum.SELL ? '🤝' : '💸');
   // creditsSign shows which way our bank account moves.
   // When it was a sell, we got paid, so we add.
-  final creditsSign =
-      transaction.type == MarketTransactionTypeEnum.SELL ? '+' : '-';
+  final creditsSign = transaction.type == MarketTransactionTypeEnum.SELL
+      ? '+'
+      : '-';
   // Fuel commonly has a 3 digit price with a credit marker and sign
   // so we pad to 5.
   final totalPriceString =
@@ -156,10 +158,9 @@ DateTime logRemainingTransitTime(
   final arrival = ship.nav.route.arrival;
   final now = getNow();
   final remaining = arrival.difference(now);
-  final coloredRemaining =
-      remaining.inHours > 1
-          ? red.wrap(approximateDuration(remaining))!
-          : approximateDuration(remaining);
+  final coloredRemaining = remaining.inHours > 1
+      ? red.wrap(approximateDuration(remaining))!
+      : approximateDuration(remaining);
   shipInfo(
     ship,
     // Extra space after emoji is needed for windows powershell.
@@ -233,9 +234,8 @@ String describeShipNav(
 /// Log the counts.
 void logCounts<T>(Counts<T> counts) {
   // Print the counts in order from most to least:
-  final sorted =
-      counts.counts.entries.toList()
-        ..sort((a, b) => b.value.compareTo(a.value));
+  final sorted = counts.counts.entries.toList()
+    ..sort((a, b) => b.value.compareTo(a.value));
   for (final entry in sorted) {
     logger.info('  ${entry.value}: ${entry.key}');
   }
@@ -258,10 +258,9 @@ Future<T> expectTime<T>(
         return;
       }
       final queryCount = queryCounts.total;
-      final logFn =
-          duration.inSeconds > expected.inSeconds * 2
-              ? logger.err
-              : logger.warn;
+      final logFn = duration.inSeconds > expected.inSeconds * 2
+          ? logger.err
+          : logger.warn;
       logFn(
         '$name took too long ${duration.inMilliseconds}ms '
         '($requestCount requests, $queryCount queries)',

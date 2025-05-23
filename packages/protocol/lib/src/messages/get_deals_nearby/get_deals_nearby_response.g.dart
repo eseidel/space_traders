@@ -16,10 +16,9 @@ DealsNearbyResponse _$DealsNearbyResponseFromJson(Map<String, dynamic> json) =>
         final val = DealsNearbyResponse(
           deals: $checkedConvert(
             'deals',
-            (v) =>
-                (v as List<dynamic>)
-                    .map((e) => NearbyDeal.fromJson(e as Map<String, dynamic>))
-                    .toList(),
+            (v) => (v as List<dynamic>)
+                .map((e) => NearbyDeal.fromJson(e as Map<String, dynamic>))
+                .toList(),
           ),
           shipType: $checkedConvert(
             'ship_type',
@@ -36,10 +35,9 @@ DealsNearbyResponse _$DealsNearbyResponseFromJson(Map<String, dynamic> json) =>
           credits: $checkedConvert('credits', (v) => (v as num).toInt()),
           extraSellOpps: $checkedConvert(
             'extra_sell_opps',
-            (v) =>
-                (v as List<dynamic>)
-                    .map((e) => SellOpp.fromJson(e as Map<String, dynamic>))
-                    .toList(),
+            (v) => (v as List<dynamic>)
+                .map((e) => SellOpp.fromJson(e as Map<String, dynamic>))
+                .toList(),
           ),
           tradeSymbolCount: $checkedConvert(
             'trade_symbol_count',

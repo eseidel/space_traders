@@ -125,10 +125,9 @@ class TestSystem {
   factory TestSystem.fromJson(Map<String, dynamic> json) {
     return TestSystem(
       symbol: json['symbol'] as String,
-      waypoints:
-          (json['waypoints'] as List<dynamic>)
-              .map((e) => TestWaypoint.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      waypoints: (json['waypoints'] as List<dynamic>)
+          .map((e) => TestWaypoint.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 
@@ -141,10 +140,9 @@ class TestExpect {
 
   factory TestExpect.fromJson(Map<String, dynamic> json) {
     return TestExpect(
-      route:
-          (json['route'] as List<dynamic>)
-              .map((e) => TestRouteAction.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      route: (json['route'] as List<dynamic>)
+          .map((e) => TestRouteAction.fromJson(e as Map<String, dynamic>))
+          .toList(),
       fuelUsed: json['fuelUsed'] as int,
       time: json['time'] as int,
     );
@@ -177,14 +175,12 @@ class TestSuite {
   factory TestSuite.fromJson(Map<String, dynamic> json) {
     return TestSuite(
       ship: TestShip.fromJson(json['ship'] as Map<String, dynamic>),
-      systems:
-          (json['systems'] as List<dynamic>)
-              .map((e) => TestSystem.fromJson(e as Map<String, dynamic>))
-              .toList(),
-      tests:
-          (json['tests'] as List<dynamic>)
-              .map((e) => Test.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      systems: (json['systems'] as List<dynamic>)
+          .map((e) => TestSystem.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      tests: (json['tests'] as List<dynamic>)
+          .map((e) => Test.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 

@@ -125,10 +125,9 @@ void main() {
     await setupShip(shipSymbol: shipBSymbol, start: bStart, end: bEnd);
 
     // Test that from S-A-A we avoid S-A-W and S-B-W.
-    final otherSystems =
-        centralCommand
-            .otherCharterSystems(ships, behaviors, shipASymbol)
-            .toList();
+    final otherSystems = centralCommand
+        .otherCharterSystems(ships, behaviors, shipASymbol)
+        .toList();
     expect(
       otherSystems,
       [bStart.system, bEnd.system], // Source and destination
@@ -136,20 +135,18 @@ void main() {
     // Forget shipB's plan and we should only avoid S-C-A (where shipB is).
     // This is another hack, modifying the snapshot:
     behaviors[shipBSymbol]?.routePlan = null;
-    final otherSystems2 =
-        centralCommand
-            .otherCharterSystems(ships, behaviors, shipASymbol)
-            .toList();
+    final otherSystems2 = centralCommand
+        .otherCharterSystems(ships, behaviors, shipASymbol)
+        .toList();
     expect(otherSystems2, [bStart.system]); // From nav.waypointSymbol
 
     final shipCSymbol = ShipSymbol.fromString('X-C');
     final cStart = WaypointSymbol.fromString('S-D-A');
     final cEnd = WaypointSymbol.fromString('S-E-W');
     await setupShip(shipSymbol: shipCSymbol, start: cStart, end: cEnd);
-    final otherSystems4 =
-        centralCommand
-            .otherCharterSystems(ships, behaviors, shipASymbol)
-            .toList();
+    final otherSystems4 = centralCommand
+        .otherCharterSystems(ships, behaviors, shipASymbol)
+        .toList();
     expect(otherSystems4, <SystemSymbol>[
       bStart.system,
       cStart.system,

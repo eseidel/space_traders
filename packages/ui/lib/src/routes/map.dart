@@ -13,19 +13,18 @@ class MapScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Map')),
       body: ApiBuilder<GetMapDataResponse>(
         fetcher: (c) => c.getMapData(),
-        builder:
-            (context, data) => ColoredBox(
-              color: Colors.black,
-              child: SizedBox.expand(
-                child: CustomPaint(
-                  painter: SystemMapPainter(
-                    systems: data.systems,
-                    ships: data.ships,
-                    paintMode: PaintMode.shipColors,
-                  ),
-                ),
+        builder: (context, data) => ColoredBox(
+          color: Colors.black,
+          child: SizedBox.expand(
+            child: CustomPaint(
+              painter: SystemMapPainter(
+                systems: data.systems,
+                ships: data.ships,
+                paintMode: PaintMode.shipColors,
               ),
             ),
+          ),
+        ),
       ),
     );
   }
@@ -108,10 +107,9 @@ class SystemMapPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     canvas.save();
 
-    final paint =
-        Paint()
-          ..style = PaintingStyle.fill
-          ..color = Colors.indigo;
+    final paint = Paint()
+      ..style = PaintingStyle.fill
+      ..color = Colors.indigo;
 
     final extents = getMapExtents();
     final scaleX = size.width / extents.width;

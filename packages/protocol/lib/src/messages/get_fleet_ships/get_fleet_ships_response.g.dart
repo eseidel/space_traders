@@ -13,10 +13,9 @@ FleetShipsResponse _$FleetShipsResponseFromJson(Map<String, dynamic> json) =>
       final val = FleetShipsResponse(
         ships: $checkedConvert(
           'ships',
-          (v) =>
-              (v as List<dynamic>)
-                  .map((e) => Ship.fromJson(e as Map<String, dynamic>))
-                  .toList(),
+          (v) => (v as List<dynamic>)
+              .map((e) => Ship.fromJson(e as Map<String, dynamic>))
+              .toList(),
         ),
       );
       return val;

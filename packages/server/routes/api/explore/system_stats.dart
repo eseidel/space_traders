@@ -28,8 +28,9 @@ Future<SystemStats> computeSystemStats({
     totalJumpgates += systemsCache.hasJumpGate(system.symbol) ? 1 : 0;
   }
 
-  final reachableSystems =
-      systemConnectivity.systemsReachableFrom(startSystemSymbol).toSet();
+  final reachableSystems = systemConnectivity
+      .systemsReachableFrom(startSystemSymbol)
+      .toSet();
 
   var jumpGates = 0;
   var asteroids = 0;

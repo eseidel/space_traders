@@ -13,17 +13,15 @@ GetMapDataResponse _$GetMapDataResponseFromJson(Map<String, dynamic> json) =>
       final val = GetMapDataResponse(
         ships: $checkedConvert(
           'ships',
-          (v) =>
-              (v as List<dynamic>)
-                  .map((e) => Ship.fromJson(e as Map<String, dynamic>))
-                  .toList(),
+          (v) => (v as List<dynamic>)
+              .map((e) => Ship.fromJson(e as Map<String, dynamic>))
+              .toList(),
         ),
         systems: $checkedConvert(
           'systems',
-          (v) =>
-              (v as List<dynamic>)
-                  .map((e) => System.fromJson(e as Map<String, dynamic>))
-                  .toList(),
+          (v) => (v as List<dynamic>)
+              .map((e) => System.fromJson(e as Map<String, dynamic>))
+              .toList(),
         ),
       );
       return val;

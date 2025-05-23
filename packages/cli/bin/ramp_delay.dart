@@ -6,8 +6,9 @@ void printRampDelay(Iterable<Transaction> transactions) {
   // buy the ship.  The difference between those times is the ramp delay.
 
   const lastShipPurchaseIndex = -1;
-  final transactionsToExamine =
-      transactions.skip(lastShipPurchaseIndex + 1).toList();
+  final transactionsToExamine = transactions
+      .skip(lastShipPurchaseIndex + 1)
+      .toList();
   final shipPurchaseIndex = transactionsToExamine.indexWhere(
     (Transaction t) => t.transactionType == TransactionType.shipyard,
   );

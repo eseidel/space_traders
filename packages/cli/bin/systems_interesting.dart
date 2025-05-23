@@ -10,8 +10,9 @@ Future<void> command(Database db, ArgResults argResults) async {
     constructionSnapshot,
   );
   final hqSystemSymbol = await myHqSystemSymbol(db);
-  final reachableSystems =
-      systemConnectivity.systemsReachableFrom(hqSystemSymbol).toSet();
+  final reachableSystems = systemConnectivity
+      .systemsReachableFrom(hqSystemSymbol)
+      .toSet();
 
   // Find all known reachable systems.
   // List ones we know are reachable but don't have any prices.
@@ -33,18 +34,16 @@ Future<void> command(Database db, ArgResults argResults) async {
   );
   // These are not necessarily reachable (the jump gate on either side might
   // be under construction).
-  final connectedSystemSymbols =
-      reachableJumpGates
-          .map((record) => record.connectedSystemSymbols)
-          .expand((e) => e)
-          .toSet();
+  final connectedSystemSymbols = reachableJumpGates
+      .map((record) => record.connectedSystemSymbols)
+      .expand((e) => e)
+      .toSet();
 
   // Number of under construction waypoints we know about:
-  final underConstruction =
-      constructionSnapshot.records
-          .where((record) => record.isUnderConstruction)
-          .map((record) => record.waypointSymbol.system)
-          .toSet();
+  final underConstruction = constructionSnapshot.records
+      .where((record) => record.isUnderConstruction)
+      .map((record) => record.waypointSymbol.system)
+      .toSet();
   final connectedUnderConstruction = underConstruction.intersection(
     connectedSystemSymbols,
   );

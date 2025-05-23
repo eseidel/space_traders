@@ -167,10 +167,9 @@ class RoutePlan {
     return RoutePlan(
       fuelCapacity: json['fuelCapacity'] as int,
       shipSpeed: json['shipSpeed'] as int,
-      actions:
-          (json['actions'] as List<dynamic>)
-              .map((e) => RouteAction.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      actions: (json['actions'] as List<dynamic>)
+          .map((e) => RouteAction.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 

@@ -70,11 +70,10 @@ List<RouteAction>? findRouteWithinSystem(
   final systemWaypoints = systems.waypointsInSystem(start.system);
   // We only consider waypoints that have markets that sell fuel.
   // Also include the start and end waypoints.
-  final waypoints =
-      systemWaypoints.where((w) {
-        final symbol = w.symbol;
-        return sellsFuel(symbol) || symbol == start || symbol == end;
-      }).toList();
+  final waypoints = systemWaypoints.where((w) {
+    final symbol = w.symbol;
+    return sellsFuel(symbol) || symbol == start || symbol == end;
+  }).toList();
 
   ShipNavFlightMode flightModeRequired({
     required SystemWaypoint from,
@@ -131,10 +130,9 @@ List<RouteAction>? findRouteWithinSystem(
               flightMode,
             );
         frontier.add((next, priority));
-        final type =
-            flightMode == ShipNavFlightMode.CRUISE
-                ? RouteActionType.navCruise
-                : RouteActionType.navDrift;
+        final type = flightMode == ShipNavFlightMode.CRUISE
+            ? RouteActionType.navCruise
+            : RouteActionType.navDrift;
         final action = RouteAction(
           startSymbol: currentSymbol,
           endSymbol: nextWaypoint.symbol,
