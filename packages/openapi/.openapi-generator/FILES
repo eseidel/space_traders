@@ -31,7 +31,6 @@ doc/CreateShipWaypointScan201ResponseData.md
 doc/CreateSurvey201Response.md
 doc/CreateSurvey201ResponseData.md
 doc/DataApi.md
-doc/DefaultApi.md
 doc/DeliverContract200Response.md
 doc/DeliverContract200ResponseData.md
 doc/DeliverContractRequest.md
@@ -53,6 +52,8 @@ doc/GetAgents200Response.md
 doc/GetConstruction200Response.md
 doc/GetContract200Response.md
 doc/GetContracts200Response.md
+doc/GetErrorCodes200Response.md
+doc/GetErrorCodes200ResponseErrorCodesInner.md
 doc/GetFaction200Response.md
 doc/GetFactions200Response.md
 doc/GetJumpGate200Response.md
@@ -78,6 +79,7 @@ doc/GetShipNav200Response.md
 doc/GetShipyard200Response.md
 doc/GetStatus200Response.md
 doc/GetStatus200ResponseAnnouncementsInner.md
+doc/GetStatus200ResponseHealth.md
 doc/GetStatus200ResponseLeaderboards.md
 doc/GetStatus200ResponseLeaderboardsMostCreditsInner.md
 doc/GetStatus200ResponseLeaderboardsMostSubmittedChartsInner.md
@@ -88,6 +90,7 @@ doc/GetSupplyChain200Response.md
 doc/GetSupplyChain200ResponseData.md
 doc/GetSystem200Response.md
 doc/GetSystemWaypoints200Response.md
+doc/GetSystemWaypointsTraitsParameter.md
 doc/GetSystems200Response.md
 doc/GetWaypoint200Response.md
 doc/GlobalApi.md
@@ -215,7 +218,6 @@ lib/api/accounts_api.dart
 lib/api/agents_api.dart
 lib/api/contracts_api.dart
 lib/api/data_api.dart
-lib/api/default_api.dart
 lib/api/factions_api.dart
 lib/api/fleet_api.dart
 lib/api/global_api.dart
@@ -271,6 +273,8 @@ lib/model/get_agents200_response.dart
 lib/model/get_construction200_response.dart
 lib/model/get_contract200_response.dart
 lib/model/get_contracts200_response.dart
+lib/model/get_error_codes200_response.dart
+lib/model/get_error_codes200_response_error_codes_inner.dart
 lib/model/get_faction200_response.dart
 lib/model/get_factions200_response.dart
 lib/model/get_jump_gate200_response.dart
@@ -296,6 +300,7 @@ lib/model/get_ship_nav200_response.dart
 lib/model/get_shipyard200_response.dart
 lib/model/get_status200_response.dart
 lib/model/get_status200_response_announcements_inner.dart
+lib/model/get_status200_response_health.dart
 lib/model/get_status200_response_leaderboards.dart
 lib/model/get_status200_response_leaderboards_most_credits_inner.dart
 lib/model/get_status200_response_leaderboards_most_submitted_charts_inner.dart
@@ -306,6 +311,7 @@ lib/model/get_supply_chain200_response.dart
 lib/model/get_supply_chain200_response_data.dart
 lib/model/get_system200_response.dart
 lib/model/get_system_waypoints200_response.dart
+lib/model/get_system_waypoints_traits_parameter.dart
 lib/model/get_systems200_response.dart
 lib/model/get_waypoint200_response.dart
 lib/model/install_mount201_response.dart
@@ -454,7 +460,6 @@ test/create_ship_waypoint_scan201_response_test.dart
 test/create_survey201_response_data_test.dart
 test/create_survey201_response_test.dart
 test/data_api_test.dart
-test/default_api_test.dart
 test/deliver_contract200_response_data_test.dart
 test/deliver_contract200_response_test.dart
 test/deliver_contract_request_test.dart
@@ -476,6 +481,8 @@ test/get_agents200_response_test.dart
 test/get_construction200_response_test.dart
 test/get_contract200_response_test.dart
 test/get_contracts200_response_test.dart
+test/get_error_codes200_response_error_codes_inner_test.dart
+test/get_error_codes200_response_test.dart
 test/get_faction200_response_test.dart
 test/get_factions200_response_test.dart
 test/get_jump_gate200_response_test.dart
@@ -500,6 +507,7 @@ test/get_ship_modules200_response_test.dart
 test/get_ship_nav200_response_test.dart
 test/get_shipyard200_response_test.dart
 test/get_status200_response_announcements_inner_test.dart
+test/get_status200_response_health_test.dart
 test/get_status200_response_leaderboards_most_credits_inner_test.dart
 test/get_status200_response_leaderboards_most_submitted_charts_inner_test.dart
 test/get_status200_response_leaderboards_test.dart
@@ -511,6 +519,7 @@ test/get_supply_chain200_response_data_test.dart
 test/get_supply_chain200_response_test.dart
 test/get_system200_response_test.dart
 test/get_system_waypoints200_response_test.dart
+test/get_system_waypoints_traits_parameter_test.dart
 test/get_systems200_response_test.dart
 test/get_waypoint200_response_test.dart
 test/global_api_test.dart

@@ -315,6 +315,10 @@ class ApiClient {
           return GetContract200Response.fromJson(value);
         case 'GetContracts200Response':
           return GetContracts200Response.fromJson(value);
+        case 'GetErrorCodes200Response':
+          return GetErrorCodes200Response.fromJson(value);
+        case 'GetErrorCodes200ResponseErrorCodesInner':
+          return GetErrorCodes200ResponseErrorCodesInner.fromJson(value);
         case 'GetFaction200Response':
           return GetFaction200Response.fromJson(value);
         case 'GetFactions200Response':
@@ -365,6 +369,8 @@ class ApiClient {
           return GetStatus200Response.fromJson(value);
         case 'GetStatus200ResponseAnnouncementsInner':
           return GetStatus200ResponseAnnouncementsInner.fromJson(value);
+        case 'GetStatus200ResponseHealth':
+          return GetStatus200ResponseHealth.fromJson(value);
         case 'GetStatus200ResponseLeaderboards':
           return GetStatus200ResponseLeaderboards.fromJson(value);
         case 'GetStatus200ResponseLeaderboardsMostCreditsInner':
@@ -387,6 +393,8 @@ class ApiClient {
           return GetSystem200Response.fromJson(value);
         case 'GetSystemWaypoints200Response':
           return GetSystemWaypoints200Response.fromJson(value);
+        case 'GetSystemWaypointsTraitsParameter':
+          return GetSystemWaypointsTraitsParameter.fromJson(value);
         case 'GetSystems200Response':
           return GetSystems200Response.fromJson(value);
         case 'GetWaypoint200Response':

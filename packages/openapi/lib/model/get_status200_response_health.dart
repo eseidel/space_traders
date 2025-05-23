@@ -10,61 +10,50 @@
 
 part of openapi;
 
-class RefuelShipRequest {
-  /// Returns a new [RefuelShipRequest] instance.
-  RefuelShipRequest({
-    this.units,
-    this.fromCargo,
+class GetStatus200ResponseHealth {
+  /// Returns a new [GetStatus200ResponseHealth] instance.
+  GetStatus200ResponseHealth({
+    this.lastMarketUpdate,
   });
 
-  /// The amount of fuel to fill in the ship's tanks. When not specified, the ship will be refueled to its maximum fuel capacity. If the amount specified is greater than the ship's remaining capacity, the ship will only be refueled to its maximum fuel capacity. The amount specified is not in market units but in ship fuel units.
-  ///
-  /// Minimum value: 1
+  /// The date/time when the market was last updated.
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
   /// does not include a default value (using the "default:" property), however, the generated
   /// source code must fall back to having a nullable type.
   /// Consider adding a "default:" property in the specification file to hide this note.
   ///
-  int? units;
-
-  bool? fromCargo;
+  String? lastMarketUpdate;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is RefuelShipRequest &&
-          other.units == units &&
-          other.fromCargo == fromCargo;
+      other is GetStatus200ResponseHealth &&
+          other.lastMarketUpdate == lastMarketUpdate;
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (units == null ? 0 : units!.hashCode) +
-      (fromCargo == null ? 0 : fromCargo!.hashCode);
+      (lastMarketUpdate == null ? 0 : lastMarketUpdate!.hashCode);
 
   @override
-  String toString() => 'RefuelShipRequest[units=$units, fromCargo=$fromCargo]';
+  String toString() =>
+      'GetStatus200ResponseHealth[lastMarketUpdate=$lastMarketUpdate]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    if (this.units != null) {
-      json[r'units'] = this.units;
+    if (this.lastMarketUpdate != null) {
+      json[r'lastMarketUpdate'] = this.lastMarketUpdate;
     } else {
-      json[r'units'] = null;
-    }
-    if (this.fromCargo != null) {
-      json[r'fromCargo'] = this.fromCargo;
-    } else {
-      json[r'fromCargo'] = null;
+      json[r'lastMarketUpdate'] = null;
     }
     return json;
   }
 
-  /// Returns a new [RefuelShipRequest] instance and imports its values from
+  /// Returns a new [GetStatus200ResponseHealth] instance and imports its values from
   /// [value] if it's a [Map], null otherwise.
   // ignore: prefer_constructors_over_static_methods
-  static RefuelShipRequest? fromJson(dynamic value) {
+  static GetStatus200ResponseHealth? fromJson(dynamic value) {
     if (value is Map) {
       final json = value.cast<String, dynamic>();
 
@@ -74,29 +63,28 @@ class RefuelShipRequest {
       assert(() {
         requiredKeys.forEach((key) {
           assert(json.containsKey(key),
-              'Required key "RefuelShipRequest[$key]" is missing from JSON.');
+              'Required key "GetStatus200ResponseHealth[$key]" is missing from JSON.');
           assert(json[key] != null,
-              'Required key "RefuelShipRequest[$key]" has a null value in JSON.');
+              'Required key "GetStatus200ResponseHealth[$key]" has a null value in JSON.');
         });
         return true;
       }());
 
-      return RefuelShipRequest(
-        units: mapValueOfType<int>(json, r'units'),
-        fromCargo: mapValueOfType<bool>(json, r'fromCargo'),
+      return GetStatus200ResponseHealth(
+        lastMarketUpdate: mapValueOfType<String>(json, r'lastMarketUpdate'),
       );
     }
     return null;
   }
 
-  static List<RefuelShipRequest> listFromJson(
+  static List<GetStatus200ResponseHealth> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final result = <RefuelShipRequest>[];
+    final result = <GetStatus200ResponseHealth>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
-        final value = RefuelShipRequest.fromJson(row);
+        final value = GetStatus200ResponseHealth.fromJson(row);
         if (value != null) {
           result.add(value);
         }
@@ -105,12 +93,12 @@ class RefuelShipRequest {
     return result.toList(growable: growable);
   }
 
-  static Map<String, RefuelShipRequest> mapFromJson(dynamic json) {
-    final map = <String, RefuelShipRequest>{};
+  static Map<String, GetStatus200ResponseHealth> mapFromJson(dynamic json) {
+    final map = <String, GetStatus200ResponseHealth>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = RefuelShipRequest.fromJson(entry.value);
+        final value = GetStatus200ResponseHealth.fromJson(entry.value);
         if (value != null) {
           map[entry.key] = value;
         }
@@ -119,17 +107,17 @@ class RefuelShipRequest {
     return map;
   }
 
-  // maps a json object with a list of RefuelShipRequest-objects as value to a dart map
-  static Map<String, List<RefuelShipRequest>> mapListFromJson(
+  // maps a json object with a list of GetStatus200ResponseHealth-objects as value to a dart map
+  static Map<String, List<GetStatus200ResponseHealth>> mapListFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final map = <String, List<RefuelShipRequest>>{};
+    final map = <String, List<GetStatus200ResponseHealth>>{};
     if (json is Map && json.isNotEmpty) {
       // ignore: parameter_assignments
       json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        map[entry.key] = RefuelShipRequest.listFromJson(
+        map[entry.key] = GetStatus200ResponseHealth.listFromJson(
           entry.value,
           growable: growable,
         );
