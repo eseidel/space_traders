@@ -18,6 +18,7 @@ class GetStatus200Response {
     required this.resetDate,
     required this.description,
     required this.stats,
+    required this.health,
     required this.leaderboards,
     required this.serverResets,
     this.announcements = const [],
@@ -37,6 +38,8 @@ class GetStatus200Response {
 
   GetStatus200ResponseStats stats;
 
+  GetStatus200ResponseHealth health;
+
   GetStatus200ResponseLeaderboards leaderboards;
 
   GetStatus200ResponseServerResets serverResets;
@@ -54,6 +57,7 @@ class GetStatus200Response {
           other.resetDate == resetDate &&
           other.description == description &&
           other.stats == stats &&
+          other.health == health &&
           other.leaderboards == leaderboards &&
           other.serverResets == serverResets &&
           _deepEquality.equals(other.announcements, announcements) &&
@@ -67,6 +71,7 @@ class GetStatus200Response {
       (resetDate.hashCode) +
       (description.hashCode) +
       (stats.hashCode) +
+      (health.hashCode) +
       (leaderboards.hashCode) +
       (serverResets.hashCode) +
       (announcements.hashCode) +
@@ -74,7 +79,7 @@ class GetStatus200Response {
 
   @override
   String toString() =>
-      'GetStatus200Response[status=$status, version=$version, resetDate=$resetDate, description=$description, stats=$stats, leaderboards=$leaderboards, serverResets=$serverResets, announcements=$announcements, links=$links]';
+      'GetStatus200Response[status=$status, version=$version, resetDate=$resetDate, description=$description, stats=$stats, health=$health, leaderboards=$leaderboards, serverResets=$serverResets, announcements=$announcements, links=$links]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
@@ -83,6 +88,7 @@ class GetStatus200Response {
     json[r'resetDate'] = this.resetDate;
     json[r'description'] = this.description;
     json[r'stats'] = this.stats;
+    json[r'health'] = this.health;
     json[r'leaderboards'] = this.leaderboards;
     json[r'serverResets'] = this.serverResets;
     json[r'announcements'] = this.announcements;
@@ -116,6 +122,7 @@ class GetStatus200Response {
         resetDate: mapValueOfType<String>(json, r'resetDate')!,
         description: mapValueOfType<String>(json, r'description')!,
         stats: GetStatus200ResponseStats.fromJson(json[r'stats'])!,
+        health: GetStatus200ResponseHealth.fromJson(json[r'health'])!,
         leaderboards:
             GetStatus200ResponseLeaderboards.fromJson(json[r'leaderboards'])!,
         serverResets:
@@ -184,6 +191,7 @@ class GetStatus200Response {
     'resetDate',
     'description',
     'stats',
+    'health',
     'leaderboards',
     'serverResets',
     'announcements',

@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:cli/caches.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/net/auth.dart';
-import 'package:cli/net/exceptions.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
 
@@ -11,13 +10,8 @@ Future<String> _tryRegister(
   AccountsApi api, {
   required String symbol,
   required FactionSymbol faction,
-  String? email,
 }) async {
-  final registerRequest = RegisterRequest(
-    symbol: symbol,
-    faction: faction,
-    email: email,
-  );
+  final registerRequest = RegisterRequest(symbol: symbol, faction: faction);
   final registerResponse = await api.register(registerRequest);
   return registerResponse!.data.token;
 }
@@ -53,34 +47,9 @@ Future<String> register(
         recruitingFactions[Random().nextInt(recruitingFactions.length)];
   }
 
-  try {
-    return await _tryRegister(
-      accountsApi,
-      symbol: agentSymbol,
-      faction: chosenFaction.symbol,
-      email: email,
-    );
-  } on ApiException catch (e) {
-    if (!isReservedHandleException(e)) {
-      logger.err('Exception registering: $e\n');
-      rethrow;
-    }
-  }
-
-  // This was a reserved handle. Ask for the email associated with it.
-  try {
-    final email = logger.prompt(
-      'Call sign has been reserved between resets. Please enter the email '
-      'associated with this call sign to proceed:',
-    );
-    return await _tryRegister(
-      accountsApi,
-      symbol: agentSymbol,
-      faction: chosenFaction.symbol,
-      email: email,
-    );
-  } on ApiException catch (e) {
-    logger.err('Exception registering: $e\n');
-    rethrow;
-  }
+  return await _tryRegister(
+    accountsApi,
+    symbol: agentSymbol,
+    faction: chosenFaction.symbol,
+  );
 }

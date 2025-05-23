@@ -15,7 +15,57 @@ class GlobalApi {
 
   final ApiClient apiClient;
 
-  /// Get the status of the game server.
+  /// Error code list
+  ///
+  /// Return a list of all possible error codes thrown by the game server.
+  ///
+  /// Note: This method returns the HTTP [Response].
+  Future<Response> getErrorCodesWithHttpInfo() async {
+    // ignore: prefer_const_declarations
+    final path = r'/error-codes';
+
+    // ignore: prefer_final_locals
+    Object? postBody;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>[];
+
+    return apiClient.invokeAPI(
+      path,
+      'GET',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Error code list
+  ///
+  /// Return a list of all possible error codes thrown by the game server.
+  Future<GetErrorCodes200Response?> getErrorCodes() async {
+    final response = await getErrorCodesWithHttpInfo();
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty &&
+        response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(
+        await _decodeBodyBytes(response),
+        'GetErrorCodes200Response',
+      ) as GetErrorCodes200Response;
+    }
+    return null;
+  }
+
+  /// Server status
   ///
   /// Return the status of the game server. This also includes a few global elements, such as announcements, server reset dates and leaderboards.
   ///
@@ -44,7 +94,7 @@ class GlobalApi {
     );
   }
 
-  /// Get the status of the game server.
+  /// Server status
   ///
   /// Return the status of the game server. This also includes a few global elements, such as announcements, server reset dates and leaderboards.
   Future<GetStatus200Response?> getStatus() async {

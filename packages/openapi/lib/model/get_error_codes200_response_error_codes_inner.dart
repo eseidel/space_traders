@@ -10,44 +10,44 @@
 
 part of openapi;
 
-class RegisterRequest {
-  /// Returns a new [RegisterRequest] instance.
-  RegisterRequest({
-    required this.symbol,
-    required this.faction,
+class GetErrorCodes200ResponseErrorCodesInner {
+  /// Returns a new [GetErrorCodes200ResponseErrorCodesInner] instance.
+  GetErrorCodes200ResponseErrorCodesInner({
+    required this.code,
+    required this.name,
   });
 
-  /// Your desired agent symbol. This will be a unique name used to represent your agent, and will be the prefix for your ships.
-  String symbol;
+  num code;
 
-  FactionSymbol faction;
+  String name;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is RegisterRequest &&
-          other.symbol == symbol &&
-          other.faction == faction;
+      other is GetErrorCodes200ResponseErrorCodesInner &&
+          other.code == code &&
+          other.name == name;
 
   @override
   int get hashCode =>
       // ignore: unnecessary_parenthesis
-      (symbol.hashCode) + (faction.hashCode);
+      (code.hashCode) + (name.hashCode);
 
   @override
-  String toString() => 'RegisterRequest[symbol=$symbol, faction=$faction]';
+  String toString() =>
+      'GetErrorCodes200ResponseErrorCodesInner[code=$code, name=$name]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    json[r'symbol'] = this.symbol;
-    json[r'faction'] = this.faction;
+    json[r'code'] = this.code;
+    json[r'name'] = this.name;
     return json;
   }
 
-  /// Returns a new [RegisterRequest] instance and imports its values from
+  /// Returns a new [GetErrorCodes200ResponseErrorCodesInner] instance and imports its values from
   /// [value] if it's a [Map], null otherwise.
   // ignore: prefer_constructors_over_static_methods
-  static RegisterRequest? fromJson(dynamic value) {
+  static GetErrorCodes200ResponseErrorCodesInner? fromJson(dynamic value) {
     if (value is Map) {
       final json = value.cast<String, dynamic>();
 
@@ -57,29 +57,29 @@ class RegisterRequest {
       assert(() {
         requiredKeys.forEach((key) {
           assert(json.containsKey(key),
-              'Required key "RegisterRequest[$key]" is missing from JSON.');
+              'Required key "GetErrorCodes200ResponseErrorCodesInner[$key]" is missing from JSON.');
           assert(json[key] != null,
-              'Required key "RegisterRequest[$key]" has a null value in JSON.');
+              'Required key "GetErrorCodes200ResponseErrorCodesInner[$key]" has a null value in JSON.');
         });
         return true;
       }());
 
-      return RegisterRequest(
-        symbol: mapValueOfType<String>(json, r'symbol')!,
-        faction: FactionSymbol.fromJson(json[r'faction'])!,
+      return GetErrorCodes200ResponseErrorCodesInner(
+        code: num.parse('${json[r'code']}'),
+        name: mapValueOfType<String>(json, r'name')!,
       );
     }
     return null;
   }
 
-  static List<RegisterRequest> listFromJson(
+  static List<GetErrorCodes200ResponseErrorCodesInner> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final result = <RegisterRequest>[];
+    final result = <GetErrorCodes200ResponseErrorCodesInner>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
-        final value = RegisterRequest.fromJson(row);
+        final value = GetErrorCodes200ResponseErrorCodesInner.fromJson(row);
         if (value != null) {
           result.add(value);
         }
@@ -88,12 +88,14 @@ class RegisterRequest {
     return result.toList(growable: growable);
   }
 
-  static Map<String, RegisterRequest> mapFromJson(dynamic json) {
-    final map = <String, RegisterRequest>{};
+  static Map<String, GetErrorCodes200ResponseErrorCodesInner> mapFromJson(
+      dynamic json) {
+    final map = <String, GetErrorCodes200ResponseErrorCodesInner>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = RegisterRequest.fromJson(entry.value);
+        final value =
+            GetErrorCodes200ResponseErrorCodesInner.fromJson(entry.value);
         if (value != null) {
           map[entry.key] = value;
         }
@@ -102,17 +104,18 @@ class RegisterRequest {
     return map;
   }
 
-  // maps a json object with a list of RegisterRequest-objects as value to a dart map
-  static Map<String, List<RegisterRequest>> mapListFromJson(
+  // maps a json object with a list of GetErrorCodes200ResponseErrorCodesInner-objects as value to a dart map
+  static Map<String, List<GetErrorCodes200ResponseErrorCodesInner>>
+      mapListFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final map = <String, List<RegisterRequest>>{};
+    final map = <String, List<GetErrorCodes200ResponseErrorCodesInner>>{};
     if (json is Map && json.isNotEmpty) {
       // ignore: parameter_assignments
       json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        map[entry.key] = RegisterRequest.listFromJson(
+        map[entry.key] = GetErrorCodes200ResponseErrorCodesInner.listFromJson(
           entry.value,
           growable: growable,
         );
@@ -123,7 +126,7 @@ class RegisterRequest {
 
   /// The list of required keys that must be present in a JSON.
   static const requiredKeys = <String>{
-    'symbol',
-    'faction',
+    'code',
+    'name',
   };
 }

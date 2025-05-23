@@ -182,6 +182,7 @@ void main() {
         agents: 100,
         ships: 100,
       ),
+      health: GetStatus200ResponseHealth(),
       status: 'OK',
     );
     when(globalApi.getStatus).thenAnswer((_) => Future.value(status));

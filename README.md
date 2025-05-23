@@ -218,7 +218,7 @@ VSCode.  Mostly I just use codecov for viewing coverage.
 * regenerate space_traders_api
 * get a new token from my.spacetraders.io
 * import the token via cli/bin/import_token.
-* cli will fail until waypoints have been poulated by idle.
+* cli will fail until waypoints have been populated by idle.
 
 ### Generating `openapi` package
 ```
@@ -231,6 +231,7 @@ find packages/openapi -name "*.md" -delete
 dart pub -C packages/openapi get
 dart format packages/openapi
 git add packages/openapi
+git apply openapi_patches/01.diff
 ```
 Then modified:
 * Fixed handling of required num fields:

@@ -1917,7 +1917,7 @@ class FleetApi {
     final headerParams = <String, String>{};
     final formParams = <String, String>{};
 
-    const contentTypes = <String>['application/json'];
+    const contentTypes = <String>['application/json', 'text/plain'];
 
     return apiClient.invokeAPI(
       path,

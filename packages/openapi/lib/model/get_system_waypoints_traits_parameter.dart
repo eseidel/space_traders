@@ -10,44 +10,29 @@
 
 part of openapi;
 
-class RegisterRequest {
-  /// Returns a new [RegisterRequest] instance.
-  RegisterRequest({
-    required this.symbol,
-    required this.faction,
-  });
-
-  /// Your desired agent symbol. This will be a unique name used to represent your agent, and will be the prefix for your ships.
-  String symbol;
-
-  FactionSymbol faction;
+class GetSystemWaypointsTraitsParameter {
+  /// Returns a new [GetSystemWaypointsTraitsParameter] instance.
+  GetSystemWaypointsTraitsParameter();
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is RegisterRequest &&
-          other.symbol == symbol &&
-          other.faction == faction;
+      identical(this, other) || other is GetSystemWaypointsTraitsParameter;
 
   @override
-  int get hashCode =>
-      // ignore: unnecessary_parenthesis
-      (symbol.hashCode) + (faction.hashCode);
+  int get hashCode => 1;
 
   @override
-  String toString() => 'RegisterRequest[symbol=$symbol, faction=$faction]';
+  String toString() => 'GetSystemWaypointsTraitsParameter[]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    json[r'symbol'] = this.symbol;
-    json[r'faction'] = this.faction;
     return json;
   }
 
-  /// Returns a new [RegisterRequest] instance and imports its values from
+  /// Returns a new [GetSystemWaypointsTraitsParameter] instance and imports its values from
   /// [value] if it's a [Map], null otherwise.
   // ignore: prefer_constructors_over_static_methods
-  static RegisterRequest? fromJson(dynamic value) {
+  static GetSystemWaypointsTraitsParameter? fromJson(dynamic value) {
     if (value is Map) {
       final json = value.cast<String, dynamic>();
 
@@ -57,29 +42,26 @@ class RegisterRequest {
       assert(() {
         requiredKeys.forEach((key) {
           assert(json.containsKey(key),
-              'Required key "RegisterRequest[$key]" is missing from JSON.');
+              'Required key "GetSystemWaypointsTraitsParameter[$key]" is missing from JSON.');
           assert(json[key] != null,
-              'Required key "RegisterRequest[$key]" has a null value in JSON.');
+              'Required key "GetSystemWaypointsTraitsParameter[$key]" has a null value in JSON.');
         });
         return true;
       }());
 
-      return RegisterRequest(
-        symbol: mapValueOfType<String>(json, r'symbol')!,
-        faction: FactionSymbol.fromJson(json[r'faction'])!,
-      );
+      return GetSystemWaypointsTraitsParameter();
     }
     return null;
   }
 
-  static List<RegisterRequest> listFromJson(
+  static List<GetSystemWaypointsTraitsParameter> listFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final result = <RegisterRequest>[];
+    final result = <GetSystemWaypointsTraitsParameter>[];
     if (json is List && json.isNotEmpty) {
       for (final row in json) {
-        final value = RegisterRequest.fromJson(row);
+        final value = GetSystemWaypointsTraitsParameter.fromJson(row);
         if (value != null) {
           result.add(value);
         }
@@ -88,12 +70,13 @@ class RegisterRequest {
     return result.toList(growable: growable);
   }
 
-  static Map<String, RegisterRequest> mapFromJson(dynamic json) {
-    final map = <String, RegisterRequest>{};
+  static Map<String, GetSystemWaypointsTraitsParameter> mapFromJson(
+      dynamic json) {
+    final map = <String, GetSystemWaypointsTraitsParameter>{};
     if (json is Map && json.isNotEmpty) {
       json = json.cast<String, dynamic>(); // ignore: parameter_assignments
       for (final entry in json.entries) {
-        final value = RegisterRequest.fromJson(entry.value);
+        final value = GetSystemWaypointsTraitsParameter.fromJson(entry.value);
         if (value != null) {
           map[entry.key] = value;
         }
@@ -102,17 +85,17 @@ class RegisterRequest {
     return map;
   }
 
-  // maps a json object with a list of RegisterRequest-objects as value to a dart map
-  static Map<String, List<RegisterRequest>> mapListFromJson(
+  // maps a json object with a list of GetSystemWaypointsTraitsParameter-objects as value to a dart map
+  static Map<String, List<GetSystemWaypointsTraitsParameter>> mapListFromJson(
     dynamic json, {
     bool growable = false,
   }) {
-    final map = <String, List<RegisterRequest>>{};
+    final map = <String, List<GetSystemWaypointsTraitsParameter>>{};
     if (json is Map && json.isNotEmpty) {
       // ignore: parameter_assignments
       json = json.cast<String, dynamic>();
       for (final entry in json.entries) {
-        map[entry.key] = RegisterRequest.listFromJson(
+        map[entry.key] = GetSystemWaypointsTraitsParameter.listFromJson(
           entry.value,
           growable: growable,
         );
@@ -122,8 +105,5 @@ class RegisterRequest {
   }
 
   /// The list of required keys that must be present in a JSON.
-  static const requiredKeys = <String>{
-    'symbol',
-    'faction',
-  };
+  static const requiredKeys = <String>{};
 }

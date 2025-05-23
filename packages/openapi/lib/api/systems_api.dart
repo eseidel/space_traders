@@ -409,14 +409,14 @@ class SystemsApi {
   /// * [WaypointType] type:
   ///   Filter waypoints by type.
   ///
-  /// * [List<WaypointTraitSymbol>] traits:
+  /// * [GetSystemWaypointsTraitsParameter] traits:
   ///   Filter waypoints by one or more traits.
   Future<Response> getSystemWaypointsWithHttpInfo(
     String systemSymbol, {
     int? page,
     int? limit,
     WaypointType? type,
-    List<WaypointTraitSymbol>? traits,
+    GetSystemWaypointsTraitsParameter? traits,
   }) async {
     // ignore: prefer_const_declarations
     final path = r'/systems/{systemSymbol}/waypoints'
@@ -439,7 +439,7 @@ class SystemsApi {
       queryParams.addAll(_queryParams('', 'type', type));
     }
     if (traits != null) {
-      queryParams.addAll(_queryParams('multi', 'traits', traits));
+      queryParams.addAll(_queryParams('', 'traits', traits));
     }
 
     const contentTypes = <String>[];
@@ -472,14 +472,14 @@ class SystemsApi {
   /// * [WaypointType] type:
   ///   Filter waypoints by type.
   ///
-  /// * [List<WaypointTraitSymbol>] traits:
+  /// * [GetSystemWaypointsTraitsParameter] traits:
   ///   Filter waypoints by one or more traits.
   Future<GetSystemWaypoints200Response?> getSystemWaypoints(
     String systemSymbol, {
     int? page,
     int? limit,
     WaypointType? type,
-    List<WaypointTraitSymbol>? traits,
+    GetSystemWaypointsTraitsParameter? traits,
   }) async {
     final response = await getSystemWaypointsWithHttpInfo(
       systemSymbol,
