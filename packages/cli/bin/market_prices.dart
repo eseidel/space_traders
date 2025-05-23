@@ -21,16 +21,15 @@ Future<void> command(Database db, ArgResults argResults) async {
     (m, t) => max(m, t.value.length),
   );
 
-  final sortedSymbols =
-      TradeSymbol.values.toList()..sort((a, b) => a.value.compareTo(b.value));
+  final sortedSymbols = TradeSymbol.values.toList()
+    ..sort((a, b) => a.value.compareTo(b.value));
   for (final tradeSymbol in sortedSymbols) {
     final medianPrice = marketPrices.medianPurchasePrice(tradeSymbol);
     final hasListing = listedSymbols.contains(tradeSymbol);
     final noPriceString = hasListing ? '?' : '';
-    final priceString = (medianPrice == null
-            ? noPriceString
-            : creditsString(medianPrice))
-        .padLeft(13);
+    final priceString =
+        (medianPrice == null ? noPriceString : creditsString(medianPrice))
+            .padLeft(13);
     final name = tradeSymbol.value;
     logger.info('${name.padRight(maxNameLength)} $priceString');
   }

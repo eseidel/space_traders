@@ -43,8 +43,9 @@ Future<NavigateShip200ResponseData> navigateToLocalWaypoint(
   await undockIfNeeded(db, api, ship);
 
   final canCruise = await _canCruiseTo(systems, ship, waypointSymbol);
-  final flightMode =
-      canCruise ? ShipNavFlightMode.CRUISE : ShipNavFlightMode.DRIFT;
+  final flightMode = canCruise
+      ? ShipNavFlightMode.CRUISE
+      : ShipNavFlightMode.DRIFT;
   await setShipFlightModeIfNeeded(db, api, ship, flightMode);
   if (!canCruise) {
     shipErr(ship, 'Insufficient fuel, drifting to $waypointSymbol');
@@ -472,10 +473,9 @@ void _checkFlightTime(
 
 void _checkFuelUsage(Ship ship, NavigateShip200ResponseData result) {
   final route = result.nav.route;
-  final expectedFuel =
-      ship.usesFuel
-          ? fuelUsedByDistance(route.distance, ship.nav.flightMode)
-          : 0;
+  final expectedFuel = ship.usesFuel
+      ? fuelUsedByDistance(route.distance, ship.nav.flightMode)
+      : 0;
   final delta = (result.fuel.consumed!.amount - expectedFuel).abs();
   if (delta > 1) {
     shipWarn(
@@ -842,16 +842,15 @@ Future<void> recordMarketPrices(
   Market market, {
   DateTime Function() getNow = defaultGetNow,
 }) async {
-  final prices =
-      market.tradeGoods
-          .map(
-            (tradeGood) => MarketPrice.fromMarketTradeGood(
-              tradeGood,
-              market.waypointSymbol,
-              getNow(),
-            ),
-          )
-          .toList();
+  final prices = market.tradeGoods
+      .map(
+        (tradeGood) => MarketPrice.fromMarketTradeGood(
+          tradeGood,
+          market.waypointSymbol,
+          getNow(),
+        ),
+      )
+      .toList();
   // package:db doesn't have access to a logger yet.
   if (prices.isEmpty) {
     logger.warn('No prices for ${market.symbol}!');
@@ -876,16 +875,15 @@ void recordShipyardPrices(
   Shipyard shipyard, {
   DateTime Function() getNow = defaultGetNow,
 }) {
-  final prices =
-      shipyard.ships
-          .map(
-            (s) => ShipyardPrice.fromShipyardShip(
-              s,
-              shipyard.waypointSymbol,
-              getNow: getNow,
-            ),
-          )
-          .toList();
+  final prices = shipyard.ships
+      .map(
+        (s) => ShipyardPrice.fromShipyardShip(
+          s,
+          shipyard.waypointSymbol,
+          getNow: getNow,
+        ),
+      )
+      .toList();
   if (prices.isEmpty) {
     logger.warn('No prices for ${shipyard.symbol}!');
   }

@@ -77,10 +77,9 @@ class WaypointCache {
     await _db.waypointTraits.addAll(waypoints.expand((w) => w.traits));
     for (final waypoint in waypoints) {
       // TODO(eseidel): Only getConstruction if no recent cached one?
-      final construction =
-          waypoint.isUnderConstruction
-              ? await getConstruction(api, waypoint.symbol)
-              : null;
+      final construction = waypoint.isUnderConstruction
+          ? await getConstruction(api, waypoint.symbol)
+          : null;
       await _db.construction.updateConstruction(waypoint.symbol, construction);
     }
   }

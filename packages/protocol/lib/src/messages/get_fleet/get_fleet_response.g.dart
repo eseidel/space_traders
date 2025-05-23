@@ -44,10 +44,9 @@ Cargo _$CargoFromJson(Map<String, dynamic> json) =>
         units: $checkedConvert('units', (v) => (v as num).toInt()),
         inventory: $checkedConvert(
           'inventory',
-          (v) =>
-              (v as List<dynamic>)
-                  .map((e) => PricedItem.fromJson(e as Map<String, dynamic>))
-                  .toList(),
+          (v) => (v as List<dynamic>)
+              .map((e) => PricedItem.fromJson(e as Map<String, dynamic>))
+              .toList(),
         ),
       );
       return val;
@@ -115,10 +114,9 @@ GetFleetResponse _$GetFleetResponseFromJson(Map<String, dynamic> json) =>
       final val = GetFleetResponse(
         ships: $checkedConvert(
           'ships',
-          (v) =>
-              (v as List<dynamic>)
-                  .map((e) => FleetShip.fromJson(e as Map<String, dynamic>))
-                  .toList(),
+          (v) => (v as List<dynamic>)
+              .map((e) => FleetShip.fromJson(e as Map<String, dynamic>))
+              .toList(),
         ),
       );
       return val;

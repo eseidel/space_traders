@@ -300,8 +300,9 @@ class MountJob {
 
   /// Create a new mount job from JSON.
   factory MountJob.fromJson(Map<String, dynamic> json) {
-    final mountSymbol =
-        ShipMountSymbolEnum.fromJson(json['mountSymbol'] as String)!;
+    final mountSymbol = ShipMountSymbolEnum.fromJson(
+      json['mountSymbol'] as String,
+    )!;
     final shipyardSymbol = WaypointSymbol.fromJson(
       json['shipyardSymbol'] as String,
     );

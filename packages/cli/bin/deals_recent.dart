@@ -14,23 +14,21 @@ class SyntheticDeal {
   const SyntheticDeal(this.transactions);
   final List<Transaction> transactions;
 
-  List<Transaction> get goodsBuys =>
-      transactions
-          .where(
-            (t) =>
-                t.tradeType == MarketTransactionTypeEnum.PURCHASE &&
-                t.accounting == AccountingType.goods,
-          )
-          .toList();
+  List<Transaction> get goodsBuys => transactions
+      .where(
+        (t) =>
+            t.tradeType == MarketTransactionTypeEnum.PURCHASE &&
+            t.accounting == AccountingType.goods,
+      )
+      .toList();
 
-  List<Transaction> get goodsSells =>
-      transactions
-          .where(
-            (t) =>
-                t.tradeType == MarketTransactionTypeEnum.SELL &&
-                t.accounting == AccountingType.goods,
-          )
-          .toList();
+  List<Transaction> get goodsSells => transactions
+      .where(
+        (t) =>
+            t.tradeType == MarketTransactionTypeEnum.SELL &&
+            t.accounting == AccountingType.goods,
+      )
+      .toList();
 
   bool get isCompleted {
     final buys = goodsBuys;

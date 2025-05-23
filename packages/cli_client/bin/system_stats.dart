@@ -22,8 +22,9 @@ ${s.reachableJumpGates} jump gates (${p(s.reachableJumpGatePercent)} of ${s.tota
 
 Future<void> command(BackendClient client, ArgResults argResults) async {
   final systemArg = argResults.rest.firstOrNull;
-  final startSystem =
-      systemArg != null ? SystemSymbol.fromString(systemArg) : null;
+  final startSystem = systemArg != null
+      ? SystemSymbol.fromString(systemArg)
+      : null;
 
   final stats = await client.getSystemStats(startSystem: startSystem);
   logger.info(statsToString(stats));

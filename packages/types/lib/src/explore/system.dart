@@ -267,10 +267,9 @@ class System extends Equatable {
     // Work around a bug in OpenApi's generated toJson method where it doesn't
     // recursively call toJson.
     json['type'] = (json['type'] as SystemType).toJson();
-    json['waypoints'] =
-        (json['waypoints'] as List<openapi.SystemWaypoint>)
-            .map(SystemWaypoint.openApiToJson)
-            .toList();
+    json['waypoints'] = (json['waypoints'] as List<openapi.SystemWaypoint>)
+        .map(SystemWaypoint.openApiToJson)
+        .toList();
     return json;
   }
 
@@ -436,8 +435,9 @@ class Waypoint {
     }
 
     final json = waypoint.toJson();
-    json['traits'] =
-        (json['traits'] as List<WaypointTrait>).map(traitToJson).toList();
+    json['traits'] = (json['traits'] as List<WaypointTrait>)
+        .map(traitToJson)
+        .toList();
     json['type'] = (json['type'] as WaypointType).toJson();
     return json;
   }

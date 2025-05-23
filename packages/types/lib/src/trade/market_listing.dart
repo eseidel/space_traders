@@ -24,21 +24,18 @@ class MarketListing {
   /// Creates a new market description from JSON data.
   factory MarketListing.fromJson(Map<String, dynamic> json) {
     final symbol = WaypointSymbol.fromJson(json['waypointSymbol'] as String);
-    final exports =
-        (json['exports'] as List<dynamic>)
-            .cast<String>()
-            .map((e) => TradeSymbol.fromJson(e)!)
-            .toList();
-    final imports =
-        (json['imports'] as List<dynamic>)
-            .cast<String>()
-            .map((e) => TradeSymbol.fromJson(e)!)
-            .toList();
-    final exchange =
-        (json['exchange'] as List<dynamic>)
-            .cast<String>()
-            .map((e) => TradeSymbol.fromJson(e)!)
-            .toList();
+    final exports = (json['exports'] as List<dynamic>)
+        .cast<String>()
+        .map((e) => TradeSymbol.fromJson(e)!)
+        .toList();
+    final imports = (json['imports'] as List<dynamic>)
+        .cast<String>()
+        .map((e) => TradeSymbol.fromJson(e)!)
+        .toList();
+    final exchange = (json['exchange'] as List<dynamic>)
+        .cast<String>()
+        .map((e) => TradeSymbol.fromJson(e)!)
+        .toList();
     return MarketListing(
       waypointSymbol: symbol,
       exports: exports.toSet(),

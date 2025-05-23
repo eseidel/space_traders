@@ -73,8 +73,9 @@ Stream<Contract> allMyContracts(Api api) {
       limit: pageLimit,
     );
     final now = DateTime.timestamp();
-    final contracts =
-        response!.data.map((c) => Contract.fromOpenApi(c, now)).toList();
+    final contracts = response!.data
+        .map((c) => Contract.fromOpenApi(c, now))
+        .toList();
     return (contracts, response.meta);
   });
 }

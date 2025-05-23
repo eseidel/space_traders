@@ -32,8 +32,9 @@ Future<void> command(Database db, ArgResults argResults) async {
       end: waypoint.symbol,
     );
     final duration = routePlan?.duration;
-    final durationString =
-        duration != null ? approximateDuration(duration) : 'unreachable';
+    final durationString = duration != null
+        ? approximateDuration(duration)
+        : 'unreachable';
     final actions = routePlan?.actions.length ?? 0;
     final distance = shipyard.distanceTo(waypoint);
     table.add([waypoint.symbol, distance, durationString, actions]);

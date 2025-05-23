@@ -10,12 +10,9 @@ class TransactionSummary {
   bool get isEmpty => transactions.isEmpty;
 
   int get creditDiff => transactions.fold(0, (m, t) => m + t.creditsChange);
-  Duration get duration =>
-      transactions.isEmpty
-          ? Duration.zero
-          : transactions.last.timestamp.difference(
-            transactions.first.timestamp,
-          );
+  Duration get duration => transactions.isEmpty
+      ? Duration.zero
+      : transactions.last.timestamp.difference(transactions.first.timestamp);
 
   double get perSecond {
     if (duration.inSeconds == 0) {
@@ -45,8 +42,9 @@ Future<void> command(Database db, ArgResults argResults) async {
   // For a given ship, show the credits per minute averaged over the
   // last hour.
   final lookbackMinutesString = argResults.rest.firstOrNull;
-  final lookbackMinutes =
-      lookbackMinutesString != null ? int.parse(lookbackMinutesString) : 180;
+  final lookbackMinutes = lookbackMinutesString != null
+      ? int.parse(lookbackMinutesString)
+      : 180;
   final lookback = Duration(minutes: lookbackMinutes);
 
   final shipSymbols =
@@ -120,8 +118,8 @@ Future<void> command(Database db, ArgResults argResults) async {
   logger
     ..info(table.toString())
     ..info('By role:');
-  final sortedRoles =
-      roleCounts.keys.toList()..sort((a, b) => a.name.compareTo(b.name));
+  final sortedRoles = roleCounts.keys.toList()
+    ..sort((a, b) => a.name.compareTo(b.name));
   for (final role in sortedRoles) {
     final count = roleCounts[role]!;
     final total = roleCreditPerSecondTotals[role]!;
@@ -133,8 +131,8 @@ Future<void> command(Database db, ArgResults argResults) async {
     );
   }
   logger.info('By frame:');
-  final sortedFrames =
-      frameCounts.keys.toList()..sort((a, b) => a.value.compareTo(b.value));
+  final sortedFrames = frameCounts.keys.toList()
+    ..sort((a, b) => a.value.compareTo(b.value));
   for (final frame in sortedFrames) {
     final count = frameCounts[frame]!;
     final total = frameCreditPerSecondTotals[frame]!;

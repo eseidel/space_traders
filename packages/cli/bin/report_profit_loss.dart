@@ -19,29 +19,30 @@ void printIncomeStatement(IncomeStatement report) {
     'content': chalk.underline(text),
   };
 
-  final table = Table(
-    header: ['Description', 'Amount'],
-    style: const TableStyle(compact: true),
-  )..addAll([
-    [subhead('Revenue')],
-    ['  Sales', c(report.goodsRevenue)],
-    ['  Contracts', c(report.contractsRevenue)],
-    ['  Asset Sales', c(report.assetSale)],
-    ['  Charting', c(report.chartingRevenue)],
-    ['Total Revenues', c(report.revenue)],
-    [subhead('Cost of Goods Sold')],
-    ['  Goods', c(report.goodsPurchase)],
-    ['  Fuel', c(report.fuelPurchase)],
-    ['Total Cost of Goods Sold', c(report.costOfGoodsSold)],
-    ['COGS Ratio', percent(report.cogsRatio)],
-    ['Gross Profit', c(report.grossProfit)],
-    [subhead('Expenses')],
-    ['  Construction', c(report.constructionMaterials)],
-    ['Total Expenses', c(report.expenses)],
-    ['Net Income', c(report.netIncome)],
-    ['Net Income per second', c(report.netIncomePerSecond)],
-    ['Capital Expenditures', c(report.capEx)],
-  ]);
+  final table =
+      Table(
+        header: ['Description', 'Amount'],
+        style: const TableStyle(compact: true),
+      )..addAll([
+        [subhead('Revenue')],
+        ['  Sales', c(report.goodsRevenue)],
+        ['  Contracts', c(report.contractsRevenue)],
+        ['  Asset Sales', c(report.assetSale)],
+        ['  Charting', c(report.chartingRevenue)],
+        ['Total Revenues', c(report.revenue)],
+        [subhead('Cost of Goods Sold')],
+        ['  Goods', c(report.goodsPurchase)],
+        ['  Fuel', c(report.fuelPurchase)],
+        ['Total Cost of Goods Sold', c(report.costOfGoodsSold)],
+        ['COGS Ratio', percent(report.cogsRatio)],
+        ['Gross Profit', c(report.grossProfit)],
+        [subhead('Expenses')],
+        ['  Construction', c(report.constructionMaterials)],
+        ['Total Expenses', c(report.expenses)],
+        ['Net Income', c(report.netIncome)],
+        ['Net Income per second', c(report.netIncomePerSecond)],
+        ['Capital Expenditures', c(report.capEx)],
+      ]);
 
   logger
     ..info('Transactions: ${report.numberOfTransactions}')

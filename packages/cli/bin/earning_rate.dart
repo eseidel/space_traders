@@ -23,10 +23,9 @@ Future<void> command(Database db, ArgResults argResults) async {
   const creditsWidth = 15;
 
   // print credit data on the hour.
-  var nextPrintDate =
-      firstTransactionHour.isBefore(oneDayAgoAsHour)
-          ? oneDayAgoAsHour
-          : firstTransactionHour;
+  var nextPrintDate = firstTransactionHour.isBefore(oneDayAgoAsHour)
+      ? oneDayAgoAsHour
+      : firstTransactionHour;
   var latestCredits = 0;
   var lastPeriodCredits = 0;
   for (final transaction in transactions) {
@@ -34,10 +33,9 @@ Future<void> command(Database db, ArgResults argResults) async {
     if (transaction.timestamp.isAfter(nextPrintDate)) {
       final diff = latestCredits - lastPeriodCredits;
       final diffString = creditsChangeString(diff);
-      final agoString =
-          hoursAgo(nextPrintDate) == 0
-              ? 'now'
-              : '-${hoursAgo(nextPrintDate)}h'.padRight(timeWidth);
+      final agoString = hoursAgo(nextPrintDate) == 0
+          ? 'now'
+          : '-${hoursAgo(nextPrintDate)}h'.padRight(timeWidth);
       final credits = creditsString(latestCredits).padRight(creditsWidth);
       logger.info('$agoString $credits $diffString');
       lastPeriodCredits = latestCredits;

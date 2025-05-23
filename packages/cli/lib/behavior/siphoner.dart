@@ -194,10 +194,9 @@ Future<JobResult> emptyCargoIfNeededForSiphoning(
 }
 
 /// Advance the siphoner.
-final advanceSiphoner =
-    const MultiJob('Siphoner', [
-      _initSiphonJob,
-      emptyCargoIfNeededForSiphoning,
-      doSiphonJob,
-      transferOrSellCargo,
-    ]).run;
+final advanceSiphoner = const MultiJob('Siphoner', [
+  _initSiphonJob,
+  emptyCargoIfNeededForSiphoning,
+  doSiphonJob,
+  transferOrSellCargo,
+]).run;

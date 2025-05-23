@@ -26,8 +26,9 @@ Agent agentFromColumnMap(Map<String, dynamic> values) {
     symbol: values['symbol'] as String,
     headquarters: WaypointSymbol.fromJson(values['headquarters'] as String),
     credits: values['credits'] as int,
-    startingFaction:
-        FactionSymbol.fromJson(values['starting_faction'] as String)!,
+    startingFaction: FactionSymbol.fromJson(
+      values['starting_faction'] as String,
+    )!,
     shipCount: values['ship_count'] as int,
     accountId: values['account_id'] as String,
   );

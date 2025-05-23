@@ -257,17 +257,16 @@ void main() {
       RoutePlan.empty(symbol: waypointSymbol, fuelCapacity: 100, shipSpeed: 30),
     );
 
-    final state =
-        BehaviorState(shipSymbol, Behavior.mountFromBuy)
-          ..buyJob = BuyJob(
-            tradeSymbol: toMount,
-            units: 1,
-            buyLocation: waypointSymbol,
-          )
-          ..mountJob = MountJob(
-            mountSymbol: mountSymbolForTradeSymbol(toMount)!,
-            shipyardSymbol: waypointSymbol,
-          );
+    final state = BehaviorState(shipSymbol, Behavior.mountFromBuy)
+      ..buyJob = BuyJob(
+        tradeSymbol: toMount,
+        units: 1,
+        buyLocation: waypointSymbol,
+      )
+      ..mountJob = MountJob(
+        mountSymbol: mountSymbolForTradeSymbol(toMount)!,
+        shipyardSymbol: waypointSymbol,
+      );
     when(() => db.upsertShip(ship)).thenAnswer((_) async {});
 
     final marketPriceStore = _MockMarketPriceStore();

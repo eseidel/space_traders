@@ -48,9 +48,8 @@ List<ShipyardTrip> _shipyardsSellingByDistance(
     }
   }
 
-  final sorted =
-      costed.toList()
-        ..sort((a, b) => a.route.duration.compareTo(b.route.duration));
+  final sorted = costed.toList()
+    ..sort((a, b) => a.route.duration.compareTo(b.route.duration));
   return sorted;
 }
 

@@ -40,11 +40,12 @@ Future<void> command(Database db, ArgResults argResults) async {
 
   // Include all ships now that scrapping is a thing.
   final purchasedShips = ships.ships;
-  final purchaseShipTypes =
-      purchasedShips.map((s) => shipyardShips.guessShipType(s)!).toList();
+  final purchaseShipTypes = purchasedShips
+      .map((s) => shipyardShips.guessShipType(s)!)
+      .toList();
   final purchaseShipTypeCounts = _shipTypeCounts(shipyardShips, purchasedShips);
-  final shipTypes =
-      purchaseShipTypeCounts.keys.toList()..sortBy((t) => t.value);
+  final shipTypes = purchaseShipTypeCounts.keys.toList()
+    ..sortBy((t) => t.value);
   for (final type in shipTypes) {
     final price = shipyardPrices.medianPurchasePrice(type);
     final priceString = price == null ? '???' : creditsString(price);
@@ -52,19 +53,17 @@ Future<void> command(Database db, ArgResults argResults) async {
   }
 
   // Purchase price != scrapping price, so this is wrong.
-  final totalShipCost =
-      purchaseShipTypes
-          .map((t) => shipyardPrices.medianPurchasePrice(t) ?? 0)
-          .sum;
+  final totalShipCost = purchaseShipTypes
+      .map((t) => shipyardPrices.medianPurchasePrice(t) ?? 0)
+      .sum;
   logger.info('Ships: ${creditsString(totalShipCost)}');
 
   // Mount costs
-  final totalMountCost =
-      purchasedShips.map((ship) {
-        if (!ship.isMiner) return 0;
-        final mounts = ship.mountedMountSymbols;
-        return _costOutMounts(marketPrices, mounts);
-      }).sum;
+  final totalMountCost = purchasedShips.map((ship) {
+    if (!ship.isMiner) return 0;
+    final mounts = ship.mountedMountSymbols;
+    return _costOutMounts(marketPrices, mounts);
+  }).sum;
   logger.info('Mounts: ${creditsString(totalMountCost)}');
 
   final totalCost = totalShipCost + totalMountCost;

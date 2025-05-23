@@ -11,10 +11,9 @@ class GetSystemStatsRequest extends GetRequest {
   ) {
     final maybeStartSystem = queryParameters['start_system'];
     return GetSystemStatsRequest(
-      startSystem:
-          maybeStartSystem != null
-              ? SystemSymbol.fromJson(maybeStartSystem)
-              : null,
+      startSystem: maybeStartSystem != null
+          ? SystemSymbol.fromJson(maybeStartSystem)
+          : null,
     );
   }
 

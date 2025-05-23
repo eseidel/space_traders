@@ -32,10 +32,9 @@ extension CostedDealPrediction on CostedDeal {
   /// without causing us to over-spend, so we instead inflate the number
   /// we're expected to buy (by not reducing to maxUnits) to allow those last
   /// few units to look profitable during planning and not let contracts stall.
-  int get maxUnitsToBuy =>
-      deal.maxUnits != null
-          ? min(deal.maxUnits!, expectedUnits)
-          : expectedUnits;
+  int get maxUnitsToBuy => deal.maxUnits != null
+      ? min(deal.maxUnits!, expectedUnits)
+      : expectedUnits;
 
   /// The expected cost of goods sold, not including fuel.
   int get expectedCostOfGoodsSold =>

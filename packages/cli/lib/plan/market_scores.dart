@@ -67,9 +67,8 @@ Map<SystemSymbol, int> scoreMarketSystems(
     marketSystemScores[system] = (marketSystemScores[system] ?? 0) + score;
   }
 
-  final sortedScores =
-      marketSystemScores.entries.toList()
-        ..sort((a, b) => b.value.compareTo(a.value));
+  final sortedScores = marketSystemScores.entries.toList()
+    ..sort((a, b) => b.value.compareTo(a.value));
   return Map.fromEntries(sortedScores.take(limit));
 }
 
@@ -167,8 +166,9 @@ class _MarketSearch {
     Set<SystemSymbol>? avoidSystems,
   }) {
     final marketSystemScores = scoreMarketSystems(marketPrices);
-    final marketSystems =
-        marketSystemScores.keys.map(systems.systemRecordBySymbol).toList();
+    final marketSystems = marketSystemScores.keys
+        .map(systems.systemRecordBySymbol)
+        .toList();
     return _MarketSearch(
       marketSystems: marketSystems,
       marketSystemScores: marketSystemScores,
@@ -181,10 +181,9 @@ class _MarketSearch {
   final Set<SystemSymbol> claimedSystemSymbols;
 
   SystemRecord? closestAvailableSystem(SystemRecord startSystem) {
-    final availableSystems =
-        marketSystems
-            .where((system) => !claimedSystemSymbols.contains(system.symbol))
-            .toList();
+    final availableSystems = marketSystems
+        .where((system) => !claimedSystemSymbols.contains(system.symbol))
+        .toList();
     return _closestSystem(startSystem, availableSystems);
   }
 

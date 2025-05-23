@@ -71,10 +71,9 @@ class _Clusters {
       throw ArgumentError('System $systemSymbol has no cluster');
     }
     if (!_systemCountByClusterId.containsKey(systemClusterId)) {
-      _systemCountByClusterId[systemClusterId] =
-          _clusterBySystemSymbol.values
-              .where((v) => v == systemClusterId)
-              .length;
+      _systemCountByClusterId[systemClusterId] = _clusterBySystemSymbol.values
+          .where((v) => v == systemClusterId)
+          .length;
     }
     return _systemCountByClusterId[systemClusterId]!;
   }

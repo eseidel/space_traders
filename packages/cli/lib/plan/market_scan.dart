@@ -12,10 +12,9 @@ class _MarketScanBuilder {
 
   void _addBuyOpp(BuyOpp buy) {
     // Sort buys ascending so we remove the most expensive buy price.
-    final buys =
-        (buyOpps[buy.tradeSymbol] ?? [])
-          ..add(buy)
-          ..sort((a, b) => a.price.compareTo(b.price));
+    final buys = (buyOpps[buy.tradeSymbol] ?? [])
+      ..add(buy)
+      ..sort((a, b) => a.price.compareTo(b.price));
     if (buys.length > topLimit) {
       buys.removeLast();
     }
@@ -24,10 +23,9 @@ class _MarketScanBuilder {
 
   void _addSellOpp(SellOpp sell) {
     // Sort sells descending so we remove the cheapest sell price.
-    final sells =
-        (sellOpps[sell.tradeSymbol] ?? [])
-          ..add(sell)
-          ..sort((a, b) => -a.price.compareTo(b.price));
+    final sells = (sellOpps[sell.tradeSymbol] ?? [])
+      ..add(sell)
+      ..sort((a, b) => -a.price.compareTo(b.price));
     if (sells.length > topLimit) {
       sells.removeLast();
     }

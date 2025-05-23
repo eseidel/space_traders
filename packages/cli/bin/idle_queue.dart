@@ -64,12 +64,11 @@ void main(List<String> args) async {
   await runOffline(
     args,
     command,
-    addArgs:
-        (parser) => parser.addFlag(
-          'all',
-          abbr: 'a',
-          help: 'Seed queue with all starter systems.',
-        ),
+    addArgs: (parser) => parser.addFlag(
+      'all',
+      abbr: 'a',
+      help: 'Seed queue with all starter systems.',
+    ),
     loadConfig: false,
   );
 }

@@ -149,10 +149,9 @@ class CostedDeal {
     cargoSize: json['cargoSize'] as int? ?? json['tradeVolume'] as int,
     startTime: DateTime.parse(json['startTime'] as String),
     route: RoutePlan.fromJson(json['route'] as Map<String, dynamic>),
-    transactions:
-        (json['transactions'] as List<dynamic>)
-            .map((e) => Transaction.fromJson(e as Map<String, dynamic>))
-            .toList(),
+    transactions: (json['transactions'] as List<dynamic>)
+        .map((e) => Transaction.fromJson(e as Map<String, dynamic>))
+        .toList(),
     costPerFuelUnit: json['costPerFuelUnit'] as int,
     costPerAntimatterUnit: json['costPerAntimatterUnit'] as int,
   );

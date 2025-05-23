@@ -38,10 +38,9 @@ SystemRecord systemRecordFromColumnMap(Map<String, dynamic> columnMap) {
     symbol: SystemSymbol.fromString(columnMap['symbol'] as String),
     type: SystemType.fromJson(columnMap['type'] as String)!,
     position: SystemPosition(columnMap['x'] as int, columnMap['y'] as int),
-    waypointSymbols:
-        (columnMap['waypoint_symbols'] as List)
-            .cast<String>()
-            .map(WaypointSymbol.fromString)
-            .toList(),
+    waypointSymbols: (columnMap['waypoint_symbols'] as List)
+        .cast<String>()
+        .map(WaypointSymbol.fromString)
+        .toList(),
   );
 }

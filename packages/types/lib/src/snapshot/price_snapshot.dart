@@ -27,13 +27,14 @@ class PriceSnapshot<Symbol extends Object, Record extends PriceBase<Symbol>> {
     WaypointSymbol waypointSymbol, {
     DateTime Function() getNow = defaultGetNow,
   }) {
-    final atWaypoint =
-        prices.where((e) => e.waypointSymbol == waypointSymbol).toList();
+    final atWaypoint = prices
+        .where((e) => e.waypointSymbol == waypointSymbol)
+        .toList();
     if (atWaypoint.isEmpty) {
       return null;
     }
-    final sortedPrices =
-        atWaypoint.toList()..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    final sortedPrices = atWaypoint.toList()
+      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
     return getNow().difference(sortedPrices.last.timestamp);
   }
 

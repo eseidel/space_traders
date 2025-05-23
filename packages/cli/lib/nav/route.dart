@@ -24,12 +24,11 @@ int approximateRoundTripDistanceWithinSystem(
   Set<WaypointSymbol> symbols,
 ) {
   final start = systems.waypoint(startSymbol);
-  final waypoints =
-      symbols
-          // ignore start symbol in the symbols list. Could also throw.
-          .where((s) => s != startSymbol)
-          .map((s) => systems.waypoint(s))
-          .toList();
+  final waypoints = symbols
+      // ignore start symbol in the symbols list. Could also throw.
+      .where((s) => s != startSymbol)
+      .map((s) => systems.waypoint(s))
+      .toList();
   if (waypoints.any((w) => w.system != start.system)) {
     throw ArgumentError('All waypoints must be in the same system.');
   }
@@ -83,10 +82,9 @@ Map<ShipNavFlightMode, int> _warpSpeedMultiplier = {
 };
 
 double _speedMultiplier(ShipNavFlightMode flightMode, TravelMethod travelType) {
-  final map =
-      travelType == TravelMethod.navigate
-          ? _navSpeedMultiplier
-          : _warpSpeedMultiplier;
+  final map = travelType == TravelMethod.navigate
+      ? _navSpeedMultiplier
+      : _warpSpeedMultiplier;
   final multiplier = map[flightMode];
   if (multiplier == null) {
     throw UnimplementedError('Unimplemented $flightMode for $travelType');
@@ -582,11 +580,11 @@ RoutePlan? planRouteThrough(
 
 /// Returns a string describing the route plan.
 String describeRoutePlan(RoutePlan plan) {
-  final buffer =
-      StringBuffer()..writeln(
-        '${plan.startSymbol} to ${plan.endSymbol} '
-        'speed: ${plan.shipSpeed} max-fuel: ${plan.fuelCapacity}',
-      );
+  final buffer = StringBuffer()
+    ..writeln(
+      '${plan.startSymbol} to ${plan.endSymbol} '
+      'speed: ${plan.shipSpeed} max-fuel: ${plan.fuelCapacity}',
+    );
   for (final action in plan.actions) {
     buffer.writeln(
       '${action.type.name.padRight(14)}  ${action.startSymbol}  '

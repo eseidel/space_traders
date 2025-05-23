@@ -30,8 +30,9 @@ void reconcile(Iterable<Transaction> transactions) {
 
 Future<void> command(Database db, ArgResults argResults) async {
   final lookbackMinutesString = argResults.rest.firstOrNull;
-  final lookbackMinutes =
-      lookbackMinutesString != null ? int.parse(lookbackMinutesString) : 180;
+  final lookbackMinutes = lookbackMinutesString != null
+      ? int.parse(lookbackMinutesString)
+      : 180;
   final lookback = Duration(minutes: lookbackMinutes);
 
   // final startTime = DateTime.timestamp().subtract(lookback);

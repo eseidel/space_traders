@@ -11,11 +11,10 @@ Future<void> command(Database db, ArgResults argResults) async {
   final api = await defaultApi(db, getPriority: () => networkPriorityLow);
 
   final systemsCache = await db.systems.snapshotAllSystems();
-  final jumpGateSymbol =
-      systemsCache
-          .waypointsInSystem(startSystemSymbol)
-          .firstWhere((w) => w.isJumpGate)
-          .symbol;
+  final jumpGateSymbol = systemsCache
+      .waypointsInSystem(startSystemSymbol)
+      .firstWhere((w) => w.isJumpGate)
+      .symbol;
 
   final jumpGate = await getOrFetchJumpGate(db, api, jumpGateSymbol);
 

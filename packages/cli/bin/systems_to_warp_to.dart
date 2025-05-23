@@ -22,8 +22,9 @@ Future<void> command(Database db, ArgResults argResults) async {
   final waypointCache = WaypointCache(api, db);
   final shipyardShips = db.shipyardShips;
 
-  final reachableSystemSymbols =
-      systemConnectivity.systemsReachableFrom(startSystemSymbol).toSet();
+  final reachableSystemSymbols = systemConnectivity
+      .systemsReachableFrom(startSystemSymbol)
+      .toSet();
   final startSystem = systemsCache.systemRecordBySymbol(startSystemSymbol);
 
   // List out systems by warp distance from HQ.

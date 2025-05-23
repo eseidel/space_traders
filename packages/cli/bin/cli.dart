@@ -24,15 +24,14 @@ void printRequestStats(RequestCounts requestCounts, Duration duration) {
         (generalizedCounts[generalizedKey] ?? 0) + counts[key]!;
   }
   // print the counts in order of most to least.
-  final sortedCounts =
-      generalizedCounts.entries.toList()
-        ..sort((a, b) => b.value.compareTo(a.value));
+  final sortedCounts = generalizedCounts.entries.toList()
+    ..sort((a, b) => b.value.compareTo(a.value));
   logger.info('Request stats:');
   for (final entry in sortedCounts) {
     logger.info('${entry.value} ${entry.key}');
   }
-  final possible =
-      (duration.inSeconds * networkConfig.targetRequestsPerSecond).round();
+  final possible = (duration.inSeconds * networkConfig.targetRequestsPerSecond)
+      .round();
   final percent = requestCounts.total / possible;
   final percentString = '${(percent * 100).round()}%';
   final avg = requestCounts.total / duration.inSeconds;
@@ -66,13 +65,12 @@ void printStatus(GetStatus200Response s) {
   final sinceLastReset = approximateDuration(now.difference(resetDate));
   final nextResetDate = DateTime.tryParse(s.serverResets.next)!;
   final untilNextReset = approximateDuration(nextResetDate.difference(now));
-  final statsParts =
-      [
-        '${s.stats.agents} agents',
-        '${s.stats.ships} ships',
-        '${s.stats.systems} systems',
-        '${s.stats.waypoints} waypoints',
-      ].map((e) => e.padLeft(20)).toList();
+  final statsParts = [
+    '${s.stats.agents} agents',
+    '${s.stats.ships} ships',
+    '${s.stats.systems} systems',
+    '${s.stats.waypoints} waypoints',
+  ].map((e) => e.padLeft(20)).toList();
 
   logger
     ..info('Stats: ${statsParts.join(' ')}')
@@ -106,20 +104,14 @@ bool Function(Ship ship)? _shipFilterFromArgs(Agent agent, List<String> only) {
 }
 
 Future<void> cliMain(List<String> args) async {
-  final parser =
-      ArgParser()
-        ..addFlag(
-          'verbose',
-          abbr: 'v',
-          negatable: false,
-          help: 'Verbose logging.',
-        )
-        ..addFlag('selloff', negatable: false, help: 'Sell off ships.')
-        ..addMultiOption(
-          'only',
-          abbr: 'o',
-          help: 'Only run the given ship numbers (hex).',
-        );
+  final parser = ArgParser()
+    ..addFlag('verbose', abbr: 'v', negatable: false, help: 'Verbose logging.')
+    ..addFlag('selloff', negatable: false, help: 'Sell off ships.')
+    ..addMultiOption(
+      'only',
+      abbr: 'o',
+      help: 'Only run the given ship numbers (hex).',
+    );
   final results = parser.parse(args);
 
   logger.level = results['verbose'] as bool ? Level.verbose : Level.info;

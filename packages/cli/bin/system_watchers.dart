@@ -86,11 +86,10 @@ Future<void> command(Database db, ArgResults argResults) async {
   final unreachableSystems = <SystemSymbol>{};
 
   for (final systemSymbol in systemsToWatch) {
-    final shipsAssigned =
-        systemWatcherStates
-            .where((s) => s.systemWatcherJob?.systemSymbol == systemSymbol)
-            .map((s) => s.shipSymbol)
-            .toList();
+    final shipsAssigned = systemWatcherStates
+        .where((s) => s.systemWatcherJob?.systemSymbol == systemSymbol)
+        .map((s) => s.shipSymbol)
+        .toList();
     if (shipsAssigned.isEmpty &&
         !systemConnectivity.existsJumpPathBetween(
           systemSymbol,

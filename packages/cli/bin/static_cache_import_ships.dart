@@ -31,14 +31,13 @@ Future<void> command(Database db, ArgResults argResults) async {
     if (shipyardShip == null) {
       continue;
     }
-    final copy =
-        shipyardShips.copyAndNormalize(shipyardShip)
-          ..engine = engines.copyAndNormalize(ship.engine)
-          // We don't have a ship frame cache it seems?
-          ..frame = ship.frame
-          ..modules = ship.modules.map(modules.copyAndNormalize).toList()
-          // Mounts on the shipyardShip might be stale, use ones from cache.
-          ..mounts = mounts.records.map((m) => mounts[m.symbol]!).toList();
+    final copy = shipyardShips.copyAndNormalize(shipyardShip)
+      ..engine = engines.copyAndNormalize(ship.engine)
+      // We don't have a ship frame cache it seems?
+      ..frame = ship.frame
+      ..modules = ship.modules.map(modules.copyAndNormalize).toList()
+      // Mounts on the shipyardShip might be stale, use ones from cache.
+      ..mounts = mounts.records.map((m) => mounts[m.symbol]!).toList();
     recordShipyardShips(db, [copy]);
   }
 }

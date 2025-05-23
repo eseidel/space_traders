@@ -30,8 +30,8 @@ void main() {
       expect(before.length, 1);
       expect(before.first, transaction);
 
-      final uniqueShipSymbols =
-          await transactionStore.uniqueShipSymbolsInTransactions();
+      final uniqueShipSymbols = await transactionStore
+          .uniqueShipSymbolsInTransactions();
       expect(uniqueShipSymbols.length, 1);
       expect(uniqueShipSymbols.first, transaction.shipSymbol);
 

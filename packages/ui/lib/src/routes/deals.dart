@@ -34,10 +34,9 @@ class DealsList extends StatelessWidget {
           subtitle: Text(
             '${deal.deal.sourceSymbol} -> ${deal.deal.destinationSymbol}',
           ),
-          trailing:
-              deal.inProgress
-                  ? const Icon(Icons.hourglass_empty)
-                  : const Icon(Icons.check_circle),
+          trailing: deal.inProgress
+              ? const Icon(Icons.hourglass_empty)
+              : const Icon(Icons.check_circle),
         );
       },
     );

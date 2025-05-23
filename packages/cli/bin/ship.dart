@@ -5,8 +5,9 @@ import 'package:cli/cli.dart';
 Future<void> command(Database db, ArgResults argResults) async {
   var ships = await db.allShips();
   if (argResults.rest.isNotEmpty) {
-    final onlyShips =
-        argResults.rest.map((s) => int.parse(s, radix: 16)).toSet();
+    final onlyShips = argResults.rest
+        .map((s) => int.parse(s, radix: 16))
+        .toSet();
     ships = ships.where((b) => onlyShips.contains(b.symbol.number)).toList();
   }
   if (ships.isEmpty) {

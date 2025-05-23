@@ -66,11 +66,10 @@ Future<void> command(Database db, ArgResults argResults) async {
       }
       final toWaypoints = await db.systems.waypointsInSystem(toSystemSymbol);
       // TODO(eseidel): This could be a db query.
-      final missingChartCount =
-          toWaypoints
-              .where((w) => !w.isAsteroid)
-              .where((w) => !(charts.isCharted(w.symbol) ?? false))
-              .length;
+      final missingChartCount = toWaypoints
+          .where((w) => !w.isAsteroid)
+          .where((w) => !(charts.isCharted(w.symbol) ?? false))
+          .length;
       connectedMissingCharts[toSystemSymbol] = missingChartCount;
       if (missingChartCount > 0) {
         slots += 1;

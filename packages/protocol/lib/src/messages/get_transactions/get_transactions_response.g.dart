@@ -14,10 +14,9 @@ GetTransactionsResponse _$GetTransactionsResponseFromJson(
   final val = GetTransactionsResponse(
     transactions: $checkedConvert(
       'transactions',
-      (v) =>
-          (v as List<dynamic>)
-              .map((e) => Transaction.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      (v) => (v as List<dynamic>)
+          .map((e) => Transaction.fromJson(e as Map<String, dynamic>))
+          .toList(),
     ),
     timestamp: $checkedConvert('timestamp', (v) => DateTime.parse(v as String)),
   );

@@ -32,11 +32,10 @@ Future<void> command(Database db, ArgResults argResults) async {
     totalDeposits += survey.survey.deposits.length;
   }
   logger.info('$totalSurveys surveys with $totalDeposits deposits');
-  final symbols =
-      Set<TradeSymbol>.from(surveyBySymbol.keys)
-        ..addAll(depositBySymbol.keys)
-        ..toList()
-        ..sorted((a, b) => a.value.compareTo(b.value));
+  final symbols = Set<TradeSymbol>.from(surveyBySymbol.keys)
+    ..addAll(depositBySymbol.keys)
+    ..toList()
+    ..sorted((a, b) => a.value.compareTo(b.value));
 
   final symbolLength = symbols.map((e) => e.value.length).max;
   const countLength = 5;

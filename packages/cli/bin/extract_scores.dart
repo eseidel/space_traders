@@ -12,27 +12,26 @@ double _scoreMarkets(
 ) {
   // Walk the prices for the given symbols at the given market, and compute
   // the average percentage sell price relative to global median sell prices.
-  final percentiles =
-      marketForGood.keys.map((tradeSymbol) {
-        final marketSymbol = marketForGood[tradeSymbol]!;
-        final sellPrice = marketPrices.recentSellPrice(
-          tradeSymbol,
-          marketSymbol: marketSymbol,
-        );
-        if (sellPrice == null) {
-          logger.warn('No sell price for $tradeSymbol at $marketSymbol');
-          return 0.0;
-        }
-        final percentile = marketPrices.percentileForSellPrice(
-          tradeSymbol,
-          sellPrice,
-        );
-        if (percentile == null) {
-          logger.warn('No percentile for $tradeSymbol at $marketSymbol');
-          return 0.0;
-        }
-        return percentile;
-      }).toList();
+  final percentiles = marketForGood.keys.map((tradeSymbol) {
+    final marketSymbol = marketForGood[tradeSymbol]!;
+    final sellPrice = marketPrices.recentSellPrice(
+      tradeSymbol,
+      marketSymbol: marketSymbol,
+    );
+    if (sellPrice == null) {
+      logger.warn('No sell price for $tradeSymbol at $marketSymbol');
+      return 0.0;
+    }
+    final percentile = marketPrices.percentileForSellPrice(
+      tradeSymbol,
+      sellPrice,
+    );
+    if (percentile == null) {
+      logger.warn('No percentile for $tradeSymbol at $marketSymbol');
+      return 0.0;
+    }
+    return percentile;
+  }).toList();
   return percentiles.average / 100.0;
 }
 

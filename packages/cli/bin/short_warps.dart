@@ -81,16 +81,12 @@ Future<void> command(Database db, ArgResults argResults) async {
 
   final explorer = ships.ships.firstWhere((s) => s.isExplorer);
 
-  final unreachableSystems =
-      systemsToWatch
-          .where(
-            (systemSymbol) =>
-                !systemConnectivity.existsJumpPathBetween(
-                  systemSymbol,
-                  hqSystem,
-                ),
-          )
-          .toList();
+  final unreachableSystems = systemsToWatch
+      .where(
+        (systemSymbol) =>
+            !systemConnectivity.existsJumpPathBetween(systemSymbol, hqSystem),
+      )
+      .toList();
 
   // Look check all systems within 800 units of an unreachable system for
   // a reachable system.

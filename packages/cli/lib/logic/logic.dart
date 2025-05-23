@@ -16,8 +16,9 @@ Future<void> _waitIfNeeded(ShipWaiterEntry entry) async {
   if (waitUntil != null && waitUntil.isAfter(DateTime.timestamp())) {
     final waitDuration = waitUntil.difference(DateTime.timestamp());
     final wait = approximateDuration(waitDuration);
-    final log =
-        waitDuration < const Duration(minutes: 1) ? logger.detail : logger.info;
+    final log = waitDuration < const Duration(minutes: 1)
+        ? logger.detail
+        : logger.info;
     log('⏱️  $wait until ${waitUntil.toLocal()}');
     await Future<void>.delayed(waitDuration);
   }
@@ -96,10 +97,12 @@ Future<void> advanceShips(
               (requestCount / networkConfig.targetRequestsPerSecond) * 1.2;
           if (duration.inSeconds > expectedSeconds) {
             final behaviorName = behaviorState?.behavior.name;
-            final behaviorString =
-                behaviorName == null ? '' : '($behaviorName) ';
-            final logFn =
-                duration.inSeconds > expectedSeconds * 5 ? shipErr : shipWarn;
+            final behaviorString = behaviorName == null
+                ? ''
+                : '($behaviorName) ';
+            final logFn = duration.inSeconds > expectedSeconds * 5
+                ? shipErr
+                : shipWarn;
             logFn(
               ship,
               '$behaviorString'
@@ -189,12 +192,12 @@ Future<Never> logic(
   bool Function(Ship ship)? shipFilter,
 }) async {
   final ships = await ShipSnapshot.load(db);
-  final waiter =
-      ShipWaiter()..scheduleMissingShips(
-        ships.ships,
-        suppressWarnings: true,
-        shipFilter: shipFilter,
-      );
+  final waiter = ShipWaiter()
+    ..scheduleMissingShips(
+      ships.ships,
+      suppressWarnings: true,
+      shipFilter: shipFilter,
+    );
   final rateLimitTracker = RateLimitTracker(api);
   final updater = TopOfLoopUpdater();
 

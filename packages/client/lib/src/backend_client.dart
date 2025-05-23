@@ -20,10 +20,9 @@ class BackendClient {
   };
 
   Future<Json> _get(Uri uri, {GetRequest? args}) async {
-    final withArgs =
-        args != null
-            ? uri.replace(queryParameters: args.toQueryParameters())
-            : uri;
+    final withArgs = args != null
+        ? uri.replace(queryParameters: args.toQueryParameters())
+        : uri;
     final response = await _httpClient.get(withArgs, headers: _requestHeaders);
     if (response.statusCode != 200) {
       throw Exception('Failed to load data: ${response.statusCode}');
