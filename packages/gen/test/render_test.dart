@@ -94,15 +94,15 @@ void main() {
             {'url': 'https://api.spacetraders.io/v2'},
           ],
           'paths': {
-            '/my/account': {
+            '/users/{name}': {
               'get': {
-                'operationId': 'get-my-account',
-                'summary': 'Get Account',
-                'description': 'Fetch your account details.',
+                'operationId': 'get-user',
+                'summary': 'Get User',
+                'description': 'Fetch a user by name.',
                 'parameters': [
                   {
-                    'schema': {'type': 'string', 'default': 'John Doe'},
-                    'in': 'query',
+                    'schema': {'type': 'string'},
+                    'in': 'path',
                     'name': 'name',
                     'required': true,
                     'description': 'The name of the user to fetch.',
