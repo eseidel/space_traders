@@ -165,7 +165,7 @@ void main() {
     expect(out.childFile('lib/api_client.dart').existsSync(), isTrue);
     expect(out.childFile('lib/api/default_api.dart').existsSync(), isTrue);
     expect(
-      out.childFile('lib/model/get_my_account200_response.dart').existsSync(),
+      out.childFile('lib/model/get_user200_response.dart').existsSync(),
       isTrue,
     );
     expect(out.childFile('lib/model/account.dart').existsSync(), isTrue);
