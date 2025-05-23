@@ -3,7 +3,7 @@ import 'package:test/test.dart';
 
 void main() {
   test(GetFleetResponse, () {
-    final response = GetFleetResponse(
+    const response = GetFleetResponse(
       ships: [
         FleetShip(
           symbol: 'ship1',
