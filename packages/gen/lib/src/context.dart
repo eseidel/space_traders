@@ -312,7 +312,7 @@ extension _SchemaGeneration on Schema {
   /// Template context for an object schema.
   Map<String, dynamic> objectTemplateContext(_Context context) {
     if (type != SchemaType.object) {
-      throw Exception('Schema is not an object: $this');
+      throw StateError('Schema is not an object: $this');
     }
     final renderProperties = properties.entries.map((entry) {
       final jsonName = entry.key;
@@ -350,20 +350,20 @@ extension _SchemaGeneration on Schema {
 
   Map<String, dynamic> stringNewtypeTemplateContext() {
     if (type != SchemaType.string) {
-      throw Exception('Schema is not a string: $this');
+      throw StateError('Schema is not a string: $this');
     }
     if (!useNewType) {
-      throw Exception('Schema is not a newtype: $this');
+      throw StateError('Schema is not a newtype: $this');
     }
     return {'typeName': className};
   }
 
   Map<String, dynamic> numberNewtypeTemplateContext() {
     if (type != SchemaType.number) {
-      throw Exception('Schema is not a number: $this');
+      throw StateError('Schema is not a number: $this');
     }
     if (!useNewType) {
-      throw Exception('Schema is not a newtype: $this');
+      throw StateError('Schema is not a newtype: $this');
     }
     return {'typeName': className};
   }
@@ -388,7 +388,7 @@ extension _SchemaGeneration on Schema {
   /// Template context for an enum schema.
   Map<String, dynamic> enumTemplateContext() {
     if (!isEnum) {
-      throw Exception('Schema is not an enum: $this');
+      throw StateError('Schema is not an enum: $this');
     }
     final sharedPrefix = _sharedPrefix(enumValues);
     Map<String, dynamic> enumValueToTemplateContext(String value) {
