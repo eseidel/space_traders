@@ -517,7 +517,7 @@ ShipConditionEvent testShipConditionEvent() {
     symbol: ShipConditionEventSymbol.REACTOR_OVERLOAD,
     name: 'name',
     description: 'description',
-    component: ShipConditionEventComponentEnum.REACTOR,
+    component: ShipConditionEventComponent.REACTOR,
   );
 }
 
