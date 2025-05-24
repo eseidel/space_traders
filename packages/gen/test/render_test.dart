@@ -134,8 +134,8 @@ void main() {
                   'type': 'object',
                   'properties': {
                     'role': {
-                      'type': 'object',
-                      'enumValues': ['admin', 'user'],
+                      'type': 'string',
+                      'enum': ['admin', 'user'],
                       'description': 'The role of the account.',
                     },
                     'id': {'type': 'string'},
