@@ -177,7 +177,7 @@ class Schema {
   }
 
   factory Schema.parse(Map<String, dynamic> json, ParseContext context) {
-    final type = json['type'] as String? ?? 'unknown';
+    final type = SchemaType.fromJson(json['type'] as String? ?? 'unknown');
     final properties = parseProperties(
       json: json['properties'] as Map<String, dynamic>?,
       context: context.key('properties'),
@@ -205,6 +205,13 @@ class Schema {
     final required = json['required'] as List<dynamic>? ?? [];
     final description = json['description'] as String? ?? '';
     final enumValues = json['enum'] as List<dynamic>? ?? [];
+    if (enumValues.isNotEmpty) {
+      if (type != SchemaType.string) {
+        throw UnimplementedError(
+          'Enum values are currently only supported for string types',
+        );
+      }
+    }
     final format = json['format'] as String?;
     final additionalPropertiesJson = json['additionalProperties'];
     SchemaRef? additionalProperties;
@@ -222,7 +229,7 @@ class Schema {
     final schema = Schema(
       pointer: context.pointer.toString(),
       snakeName: context.snakeName,
-      type: SchemaType.fromJson(type),
+      type: type,
       properties: properties,
       required: required.cast<String>(),
       description: description,
@@ -411,12 +418,26 @@ class Endpoint {
     );
   }
 
+  /// The path of this endpoint (e.g. /my/user/{name})
   final String path;
+
+  /// The method of this endpoint (e.g. GET, POST, etc.)
   final Method method;
+
+  /// A tag for grouping endpoints.
   final String tag;
+
+  /// The responses of this endpoint.
   final List<Response> responses;
+
+  /// The snake name of this endpoint (e.g. get_user)
+  /// Typically the operationId, or the last path segment if not present.
   final String snakeName;
+
+  /// The parameters of this endpoint.
   final List<Parameter> parameters;
+
+  /// The request body of this endpoint.
   final SchemaRef? requestBody;
 }
 
