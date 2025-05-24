@@ -180,8 +180,6 @@ class RefOr<T> {
   final String? ref;
   final T? object;
 
-  bool get isRef => ref != null;
-
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -294,7 +292,7 @@ class Schema {
       defaultValue: defaultValue,
       useNewType: context.isTopLevelComponent,
     );
-    context.addSchema(schema);
+    context.addObject(schema);
     return schema;
   }
 
@@ -383,7 +381,8 @@ RefOr<RequestBody> parseRequestBodyOrRef({
   if (json.containsKey(r'$ref')) {
     return RefOr<RequestBody>.ref(json[r'$ref'] as String);
   }
-  return RefOr<RequestBody>.object(RequestBody.parse(json, context));
+  final body = RequestBody.parse(json, context);
+  return RefOr<RequestBody>.object(body);
 }
 
 /// Parse the properties of a schema.
@@ -446,20 +445,33 @@ enum Method {
 /// https://spec.openapis.org/oas/v3.0.0#requestBodyObject
 /// Notably "required" is a boolean, not a list of strings.
 class RequestBody {
-  const RequestBody({required this.isRequired, required this.schema});
+  const RequestBody({
+    required this.pointer,
+    required this.isRequired,
+    required this.schema,
+  });
 
   factory RequestBody.parse(Json requestBodyJson, ParseContext context) {
-    final content = requestBodyJson['content'] as Json;
-    final applicationJson = content['application/json'] as Json;
+    final content = _required<Json>(requestBodyJson, 'content');
+    final applicationJson = _required<Json>(content, 'application/json');
     final schema = parseSchemaOrRef(
-      json: applicationJson['schema'] as Json,
+      json: _required<Json>(applicationJson, 'schema'),
       context: context.addSnakeName('request').key('requestBody'),
     );
     _ignored(requestBodyJson, 'description');
 
     final isRequired = requestBodyJson['required'] as bool? ?? false;
-    return RequestBody(isRequired: isRequired, schema: schema);
+    final body = RequestBody(
+      pointer: context.pointer.toString(),
+      isRequired: isRequired,
+      schema: schema,
+    );
+    context.addObject(body);
+    return body;
   }
+
+  /// The pointer to this request body.
+  final String pointer;
 
   /// Whether the request body is required.
   final bool isRequired;
@@ -607,12 +619,12 @@ List<Response> parseResponses(Json? json, ParseContext parentContext) {
 }
 
 class Components {
-  const Components({required this.schemas});
+  const Components({required this.schemas, required this.requestBodies});
 
   final Map<String, Schema> schemas;
   // final Map<String, Parameter> parameters;
   // final Map<String, SecurityScheme> securitySchemes;
-  // final Map<String, RequestBody> requestBodies;
+  final Map<String, RequestBody> requestBodies;
   // final Map<String, Response> responses;
   // final Map<String, Header> headers;
   // final Map<String, Example> examples;
@@ -622,10 +634,10 @@ class Components {
 
 Components parseComponents(Json? json, ParseContext context) {
   if (json == null) {
-    return const Components(schemas: {});
+    return const Components(schemas: {}, requestBodies: {});
   }
   final keys = json.keys.toList();
-  final supportedKeys = ['schemas', 'securitySchemes'];
+  final supportedKeys = ['schemas', 'securitySchemes', 'requestBodies'];
 
   for (final key in keys) {
     if (!supportedKeys.contains(key)) {
@@ -658,7 +670,24 @@ Components parseComponents(Json? json, ParseContext context) {
     }
   }
 
-  return Components(schemas: schemas);
+  final requestBodiesJson = json['requestBodies'] as Json?;
+  final requestBodies = <String, RequestBody>{};
+  if (requestBodiesJson != null) {
+    for (final entry in requestBodiesJson.entries) {
+      final name = entry.key;
+      final snakeName = snakeFromCamel(name);
+      final value = entry.value as Json;
+      requestBodies[name] = RequestBody.parse(
+        value,
+        context
+            .addSnakeName(snakeName, isTopLevelComponent: true)
+            .key('requestBodies')
+            .key(name),
+      );
+    }
+  }
+
+  return Components(schemas: schemas, requestBodies: requestBodies);
 }
 
 T _required<T>(Json json, String key) {
@@ -747,47 +776,57 @@ class Spec {
   List<String> get tags => endpoints.map((e) => e.tag).toSet().sorted();
 }
 
-class SchemaRegistry {
-  SchemaRegistry();
+class RefRegistry {
+  RefRegistry();
 
-  final Map<Uri, Schema> schemas = {};
+  final objectsByUri = <Uri, dynamic>{};
 
-  Schema get(Uri uri) {
-    final schema = schemas[uri];
-    if (schema == null) {
-      throw Exception('Schema not found: $uri');
+  Iterable<Uri> get uris => objectsByUri.keys;
+
+  T get<T>(Uri uri) {
+    final object = objectsByUri[uri];
+    if (object == null) {
+      throw Exception('$T not found: $uri');
     }
-    return schema;
+    if (object is! T) {
+      throw Exception('Expected $T, got $object');
+    }
+    return object;
   }
 
-  Schema operator [](Uri uri) => get(uri);
-
-  void register(Uri uri, Schema schema) {
-    if (schemas.containsKey(uri)) {
+  void register(Uri uri, dynamic object) {
+    if (objectsByUri.containsKey(uri)) {
       logger
-        ..warn('Schema already registered: $uri')
-        ..info('before: ${schemas[uri]}')
-        ..info('after: $schema');
-      throw Exception('Schema already registered: $uri');
+        ..warn('Object already registered: $uri')
+        ..info('before: ${objectsByUri[uri]}')
+        ..info('after: $object');
+      throw Exception('Object already registered: $uri');
     }
-    final byName = schemas.entries.firstWhereOrNull(
-      (e) => e.value.snakeName == schema.snakeName,
+    if (object is Schema) {
+      final schema = object;
+      final byName = objectsByUri.entries
+          .where((e) => e.value is Schema)
+          .firstWhereOrNull(
+            (e) => (e.value as Schema).snakeName == schema.snakeName,
+          );
+      if (byName != null) {
+        logger
+          ..warn('Schema already registered by name: ${schema.snakeName}')
+          ..info('existing uri: ${byName.key}')
+          ..info('existing schema: ${byName.value}')
+          ..info('new uri: $uri')
+          ..info('new schema: $schema');
+      }
+    }
+    objectsByUri[uri] = object;
+  }
+
+  Uri lookupUri(dynamic object) {
+    final entry = objectsByUri.entries.firstWhereOrNull(
+      (e) => e.value == object,
     );
-    if (byName != null) {
-      logger
-        ..warn('Schema already registered by name: ${schema.snakeName}')
-        ..info('existing uri: ${byName.key}')
-        ..info('existing schema: ${byName.value}')
-        ..info('new uri: $uri')
-        ..info('new schema: $schema');
-    }
-    schemas[uri] = schema;
-  }
-
-  Uri lookupUri(Schema schema) {
-    final entry = schemas.entries.firstWhereOrNull((e) => e.value == schema);
     if (entry == null) {
-      throw Exception('Url not found for schema: $schema');
+      throw Exception('Url not found for object: $object');
     }
     return entry.key;
   }
@@ -821,7 +860,7 @@ class ParseContext {
     required this.baseUrl,
     required this.pointerParts,
     required this.snakeNameStack,
-    required this.schemas,
+    required this.refRegistry,
     required this.isTopLevelComponent,
   }) {
     if (baseUrl.hasFragment) {
@@ -835,7 +874,7 @@ class ParseContext {
   ParseContext.initial(this.baseUrl)
     : pointerParts = [],
       snakeNameStack = [],
-      schemas = SchemaRegistry(),
+      refRegistry = RefRegistry(),
       isTopLevelComponent = false;
 
   /// The base url of the spec being parsed.
@@ -865,8 +904,8 @@ class ParseContext {
   }
 
   // Registry of all the schemas we've parsed so far.
-  // SchemaRegistry is internally mutable.
-  final SchemaRegistry schemas;
+  // RefRegistry is internally mutable.
+  final RefRegistry refRegistry;
 
   ParseContext _addPart(String part) =>
       copyWith(pointerParts: [...pointerParts, part]);
@@ -874,9 +913,9 @@ class ParseContext {
   ParseContext key(String key) => _addPart(key);
   ParseContext index(int index) => _addPart(index.toString());
 
-  void addSchema(Schema schema) {
+  void addObject(dynamic object) {
     final uri = baseUrl.replace(fragment: pointer.toString());
-    schemas.register(uri, schema);
+    refRegistry.register(uri, object);
   }
 
   /// Add a snake name to the current context.
@@ -898,7 +937,7 @@ class ParseContext {
       baseUrl: baseUrl,
       pointerParts: pointerParts ?? this.pointerParts,
       snakeNameStack: snakeNameStack ?? this.snakeNameStack,
-      schemas: schemas,
+      refRegistry: refRegistry,
       isTopLevelComponent: isTopLevelComponent ?? this.isTopLevelComponent,
     );
   }

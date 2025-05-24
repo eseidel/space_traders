@@ -64,7 +64,7 @@ extension _EndpointGeneration on Endpoint {
     final parameters = this.parameters
         .map((param) => param.toTemplateContext(context))
         .toList();
-    final body = context._maybeResolve(requestBody);
+    final body = context._maybeResolve<RequestBody>(requestBody);
     if (body != null) {
       final templateContext = body.toTemplateContext(context);
       parameters.add(templateContext);
@@ -490,7 +490,7 @@ class _Context {
     required this.spec,
     required this.outDir,
     required this.packageName,
-    required this.schemaRegistry,
+    required this.refRegistry,
     Directory? templateDir,
     RunProcess? runProcess,
     this.quirks = const Quirks(),
@@ -522,9 +522,9 @@ class _Context {
   /// The file system where the rendered files will go.
   final FileSystem fs;
 
-  /// The schema registry.
+  /// The registry of all the objects we've parsed so far.
   /// This must be fully populated before rendering.
-  final SchemaRegistry schemaRegistry;
+  final RefRegistry refRegistry;
 
   /// The function to run a process. Allows for mocking in tests.
   final RunProcess runProcess;
@@ -563,13 +563,7 @@ class _Context {
   }
 
   /// Resolve a uri into a [Schema].
-  T _resolveUri<T>(Uri uri) {
-    final schema = schemaRegistry.get(uri);
-    if (schema is! T) {
-      throw StateError('Schema is not a $T: $uri');
-    }
-    return schema as T;
-  }
+  T _resolveUri<T>(Uri uri) => refRegistry.get<T>(uri);
 
   /// Ensure a file exists.
   File _ensureFile(String path) {
@@ -641,13 +635,15 @@ class _Context {
       if (rendered.contains(uri)) {
         continue;
       }
-      rendered.add(uri);
-      final schema = _resolveUri<Schema>(uri);
-      final renderContext = _renderSchema(this, schema);
-      renderQueue.addAll([
-        ...urisFromSchemas(renderContext.inlineSchemas),
-        ...urisFromRefs(renderContext.importedSchemas),
-      ]);
+      final schema = _resolveUri<dynamic>(uri);
+      if (schema is Schema) {
+        final renderContext = _renderSchema(this, schema);
+        renderQueue.addAll([
+          ...urisFromSchemas(renderContext.inlineSchemas),
+          ...urisFromRefs(renderContext.importedSchemas),
+        ]);
+        rendered.add(uri);
+      }
     }
     return rendered;
   }
@@ -707,7 +703,7 @@ class _Context {
     final rendered = _renderApis();
     _renderApiClient();
     // Render the combined api.dart exporting all rendered schemas.
-    final renderedModels = rendered.map(schemaRegistry.get);
+    final renderedModels = rendered.map(refRegistry.get<Schema>);
     _renderPublicApi(renderedModels);
     // Consider running pub upgrade here to ensure packages are up to date.
     _runDart(['pub', 'get']);
@@ -737,7 +733,7 @@ void renderSpec({
   required String packageName,
   required Directory outDir,
   required Spec spec,
-  required SchemaRegistry schemaRegistry,
+  required RefRegistry refRegistry,
   Directory? templateDir,
   RunProcess? runProcess,
   Quirks quirks = const Quirks(),
@@ -747,7 +743,7 @@ void renderSpec({
     spec: spec,
     outDir: outDir,
     packageName: packageName,
-    schemaRegistry: schemaRegistry,
+    refRegistry: refRegistry,
     templateDir: templateDir,
     runProcess: runProcess,
     quirks: quirks,
