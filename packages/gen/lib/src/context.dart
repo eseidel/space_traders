@@ -116,6 +116,8 @@ extension EndpointGeneration on Endpoint {
   }
 }
 
+enum SchemaRenderType { enumeration, object, stringNewtype, numberNewtype, pod }
+
 extension SchemaGeneration on Schema {
   /// Schema name in file name format.
   String get fileName => snakeName;
@@ -125,6 +127,23 @@ extension SchemaGeneration on Schema {
 
   /// Whether this schema needs to be rendered.
   bool get needsRender => type == SchemaType.object || isEnum;
+
+  /// The type of schema to render.
+  SchemaRenderType get renderType {
+    if (isEnum) {
+      return SchemaRenderType.enumeration;
+    }
+    if (type == SchemaType.string && useNewType) {
+      return SchemaRenderType.stringNewtype;
+    }
+    if (type == SchemaType.number && useNewType) {
+      return SchemaRenderType.numberNewtype;
+    }
+    if (type == SchemaType.object) {
+      return SchemaRenderType.object;
+    }
+    return SchemaRenderType.pod;
+  }
 
   /// Whether this schema is a date time.
   bool get isDateTime => type == SchemaType.string && format == 'date-time';
@@ -267,7 +286,10 @@ extension SchemaGeneration on Schema {
   }
 
   /// Template context for an object schema.
-  Map<String, dynamic> _objectToTemplateContext(Context context) {
+  Map<String, dynamic> objectTemplateContext(Context context) {
+    if (type != SchemaType.object) {
+      throw Exception('Schema is not an object: $this');
+    }
     final renderProperties = properties.entries.map((entry) {
       final jsonName = entry.key;
       final schema = context.maybeResolve(entry.value)!;
@@ -294,6 +316,26 @@ extension SchemaGeneration on Schema {
     };
   }
 
+  Map<String, dynamic> stringNewtypeTemplateContext() {
+    if (type != SchemaType.string) {
+      throw Exception('Schema is not a string: $this');
+    }
+    if (!useNewType) {
+      throw Exception('Schema is not a newtype: $this');
+    }
+    return {'schemaName': className};
+  }
+
+  Map<String, dynamic> numberNewtypeTemplateContext() {
+    if (type != SchemaType.number) {
+      throw Exception('Schema is not a number: $this');
+    }
+    if (!useNewType) {
+      throw Exception('Schema is not a newtype: $this');
+    }
+    return {'schemaName': className};
+  }
+
   String _sharedPrefix(List<String> values) {
     final prefix = '${values.first.split('_').first}_';
     for (final value in values) {
@@ -312,7 +354,10 @@ extension SchemaGeneration on Schema {
   }
 
   /// Template context for an enum schema.
-  Map<String, dynamic> _enumToTemplateContext() {
+  Map<String, dynamic> enumTemplateContext() {
+    if (!isEnum) {
+      throw Exception('Schema is not an enum: $this');
+    }
     final sharedPrefix = _sharedPrefix(enumValues);
     Map<String, dynamic> enumValueToTemplateContext(String value) {
       // var dartName = camelFromScreamingCaps(value);
@@ -329,13 +374,6 @@ extension SchemaGeneration on Schema {
       'schemaName': className,
       'enumValues': enumValues.map(enumValueToTemplateContext).toList(),
     };
-  }
-
-  /// Convert this schema to a template context.
-  Map<String, dynamic> toTemplateContext(Context context) {
-    return isEnum
-        ? _enumToTemplateContext()
-        : _objectToTemplateContext(context);
   }
 
   /// package import string for this schema.
@@ -693,8 +731,24 @@ RenderContext renderSchema(Context context, Schema schema) {
     context,
     includeInlineSchema: true,
   );
-  final schemaContext = schema.toTemplateContext(context);
-  final template = schema.isEnum ? 'schema_enum' : 'schema_object';
+  final Map<String, dynamic> schemaContext;
+  final String template;
+  switch (schema.renderType) {
+    case SchemaRenderType.enumeration:
+      schemaContext = schema.enumTemplateContext();
+      template = 'schema_enum';
+    case SchemaRenderType.object:
+      schemaContext = schema.objectTemplateContext(context);
+      template = 'schema_object';
+    case SchemaRenderType.stringNewtype:
+      schemaContext = schema.stringNewtypeTemplateContext();
+      template = 'schema_string_newtype';
+    case SchemaRenderType.numberNewtype:
+      schemaContext = schema.numberNewtypeTemplateContext();
+      template = 'schema_number_newtype';
+    case SchemaRenderType.pod:
+      throw Exception('Pod schemas should not be rendered: $schema');
+  }
 
   final outPath = Paths.modelFilePath(schema);
   logger.detail('rendering $outPath from ${schema.pointer}');

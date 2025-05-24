@@ -1,11 +1,8 @@
-class ShipComponentQuality {
-  ShipComponentQuality();
+extension type ShipComponentQuality(double value) {
+  ShipComponentQuality(this.value);
 
-  factory ShipComponentQuality.fromJson() {
-    return ShipComponentQuality();
-  }
+  factory ShipComponentQuality.fromJson(String json) =>
+      ShipComponentQuality(json);
 
-  Map<String, dynamic> toJson() {
-    return {};
-  }
+  String toJson() => value;
 }

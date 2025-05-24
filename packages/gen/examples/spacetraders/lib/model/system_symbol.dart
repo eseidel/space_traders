@@ -1,11 +1,7 @@
-class SystemSymbol {
-  SystemSymbol();
+extension type SystemSymbol(String value) {
+  SystemSymbol(this.value);
 
-  factory SystemSymbol.fromJson() {
-    return SystemSymbol();
-  }
+  factory SystemSymbol.fromJson(String json) => SystemSymbol(json);
 
-  Map<String, dynamic> toJson() {
-    return {};
-  }
+  String toJson() => value;
 }

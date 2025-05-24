@@ -165,6 +165,7 @@ class Schema {
     required this.format,
     required this.additionalProperties,
     required this.defaultValue,
+    required this.useNewType,
   }) {
     if (type == SchemaType.object && snakeName.isEmpty) {
       throw ArgumentError.value(
@@ -230,6 +231,7 @@ class Schema {
       format: format,
       additionalProperties: additionalProperties,
       defaultValue: defaultValue,
+      useNewType: context.isTopLevelComponent,
     );
     context.addSchema(schema);
     return schema;
@@ -241,21 +243,42 @@ class Schema {
   /// Name of this schema based on parse location.
   final String snakeName;
 
+  /// The type of this schema.
   final SchemaType type;
+
+  /// The properties of this schema.
   final Map<String, SchemaRef> properties;
+
+  /// The required properties of this schema.
   final List<String> required;
+
+  /// The description of this schema.
   final String description;
+
+  /// The items of this schema.
   final SchemaRef? items;
+
+  /// The enum values of this schema.
   final List<String> enumValues;
+
+  /// The format of this schema.
   final String? format;
+
+  /// The additional properties of this schema.
+  /// Used for specifying T for Map\<String, T\>.
   final SchemaRef? additionalProperties;
+
+  /// The default value of this schema.
   final dynamic defaultValue;
+
+  /// Whether to use the newtype pattern for this schema.
+  /// e.g. Wrap the underlying type in a named object.
+  final bool useNewType;
 
   @override
   String toString() {
-    return 'Schema(type: $type, properties: $properties, '
-        'required: $required, description: $description, '
-        'items: $items, enumValues: $enumValues, format: $format)';
+    return 'Schema(name: $snakeName, pointer: $pointer, type: $type, '
+        'description: $description, useNewType: $useNewType)';
   }
 }
 
@@ -486,7 +509,10 @@ Components parseComponents(Map<String, dynamic>? json, ParseContext context) {
       final value = entry.value as Map<String, dynamic>;
       schemas[name] = Schema.parse(
         value,
-        context.addSnakeName(snakeName).key('schemas').key(name),
+        context
+            .addSnakeName(snakeName, isTopLevelComponent: true)
+            .key('schemas')
+            .key(name),
       );
     }
   }
@@ -651,6 +677,7 @@ class ParseContext {
     required this.pointerParts,
     required this.snakeNameStack,
     required this.schemas,
+    required this.isTopLevelComponent,
   }) {
     if (baseUrl.hasFragment) {
       throw ArgumentError.value(
@@ -663,7 +690,8 @@ class ParseContext {
   ParseContext.initial(this.baseUrl)
     : pointerParts = [],
       snakeNameStack = [],
-      schemas = SchemaRegistry();
+      schemas = SchemaRegistry(),
+      isTopLevelComponent = false;
 
   /// The base url of the spec being parsed.
   final Uri baseUrl;
@@ -673,6 +701,9 @@ class ParseContext {
 
   /// Stack of name parts for the current schema.
   final List<String> snakeNameStack;
+
+  /// Whether the current schema is a top-level component.
+  final bool isTopLevelComponent;
 
   JsonPointer get pointer => JsonPointer(pointerParts);
 
@@ -703,18 +734,27 @@ class ParseContext {
     schemas.register(uri, schema);
   }
 
-  ParseContext addSnakeName(String snakeName) =>
-      copyWith(snakeNameStack: [...snakeNameStack, snakeName]);
+  /// Add a snake name to the current context.
+  /// Also resets the top-level component flag by default.
+  ParseContext addSnakeName(
+    String snakeName, {
+    bool isTopLevelComponent = false,
+  }) => copyWith(
+    snakeNameStack: [...snakeNameStack, snakeName],
+    isTopLevelComponent: isTopLevelComponent,
+  );
 
   ParseContext copyWith({
     List<String>? pointerParts,
     List<String>? snakeNameStack,
+    bool? isTopLevelComponent,
   }) {
     return ParseContext(
       baseUrl: baseUrl,
       pointerParts: pointerParts ?? this.pointerParts,
       snakeNameStack: snakeNameStack ?? this.snakeNameStack,
       schemas: schemas,
+      isTopLevelComponent: isTopLevelComponent ?? this.isTopLevelComponent,
     );
   }
 }
