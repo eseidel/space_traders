@@ -14,7 +14,7 @@ class _MockLogger extends Mock implements Logger {}
 class _EmptyClass {}
 
 void main() {
-  group('renderSpec', () {
+  group('loadAndRenderSpec', () {
     const localFs = LocalFileSystem();
     // https://github.com/dart-lang/test/issues/110
     final templatesUri = (reflectClass(_EmptyClass).owner! as LibraryMirror).uri
@@ -40,7 +40,7 @@ void main() {
       await expectLater(
         () => runWithLogger(
           logger,
-          () => renderSpec(
+          () => loadAndRenderSpec(
             specUri: Uri.file(spec.path),
             packageName: 'spacetraders',
             outDir: out,
@@ -72,7 +72,7 @@ void main() {
 
       await runWithLogger(
         logger,
-        () => renderSpec(
+        () => loadAndRenderSpec(
           specUri: Uri.file(spec.path),
           packageName: 'spacetraders',
           outDir: out,
@@ -153,7 +153,7 @@ void main() {
 
       await runWithLogger(
         logger,
-        () => renderSpec(
+        () => loadAndRenderSpec(
           specUri: Uri.file(spec.path),
           packageName: 'spacetraders',
           outDir: out,
@@ -267,7 +267,7 @@ void main() {
 
       await runWithLogger(
         logger,
-        () => renderSpec(
+        () => loadAndRenderSpec(
           specUri: Uri.file(spec.path),
           packageName: 'spacetraders',
           outDir: out,
@@ -349,7 +349,7 @@ void main() {
 
       await runWithLogger(
         logger,
-        () => renderSpec(
+        () => loadAndRenderSpec(
           specUri: Uri.file(spec.path),
           packageName: 'spacetraders',
           outDir: out,
