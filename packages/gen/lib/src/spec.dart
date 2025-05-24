@@ -173,29 +173,32 @@ enum SchemaType {
 /// An object which either holds a schema or a reference to a schema.
 /// https://spec.openapis.org/oas/v3.0.0#schemaObject
 @immutable
-class SchemaRef {
-  /// Create a new schema reference from a path.
-  const SchemaRef.fromPath({required String ref}) : schema = null, uri = ref;
+class RefOr<T> {
+  const RefOr.ref(this.ref) : object = null;
+  const RefOr.object(this.object) : ref = null;
 
-  /// Create a new schema reference from a schema.
-  const SchemaRef.schema(this.schema) : uri = null;
+  final String? ref;
+  final T? object;
 
-  /// The uri of the schema.
-  final String? uri;
-
-  /// The schema.
-  final Schema? schema;
+  bool get isRef => ref != null;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is SchemaRef &&
+      other is RefOr<T> &&
           runtimeType == other.runtimeType &&
-          uri == other.uri &&
-          schema == other.schema;
+          ref == other.ref &&
+          object == other.object;
 
   @override
-  int get hashCode => Object.hash(uri, schema);
+  int get hashCode => Object.hash(ref, object);
+}
+
+class SchemaRef extends RefOr<Schema> {
+  const SchemaRef.ref(String super.ref) : super.ref();
+  const SchemaRef.schema(Schema super.schema) : super.object();
+
+  Schema? get schema => object;
 }
 
 /// A schema is a json object that describes the shape of a json object.
@@ -348,7 +351,7 @@ SchemaRef parseSchemaOrRef({
   required ParseContext context,
 }) {
   if (json.containsKey(r'$ref')) {
-    return SchemaRef.fromPath(ref: json[r'$ref'] as String);
+    return SchemaRef.ref(json[r'$ref'] as String);
   }
 
   if (json.containsKey('oneOf')) {
@@ -368,6 +371,19 @@ SchemaRef parseSchemaOrRef({
   }
 
   return SchemaRef.schema(Schema.parse(json, context));
+}
+
+/// Parse a schema or a reference to a schema.
+/// https://spec.openapis.org/oas/v3.0.0#schemaObject
+/// https://spec.openapis.org/oas/v3.0.0#relative-references-in-urls
+RefOr<RequestBody> parseRequestBodyOrRef({
+  required Json json,
+  required ParseContext context,
+}) {
+  if (json.containsKey(r'$ref')) {
+    return RefOr<RequestBody>.ref(json[r'$ref'] as String);
+  }
+  return RefOr<RequestBody>.object(RequestBody.parse(json, context));
 }
 
 /// Parse the properties of a schema.
@@ -426,7 +442,34 @@ enum Method {
   String get key => name.toLowerCase();
 }
 
+/// Request body is sorta a schema, but it's a bit different.
+/// https://spec.openapis.org/oas/v3.0.0#requestBodyObject
+/// Notably "required" is a boolean, not a list of strings.
+class RequestBody {
+  const RequestBody({required this.isRequired, required this.schema});
+
+  factory RequestBody.parse(Json requestBodyJson, ParseContext context) {
+    final content = requestBodyJson['content'] as Json;
+    final applicationJson = content['application/json'] as Json;
+    final schema = parseSchemaOrRef(
+      json: applicationJson['schema'] as Json,
+      context: context.addSnakeName('request').key('requestBody'),
+    );
+    _ignored(requestBodyJson, 'description');
+
+    final isRequired = requestBodyJson['required'] as bool? ?? false;
+    return RequestBody(isRequired: isRequired, schema: schema);
+  }
+
+  /// Whether the request body is required.
+  final bool isRequired;
+
+  /// The schema of the application/json content.
+  final SchemaRef schema;
+}
+
 /// An endpoint is a path with a method.
+/// Spec splits this into a "path item" and a "operation" object.
 /// https://spec.openapis.org/oas/v3.0.0#path-item-object
 class Endpoint {
   /// Create a new endpoint.
@@ -474,13 +517,11 @@ class Endpoint {
         )
         .toList();
     final requestBodyJson = json['requestBody'] as Json?;
-    SchemaRef? requestBody;
+    RefOr<RequestBody>? requestBody;
     if (requestBodyJson != null) {
-      final content = requestBodyJson['content'] as Json;
-      final json = content['application/json'] as Json;
-      requestBody = parseSchemaOrRef(
-        json: json['schema'] as Json,
-        context: context.addSnakeName('request').key('requestBody'),
+      requestBody = parseRequestBodyOrRef(
+        json: requestBodyJson,
+        context: context.key('requestBody'),
       );
     }
     return Endpoint(
@@ -514,7 +555,7 @@ class Endpoint {
   final List<Parameter> parameters;
 
   /// The request body of this endpoint.
-  final SchemaRef? requestBody;
+  final RefOr<RequestBody>? requestBody;
 }
 
 /// A response from an endpoint.
