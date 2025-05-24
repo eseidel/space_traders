@@ -3,9 +3,7 @@ import '{{{.}}}';
 {{/imports}}
 
 extension type {{{ schemaName }}}(double value) {
-    {{ schemaName }}(this.value);
+    factory {{ schemaName }}.fromJson(num json) => {{ schemaName }}(json.toDouble());
 
-    factory {{ schemaName }}.fromJson(String json) => {{ schemaName }}(json);
-
-    String toJson() => value;
+    double toJson() => value;
 }

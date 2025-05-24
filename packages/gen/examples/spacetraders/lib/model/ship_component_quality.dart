@@ -1,8 +1,6 @@
 extension type ShipComponentQuality(double value) {
-  ShipComponentQuality(this.value);
+  factory ShipComponentQuality.fromJson(num json) =>
+      ShipComponentQuality(json.toDouble());
 
-  factory ShipComponentQuality.fromJson(String json) =>
-      ShipComponentQuality(json);
-
-  String toJson() => value;
+  double toJson() => value;
 }

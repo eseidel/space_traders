@@ -3,8 +3,6 @@ import '{{{.}}}';
 {{/imports}}
 
 extension type {{{ schemaName }}}(String value) {
-    {{ schemaName }}(this.value);
-
     factory {{ schemaName }}.fromJson(String json) => {{ schemaName }}(json);
 
     String toJson() => value;

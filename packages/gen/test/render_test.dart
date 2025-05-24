@@ -29,6 +29,42 @@ void main() {
       return ProcessResult(0, 0, '', '');
     }
 
+    test('deletes existing output directory', () async {
+      final fs = MemoryFileSystem.test();
+      final out = fs.directory('spacetraders');
+      final spec = fs.file('test/spec.json')
+        ..createSync(recursive: true)
+        ..writeAsStringSync(
+          jsonEncode({
+            'servers': [
+              {'url': 'https://api.spacetraders.io/v2'},
+            ],
+            'paths': {
+              '/users': {
+                'get': {'summary': 'Get user'},
+              },
+            },
+          }),
+        );
+      final spuriousFile = out.childFile('foo.txt')
+        ..createSync(recursive: true);
+      expect(spuriousFile.existsSync(), isTrue);
+      final logger = _MockLogger();
+      await runWithLogger(
+        logger,
+        () => loadAndRenderSpec(
+          specUri: Uri.file(spec.path),
+          packageName: 'spacetraders',
+          outDir: out,
+          templateDir: templateDir,
+          runProcess: runProcess,
+        ),
+      );
+      expect(spuriousFile.existsSync(), isFalse);
+      expect(out.childFile('lib/api.dart').existsSync(), isTrue);
+      expect(out.childFile('lib/api_client.dart').existsSync(), isTrue);
+    });
+
     test('empty spec throws format exception', () async {
       final fs = MemoryFileSystem.test();
       final spec = fs.file('test/spec.json')

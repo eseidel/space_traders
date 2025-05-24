@@ -1,8 +1,6 @@
 extension type ShipComponentIntegrity(double value) {
-  ShipComponentIntegrity(this.value);
+  factory ShipComponentIntegrity.fromJson(num json) =>
+      ShipComponentIntegrity(json.toDouble());
 
-  factory ShipComponentIntegrity.fromJson(String json) =>
-      ShipComponentIntegrity(json);
-
-  String toJson() => value;
+  double toJson() => value;
 }

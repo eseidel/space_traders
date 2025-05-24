@@ -1,8 +1,6 @@
 extension type ShipComponentCondition(double value) {
-  ShipComponentCondition(this.value);
+  factory ShipComponentCondition.fromJson(num json) =>
+      ShipComponentCondition(json.toDouble());
 
-  factory ShipComponentCondition.fromJson(String json) =>
-      ShipComponentCondition(json);
-
-  String toJson() => value;
+  double toJson() => value;
 }
