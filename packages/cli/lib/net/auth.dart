@@ -43,7 +43,6 @@ Api apiFromAuthToken(
   String token,
   Database db, {
   int Function() getPriority = defaultGetPriority,
-  String? overrideBaseUrl,
 }) {
   final auth = HttpBearerAuth()..accessToken = token;
   final apiClient = getApiClient(db, getPriority: getPriority, auth: auth);
