@@ -337,5 +337,67 @@ void main() {
       expect(out.childFile('lib/model/user.dart').existsSync(), isTrue);
       expect(out.childFile('lib/model/multiplier.dart').existsSync(), isTrue);
     });
+
+    test('with default enum value', () async {
+      final fs = MemoryFileSystem.test();
+      final spec = {
+        'servers': [
+          {'url': 'https://api.spacetraders.io/v2'},
+        ],
+        'paths': {
+          '/users': {
+            'get': {
+              'operationId': 'get-user',
+              'summary': 'Get User',
+              'description': 'Fetch a user by name.',
+              'parameters': [
+                {
+                  'schema': {'type': 'string'},
+                  'in': 'query',
+                  'name': 'id',
+                  'required': true,
+                  'description': 'The role of the user to fetch.',
+                },
+              ],
+              'responses': {
+                '200': {
+                  'description': 'Default Response',
+                  'content': {
+                    'application/json': {
+                      'schema': {
+                        'type': 'object',
+                        'properties': {
+                          'user': {r'$ref': '#/components/schemas/User'},
+                        },
+                        'required': ['user'],
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        'components': {
+          'schemas': {
+            'User': {
+              'type': 'string',
+              'enum': ['admin', 'user'],
+              // Special handling is needed when an enum is default.
+              'default': 'user',
+            },
+          },
+        },
+      };
+      final out = fs.directory('spacetraders');
+      final logger = _MockLogger();
+
+      await renderToDirectory(spec: spec, outDir: out, logger: logger);
+      expect(
+        out.childFile('lib/model/get_user200_response.dart').existsSync(),
+        isTrue,
+      );
+      expect(out.childFile('lib/model/user.dart').existsSync(), isTrue);
+    });
   });
 }
