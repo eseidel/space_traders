@@ -14,20 +14,25 @@ class _MockLogger extends Mock implements Logger {}
 
 class _EmptyClass {}
 
-class _Exists extends CustomMatcher {
-  _Exists() : super('exists', 'exists', '');
+class _Exists extends Matcher {
+  const _Exists();
 
   @override
-  bool matches(
-    covariant FileSystemEntity file,
-    Map<dynamic, dynamic> matchState,
-  ) => file.existsSync();
+  bool matches(dynamic file, Map<dynamic, dynamic> matchState) {
+    if (file is File) {
+      return file.existsSync();
+    }
+    if (file is Directory) {
+      return file.existsSync();
+    }
+    return false;
+  }
 
   @override
   Description describe(Description description) => description.add('exists');
 }
 
-final exists = _Exists();
+const exists = _Exists();
 
 void main() {
   group('loadAndRenderSpec', () {
@@ -447,6 +452,64 @@ void main() {
 
       await renderToDirectory(spec: spec, outDir: out, logger: logger);
       expect(out.childFile('lib/model/get_user200_response.dart'), exists);
+    });
+
+    test('with inner types', () async {
+      final fs = MemoryFileSystem.test();
+      final spec = {
+        'servers': [
+          {'url': 'https://api.spacetraders.io/v2'},
+        ],
+        'paths': {
+          '/my/factions': {
+            'get': {
+              'operationId': 'get-my-factions',
+              'summary': 'Get My Factions',
+              'description':
+                  'Retrieve factions with which the agent has reputation.',
+              'responses': {
+                '200': {
+                  'description': 'Default Response',
+                  'content': {
+                    'application/json': {
+                      'schema': {
+                        'type': 'object',
+                        'properties': {
+                          'data': {
+                            'type': 'array',
+                            'items': {
+                              'type': 'object',
+                              'properties': {
+                                'symbol': {'type': 'string'},
+                                'reputation': {'type': 'integer'},
+                              },
+                              'required': ['symbol', 'reputation'],
+                            },
+                          },
+                        },
+                        'required': ['data'],
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      };
+      final out = fs.directory('spacetraders');
+      final logger = _MockLogger();
+
+      await renderToDirectory(spec: spec, outDir: out, logger: logger);
+      final modelPaths = out.childDirectory('lib/model').listSync();
+      expect(modelPaths, hasLength(2));
+      expect(
+        modelPaths.map((e) => e.path.split('/').last),
+        containsAll([
+          'get_my_factions200_response.dart',
+          'get_my_factions200_response_data_inner.dart',
+        ]),
+      );
     });
   });
 }
