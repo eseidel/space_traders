@@ -14,6 +14,21 @@ class _MockLogger extends Mock implements Logger {}
 
 class _EmptyClass {}
 
+class _Exists extends CustomMatcher {
+  _Exists() : super('exists', 'exists', '');
+
+  @override
+  bool matches(
+    covariant FileSystemEntity file,
+    Map<dynamic, dynamic> matchState,
+  ) => file.existsSync();
+
+  @override
+  Description describe(Description description) => description.add('exists');
+}
+
+final exists = _Exists();
+
 void main() {
   group('loadAndRenderSpec', () {
     const localFs = LocalFileSystem();
@@ -71,8 +86,8 @@ void main() {
       final logger = _MockLogger();
       await renderToDirectory(spec: spec, outDir: out, logger: logger);
       expect(spuriousFile.existsSync(), isFalse);
-      expect(out.childFile('lib/api.dart').existsSync(), isTrue);
-      expect(out.childFile('lib/api_client.dart').existsSync(), isTrue);
+      expect(out.childFile('lib/api.dart'), exists);
+      expect(out.childFile('lib/api_client.dart'), exists);
     });
 
     test('empty spec throws format exception', () async {
@@ -100,9 +115,10 @@ void main() {
       final out = fs.directory('spacetraders');
       final logger = _MockLogger();
       await renderToDirectory(spec: spec, outDir: out, logger: logger);
-      expect(out.existsSync(), isTrue);
-      expect(out.childFile('lib/api.dart').existsSync(), isTrue);
-      expect(out.childFile('lib/api_client.dart').existsSync(), isTrue);
+      expect(out, exists);
+      expect(out.childFile('foo.txt'), isNot(exists));
+      expect(out.childFile('lib/api.dart'), exists);
+      expect(out.childFile('lib/api_client.dart'), exists);
     });
 
     test('with real endpoints', () async {
@@ -169,15 +185,12 @@ void main() {
 
       await renderToDirectory(spec: spec, outDir: out, logger: logger);
       expect(out.existsSync(), isTrue);
-      expect(out.childFile('lib/api.dart').existsSync(), isTrue);
-      expect(out.childFile('lib/api_client.dart').existsSync(), isTrue);
-      expect(out.childFile('lib/api/default_api.dart').existsSync(), isTrue);
-      expect(
-        out.childFile('lib/model/get_user200_response.dart').existsSync(),
-        isTrue,
-      );
-      expect(out.childFile('lib/model/account.dart').existsSync(), isTrue);
-      expect(out.childFile('lib/model/account_role.dart').existsSync(), isTrue);
+      expect(out.childFile('lib/api.dart'), exists);
+      expect(out.childFile('lib/api_client.dart'), exists);
+      expect(out.childFile('lib/api/default_api.dart'), exists);
+      expect(out.childFile('lib/model/get_user200_response.dart'), exists);
+      expect(out.childFile('lib/model/account.dart'), exists);
+      expect(out.childFile('lib/model/account_role.dart'), exists);
     });
 
     test('with request body', () async {
@@ -265,19 +278,21 @@ void main() {
       final out = fs.directory('spacetraders');
       final logger = _MockLogger();
 
+      File outFile(String path) => out.childFile(path);
+      File modelFile(String path) =>
+          out.childDirectory('lib/model').childFile(path);
+      File apiFile(String path) =>
+          out.childDirectory('lib/api').childFile(path);
+
       await renderToDirectory(spec: spec, outDir: out, logger: logger);
       expect(out.existsSync(), isTrue);
-      expect(out.childFile('lib/api.dart').existsSync(), isTrue);
-      expect(out.childFile('lib/api_client.dart').existsSync(), isTrue);
-      expect(out.childFile('lib/api/fleet_api.dart').existsSync(), isTrue);
-      expect(
-        out.childFile('lib/model/purchase_cargo201_response.dart').existsSync(),
-        isTrue,
-      );
-      expect(
-        out.childFile('lib/model/purchase_cargo_request.dart').existsSync(),
-        isTrue,
-      );
+      expect(outFile('lib/api.dart'), exists);
+      expect(outFile('lib/api_client.dart'), exists);
+      expect(apiFile('fleet_api.dart'), exists);
+      expect(modelFile('purchase_cargo201_response.dart'), exists);
+      expect(modelFile('purchase_cargo201_response_data.dart'), exists);
+      expect(modelFile('purchase_cargo201_response_data_cargo.dart'), exists);
+      expect(modelFile('purchase_cargo_request.dart'), exists);
     });
 
     test('with newtype', () async {
@@ -334,8 +349,8 @@ void main() {
       final logger = _MockLogger();
 
       await renderToDirectory(spec: spec, outDir: out, logger: logger);
-      expect(out.childFile('lib/model/user.dart').existsSync(), isTrue);
-      expect(out.childFile('lib/model/multiplier.dart').existsSync(), isTrue);
+      expect(out.childFile('lib/model/user.dart'), exists);
+      expect(out.childFile('lib/model/multiplier.dart'), exists);
     });
 
     test('with default enum value', () async {
@@ -393,11 +408,8 @@ void main() {
       final logger = _MockLogger();
 
       await renderToDirectory(spec: spec, outDir: out, logger: logger);
-      expect(
-        out.childFile('lib/model/get_user200_response.dart').existsSync(),
-        isTrue,
-      );
-      expect(out.childFile('lib/model/user.dart').existsSync(), isTrue);
+      expect(out.childFile('lib/model/get_user200_response.dart'), exists);
+      expect(out.childFile('lib/model/user.dart'), exists);
     });
 
     test('with additionalProperties', () async {
@@ -434,10 +446,7 @@ void main() {
       final logger = _MockLogger();
 
       await renderToDirectory(spec: spec, outDir: out, logger: logger);
-      expect(
-        out.childFile('lib/model/get_user200_response.dart').existsSync(),
-        isTrue,
-      );
+      expect(out.childFile('lib/model/get_user200_response.dart'), exists);
     });
   });
 }
