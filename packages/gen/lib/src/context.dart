@@ -747,7 +747,7 @@ RenderContext renderSchema(Context context, Schema schema) {
       schemaContext = schema.numberNewtypeTemplateContext();
       template = 'schema_number_newtype';
     case SchemaRenderType.pod:
-      throw Exception('Pod schemas should not be rendered: $schema');
+      throw StateError('Pod schemas should not be rendered: $schema');
   }
 
   final outPath = Paths.modelFilePath(schema);
