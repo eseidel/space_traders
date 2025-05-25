@@ -69,7 +69,7 @@ Future<NavigateShip200ResponseData> navigateToLocalWaypoint(
 
 /// Navigate [ship] to [waypointSymbol] will retry in drift mode if
 /// there is insufficient fuel.
-Future<NavigateShip200ResponseData> warpToWaypoint(
+Future<WarpShip200ResponseData> warpToWaypoint(
   Database db,
   Api api,
   Ship ship,
@@ -83,7 +83,7 @@ Future<NavigateShip200ResponseData> warpToWaypoint(
 /// Sell all cargo matching the [where] predicate.
 /// If [where] is null, sell all cargo.
 /// returns a stream of the sell responses.
-Stream<PurchaseCargo201ResponseData> sellAllCargo(
+Stream<SellCargo201ResponseData> sellAllCargo(
   Database db,
   Api api,
   Market market,

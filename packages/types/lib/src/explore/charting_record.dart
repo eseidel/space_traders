@@ -44,9 +44,9 @@ class ChartedValues {
     );
     final traitSymbols = (json['traitSymbols'] as List<dynamic>)
         .cast<String>()
-        .map((e) => WaypointTraitSymbol.fromJson(e)!)
+        .map(WaypointTraitSymbol.fromJson)
         .toSet();
-    final chart = Chart.fromJson(json['chart'] as Map<String, dynamic>)!;
+    final chart = Chart.fromJson(json['chart'] as Map<String, dynamic>);
     return ChartedValues(
       faction: faction,
       traitSymbols: traitSymbols,

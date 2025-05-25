@@ -36,7 +36,7 @@ class ExtractionRecord extends Equatable {
       waypointSymbol: WaypointSymbol.fromString(
         json['waypointSymbol'] as String,
       ),
-      tradeSymbol: TradeSymbol.fromJson(json['tradeSymbol'] as String)!,
+      tradeSymbol: TradeSymbol.fromJson(json['tradeSymbol'] as String),
       quantity: json['quantity'] as int,
       power: json['power'] as int,
       surveySignature: json['surveySignature'] as String?,

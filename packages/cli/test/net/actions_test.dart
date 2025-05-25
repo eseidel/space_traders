@@ -121,7 +121,7 @@ void main() {
     when(() => fleetApi.orbitShip(any())).thenAnswer(
       (invocation) => Future.value(
         OrbitShip200Response(
-          data: DockShip200ResponseData(nav: _MockShipNav()),
+          data: OrbitShip200ResponseData(nav: _MockShipNav()),
         ),
       ),
     );
@@ -192,7 +192,11 @@ void main() {
     final systemsSnapshot = SystemsSnapshot([]);
 
     final patchResponse = PatchShipNav200Response(
-      data: NavigateShip200ResponseData(nav: shipNav, fuel: shipFuel),
+      data: PatchShipNav200ResponseData(
+        nav: shipNav,
+        fuel: shipFuel,
+        events: [],
+      ),
     );
 
     when(
@@ -284,9 +288,9 @@ void main() {
       (_) => Future.value(
         TransferCargo200Response(
           data: TransferCargo200ResponseData(
-            cargo: ShipCargo(capacity: 100, units: 0),
+            cargo: ShipCargo(capacity: 100, units: 0, inventory: []),
             // Hack to give same cargo for both ships.
-            targetCargo: ShipCargo(capacity: 100, units: 0),
+            targetCargo: ShipCargo(capacity: 100, units: 0, inventory: []),
           ),
         ),
       ),
@@ -338,9 +342,10 @@ void main() {
     final logger = _MockLogger();
 
     final patchResponse = PatchShipNav200Response(
-      data: NavigateShip200ResponseData(
+      data: PatchShipNav200ResponseData(
         nav: shipNav,
         fuel: ShipFuel(current: 0, capacity: 0),
+        events: [],
       ),
     );
 
@@ -460,9 +465,7 @@ void main() {
     verify(
       () => fleetApi.patchShipNav(
         shipSymbol.symbol,
-        patchShipNavRequest: PatchShipNavRequest(
-          flightMode: ShipNavFlightMode.CRUISE,
-        ),
+        patchShipNavRequest: PatchShipNavRequest(),
       ),
     ).called(1);
 
@@ -633,9 +636,9 @@ void main() {
     when(() => fleetApi.sellCargo(any(), any())).thenAnswer(
       (invocation) => Future.value(
         SellCargo201Response(
-          data: PurchaseCargo201ResponseData(
+          data: SellCargo201ResponseData(
             agent: agent.toOpenApi(),
-            cargo: ShipCargo(capacity: 10, units: 0),
+            cargo: ShipCargo(capacity: 10, units: 0, inventory: []),
             transaction: MarketTransaction(
               waypointSymbol: 'S-A-W',
               shipSymbol: shipSymbol.symbol,
@@ -730,7 +733,7 @@ void main() {
       (invocation) => Future.value(
         Jettison200Response(
           data: Jettison200ResponseData(
-            cargo: ShipCargo(capacity: 10, units: 0),
+            cargo: ShipCargo(capacity: 10, units: 0, inventory: []),
           ),
         ),
       ),
@@ -815,7 +818,7 @@ void main() {
 
     // Waypoint already charted exceptions are caught and logged.
     when(() => fleetApi.createChart(shipSymbol.symbol)).thenAnswer(
-      (invocation) => throw ApiException(
+      (invocation) => throw const ApiException(
         400,
         '{"error":{"message":"Waypoint already charted: X1-ZY63-71980E" '
         ',"code":4230,"data":{"waypointSymbol":"X1-ZY63-71980E"}}}',
@@ -829,9 +832,9 @@ void main() {
     ).called(1);
 
     // Any other exception is thrown.
-    when(
-      () => fleetApi.createChart(shipSymbol.symbol),
-    ).thenAnswer((invocation) => throw ApiException(401, 'other exception'));
+    when(() => fleetApi.createChart(shipSymbol.symbol)).thenAnswer(
+      (invocation) => throw const ApiException(401, 'other exception'),
+    );
     expect(
       () => runWithLogger(logger, () async {
         await chartWaypointAndLog(api, db, ship);
@@ -928,7 +931,7 @@ void main() {
     when(() => contractsApi.fulfillContract(any())).thenAnswer(
       (invocation) => Future.value(
         FulfillContract200Response(
-          data: AcceptContract200ResponseData(
+          data: FulfillContract200ResponseData(
             contract: contract.toOpenApi(),
             agent: Agent.test(credits: 1000).toOpenApi(),
           ),
@@ -1010,7 +1013,7 @@ void main() {
     when(() => fleetApi.orbitShip(shipSymbol.symbol)).thenAnswer(
       (invocation) => Future.value(
         OrbitShip200Response(
-          data: DockShip200ResponseData(nav: _MockShipNav()),
+          data: OrbitShip200ResponseData(nav: _MockShipNav()),
         ),
       ),
     );
@@ -1090,7 +1093,7 @@ void main() {
       );
     });
     final agent = Agent.test(credits: 10000000);
-    final cargo = ShipCargo(capacity: 100, units: 0);
+    final cargo = ShipCargo(capacity: 100, units: 0, inventory: []);
     final transaction = MarketTransaction(
       waypointSymbol: waypointSymbol.waypoint,
       shipSymbol: shipSymbol.symbol,
@@ -1184,10 +1187,11 @@ void main() {
     );
 
     when(() => fleetApi.warpShip(any(), request)).thenAnswer((_) async {
-      return NavigateShip200Response(
-        data: NavigateShip200ResponseData(
+      return WarpShip200Response(
+        data: WarpShip200ResponseData(
           fuel: ShipFuel(current: 0, capacity: 0),
           nav: _MockShipNav(),
+          events: [],
         ),
       );
     });

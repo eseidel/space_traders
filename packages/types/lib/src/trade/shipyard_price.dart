@@ -41,7 +41,7 @@ class ShipyardPrice extends PriceBase<ShipType> {
   factory ShipyardPrice.fromJson(Map<String, dynamic> json) {
     return ShipyardPrice(
       waypointSymbol: WaypointSymbol.fromJson(json['waypointSymbol'] as String),
-      shipType: ShipType.fromJson(json['shipType'] as String)!,
+      shipType: ShipType.fromJson(json['shipType'] as String),
       purchasePrice: json['purchasePrice'] as int,
       timestamp: DateTime.parse(json['timestamp'] as String),
     );

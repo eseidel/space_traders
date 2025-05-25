@@ -51,8 +51,8 @@ void main() {
         '"description":"A basic gas siphon that can extract gas from '
         'gas giants and other gas-rich bodies.","strength":10, '
         '"deposits":[],"requirements":{"power":1,"crew":0,"slots":null}}';
-    final a = ShipMount.fromJson(jsonDecode(json))!;
-    final b = ShipMount.fromJson(jsonDecode(json))!;
+    final a = ShipMount.fromJson(jsonDecode(json));
+    final b = ShipMount.fromJson(jsonDecode(json));
 
     final logger = Logger();
     runWithLogger(logger, () {

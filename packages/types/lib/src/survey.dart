@@ -14,7 +14,7 @@ class HistoricalSurvey {
   factory HistoricalSurvey.fromJson(Map<String, dynamic> json) {
     return HistoricalSurvey(
       timestamp: DateTime.parse(json['timestamp'] as String),
-      survey: Survey.fromJson(json['survey'] as Map<String, dynamic>)!,
+      survey: Survey.fromJson(json['survey'] as Map<String, dynamic>),
       exhausted: json['exhausted'] as bool,
     );
   }

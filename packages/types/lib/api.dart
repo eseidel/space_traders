@@ -4,7 +4,7 @@ import 'package:types/types.dart';
 export 'package:openapi/api.dart'
     hide Agent, Contract, JumpGate, Ship, System, SystemWaypoint, Waypoint;
 
-export 'api_compat.dart';
+// export 'api_compat.dart';
 
 /// The default implementation of getNow for production.
 /// Used for tests for overriding the current time.
@@ -129,7 +129,7 @@ extension ContractDeliverGoodUtils on ContractDeliverGood {
       WaypointSymbol.fromString(destinationSymbol);
 
   /// Returns tradeSymbol as a TradeSymbol object.
-  TradeSymbol get tradeSymbolObject => TradeSymbol.fromJson(tradeSymbol)!;
+  TradeSymbol get tradeSymbolObject => TradeSymbol.fromJson(tradeSymbol);
 }
 
 /// Extensions onto Survey to make it easier to work with.
@@ -223,7 +223,7 @@ extension ConstructionMaterialUtils on ConstructionMaterial {
 /// Extensions onto MarketTransaction to make it easier to work with.
 extension MarketTransactionUtils on MarketTransaction {
   /// Returns the TradeSymbol for the given transaction.
-  TradeSymbol get tradeSymbolObject => TradeSymbol.fromJson(tradeSymbol)!;
+  TradeSymbol get tradeSymbolObject => TradeSymbol.fromJson(tradeSymbol);
 
   /// Returns the ShipSymbol for the given transaction.
   ShipSymbol get shipSymbolObject => ShipSymbol.fromString(shipSymbol);
@@ -236,7 +236,7 @@ extension MarketTransactionUtils on MarketTransaction {
 /// Extensions onto ShipyardTransaction to make it easier to work with.
 extension ShipyardTransactionUtils on ShipyardTransaction {
   /// Returns the ShipType purchased in the transaction.
-  ShipType get shipTypeObject => ShipType.fromJson(shipType)!;
+  ShipType get shipTypeObject => ShipType.fromJson(shipType);
 
   /// Returns the WaypointSymbol for the given transaction.
   WaypointSymbol get waypointSymbolObject =>
@@ -276,7 +276,7 @@ extension FactionUtils on Faction {
 /// Compute the trade symbol for the given mount symbol.
 /// TradeSymbols are a superset of ShipMountSymbols so this should never fail.
 TradeSymbol tradeSymbolForMountSymbol(ShipMountSymbol mountSymbol) {
-  return TradeSymbol.fromJson(mountSymbol.value)!;
+  return TradeSymbol.fromJson(mountSymbol.value);
 }
 
 /// Compute the mount symbol for the given trade symbol.

@@ -26,15 +26,15 @@ class MarketListing {
     final symbol = WaypointSymbol.fromJson(json['waypointSymbol'] as String);
     final exports = (json['exports'] as List<dynamic>)
         .cast<String>()
-        .map((e) => TradeSymbol.fromJson(e)!)
+        .map(TradeSymbol.fromJson)
         .toList();
     final imports = (json['imports'] as List<dynamic>)
         .cast<String>()
-        .map((e) => TradeSymbol.fromJson(e)!)
+        .map(TradeSymbol.fromJson)
         .toList();
     final exchange = (json['exchange'] as List<dynamic>)
         .cast<String>()
-        .map((e) => TradeSymbol.fromJson(e)!)
+        .map(TradeSymbol.fromJson)
         .toList();
     return MarketListing(
       waypointSymbol: symbol,
