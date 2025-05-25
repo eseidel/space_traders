@@ -4,8 +4,6 @@ import 'package:types/types.dart';
 export 'package:openapi/api.dart'
     hide Agent, Contract, JumpGate, Ship, System, SystemWaypoint, Waypoint;
 
-// export 'api_compat.dart';
-
 /// The default implementation of getNow for production.
 /// Used for tests for overriding the current time.
 DateTime defaultGetNow() => DateTime.timestamp();
