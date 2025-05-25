@@ -50,31 +50,55 @@ void main() {
         throwsA(isA<UnimplementedError>()),
       );
     });
+
+    test('equals', () {
+      final specJson = {
+        'servers': [
+          {'url': 'https://api.spacetraders.io/v2'},
+        ],
+        'paths': {
+          '/users': {
+            'get': {'summary': 'Get user'},
+          },
+        },
+      };
+      final specOne = parseSpec(
+        specJson,
+        ParseContext.initial(Uri.parse('file:///foo.json')),
+      );
+      final specTwo = parseSpec(
+        specJson,
+        ParseContext.initial(Uri.parse('file:///foo.json')),
+      );
+      expect(specOne, specTwo);
+    });
   });
 
-  test('RefOr equality', () {
-    const bodyOne = RequestBody(
-      pointer: '#/components/requestBodies/Foo',
-      isRequired: true,
-      schema: SchemaRef.ref('#/components/schemas/Foo'),
-    );
-    const bodyTwo = RequestBody(
-      pointer: '#/components/requestBodies/Foo',
-      isRequired: true,
-      schema: SchemaRef.ref('#/components/schemas/Foo'),
-    );
-    const refOrOne = RefOr.object(bodyOne);
-    const refOrTwo = RefOr.object(bodyTwo);
-    const refOrThree = RefOr.object(
-      RequestBody(
-        pointer: '#/components/requestBodies/Bar',
+  group('RefOr', () {
+    test('equality', () {
+      const bodyOne = RequestBody(
+        pointer: '#/components/requestBodies/Foo',
         isRequired: true,
-        schema: SchemaRef.ref('#/components/schemas/Bar'),
-      ),
-    );
-    expect(refOrOne, refOrTwo);
-    expect(refOrOne, isNot(refOrThree));
-    expect(refOrOne.hashCode, refOrTwo.hashCode);
-    expect(refOrOne.hashCode, isNot(refOrThree.hashCode));
+        schema: SchemaRef.ref('#/components/schemas/Foo'),
+      );
+      const bodyTwo = RequestBody(
+        pointer: '#/components/requestBodies/Foo',
+        isRequired: true,
+        schema: SchemaRef.ref('#/components/schemas/Foo'),
+      );
+      const refOrOne = RefOr.object(bodyOne);
+      const refOrTwo = RefOr.object(bodyTwo);
+      const refOrThree = RefOr.object(
+        RequestBody(
+          pointer: '#/components/requestBodies/Bar',
+          isRequired: true,
+          schema: SchemaRef.ref('#/components/schemas/Bar'),
+        ),
+      );
+      expect(refOrOne, refOrTwo);
+      expect(refOrOne, isNot(refOrThree));
+      expect(refOrOne.hashCode, refOrTwo.hashCode);
+      expect(refOrOne.hashCode, isNot(refOrThree.hashCode));
+    });
   });
 }
