@@ -214,6 +214,7 @@ VSCode.  Mostly I just use codecov for viewing coverage.
 ```
 ./packages/db/tools/backup.sh # Optionally save the db contents.
 docker compose down # Shut down services
+sudo rm -rf db_data # Remove existing postgres.
 ```
 
 * Update `open_api_config.yaml` to have the latest git hash.
