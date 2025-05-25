@@ -53,7 +53,7 @@ class AgentEvent {
         id == other.id &&
         type == other.type &&
         message == other.message &&
-        true &&
+        identical(data, other.data) &&
         createdAt == other.createdAt;
   }
 }

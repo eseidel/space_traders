@@ -1,7 +1,7 @@
-import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/shipyard_ship.dart';
 import 'package:openapi/model/shipyard_ship_types_inner.dart';
 import 'package:openapi/model/shipyard_transaction.dart';
+import 'package:openapi/model_helpers.dart';
 
 class Shipyard {
   Shipyard({

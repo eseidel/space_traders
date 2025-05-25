@@ -1,5 +1,5 @@
-import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/ship_cargo_item.dart';
+import 'package:openapi/model_helpers.dart';
 
 class ShipCargo {
   ShipCargo({

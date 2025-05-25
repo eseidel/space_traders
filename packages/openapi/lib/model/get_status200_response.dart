@@ -1,10 +1,10 @@
-import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/get_status200_response_announcements_inner.dart';
 import 'package:openapi/model/get_status200_response_health.dart';
 import 'package:openapi/model/get_status200_response_leaderboards.dart';
 import 'package:openapi/model/get_status200_response_links_inner.dart';
 import 'package:openapi/model/get_status200_response_server_resets.dart';
 import 'package:openapi/model/get_status200_response_stats.dart';
+import 'package:openapi/model_helpers.dart';
 
 class GetStatus200Response {
   GetStatus200Response({

@@ -1,6 +1,6 @@
-import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/faction_symbol.dart';
 import 'package:openapi/model/faction_trait.dart';
+import 'package:openapi/model_helpers.dart';
 
 class Faction {
   Faction({

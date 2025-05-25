@@ -1,10 +1,10 @@
-import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/scanned_ship_engine.dart';
 import 'package:openapi/model/scanned_ship_frame.dart';
 import 'package:openapi/model/scanned_ship_mounts_inner.dart';
 import 'package:openapi/model/scanned_ship_reactor.dart';
 import 'package:openapi/model/ship_nav.dart';
 import 'package:openapi/model/ship_registration.dart';
+import 'package:openapi/model_helpers.dart';
 
 class ScannedShip {
   ScannedShip({

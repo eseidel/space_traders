@@ -1,7 +1,7 @@
-import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/market_trade_good.dart';
 import 'package:openapi/model/market_transaction.dart';
 import 'package:openapi/model/trade_good.dart';
+import 'package:openapi/model_helpers.dart';
 
 class Market {
   Market({

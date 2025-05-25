@@ -1,4 +1,3 @@
-import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/contract_terms.dart';
 import 'package:openapi/model/contract_type.dart';
 

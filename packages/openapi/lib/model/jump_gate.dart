@@ -1,4 +1,4 @@
-import 'package:openapi/api_helpers.dart';
+import 'package:openapi/model_helpers.dart';
 
 class JumpGate {
   JumpGate({required this.symbol, this.connections = const []});

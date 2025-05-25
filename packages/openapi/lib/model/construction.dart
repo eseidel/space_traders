@@ -1,5 +1,5 @@
-import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/construction_material.dart';
+import 'package:openapi/model_helpers.dart';
 
 class Construction {
   Construction({

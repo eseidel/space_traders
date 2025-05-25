@@ -1,7 +1,7 @@
-import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/ship_mount_deposits_inner.dart';
 import 'package:openapi/model/ship_mount_symbol.dart';
 import 'package:openapi/model/ship_requirements.dart';
+import 'package:openapi/model_helpers.dart';
 
 class ShipMount {
   ShipMount({

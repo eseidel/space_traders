@@ -1,8 +1,8 @@
-import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/cooldown.dart';
 import 'package:openapi/model/ship_cargo.dart';
 import 'package:openapi/model/ship_refine201_response_data_consumed_inner.dart';
 import 'package:openapi/model/ship_refine201_response_data_produced_inner.dart';
+import 'package:openapi/model_helpers.dart';
 
 class ShipRefine201ResponseData {
   ShipRefine201ResponseData({

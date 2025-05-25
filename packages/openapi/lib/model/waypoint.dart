@@ -1,10 +1,10 @@
-import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/chart.dart';
 import 'package:openapi/model/waypoint_faction.dart';
 import 'package:openapi/model/waypoint_modifier.dart';
 import 'package:openapi/model/waypoint_orbital.dart';
 import 'package:openapi/model/waypoint_trait.dart';
 import 'package:openapi/model/waypoint_type.dart';
+import 'package:openapi/model_helpers.dart';
 
 class Waypoint {
   Waypoint({

@@ -1,6 +1,6 @@
-import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/contract_deliver_good.dart';
 import 'package:openapi/model/contract_payment.dart';
+import 'package:openapi/model_helpers.dart';
 
 class ContractTerms {
   ContractTerms({

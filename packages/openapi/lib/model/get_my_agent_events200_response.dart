@@ -1,5 +1,5 @@
-import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/agent_event.dart';
+import 'package:openapi/model_helpers.dart';
 
 class GetMyAgentEvents200Response {
   GetMyAgentEvents200Response({this.data = const []});

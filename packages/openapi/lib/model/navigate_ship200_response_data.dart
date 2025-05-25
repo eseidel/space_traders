@@ -1,7 +1,7 @@
-import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/ship_condition_event.dart';
 import 'package:openapi/model/ship_fuel.dart';
 import 'package:openapi/model/ship_nav.dart';
+import 'package:openapi/model_helpers.dart';
 
 class NavigateShip200ResponseData {
   NavigateShip200ResponseData({

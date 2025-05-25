@@ -1,7 +1,7 @@
-import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/system_faction.dart';
 import 'package:openapi/model/system_type.dart';
 import 'package:openapi/model/system_waypoint.dart';
+import 'package:openapi/model_helpers.dart';
 
 class System {
   System({

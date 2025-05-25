@@ -1,6 +1,6 @@
-import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/cooldown.dart';
 import 'package:openapi/model/scanned_waypoint.dart';
+import 'package:openapi/model_helpers.dart';
 
 class CreateShipWaypointScan201ResponseData {
   CreateShipWaypointScan201ResponseData({

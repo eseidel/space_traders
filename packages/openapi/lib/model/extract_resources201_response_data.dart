@@ -1,9 +1,9 @@
-import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/cooldown.dart';
 import 'package:openapi/model/extraction.dart';
 import 'package:openapi/model/ship_cargo.dart';
 import 'package:openapi/model/ship_condition_event.dart';
 import 'package:openapi/model/waypoint_modifier.dart';
+import 'package:openapi/model_helpers.dart';
 
 class ExtractResources201ResponseData {
   ExtractResources201ResponseData({

@@ -1,6 +1,6 @@
-import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/get_status200_response_leaderboards_most_credits_inner.dart';
 import 'package:openapi/model/get_status200_response_leaderboards_most_submitted_charts_inner.dart';
+import 'package:openapi/model_helpers.dart';
 
 class GetStatus200ResponseLeaderboards {
   GetStatus200ResponseLeaderboards({

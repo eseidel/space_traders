@@ -1,6 +1,6 @@
-import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/cooldown.dart';
 import 'package:openapi/model/survey.dart';
+import 'package:openapi/model_helpers.dart';
 
 class CreateSurvey201ResponseData {
   CreateSurvey201ResponseData({

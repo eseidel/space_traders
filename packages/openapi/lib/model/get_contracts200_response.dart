@@ -1,6 +1,6 @@
-import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/contract.dart';
 import 'package:openapi/model/meta.dart';
+import 'package:openapi/model_helpers.dart';
 
 class GetContracts200Response {
   GetContracts200Response({required this.meta, this.data = const []});

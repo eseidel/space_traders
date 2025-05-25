@@ -1,6 +1,6 @@
-import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/cooldown.dart';
 import 'package:openapi/model/scanned_system.dart';
+import 'package:openapi/model_helpers.dart';
 
 class CreateShipSystemScan201ResponseData {
   CreateShipSystemScan201ResponseData({

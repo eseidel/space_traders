@@ -31,6 +31,8 @@ class RefuelShipRequest {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is RefuelShipRequest && units == other.units && true;
+    return other is RefuelShipRequest &&
+        units == other.units &&
+        identical(fromCargo, other.fromCargo);
   }
 }

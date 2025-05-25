@@ -1,4 +1,3 @@
-import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/cooldown.dart';
 import 'package:openapi/model/ship_cargo.dart';
 import 'package:openapi/model/ship_crew.dart';
@@ -10,6 +9,7 @@ import 'package:openapi/model/ship_mount.dart';
 import 'package:openapi/model/ship_nav.dart';
 import 'package:openapi/model/ship_reactor.dart';
 import 'package:openapi/model/ship_registration.dart';
+import 'package:openapi/model_helpers.dart';
 
 class Ship {
   Ship({

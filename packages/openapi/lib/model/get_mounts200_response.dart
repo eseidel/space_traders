@@ -1,5 +1,5 @@
-import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/ship_mount.dart';
+import 'package:openapi/model_helpers.dart';
 
 class GetMounts200Response {
   GetMounts200Response({this.data = const []});

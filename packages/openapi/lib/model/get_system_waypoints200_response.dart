@@ -1,6 +1,6 @@
-import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/meta.dart';
 import 'package:openapi/model/waypoint.dart';
+import 'package:openapi/model_helpers.dart';
 
 class GetSystemWaypoints200Response {
   GetSystemWaypoints200Response({required this.meta, this.data = const []});

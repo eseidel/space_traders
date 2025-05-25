@@ -1,8 +1,8 @@
-import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/cooldown.dart';
 import 'package:openapi/model/ship_cargo.dart';
 import 'package:openapi/model/ship_condition_event.dart';
 import 'package:openapi/model/siphon.dart';
+import 'package:openapi/model_helpers.dart';
 
 class SiphonResources201ResponseData {
   SiphonResources201ResponseData({

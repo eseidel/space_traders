@@ -1,6 +1,6 @@
-import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/waypoint_orbital.dart';
 import 'package:openapi/model/waypoint_type.dart';
+import 'package:openapi/model_helpers.dart';
 
 class SystemWaypoint {
   SystemWaypoint({

@@ -1,6 +1,6 @@
-import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/get_my_factions200_response_data_inner.dart';
 import 'package:openapi/model/meta.dart';
+import 'package:openapi/model_helpers.dart';
 
 class GetMyFactions200Response {
   GetMyFactions200Response({required this.meta, this.data = const []});

@@ -1,6 +1,6 @@
-import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/survey_deposit.dart';
 import 'package:openapi/model/survey_size.dart';
+import 'package:openapi/model_helpers.dart';
 
 class Survey {
   Survey({

@@ -1,8 +1,8 @@
-import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/agent.dart';
 import 'package:openapi/model/ship_cargo.dart';
 import 'package:openapi/model/ship_modification_transaction.dart';
 import 'package:openapi/model/ship_mount.dart';
+import 'package:openapi/model_helpers.dart';
 
 class InstallMount201ResponseData {
   InstallMount201ResponseData({

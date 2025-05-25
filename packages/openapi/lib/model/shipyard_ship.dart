@@ -1,4 +1,3 @@
-import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/activity_level.dart';
 import 'package:openapi/model/ship_engine.dart';
 import 'package:openapi/model/ship_frame.dart';
@@ -8,6 +7,7 @@ import 'package:openapi/model/ship_reactor.dart';
 import 'package:openapi/model/ship_type.dart';
 import 'package:openapi/model/shipyard_ship_crew.dart';
 import 'package:openapi/model/supply_level.dart';
+import 'package:openapi/model_helpers.dart';
 
 class ShipyardShip {
   ShipyardShip({

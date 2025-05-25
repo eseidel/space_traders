@@ -1,8 +1,8 @@
-import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/agent.dart';
 import 'package:openapi/model/contract.dart';
 import 'package:openapi/model/faction.dart';
 import 'package:openapi/model/ship.dart';
+import 'package:openapi/model_helpers.dart';
 
 class Register201ResponseData {
   Register201ResponseData({
