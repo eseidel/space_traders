@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:space_gen/src/logger.dart';
 import 'package:space_gen/src/string.dart';
@@ -173,7 +174,7 @@ enum SchemaType {
 /// An object which either holds a schema or a reference to a schema.
 /// https://spec.openapis.org/oas/v3.0.0#schemaObject
 @immutable
-class RefOr<T> {
+class RefOr<T> extends Equatable {
   const RefOr.ref(this.ref) : object = null;
   const RefOr.object(this.object) : ref = null;
 
@@ -181,15 +182,7 @@ class RefOr<T> {
   final T? object;
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is RefOr<T> &&
-          runtimeType == other.runtimeType &&
-          ref == other.ref &&
-          object == other.object;
-
-  @override
-  int get hashCode => Object.hash(ref, object);
+  List<Object?> get props => [ref, object];
 }
 
 class SchemaRef extends RefOr<Schema> {
