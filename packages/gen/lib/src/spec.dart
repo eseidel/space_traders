@@ -820,16 +820,6 @@ class RefRegistry {
     }
     objectsByUri[uri] = object;
   }
-
-  Uri lookupUri(dynamic object) {
-    final entry = objectsByUri.entries.firstWhereOrNull(
-      (e) => e.value == object,
-    );
-    if (entry == null) {
-      throw StateError('Url not found for object: $object');
-    }
-    return entry.key;
-  }
 }
 
 /// Json pointer is a string that can be used to reference a value in a json
