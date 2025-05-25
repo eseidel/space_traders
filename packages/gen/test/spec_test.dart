@@ -52,7 +52,22 @@ void main() {
     });
 
     test('equals', () {
-      final specJson = {
+      final jsonOne = {
+        'servers': [
+          {'url': 'https://api.spacetraders.io/v2'},
+        ],
+        'paths': {
+          '/users': {
+            'get': {'summary': 'Get user'},
+          },
+        },
+        'components': {
+          'schemas': {
+            'Foo': {'type': 'object'},
+          },
+        },
+      };
+      final jsonTwo = {
         'servers': [
           {'url': 'https://api.spacetraders.io/v2'},
         ],
@@ -63,14 +78,21 @@ void main() {
         },
       };
       final specOne = parseSpec(
-        specJson,
+        jsonOne,
         ParseContext.initial(Uri.parse('file:///foo.json')),
       );
       final specTwo = parseSpec(
-        specJson,
+        jsonOne,
+        ParseContext.initial(Uri.parse('file:///foo.json')),
+      );
+      final specThree = parseSpec(
+        jsonTwo,
         ParseContext.initial(Uri.parse('file:///foo.json')),
       );
       expect(specOne, specTwo);
+      expect(specOne, isNot(specThree));
+      expect(specOne.hashCode, specTwo.hashCode);
+      expect(specOne.hashCode, isNot(specThree.hashCode));
     });
   });
 
