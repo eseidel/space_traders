@@ -1,25 +1,22 @@
-//
-// AUTO-GENERATED FILE, DO NOT MODIFY!
-//
-// @dart=2.18
+import 'package:meta/meta.dart';
 
-// ignore_for_file: unused_element, unused_import
-// ignore_for_file: always_put_required_named_parameters_first
-// ignore_for_file: constant_identifier_names
-// ignore_for_file: lines_longer_than_80_chars
-
-part of openapi;
-
+@immutable
 class ApiException implements Exception {
-  ApiException(this.code, this.message);
+  const ApiException(this.code, this.message)
+    : innerException = null,
+      stackTrace = null;
 
-  ApiException.withInner(
-      this.code, this.message, this.innerException, this.stackTrace);
+  const ApiException.withInner(
+    this.code,
+    this.message,
+    this.innerException,
+    this.stackTrace,
+  );
 
-  int code = 0;
-  String? message;
-  Exception? innerException;
-  StackTrace? stackTrace;
+  final int code;
+  final String? message;
+  final Exception? innerException;
+  final StackTrace? stackTrace;
 
   @override
   String toString() {

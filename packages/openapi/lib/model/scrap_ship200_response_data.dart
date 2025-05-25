@@ -1,129 +1,31 @@
-//
-// AUTO-GENERATED FILE, DO NOT MODIFY!
-//
-// @dart=2.18
-
-// ignore_for_file: unused_element, unused_import
-// ignore_for_file: always_put_required_named_parameters_first
-// ignore_for_file: constant_identifier_names
-// ignore_for_file: lines_longer_than_80_chars
-
-part of openapi;
+import 'package:openapi/model/agent.dart';
+import 'package:openapi/model/scrap_transaction.dart';
 
 class ScrapShip200ResponseData {
-  /// Returns a new [ScrapShip200ResponseData] instance.
-  ScrapShip200ResponseData({
-    required this.agent,
-    required this.transaction,
-  });
+  ScrapShip200ResponseData({required this.agent, required this.transaction});
 
-  Agent agent;
+  factory ScrapShip200ResponseData.fromJson(Map<String, dynamic> json) {
+    return ScrapShip200ResponseData(
+      agent: Agent.fromJson(json['agent'] as Map<String, dynamic>),
+      transaction: ScrapTransaction.fromJson(
+        json['transaction'] as Map<String, dynamic>,
+      ),
+    );
+  }
 
-  ScrapTransaction transaction;
+  /// Convenience to create a nullable type from a nullable json object.
+  /// Useful when parsing optional fields.
+  static ScrapShip200ResponseData? maybeFromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return null;
+    }
+    return ScrapShip200ResponseData.fromJson(json);
+  }
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ScrapShip200ResponseData &&
-          other.agent == agent &&
-          other.transaction == transaction;
-
-  @override
-  int get hashCode =>
-      // ignore: unnecessary_parenthesis
-      (agent.hashCode) + (transaction.hashCode);
-
-  @override
-  String toString() =>
-      'ScrapShip200ResponseData[agent=$agent, transaction=$transaction]';
+  final Agent agent;
+  final ScrapTransaction transaction;
 
   Map<String, dynamic> toJson() {
-    final json = <String, dynamic>{};
-    json[r'agent'] = this.agent;
-    json[r'transaction'] = this.transaction;
-    return json;
+    return {'agent': agent.toJson(), 'transaction': transaction.toJson()};
   }
-
-  /// Returns a new [ScrapShip200ResponseData] instance and imports its values from
-  /// [value] if it's a [Map], null otherwise.
-  // ignore: prefer_constructors_over_static_methods
-  static ScrapShip200ResponseData? fromJson(dynamic value) {
-    if (value is Map) {
-      final json = value.cast<String, dynamic>();
-
-      // Ensure that the map contains the required keys.
-      // Note 1: the values aren't checked for validity beyond being non-null.
-      // Note 2: this code is stripped in release mode!
-      assert(() {
-        requiredKeys.forEach((key) {
-          assert(json.containsKey(key),
-              'Required key "ScrapShip200ResponseData[$key]" is missing from JSON.');
-          assert(json[key] != null,
-              'Required key "ScrapShip200ResponseData[$key]" has a null value in JSON.');
-        });
-        return true;
-      }());
-
-      return ScrapShip200ResponseData(
-        agent: Agent.fromJson(json[r'agent'])!,
-        transaction: ScrapTransaction.fromJson(json[r'transaction'])!,
-      );
-    }
-    return null;
-  }
-
-  static List<ScrapShip200ResponseData> listFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
-    final result = <ScrapShip200ResponseData>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = ScrapShip200ResponseData.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-
-  static Map<String, ScrapShip200ResponseData> mapFromJson(dynamic json) {
-    final map = <String, ScrapShip200ResponseData>{};
-    if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
-      for (final entry in json.entries) {
-        final value = ScrapShip200ResponseData.fromJson(entry.value);
-        if (value != null) {
-          map[entry.key] = value;
-        }
-      }
-    }
-    return map;
-  }
-
-  // maps a json object with a list of ScrapShip200ResponseData-objects as value to a dart map
-  static Map<String, List<ScrapShip200ResponseData>> mapListFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
-    final map = <String, List<ScrapShip200ResponseData>>{};
-    if (json is Map && json.isNotEmpty) {
-      // ignore: parameter_assignments
-      json = json.cast<String, dynamic>();
-      for (final entry in json.entries) {
-        map[entry.key] = ScrapShip200ResponseData.listFromJson(
-          entry.value,
-          growable: growable,
-        );
-      }
-    }
-    return map;
-  }
-
-  /// The list of required keys that must be present in a JSON.
-  static const requiredKeys = <String>{
-    'agent',
-    'transaction',
-  };
 }

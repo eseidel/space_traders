@@ -1,17 +1,7 @@
-//
-// AUTO-GENERATED FILE, DO NOT MODIFY!
-//
-// @dart=2.18
-
-// ignore_for_file: unused_element, unused_import
-// ignore_for_file: always_put_required_named_parameters_first
-// ignore_for_file: constant_identifier_names
-// ignore_for_file: lines_longer_than_80_chars
-
-part of openapi;
+import 'package:openapi/model/ship_reactor_symbol.dart';
+import 'package:openapi/model/ship_requirements.dart';
 
 class ShipReactor {
-  /// Returns a new [ShipReactor] instance.
   ShipReactor({
     required this.symbol,
     required this.name,
@@ -23,263 +13,49 @@ class ShipReactor {
     required this.quality,
   });
 
-  /// Symbol of the reactor.
-  ShipReactorSymbolEnum symbol;
+  factory ShipReactor.fromJson(Map<String, dynamic> json) {
+    return ShipReactor(
+      symbol: ShipReactorSymbol.fromJson(json['symbol'] as String),
+      name: json['name'] as String,
+      condition: json['condition'] as double,
+      integrity: json['integrity'] as double,
+      description: json['description'] as String,
+      powerOutput: json['powerOutput'] as int,
+      requirements: ShipRequirements.fromJson(
+        json['requirements'] as Map<String, dynamic>,
+      ),
+      quality: json['quality'] as double,
+    );
+  }
 
-  /// Name of the reactor.
-  String name;
+  /// Convenience to create a nullable type from a nullable json object.
+  /// Useful when parsing optional fields.
+  static ShipReactor? maybeFromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return null;
+    }
+    return ShipReactor.fromJson(json);
+  }
 
-  /// The repairable condition of a component. A value of 0 indicates the component needs significant repairs, while a value of 1 indicates the component is in near perfect condition. As the condition of a component is repaired, the overall integrity of the component decreases.
-  ///
-  /// Minimum value: 0
-  /// Maximum value: 1
-  double condition;
-
-  /// The overall integrity of the component, which determines the performance of the component. A value of 0 indicates that the component is almost completely degraded, while a value of 1 indicates that the component is in near perfect condition. The integrity of the component is non-repairable, and represents permanent wear over time.
-  ///
-  /// Minimum value: 0
-  /// Maximum value: 1
-  double integrity;
-
-  /// Description of the reactor.
-  String description;
-
-  /// The amount of power provided by this reactor. The more power a reactor provides to the ship, the lower the cooldown it gets when using a module or mount that taxes the ship's power.
-  ///
-  /// Minimum value: 1
-  int powerOutput;
-
-  ShipRequirements requirements;
-
-  /// The overall quality of the component, which determines the quality of the component. High quality components return more ships parts and ship plating when a ship is scrapped. But also require more of these parts to repair. This is transparent to the player, as the parts are bought from/sold to the marketplace.
-  num quality;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ShipReactor &&
-          other.symbol == symbol &&
-          other.name == name &&
-          other.condition == condition &&
-          other.integrity == integrity &&
-          other.description == description &&
-          other.powerOutput == powerOutput &&
-          other.requirements == requirements &&
-          other.quality == quality;
-
-  @override
-  int get hashCode =>
-      // ignore: unnecessary_parenthesis
-      (symbol.hashCode) +
-      (name.hashCode) +
-      (condition.hashCode) +
-      (integrity.hashCode) +
-      (description.hashCode) +
-      (powerOutput.hashCode) +
-      (requirements.hashCode) +
-      (quality.hashCode);
-
-  @override
-  String toString() =>
-      'ShipReactor[symbol=$symbol, name=$name, condition=$condition, integrity=$integrity, description=$description, powerOutput=$powerOutput, requirements=$requirements, quality=$quality]';
+  final ShipReactorSymbol symbol;
+  final String name;
+  final double condition;
+  final double integrity;
+  final String description;
+  final int powerOutput;
+  final ShipRequirements requirements;
+  final double quality;
 
   Map<String, dynamic> toJson() {
-    final json = <String, dynamic>{};
-    json[r'symbol'] = this.symbol;
-    json[r'name'] = this.name;
-    json[r'condition'] = this.condition;
-    json[r'integrity'] = this.integrity;
-    json[r'description'] = this.description;
-    json[r'powerOutput'] = this.powerOutput;
-    json[r'requirements'] = this.requirements;
-    json[r'quality'] = this.quality;
-    return json;
+    return {
+      'symbol': symbol.toJson(),
+      'name': name,
+      'condition': condition,
+      'integrity': integrity,
+      'description': description,
+      'powerOutput': powerOutput,
+      'requirements': requirements.toJson(),
+      'quality': quality,
+    };
   }
-
-  /// Returns a new [ShipReactor] instance and imports its values from
-  /// [value] if it's a [Map], null otherwise.
-  // ignore: prefer_constructors_over_static_methods
-  static ShipReactor? fromJson(dynamic value) {
-    if (value is Map) {
-      final json = value.cast<String, dynamic>();
-
-      // Ensure that the map contains the required keys.
-      // Note 1: the values aren't checked for validity beyond being non-null.
-      // Note 2: this code is stripped in release mode!
-      assert(() {
-        requiredKeys.forEach((key) {
-          assert(json.containsKey(key),
-              'Required key "ShipReactor[$key]" is missing from JSON.');
-          assert(json[key] != null,
-              'Required key "ShipReactor[$key]" has a null value in JSON.');
-        });
-        return true;
-      }());
-
-      return ShipReactor(
-        symbol: ShipReactorSymbolEnum.fromJson(json[r'symbol'])!,
-        name: mapValueOfType<String>(json, r'name')!,
-        condition: mapValueOfType<num>(json, r'condition')!.toDouble(),
-        integrity: mapValueOfType<num>(json, r'integrity')!.toDouble(),
-        description: mapValueOfType<String>(json, r'description')!,
-        powerOutput: mapValueOfType<int>(json, r'powerOutput')!,
-        requirements: ShipRequirements.fromJson(json[r'requirements'])!,
-        quality: num.parse('${json[r'quality']}'),
-      );
-    }
-    return null;
-  }
-
-  static List<ShipReactor> listFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
-    final result = <ShipReactor>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = ShipReactor.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-
-  static Map<String, ShipReactor> mapFromJson(dynamic json) {
-    final map = <String, ShipReactor>{};
-    if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
-      for (final entry in json.entries) {
-        final value = ShipReactor.fromJson(entry.value);
-        if (value != null) {
-          map[entry.key] = value;
-        }
-      }
-    }
-    return map;
-  }
-
-  // maps a json object with a list of ShipReactor-objects as value to a dart map
-  static Map<String, List<ShipReactor>> mapListFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
-    final map = <String, List<ShipReactor>>{};
-    if (json is Map && json.isNotEmpty) {
-      // ignore: parameter_assignments
-      json = json.cast<String, dynamic>();
-      for (final entry in json.entries) {
-        map[entry.key] = ShipReactor.listFromJson(
-          entry.value,
-          growable: growable,
-        );
-      }
-    }
-    return map;
-  }
-
-  /// The list of required keys that must be present in a JSON.
-  static const requiredKeys = <String>{
-    'symbol',
-    'name',
-    'condition',
-    'integrity',
-    'description',
-    'powerOutput',
-    'requirements',
-    'quality',
-  };
-}
-
-/// Symbol of the reactor.
-class ShipReactorSymbolEnum {
-  /// Instantiate a new enum with the provided [value].
-  const ShipReactorSymbolEnum._(this.value);
-
-  /// The underlying value of this enum member.
-  final String value;
-
-  @override
-  String toString() => value;
-
-  String toJson() => value;
-
-  static const SOLAR_I = ShipReactorSymbolEnum._(r'REACTOR_SOLAR_I');
-  static const FUSION_I = ShipReactorSymbolEnum._(r'REACTOR_FUSION_I');
-  static const FISSION_I = ShipReactorSymbolEnum._(r'REACTOR_FISSION_I');
-  static const CHEMICAL_I = ShipReactorSymbolEnum._(r'REACTOR_CHEMICAL_I');
-  static const ANTIMATTER_I = ShipReactorSymbolEnum._(r'REACTOR_ANTIMATTER_I');
-
-  /// List of all possible values in this [enum][ShipReactorSymbolEnum].
-  static const values = <ShipReactorSymbolEnum>[
-    SOLAR_I,
-    FUSION_I,
-    FISSION_I,
-    CHEMICAL_I,
-    ANTIMATTER_I,
-  ];
-
-  static ShipReactorSymbolEnum? fromJson(dynamic value) =>
-      ShipReactorSymbolEnumTypeTransformer().decode(value);
-
-  static List<ShipReactorSymbolEnum> listFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
-    final result = <ShipReactorSymbolEnum>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = ShipReactorSymbolEnum.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-}
-
-/// Transformation class that can [encode] an instance of [ShipReactorSymbolEnum] to String,
-/// and [decode] dynamic data back to [ShipReactorSymbolEnum].
-class ShipReactorSymbolEnumTypeTransformer {
-  factory ShipReactorSymbolEnumTypeTransformer() =>
-      _instance ??= const ShipReactorSymbolEnumTypeTransformer._();
-
-  const ShipReactorSymbolEnumTypeTransformer._();
-
-  String encode(ShipReactorSymbolEnum data) => data.value;
-
-  /// Decodes a [dynamic value][data] to a ShipReactorSymbolEnum.
-  ///
-  /// If [allowNull] is true and the [dynamic value][data] cannot be decoded successfully,
-  /// then null is returned. However, if [allowNull] is false and the [dynamic value][data]
-  /// cannot be decoded successfully, then an [UnimplementedError] is thrown.
-  ///
-  /// The [allowNull] is very handy when an API changes and a new enum value is added or removed,
-  /// and users are still using an old app with the old code.
-  ShipReactorSymbolEnum? decode(dynamic data, {bool allowNull = true}) {
-    if (data != null) {
-      switch (data) {
-        case r'REACTOR_SOLAR_I':
-          return ShipReactorSymbolEnum.SOLAR_I;
-        case r'REACTOR_FUSION_I':
-          return ShipReactorSymbolEnum.FUSION_I;
-        case r'REACTOR_FISSION_I':
-          return ShipReactorSymbolEnum.FISSION_I;
-        case r'REACTOR_CHEMICAL_I':
-          return ShipReactorSymbolEnum.CHEMICAL_I;
-        case r'REACTOR_ANTIMATTER_I':
-          return ShipReactorSymbolEnum.ANTIMATTER_I;
-        default:
-          if (!allowNull) {
-            throw ArgumentError('Unknown enum value to decode: $data');
-          }
-      }
-    }
-    return null;
-  }
-
-  /// Singleton [ShipReactorSymbolEnumTypeTransformer] instance.
-  static ShipReactorSymbolEnumTypeTransformer? _instance;
 }

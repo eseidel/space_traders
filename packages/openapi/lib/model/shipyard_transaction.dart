@@ -1,17 +1,4 @@
-//
-// AUTO-GENERATED FILE, DO NOT MODIFY!
-//
-// @dart=2.18
-
-// ignore_for_file: unused_element, unused_import
-// ignore_for_file: always_put_required_named_parameters_first
-// ignore_for_file: constant_identifier_names
-// ignore_for_file: lines_longer_than_80_chars
-
-part of openapi;
-
 class ShipyardTransaction {
-  /// Returns a new [ShipyardTransaction] instance.
   ShipyardTransaction({
     required this.waypointSymbol,
     required this.shipSymbol,
@@ -21,150 +8,41 @@ class ShipyardTransaction {
     required this.timestamp,
   });
 
-  /// The symbol of the waypoint.
-  String waypointSymbol;
+  factory ShipyardTransaction.fromJson(Map<String, dynamic> json) {
+    return ShipyardTransaction(
+      waypointSymbol: json['waypointSymbol'] as String,
+      shipSymbol: json['shipSymbol'] as String,
+      shipType: json['shipType'] as String,
+      price: json['price'] as int,
+      agentSymbol: json['agentSymbol'] as String,
+      timestamp: DateTime.parse(json['timestamp'] as String),
+    );
+  }
 
-  /// The symbol of the ship type (e.g. SHIP_MINING_DRONE) that was the subject of the transaction. Contrary to what the name implies, this is NOT the symbol of the ship that was purchased.
-  String shipSymbol;
+  /// Convenience to create a nullable type from a nullable json object.
+  /// Useful when parsing optional fields.
+  static ShipyardTransaction? maybeFromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return null;
+    }
+    return ShipyardTransaction.fromJson(json);
+  }
 
-  /// The symbol of the ship type (e.g. SHIP_MINING_DRONE) that was the subject of the transaction.
-  String shipType;
-
-  /// The price of the transaction.
-  ///
-  /// Minimum value: 0
-  int price;
-
-  /// The symbol of the agent that made the transaction.
-  String agentSymbol;
-
-  /// The timestamp of the transaction.
-  DateTime timestamp;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ShipyardTransaction &&
-          other.waypointSymbol == waypointSymbol &&
-          other.shipSymbol == shipSymbol &&
-          other.shipType == shipType &&
-          other.price == price &&
-          other.agentSymbol == agentSymbol &&
-          other.timestamp == timestamp;
-
-  @override
-  int get hashCode =>
-      // ignore: unnecessary_parenthesis
-      (waypointSymbol.hashCode) +
-      (shipSymbol.hashCode) +
-      (shipType.hashCode) +
-      (price.hashCode) +
-      (agentSymbol.hashCode) +
-      (timestamp.hashCode);
-
-  @override
-  String toString() =>
-      'ShipyardTransaction[waypointSymbol=$waypointSymbol, shipSymbol=$shipSymbol, shipType=$shipType, price=$price, agentSymbol=$agentSymbol, timestamp=$timestamp]';
+  final String waypointSymbol;
+  final String shipSymbol;
+  final String shipType;
+  final int price;
+  final String agentSymbol;
+  final DateTime timestamp;
 
   Map<String, dynamic> toJson() {
-    final json = <String, dynamic>{};
-    json[r'waypointSymbol'] = this.waypointSymbol;
-    json[r'shipSymbol'] = this.shipSymbol;
-    json[r'shipType'] = this.shipType;
-    json[r'price'] = this.price;
-    json[r'agentSymbol'] = this.agentSymbol;
-    json[r'timestamp'] = this.timestamp.toUtc().toIso8601String();
-    return json;
+    return {
+      'waypointSymbol': waypointSymbol,
+      'shipSymbol': shipSymbol,
+      'shipType': shipType,
+      'price': price,
+      'agentSymbol': agentSymbol,
+      'timestamp': timestamp.toIso8601String(),
+    };
   }
-
-  /// Returns a new [ShipyardTransaction] instance and imports its values from
-  /// [value] if it's a [Map], null otherwise.
-  // ignore: prefer_constructors_over_static_methods
-  static ShipyardTransaction? fromJson(dynamic value) {
-    if (value is Map) {
-      final json = value.cast<String, dynamic>();
-
-      // Ensure that the map contains the required keys.
-      // Note 1: the values aren't checked for validity beyond being non-null.
-      // Note 2: this code is stripped in release mode!
-      assert(() {
-        requiredKeys.forEach((key) {
-          assert(json.containsKey(key),
-              'Required key "ShipyardTransaction[$key]" is missing from JSON.');
-          assert(json[key] != null,
-              'Required key "ShipyardTransaction[$key]" has a null value in JSON.');
-        });
-        return true;
-      }());
-
-      return ShipyardTransaction(
-        waypointSymbol: mapValueOfType<String>(json, r'waypointSymbol')!,
-        shipSymbol: mapValueOfType<String>(json, r'shipSymbol')!,
-        shipType: mapValueOfType<String>(json, r'shipType')!,
-        price: mapValueOfType<int>(json, r'price')!,
-        agentSymbol: mapValueOfType<String>(json, r'agentSymbol')!,
-        timestamp: mapDateTime(json, r'timestamp', r'')!,
-      );
-    }
-    return null;
-  }
-
-  static List<ShipyardTransaction> listFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
-    final result = <ShipyardTransaction>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = ShipyardTransaction.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-
-  static Map<String, ShipyardTransaction> mapFromJson(dynamic json) {
-    final map = <String, ShipyardTransaction>{};
-    if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
-      for (final entry in json.entries) {
-        final value = ShipyardTransaction.fromJson(entry.value);
-        if (value != null) {
-          map[entry.key] = value;
-        }
-      }
-    }
-    return map;
-  }
-
-  // maps a json object with a list of ShipyardTransaction-objects as value to a dart map
-  static Map<String, List<ShipyardTransaction>> mapListFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
-    final map = <String, List<ShipyardTransaction>>{};
-    if (json is Map && json.isNotEmpty) {
-      // ignore: parameter_assignments
-      json = json.cast<String, dynamic>();
-      for (final entry in json.entries) {
-        map[entry.key] = ShipyardTransaction.listFromJson(
-          entry.value,
-          growable: growable,
-        );
-      }
-    }
-    return map;
-  }
-
-  /// The list of required keys that must be present in a JSON.
-  static const requiredKeys = <String>{
-    'waypointSymbol',
-    'shipSymbol',
-    'shipType',
-    'price',
-    'agentSymbol',
-    'timestamp',
-  };
 }

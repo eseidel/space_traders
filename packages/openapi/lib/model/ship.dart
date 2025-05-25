@@ -1,17 +1,16 @@
-//
-// AUTO-GENERATED FILE, DO NOT MODIFY!
-//
-// @dart=2.18
-
-// ignore_for_file: unused_element, unused_import
-// ignore_for_file: always_put_required_named_parameters_first
-// ignore_for_file: constant_identifier_names
-// ignore_for_file: lines_longer_than_80_chars
-
-part of openapi;
+import 'package:openapi/model/cooldown.dart';
+import 'package:openapi/model/ship_cargo.dart';
+import 'package:openapi/model/ship_crew.dart';
+import 'package:openapi/model/ship_engine.dart';
+import 'package:openapi/model/ship_frame.dart';
+import 'package:openapi/model/ship_fuel.dart';
+import 'package:openapi/model/ship_module.dart';
+import 'package:openapi/model/ship_mount.dart';
+import 'package:openapi/model/ship_nav.dart';
+import 'package:openapi/model/ship_reactor.dart';
+import 'package:openapi/model/ship_registration.dart';
 
 class Ship {
-  /// Returns a new [Ship] instance.
   Ship({
     required this.symbol,
     required this.registration,
@@ -20,194 +19,78 @@ class Ship {
     required this.frame,
     required this.reactor,
     required this.engine,
-    this.modules = const [],
-    this.mounts = const [],
+    required this.modules,
+    required this.mounts,
     required this.cargo,
     required this.fuel,
     required this.cooldown,
   });
 
-  /// The globally unique identifier of the ship in the following format: `[AGENT_SYMBOL]-[HEX_ID]`
-  String symbol;
+  factory Ship.fromJson(Map<String, dynamic> json) {
+    return Ship(
+      symbol: json['symbol'] as String,
+      registration: ShipRegistration.fromJson(
+        json['registration'] as Map<String, dynamic>,
+      ),
+      nav: ShipNav.fromJson(json['nav'] as Map<String, dynamic>),
+      crew: ShipCrew.fromJson(json['crew'] as Map<String, dynamic>),
+      frame: ShipFrame.fromJson(json['frame'] as Map<String, dynamic>),
+      reactor: ShipReactor.fromJson(json['reactor'] as Map<String, dynamic>),
+      engine: ShipEngine.fromJson(json['engine'] as Map<String, dynamic>),
+      modules:
+          (json['modules'] as List<dynamic>)
+              .map<ShipModule>(
+                (e) => ShipModule.fromJson(e as Map<String, dynamic>),
+              )
+              .toList(),
+      mounts:
+          (json['mounts'] as List<dynamic>)
+              .map<ShipMount>(
+                (e) => ShipMount.fromJson(e as Map<String, dynamic>),
+              )
+              .toList(),
+      cargo: ShipCargo.fromJson(json['cargo'] as Map<String, dynamic>),
+      fuel: ShipFuel.fromJson(json['fuel'] as Map<String, dynamic>),
+      cooldown: Cooldown.fromJson(json['cooldown'] as Map<String, dynamic>),
+    );
+  }
 
-  ShipRegistration registration;
+  /// Convenience to create a nullable type from a nullable json object.
+  /// Useful when parsing optional fields.
+  static Ship? maybeFromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return null;
+    }
+    return Ship.fromJson(json);
+  }
 
-  ShipNav nav;
-
-  ShipCrew crew;
-
-  ShipFrame frame;
-
-  ShipReactor reactor;
-
-  ShipEngine engine;
-
-  /// Modules installed in this ship.
-  List<ShipModule> modules;
-
-  /// Mounts installed in this ship.
-  List<ShipMount> mounts;
-
-  ShipCargo cargo;
-
-  ShipFuel fuel;
-
-  Cooldown cooldown;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Ship &&
-          other.symbol == symbol &&
-          other.registration == registration &&
-          other.nav == nav &&
-          other.crew == crew &&
-          other.frame == frame &&
-          other.reactor == reactor &&
-          other.engine == engine &&
-          _deepEquality.equals(other.modules, modules) &&
-          _deepEquality.equals(other.mounts, mounts) &&
-          other.cargo == cargo &&
-          other.fuel == fuel &&
-          other.cooldown == cooldown;
-
-  @override
-  int get hashCode =>
-      // ignore: unnecessary_parenthesis
-      (symbol.hashCode) +
-      (registration.hashCode) +
-      (nav.hashCode) +
-      (crew.hashCode) +
-      (frame.hashCode) +
-      (reactor.hashCode) +
-      (engine.hashCode) +
-      (modules.hashCode) +
-      (mounts.hashCode) +
-      (cargo.hashCode) +
-      (fuel.hashCode) +
-      (cooldown.hashCode);
-
-  @override
-  String toString() =>
-      'Ship[symbol=$symbol, registration=$registration, nav=$nav, crew=$crew, frame=$frame, reactor=$reactor, engine=$engine, modules=$modules, mounts=$mounts, cargo=$cargo, fuel=$fuel, cooldown=$cooldown]';
+  final String symbol;
+  final ShipRegistration registration;
+  final ShipNav nav;
+  final ShipCrew crew;
+  final ShipFrame frame;
+  final ShipReactor reactor;
+  final ShipEngine engine;
+  final List<ShipModule> modules;
+  final List<ShipMount> mounts;
+  final ShipCargo cargo;
+  final ShipFuel fuel;
+  final Cooldown cooldown;
 
   Map<String, dynamic> toJson() {
-    final json = <String, dynamic>{};
-    json[r'symbol'] = this.symbol;
-    json[r'registration'] = this.registration;
-    json[r'nav'] = this.nav;
-    json[r'crew'] = this.crew;
-    json[r'frame'] = this.frame;
-    json[r'reactor'] = this.reactor;
-    json[r'engine'] = this.engine;
-    json[r'modules'] = this.modules;
-    json[r'mounts'] = this.mounts;
-    json[r'cargo'] = this.cargo;
-    json[r'fuel'] = this.fuel;
-    json[r'cooldown'] = this.cooldown;
-    return json;
+    return {
+      'symbol': symbol,
+      'registration': registration.toJson(),
+      'nav': nav.toJson(),
+      'crew': crew.toJson(),
+      'frame': frame.toJson(),
+      'reactor': reactor.toJson(),
+      'engine': engine.toJson(),
+      'modules': modules.map((e) => e.toJson()).toList(),
+      'mounts': mounts.map((e) => e.toJson()).toList(),
+      'cargo': cargo.toJson(),
+      'fuel': fuel.toJson(),
+      'cooldown': cooldown.toJson(),
+    };
   }
-
-  /// Returns a new [Ship] instance and imports its values from
-  /// [value] if it's a [Map], null otherwise.
-  // ignore: prefer_constructors_over_static_methods
-  static Ship? fromJson(dynamic value) {
-    if (value is Map) {
-      final json = value.cast<String, dynamic>();
-
-      // Ensure that the map contains the required keys.
-      // Note 1: the values aren't checked for validity beyond being non-null.
-      // Note 2: this code is stripped in release mode!
-      assert(() {
-        requiredKeys.forEach((key) {
-          assert(json.containsKey(key),
-              'Required key "Ship[$key]" is missing from JSON.');
-          assert(json[key] != null,
-              'Required key "Ship[$key]" has a null value in JSON.');
-        });
-        return true;
-      }());
-
-      return Ship(
-        symbol: mapValueOfType<String>(json, r'symbol')!,
-        registration: ShipRegistration.fromJson(json[r'registration'])!,
-        nav: ShipNav.fromJson(json[r'nav'])!,
-        crew: ShipCrew.fromJson(json[r'crew'])!,
-        frame: ShipFrame.fromJson(json[r'frame'])!,
-        reactor: ShipReactor.fromJson(json[r'reactor'])!,
-        engine: ShipEngine.fromJson(json[r'engine'])!,
-        modules: ShipModule.listFromJson(json[r'modules']),
-        mounts: ShipMount.listFromJson(json[r'mounts']),
-        cargo: ShipCargo.fromJson(json[r'cargo'])!,
-        fuel: ShipFuel.fromJson(json[r'fuel'])!,
-        cooldown: Cooldown.fromJson(json[r'cooldown'])!,
-      );
-    }
-    return null;
-  }
-
-  static List<Ship> listFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
-    final result = <Ship>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = Ship.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-
-  static Map<String, Ship> mapFromJson(dynamic json) {
-    final map = <String, Ship>{};
-    if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
-      for (final entry in json.entries) {
-        final value = Ship.fromJson(entry.value);
-        if (value != null) {
-          map[entry.key] = value;
-        }
-      }
-    }
-    return map;
-  }
-
-  // maps a json object with a list of Ship-objects as value to a dart map
-  static Map<String, List<Ship>> mapListFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
-    final map = <String, List<Ship>>{};
-    if (json is Map && json.isNotEmpty) {
-      // ignore: parameter_assignments
-      json = json.cast<String, dynamic>();
-      for (final entry in json.entries) {
-        map[entry.key] = Ship.listFromJson(
-          entry.value,
-          growable: growable,
-        );
-      }
-    }
-    return map;
-  }
-
-  /// The list of required keys that must be present in a JSON.
-  static const requiredKeys = <String>{
-    'symbol',
-    'registration',
-    'nav',
-    'crew',
-    'frame',
-    'reactor',
-    'engine',
-    'modules',
-    'mounts',
-    'cargo',
-    'fuel',
-    'cooldown',
-  };
 }

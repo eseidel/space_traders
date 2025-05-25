@@ -1,14 +1,14 @@
 # These names I inferred from https://github.com/OpenAPITools/openapi-generator/blob/master/docs/configuration.md
 # but they seem to work:
 inputSpec: spacetraders.json
-outputDir: spacetraders
+outputDir: ../../openapi
 generatorName: dart
 
 # Dart specific config:
 # https://github.com/OpenAPITools/openapi-generator/blob/master/docs/generators/dart.md
 # Also:
 # openapi-generator config-help -g dart
-pubName: spacetraders
+pubName: openapi
 pubAuthor: Eric Seidel
 pubAuthorEmail: eric@shorebird.dev
 pubDescription: SpaceTraders API

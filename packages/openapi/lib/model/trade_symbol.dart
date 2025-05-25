@@ -1,678 +1,160 @@
-//
-// AUTO-GENERATED FILE, DO NOT MODIFY!
-//
-// @dart=2.18
+enum TradeSymbol {
+  PRECIOUS_STONES._('PRECIOUS_STONES'),
+  QUARTZ_SAND._('QUARTZ_SAND'),
+  SILICON_CRYSTALS._('SILICON_CRYSTALS'),
+  AMMONIA_ICE._('AMMONIA_ICE'),
+  LIQUID_HYDROGEN._('LIQUID_HYDROGEN'),
+  LIQUID_NITROGEN._('LIQUID_NITROGEN'),
+  ICE_WATER._('ICE_WATER'),
+  EXOTIC_MATTER._('EXOTIC_MATTER'),
+  ADVANCED_CIRCUITRY._('ADVANCED_CIRCUITRY'),
+  GRAVITON_EMITTERS._('GRAVITON_EMITTERS'),
+  IRON._('IRON'),
+  IRON_ORE._('IRON_ORE'),
+  COPPER._('COPPER'),
+  COPPER_ORE._('COPPER_ORE'),
+  ALUMINUM._('ALUMINUM'),
+  ALUMINUM_ORE._('ALUMINUM_ORE'),
+  SILVER._('SILVER'),
+  SILVER_ORE._('SILVER_ORE'),
+  GOLD._('GOLD'),
+  GOLD_ORE._('GOLD_ORE'),
+  PLATINUM._('PLATINUM'),
+  PLATINUM_ORE._('PLATINUM_ORE'),
+  DIAMONDS._('DIAMONDS'),
+  URANITE._('URANITE'),
+  URANITE_ORE._('URANITE_ORE'),
+  MERITIUM._('MERITIUM'),
+  MERITIUM_ORE._('MERITIUM_ORE'),
+  HYDROCARBON._('HYDROCARBON'),
+  ANTIMATTER._('ANTIMATTER'),
+  FAB_MATS._('FAB_MATS'),
+  FERTILIZERS._('FERTILIZERS'),
+  FABRICS._('FABRICS'),
+  FOOD._('FOOD'),
+  JEWELRY._('JEWELRY'),
+  MACHINERY._('MACHINERY'),
+  FIREARMS._('FIREARMS'),
+  ASSAULT_RIFLES._('ASSAULT_RIFLES'),
+  MILITARY_EQUIPMENT._('MILITARY_EQUIPMENT'),
+  EXPLOSIVES._('EXPLOSIVES'),
+  LAB_INSTRUMENTS._('LAB_INSTRUMENTS'),
+  AMMUNITION._('AMMUNITION'),
+  ELECTRONICS._('ELECTRONICS'),
+  SHIP_PLATING._('SHIP_PLATING'),
+  SHIP_PARTS._('SHIP_PARTS'),
+  EQUIPMENT._('EQUIPMENT'),
+  FUEL._('FUEL'),
+  MEDICINE._('MEDICINE'),
+  DRUGS._('DRUGS'),
+  CLOTHING._('CLOTHING'),
+  MICROPROCESSORS._('MICROPROCESSORS'),
+  PLASTICS._('PLASTICS'),
+  POLYNUCLEOTIDES._('POLYNUCLEOTIDES'),
+  BIOCOMPOSITES._('BIOCOMPOSITES'),
+  QUANTUM_STABILIZERS._('QUANTUM_STABILIZERS'),
+  NANOBOTS._('NANOBOTS'),
+  AI_MAINFRAMES._('AI_MAINFRAMES'),
+  QUANTUM_DRIVES._('QUANTUM_DRIVES'),
+  ROBOTIC_DRONES._('ROBOTIC_DRONES'),
+  CYBER_IMPLANTS._('CYBER_IMPLANTS'),
+  GENE_THERAPEUTICS._('GENE_THERAPEUTICS'),
+  NEURAL_CHIPS._('NEURAL_CHIPS'),
+  MOOD_REGULATORS._('MOOD_REGULATORS'),
+  VIRAL_AGENTS._('VIRAL_AGENTS'),
+  MICRO_FUSION_GENERATORS._('MICRO_FUSION_GENERATORS'),
+  SUPERGRAINS._('SUPERGRAINS'),
+  LASER_RIFLES._('LASER_RIFLES'),
+  HOLOGRAPHICS._('HOLOGRAPHICS'),
+  SHIP_SALVAGE._('SHIP_SALVAGE'),
+  RELIC_TECH._('RELIC_TECH'),
+  NOVEL_LIFEFORMS._('NOVEL_LIFEFORMS'),
+  BOTANICAL_SPECIMENS._('BOTANICAL_SPECIMENS'),
+  CULTURAL_ARTIFACTS._('CULTURAL_ARTIFACTS'),
+  FRAME_PROBE._('FRAME_PROBE'),
+  FRAME_DRONE._('FRAME_DRONE'),
+  FRAME_INTERCEPTOR._('FRAME_INTERCEPTOR'),
+  FRAME_RACER._('FRAME_RACER'),
+  FRAME_FIGHTER._('FRAME_FIGHTER'),
+  FRAME_FRIGATE._('FRAME_FRIGATE'),
+  FRAME_SHUTTLE._('FRAME_SHUTTLE'),
+  FRAME_EXPLORER._('FRAME_EXPLORER'),
+  FRAME_MINER._('FRAME_MINER'),
+  FRAME_LIGHT_FREIGHTER._('FRAME_LIGHT_FREIGHTER'),
+  FRAME_HEAVY_FREIGHTER._('FRAME_HEAVY_FREIGHTER'),
+  FRAME_TRANSPORT._('FRAME_TRANSPORT'),
+  FRAME_DESTROYER._('FRAME_DESTROYER'),
+  FRAME_CRUISER._('FRAME_CRUISER'),
+  FRAME_CARRIER._('FRAME_CARRIER'),
+  FRAME_BULK_FREIGHTER._('FRAME_BULK_FREIGHTER'),
+  REACTOR_SOLAR_I._('REACTOR_SOLAR_I'),
+  REACTOR_FUSION_I._('REACTOR_FUSION_I'),
+  REACTOR_FISSION_I._('REACTOR_FISSION_I'),
+  REACTOR_CHEMICAL_I._('REACTOR_CHEMICAL_I'),
+  REACTOR_ANTIMATTER_I._('REACTOR_ANTIMATTER_I'),
+  ENGINE_IMPULSE_DRIVE_I._('ENGINE_IMPULSE_DRIVE_I'),
+  ENGINE_ION_DRIVE_I._('ENGINE_ION_DRIVE_I'),
+  ENGINE_ION_DRIVE_II._('ENGINE_ION_DRIVE_II'),
+  ENGINE_HYPER_DRIVE_I._('ENGINE_HYPER_DRIVE_I'),
+  MODULE_MINERAL_PROCESSOR_I._('MODULE_MINERAL_PROCESSOR_I'),
+  MODULE_GAS_PROCESSOR_I._('MODULE_GAS_PROCESSOR_I'),
+  MODULE_CARGO_HOLD_I._('MODULE_CARGO_HOLD_I'),
+  MODULE_CARGO_HOLD_II._('MODULE_CARGO_HOLD_II'),
+  MODULE_CARGO_HOLD_III._('MODULE_CARGO_HOLD_III'),
+  MODULE_CREW_QUARTERS_I._('MODULE_CREW_QUARTERS_I'),
+  MODULE_ENVOY_QUARTERS_I._('MODULE_ENVOY_QUARTERS_I'),
+  MODULE_PASSENGER_CABIN_I._('MODULE_PASSENGER_CABIN_I'),
+  MODULE_MICRO_REFINERY_I._('MODULE_MICRO_REFINERY_I'),
+  MODULE_SCIENCE_LAB_I._('MODULE_SCIENCE_LAB_I'),
+  MODULE_JUMP_DRIVE_I._('MODULE_JUMP_DRIVE_I'),
+  MODULE_JUMP_DRIVE_II._('MODULE_JUMP_DRIVE_II'),
+  MODULE_JUMP_DRIVE_III._('MODULE_JUMP_DRIVE_III'),
+  MODULE_WARP_DRIVE_I._('MODULE_WARP_DRIVE_I'),
+  MODULE_WARP_DRIVE_II._('MODULE_WARP_DRIVE_II'),
+  MODULE_WARP_DRIVE_III._('MODULE_WARP_DRIVE_III'),
+  MODULE_SHIELD_GENERATOR_I._('MODULE_SHIELD_GENERATOR_I'),
+  MODULE_SHIELD_GENERATOR_II._('MODULE_SHIELD_GENERATOR_II'),
+  MODULE_ORE_REFINERY_I._('MODULE_ORE_REFINERY_I'),
+  MODULE_FUEL_REFINERY_I._('MODULE_FUEL_REFINERY_I'),
+  MOUNT_GAS_SIPHON_I._('MOUNT_GAS_SIPHON_I'),
+  MOUNT_GAS_SIPHON_II._('MOUNT_GAS_SIPHON_II'),
+  MOUNT_GAS_SIPHON_III._('MOUNT_GAS_SIPHON_III'),
+  MOUNT_SURVEYOR_I._('MOUNT_SURVEYOR_I'),
+  MOUNT_SURVEYOR_II._('MOUNT_SURVEYOR_II'),
+  MOUNT_SURVEYOR_III._('MOUNT_SURVEYOR_III'),
+  MOUNT_SENSOR_ARRAY_I._('MOUNT_SENSOR_ARRAY_I'),
+  MOUNT_SENSOR_ARRAY_II._('MOUNT_SENSOR_ARRAY_II'),
+  MOUNT_SENSOR_ARRAY_III._('MOUNT_SENSOR_ARRAY_III'),
+  MOUNT_MINING_LASER_I._('MOUNT_MINING_LASER_I'),
+  MOUNT_MINING_LASER_II._('MOUNT_MINING_LASER_II'),
+  MOUNT_MINING_LASER_III._('MOUNT_MINING_LASER_III'),
+  MOUNT_LASER_CANNON_I._('MOUNT_LASER_CANNON_I'),
+  MOUNT_MISSILE_LAUNCHER_I._('MOUNT_MISSILE_LAUNCHER_I'),
+  MOUNT_TURRET_I._('MOUNT_TURRET_I'),
+  SHIP_PROBE._('SHIP_PROBE'),
+  SHIP_MINING_DRONE._('SHIP_MINING_DRONE'),
+  SHIP_SIPHON_DRONE._('SHIP_SIPHON_DRONE'),
+  SHIP_INTERCEPTOR._('SHIP_INTERCEPTOR'),
+  SHIP_LIGHT_HAULER._('SHIP_LIGHT_HAULER'),
+  SHIP_COMMAND_FRIGATE._('SHIP_COMMAND_FRIGATE'),
+  SHIP_EXPLORER._('SHIP_EXPLORER'),
+  SHIP_HEAVY_FREIGHTER._('SHIP_HEAVY_FREIGHTER'),
+  SHIP_LIGHT_SHUTTLE._('SHIP_LIGHT_SHUTTLE'),
+  SHIP_ORE_HOUND._('SHIP_ORE_HOUND'),
+  SHIP_REFINING_FREIGHTER._('SHIP_REFINING_FREIGHTER'),
+  SHIP_SURVEYOR._('SHIP_SURVEYOR'),
+  SHIP_BULK_FREIGHTER._('SHIP_BULK_FREIGHTER');
 
-// ignore_for_file: unused_element, unused_import
-// ignore_for_file: always_put_required_named_parameters_first
-// ignore_for_file: constant_identifier_names
-// ignore_for_file: lines_longer_than_80_chars
-
-part of openapi;
-
-/// The good's symbol.
-class TradeSymbol {
-  /// Instantiate a new enum with the provided [value].
   const TradeSymbol._(this.value);
 
-  /// The underlying value of this enum member.
+  factory TradeSymbol.fromJson(String json) {
+    return TradeSymbol.values.firstWhere(
+      (value) => value.value == json,
+      orElse: () => throw Exception('Unknown TradeSymbol value: $json'),
+    );
+  }
+
   final String value;
 
-  @override
-  String toString() => value;
-
   String toJson() => value;
-
-  static const PRECIOUS_STONES = TradeSymbol._(r'PRECIOUS_STONES');
-  static const QUARTZ_SAND = TradeSymbol._(r'QUARTZ_SAND');
-  static const SILICON_CRYSTALS = TradeSymbol._(r'SILICON_CRYSTALS');
-  static const AMMONIA_ICE = TradeSymbol._(r'AMMONIA_ICE');
-  static const LIQUID_HYDROGEN = TradeSymbol._(r'LIQUID_HYDROGEN');
-  static const LIQUID_NITROGEN = TradeSymbol._(r'LIQUID_NITROGEN');
-  static const ICE_WATER = TradeSymbol._(r'ICE_WATER');
-  static const EXOTIC_MATTER = TradeSymbol._(r'EXOTIC_MATTER');
-  static const ADVANCED_CIRCUITRY = TradeSymbol._(r'ADVANCED_CIRCUITRY');
-  static const GRAVITON_EMITTERS = TradeSymbol._(r'GRAVITON_EMITTERS');
-  static const IRON = TradeSymbol._(r'IRON');
-  static const IRON_ORE = TradeSymbol._(r'IRON_ORE');
-  static const COPPER = TradeSymbol._(r'COPPER');
-  static const COPPER_ORE = TradeSymbol._(r'COPPER_ORE');
-  static const ALUMINUM = TradeSymbol._(r'ALUMINUM');
-  static const ALUMINUM_ORE = TradeSymbol._(r'ALUMINUM_ORE');
-  static const SILVER = TradeSymbol._(r'SILVER');
-  static const SILVER_ORE = TradeSymbol._(r'SILVER_ORE');
-  static const GOLD = TradeSymbol._(r'GOLD');
-  static const GOLD_ORE = TradeSymbol._(r'GOLD_ORE');
-  static const PLATINUM = TradeSymbol._(r'PLATINUM');
-  static const PLATINUM_ORE = TradeSymbol._(r'PLATINUM_ORE');
-  static const DIAMONDS = TradeSymbol._(r'DIAMONDS');
-  static const URANITE = TradeSymbol._(r'URANITE');
-  static const URANITE_ORE = TradeSymbol._(r'URANITE_ORE');
-  static const MERITIUM = TradeSymbol._(r'MERITIUM');
-  static const MERITIUM_ORE = TradeSymbol._(r'MERITIUM_ORE');
-  static const HYDROCARBON = TradeSymbol._(r'HYDROCARBON');
-  static const ANTIMATTER = TradeSymbol._(r'ANTIMATTER');
-  static const FAB_MATS = TradeSymbol._(r'FAB_MATS');
-  static const FERTILIZERS = TradeSymbol._(r'FERTILIZERS');
-  static const FABRICS = TradeSymbol._(r'FABRICS');
-  static const FOOD = TradeSymbol._(r'FOOD');
-  static const JEWELRY = TradeSymbol._(r'JEWELRY');
-  static const MACHINERY = TradeSymbol._(r'MACHINERY');
-  static const FIREARMS = TradeSymbol._(r'FIREARMS');
-  static const ASSAULT_RIFLES = TradeSymbol._(r'ASSAULT_RIFLES');
-  static const MILITARY_EQUIPMENT = TradeSymbol._(r'MILITARY_EQUIPMENT');
-  static const EXPLOSIVES = TradeSymbol._(r'EXPLOSIVES');
-  static const LAB_INSTRUMENTS = TradeSymbol._(r'LAB_INSTRUMENTS');
-  static const AMMUNITION = TradeSymbol._(r'AMMUNITION');
-  static const ELECTRONICS = TradeSymbol._(r'ELECTRONICS');
-  static const SHIP_PLATING = TradeSymbol._(r'SHIP_PLATING');
-  static const SHIP_PARTS = TradeSymbol._(r'SHIP_PARTS');
-  static const EQUIPMENT = TradeSymbol._(r'EQUIPMENT');
-  static const FUEL = TradeSymbol._(r'FUEL');
-  static const MEDICINE = TradeSymbol._(r'MEDICINE');
-  static const DRUGS = TradeSymbol._(r'DRUGS');
-  static const CLOTHING = TradeSymbol._(r'CLOTHING');
-  static const MICROPROCESSORS = TradeSymbol._(r'MICROPROCESSORS');
-  static const PLASTICS = TradeSymbol._(r'PLASTICS');
-  static const POLYNUCLEOTIDES = TradeSymbol._(r'POLYNUCLEOTIDES');
-  static const BIOCOMPOSITES = TradeSymbol._(r'BIOCOMPOSITES');
-  static const QUANTUM_STABILIZERS = TradeSymbol._(r'QUANTUM_STABILIZERS');
-  static const NANOBOTS = TradeSymbol._(r'NANOBOTS');
-  static const AI_MAINFRAMES = TradeSymbol._(r'AI_MAINFRAMES');
-  static const QUANTUM_DRIVES = TradeSymbol._(r'QUANTUM_DRIVES');
-  static const ROBOTIC_DRONES = TradeSymbol._(r'ROBOTIC_DRONES');
-  static const CYBER_IMPLANTS = TradeSymbol._(r'CYBER_IMPLANTS');
-  static const GENE_THERAPEUTICS = TradeSymbol._(r'GENE_THERAPEUTICS');
-  static const NEURAL_CHIPS = TradeSymbol._(r'NEURAL_CHIPS');
-  static const MOOD_REGULATORS = TradeSymbol._(r'MOOD_REGULATORS');
-  static const VIRAL_AGENTS = TradeSymbol._(r'VIRAL_AGENTS');
-  static const MICRO_FUSION_GENERATORS =
-      TradeSymbol._(r'MICRO_FUSION_GENERATORS');
-  static const SUPERGRAINS = TradeSymbol._(r'SUPERGRAINS');
-  static const LASER_RIFLES = TradeSymbol._(r'LASER_RIFLES');
-  static const HOLOGRAPHICS = TradeSymbol._(r'HOLOGRAPHICS');
-  static const SHIP_SALVAGE = TradeSymbol._(r'SHIP_SALVAGE');
-  static const RELIC_TECH = TradeSymbol._(r'RELIC_TECH');
-  static const NOVEL_LIFEFORMS = TradeSymbol._(r'NOVEL_LIFEFORMS');
-  static const BOTANICAL_SPECIMENS = TradeSymbol._(r'BOTANICAL_SPECIMENS');
-  static const CULTURAL_ARTIFACTS = TradeSymbol._(r'CULTURAL_ARTIFACTS');
-  static const FRAME_PROBE = TradeSymbol._(r'FRAME_PROBE');
-  static const FRAME_DRONE = TradeSymbol._(r'FRAME_DRONE');
-  static const FRAME_INTERCEPTOR = TradeSymbol._(r'FRAME_INTERCEPTOR');
-  static const FRAME_RACER = TradeSymbol._(r'FRAME_RACER');
-  static const FRAME_FIGHTER = TradeSymbol._(r'FRAME_FIGHTER');
-  static const FRAME_FRIGATE = TradeSymbol._(r'FRAME_FRIGATE');
-  static const FRAME_SHUTTLE = TradeSymbol._(r'FRAME_SHUTTLE');
-  static const FRAME_EXPLORER = TradeSymbol._(r'FRAME_EXPLORER');
-  static const FRAME_MINER = TradeSymbol._(r'FRAME_MINER');
-  static const FRAME_LIGHT_FREIGHTER = TradeSymbol._(r'FRAME_LIGHT_FREIGHTER');
-  static const FRAME_HEAVY_FREIGHTER = TradeSymbol._(r'FRAME_HEAVY_FREIGHTER');
-  static const FRAME_TRANSPORT = TradeSymbol._(r'FRAME_TRANSPORT');
-  static const FRAME_DESTROYER = TradeSymbol._(r'FRAME_DESTROYER');
-  static const FRAME_CRUISER = TradeSymbol._(r'FRAME_CRUISER');
-  static const FRAME_CARRIER = TradeSymbol._(r'FRAME_CARRIER');
-  static const FRAME_BULK_FREIGHTER = TradeSymbol._(r'FRAME_BULK_FREIGHTER');
-  static const REACTOR_SOLAR_I = TradeSymbol._(r'REACTOR_SOLAR_I');
-  static const REACTOR_FUSION_I = TradeSymbol._(r'REACTOR_FUSION_I');
-  static const REACTOR_FISSION_I = TradeSymbol._(r'REACTOR_FISSION_I');
-  static const REACTOR_CHEMICAL_I = TradeSymbol._(r'REACTOR_CHEMICAL_I');
-  static const REACTOR_ANTIMATTER_I = TradeSymbol._(r'REACTOR_ANTIMATTER_I');
-  static const ENGINE_IMPULSE_DRIVE_I =
-      TradeSymbol._(r'ENGINE_IMPULSE_DRIVE_I');
-  static const ENGINE_ION_DRIVE_I = TradeSymbol._(r'ENGINE_ION_DRIVE_I');
-  static const ENGINE_ION_DRIVE_II = TradeSymbol._(r'ENGINE_ION_DRIVE_II');
-  static const ENGINE_HYPER_DRIVE_I = TradeSymbol._(r'ENGINE_HYPER_DRIVE_I');
-  static const MODULE_MINERAL_PROCESSOR_I =
-      TradeSymbol._(r'MODULE_MINERAL_PROCESSOR_I');
-  static const MODULE_GAS_PROCESSOR_I =
-      TradeSymbol._(r'MODULE_GAS_PROCESSOR_I');
-  static const MODULE_CARGO_HOLD_I = TradeSymbol._(r'MODULE_CARGO_HOLD_I');
-  static const MODULE_CARGO_HOLD_II = TradeSymbol._(r'MODULE_CARGO_HOLD_II');
-  static const MODULE_CARGO_HOLD_III = TradeSymbol._(r'MODULE_CARGO_HOLD_III');
-  static const MODULE_CREW_QUARTERS_I =
-      TradeSymbol._(r'MODULE_CREW_QUARTERS_I');
-  static const MODULE_ENVOY_QUARTERS_I =
-      TradeSymbol._(r'MODULE_ENVOY_QUARTERS_I');
-  static const MODULE_PASSENGER_CABIN_I =
-      TradeSymbol._(r'MODULE_PASSENGER_CABIN_I');
-  static const MODULE_MICRO_REFINERY_I =
-      TradeSymbol._(r'MODULE_MICRO_REFINERY_I');
-  static const MODULE_SCIENCE_LAB_I = TradeSymbol._(r'MODULE_SCIENCE_LAB_I');
-  static const MODULE_JUMP_DRIVE_I = TradeSymbol._(r'MODULE_JUMP_DRIVE_I');
-  static const MODULE_JUMP_DRIVE_II = TradeSymbol._(r'MODULE_JUMP_DRIVE_II');
-  static const MODULE_JUMP_DRIVE_III = TradeSymbol._(r'MODULE_JUMP_DRIVE_III');
-  static const MODULE_WARP_DRIVE_I = TradeSymbol._(r'MODULE_WARP_DRIVE_I');
-  static const MODULE_WARP_DRIVE_II = TradeSymbol._(r'MODULE_WARP_DRIVE_II');
-  static const MODULE_WARP_DRIVE_III = TradeSymbol._(r'MODULE_WARP_DRIVE_III');
-  static const MODULE_SHIELD_GENERATOR_I =
-      TradeSymbol._(r'MODULE_SHIELD_GENERATOR_I');
-  static const MODULE_SHIELD_GENERATOR_II =
-      TradeSymbol._(r'MODULE_SHIELD_GENERATOR_II');
-  static const MODULE_ORE_REFINERY_I = TradeSymbol._(r'MODULE_ORE_REFINERY_I');
-  static const MODULE_FUEL_REFINERY_I =
-      TradeSymbol._(r'MODULE_FUEL_REFINERY_I');
-  static const MOUNT_GAS_SIPHON_I = TradeSymbol._(r'MOUNT_GAS_SIPHON_I');
-  static const MOUNT_GAS_SIPHON_II = TradeSymbol._(r'MOUNT_GAS_SIPHON_II');
-  static const MOUNT_GAS_SIPHON_III = TradeSymbol._(r'MOUNT_GAS_SIPHON_III');
-  static const MOUNT_SURVEYOR_I = TradeSymbol._(r'MOUNT_SURVEYOR_I');
-  static const MOUNT_SURVEYOR_II = TradeSymbol._(r'MOUNT_SURVEYOR_II');
-  static const MOUNT_SURVEYOR_III = TradeSymbol._(r'MOUNT_SURVEYOR_III');
-  static const MOUNT_SENSOR_ARRAY_I = TradeSymbol._(r'MOUNT_SENSOR_ARRAY_I');
-  static const MOUNT_SENSOR_ARRAY_II = TradeSymbol._(r'MOUNT_SENSOR_ARRAY_II');
-  static const MOUNT_SENSOR_ARRAY_III =
-      TradeSymbol._(r'MOUNT_SENSOR_ARRAY_III');
-  static const MOUNT_MINING_LASER_I = TradeSymbol._(r'MOUNT_MINING_LASER_I');
-  static const MOUNT_MINING_LASER_II = TradeSymbol._(r'MOUNT_MINING_LASER_II');
-  static const MOUNT_MINING_LASER_III =
-      TradeSymbol._(r'MOUNT_MINING_LASER_III');
-  static const MOUNT_LASER_CANNON_I = TradeSymbol._(r'MOUNT_LASER_CANNON_I');
-  static const MOUNT_MISSILE_LAUNCHER_I =
-      TradeSymbol._(r'MOUNT_MISSILE_LAUNCHER_I');
-  static const MOUNT_TURRET_I = TradeSymbol._(r'MOUNT_TURRET_I');
-  static const SHIP_PROBE = TradeSymbol._(r'SHIP_PROBE');
-  static const SHIP_MINING_DRONE = TradeSymbol._(r'SHIP_MINING_DRONE');
-  static const SHIP_SIPHON_DRONE = TradeSymbol._(r'SHIP_SIPHON_DRONE');
-  static const SHIP_INTERCEPTOR = TradeSymbol._(r'SHIP_INTERCEPTOR');
-  static const SHIP_LIGHT_HAULER = TradeSymbol._(r'SHIP_LIGHT_HAULER');
-  static const SHIP_COMMAND_FRIGATE = TradeSymbol._(r'SHIP_COMMAND_FRIGATE');
-  static const SHIP_EXPLORER = TradeSymbol._(r'SHIP_EXPLORER');
-  static const SHIP_HEAVY_FREIGHTER = TradeSymbol._(r'SHIP_HEAVY_FREIGHTER');
-  static const SHIP_LIGHT_SHUTTLE = TradeSymbol._(r'SHIP_LIGHT_SHUTTLE');
-  static const SHIP_ORE_HOUND = TradeSymbol._(r'SHIP_ORE_HOUND');
-  static const SHIP_REFINING_FREIGHTER =
-      TradeSymbol._(r'SHIP_REFINING_FREIGHTER');
-  static const SHIP_SURVEYOR = TradeSymbol._(r'SHIP_SURVEYOR');
-  static const SHIP_BULK_FREIGHTER = TradeSymbol._(r'SHIP_BULK_FREIGHTER');
-
-  /// List of all possible values in this [enum][TradeSymbol].
-  static const values = <TradeSymbol>[
-    PRECIOUS_STONES,
-    QUARTZ_SAND,
-    SILICON_CRYSTALS,
-    AMMONIA_ICE,
-    LIQUID_HYDROGEN,
-    LIQUID_NITROGEN,
-    ICE_WATER,
-    EXOTIC_MATTER,
-    ADVANCED_CIRCUITRY,
-    GRAVITON_EMITTERS,
-    IRON,
-    IRON_ORE,
-    COPPER,
-    COPPER_ORE,
-    ALUMINUM,
-    ALUMINUM_ORE,
-    SILVER,
-    SILVER_ORE,
-    GOLD,
-    GOLD_ORE,
-    PLATINUM,
-    PLATINUM_ORE,
-    DIAMONDS,
-    URANITE,
-    URANITE_ORE,
-    MERITIUM,
-    MERITIUM_ORE,
-    HYDROCARBON,
-    ANTIMATTER,
-    FAB_MATS,
-    FERTILIZERS,
-    FABRICS,
-    FOOD,
-    JEWELRY,
-    MACHINERY,
-    FIREARMS,
-    ASSAULT_RIFLES,
-    MILITARY_EQUIPMENT,
-    EXPLOSIVES,
-    LAB_INSTRUMENTS,
-    AMMUNITION,
-    ELECTRONICS,
-    SHIP_PLATING,
-    SHIP_PARTS,
-    EQUIPMENT,
-    FUEL,
-    MEDICINE,
-    DRUGS,
-    CLOTHING,
-    MICROPROCESSORS,
-    PLASTICS,
-    POLYNUCLEOTIDES,
-    BIOCOMPOSITES,
-    QUANTUM_STABILIZERS,
-    NANOBOTS,
-    AI_MAINFRAMES,
-    QUANTUM_DRIVES,
-    ROBOTIC_DRONES,
-    CYBER_IMPLANTS,
-    GENE_THERAPEUTICS,
-    NEURAL_CHIPS,
-    MOOD_REGULATORS,
-    VIRAL_AGENTS,
-    MICRO_FUSION_GENERATORS,
-    SUPERGRAINS,
-    LASER_RIFLES,
-    HOLOGRAPHICS,
-    SHIP_SALVAGE,
-    RELIC_TECH,
-    NOVEL_LIFEFORMS,
-    BOTANICAL_SPECIMENS,
-    CULTURAL_ARTIFACTS,
-    FRAME_PROBE,
-    FRAME_DRONE,
-    FRAME_INTERCEPTOR,
-    FRAME_RACER,
-    FRAME_FIGHTER,
-    FRAME_FRIGATE,
-    FRAME_SHUTTLE,
-    FRAME_EXPLORER,
-    FRAME_MINER,
-    FRAME_LIGHT_FREIGHTER,
-    FRAME_HEAVY_FREIGHTER,
-    FRAME_TRANSPORT,
-    FRAME_DESTROYER,
-    FRAME_CRUISER,
-    FRAME_CARRIER,
-    FRAME_BULK_FREIGHTER,
-    REACTOR_SOLAR_I,
-    REACTOR_FUSION_I,
-    REACTOR_FISSION_I,
-    REACTOR_CHEMICAL_I,
-    REACTOR_ANTIMATTER_I,
-    ENGINE_IMPULSE_DRIVE_I,
-    ENGINE_ION_DRIVE_I,
-    ENGINE_ION_DRIVE_II,
-    ENGINE_HYPER_DRIVE_I,
-    MODULE_MINERAL_PROCESSOR_I,
-    MODULE_GAS_PROCESSOR_I,
-    MODULE_CARGO_HOLD_I,
-    MODULE_CARGO_HOLD_II,
-    MODULE_CARGO_HOLD_III,
-    MODULE_CREW_QUARTERS_I,
-    MODULE_ENVOY_QUARTERS_I,
-    MODULE_PASSENGER_CABIN_I,
-    MODULE_MICRO_REFINERY_I,
-    MODULE_SCIENCE_LAB_I,
-    MODULE_JUMP_DRIVE_I,
-    MODULE_JUMP_DRIVE_II,
-    MODULE_JUMP_DRIVE_III,
-    MODULE_WARP_DRIVE_I,
-    MODULE_WARP_DRIVE_II,
-    MODULE_WARP_DRIVE_III,
-    MODULE_SHIELD_GENERATOR_I,
-    MODULE_SHIELD_GENERATOR_II,
-    MODULE_ORE_REFINERY_I,
-    MODULE_FUEL_REFINERY_I,
-    MOUNT_GAS_SIPHON_I,
-    MOUNT_GAS_SIPHON_II,
-    MOUNT_GAS_SIPHON_III,
-    MOUNT_SURVEYOR_I,
-    MOUNT_SURVEYOR_II,
-    MOUNT_SURVEYOR_III,
-    MOUNT_SENSOR_ARRAY_I,
-    MOUNT_SENSOR_ARRAY_II,
-    MOUNT_SENSOR_ARRAY_III,
-    MOUNT_MINING_LASER_I,
-    MOUNT_MINING_LASER_II,
-    MOUNT_MINING_LASER_III,
-    MOUNT_LASER_CANNON_I,
-    MOUNT_MISSILE_LAUNCHER_I,
-    MOUNT_TURRET_I,
-    SHIP_PROBE,
-    SHIP_MINING_DRONE,
-    SHIP_SIPHON_DRONE,
-    SHIP_INTERCEPTOR,
-    SHIP_LIGHT_HAULER,
-    SHIP_COMMAND_FRIGATE,
-    SHIP_EXPLORER,
-    SHIP_HEAVY_FREIGHTER,
-    SHIP_LIGHT_SHUTTLE,
-    SHIP_ORE_HOUND,
-    SHIP_REFINING_FREIGHTER,
-    SHIP_SURVEYOR,
-    SHIP_BULK_FREIGHTER,
-  ];
-
-  static TradeSymbol? fromJson(dynamic value) =>
-      TradeSymbolTypeTransformer().decode(value);
-
-  static List<TradeSymbol> listFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
-    final result = <TradeSymbol>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = TradeSymbol.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-}
-
-/// Transformation class that can [encode] an instance of [TradeSymbol] to String,
-/// and [decode] dynamic data back to [TradeSymbol].
-class TradeSymbolTypeTransformer {
-  factory TradeSymbolTypeTransformer() =>
-      _instance ??= const TradeSymbolTypeTransformer._();
-
-  const TradeSymbolTypeTransformer._();
-
-  String encode(TradeSymbol data) => data.value;
-
-  /// Decodes a [dynamic value][data] to a TradeSymbol.
-  ///
-  /// If [allowNull] is true and the [dynamic value][data] cannot be decoded successfully,
-  /// then null is returned. However, if [allowNull] is false and the [dynamic value][data]
-  /// cannot be decoded successfully, then an [UnimplementedError] is thrown.
-  ///
-  /// The [allowNull] is very handy when an API changes and a new enum value is added or removed,
-  /// and users are still using an old app with the old code.
-  TradeSymbol? decode(dynamic data, {bool allowNull = true}) {
-    if (data != null) {
-      switch (data) {
-        case r'PRECIOUS_STONES':
-          return TradeSymbol.PRECIOUS_STONES;
-        case r'QUARTZ_SAND':
-          return TradeSymbol.QUARTZ_SAND;
-        case r'SILICON_CRYSTALS':
-          return TradeSymbol.SILICON_CRYSTALS;
-        case r'AMMONIA_ICE':
-          return TradeSymbol.AMMONIA_ICE;
-        case r'LIQUID_HYDROGEN':
-          return TradeSymbol.LIQUID_HYDROGEN;
-        case r'LIQUID_NITROGEN':
-          return TradeSymbol.LIQUID_NITROGEN;
-        case r'ICE_WATER':
-          return TradeSymbol.ICE_WATER;
-        case r'EXOTIC_MATTER':
-          return TradeSymbol.EXOTIC_MATTER;
-        case r'ADVANCED_CIRCUITRY':
-          return TradeSymbol.ADVANCED_CIRCUITRY;
-        case r'GRAVITON_EMITTERS':
-          return TradeSymbol.GRAVITON_EMITTERS;
-        case r'IRON':
-          return TradeSymbol.IRON;
-        case r'IRON_ORE':
-          return TradeSymbol.IRON_ORE;
-        case r'COPPER':
-          return TradeSymbol.COPPER;
-        case r'COPPER_ORE':
-          return TradeSymbol.COPPER_ORE;
-        case r'ALUMINUM':
-          return TradeSymbol.ALUMINUM;
-        case r'ALUMINUM_ORE':
-          return TradeSymbol.ALUMINUM_ORE;
-        case r'SILVER':
-          return TradeSymbol.SILVER;
-        case r'SILVER_ORE':
-          return TradeSymbol.SILVER_ORE;
-        case r'GOLD':
-          return TradeSymbol.GOLD;
-        case r'GOLD_ORE':
-          return TradeSymbol.GOLD_ORE;
-        case r'PLATINUM':
-          return TradeSymbol.PLATINUM;
-        case r'PLATINUM_ORE':
-          return TradeSymbol.PLATINUM_ORE;
-        case r'DIAMONDS':
-          return TradeSymbol.DIAMONDS;
-        case r'URANITE':
-          return TradeSymbol.URANITE;
-        case r'URANITE_ORE':
-          return TradeSymbol.URANITE_ORE;
-        case r'MERITIUM':
-          return TradeSymbol.MERITIUM;
-        case r'MERITIUM_ORE':
-          return TradeSymbol.MERITIUM_ORE;
-        case r'HYDROCARBON':
-          return TradeSymbol.HYDROCARBON;
-        case r'ANTIMATTER':
-          return TradeSymbol.ANTIMATTER;
-        case r'FAB_MATS':
-          return TradeSymbol.FAB_MATS;
-        case r'FERTILIZERS':
-          return TradeSymbol.FERTILIZERS;
-        case r'FABRICS':
-          return TradeSymbol.FABRICS;
-        case r'FOOD':
-          return TradeSymbol.FOOD;
-        case r'JEWELRY':
-          return TradeSymbol.JEWELRY;
-        case r'MACHINERY':
-          return TradeSymbol.MACHINERY;
-        case r'FIREARMS':
-          return TradeSymbol.FIREARMS;
-        case r'ASSAULT_RIFLES':
-          return TradeSymbol.ASSAULT_RIFLES;
-        case r'MILITARY_EQUIPMENT':
-          return TradeSymbol.MILITARY_EQUIPMENT;
-        case r'EXPLOSIVES':
-          return TradeSymbol.EXPLOSIVES;
-        case r'LAB_INSTRUMENTS':
-          return TradeSymbol.LAB_INSTRUMENTS;
-        case r'AMMUNITION':
-          return TradeSymbol.AMMUNITION;
-        case r'ELECTRONICS':
-          return TradeSymbol.ELECTRONICS;
-        case r'SHIP_PLATING':
-          return TradeSymbol.SHIP_PLATING;
-        case r'SHIP_PARTS':
-          return TradeSymbol.SHIP_PARTS;
-        case r'EQUIPMENT':
-          return TradeSymbol.EQUIPMENT;
-        case r'FUEL':
-          return TradeSymbol.FUEL;
-        case r'MEDICINE':
-          return TradeSymbol.MEDICINE;
-        case r'DRUGS':
-          return TradeSymbol.DRUGS;
-        case r'CLOTHING':
-          return TradeSymbol.CLOTHING;
-        case r'MICROPROCESSORS':
-          return TradeSymbol.MICROPROCESSORS;
-        case r'PLASTICS':
-          return TradeSymbol.PLASTICS;
-        case r'POLYNUCLEOTIDES':
-          return TradeSymbol.POLYNUCLEOTIDES;
-        case r'BIOCOMPOSITES':
-          return TradeSymbol.BIOCOMPOSITES;
-        case r'QUANTUM_STABILIZERS':
-          return TradeSymbol.QUANTUM_STABILIZERS;
-        case r'NANOBOTS':
-          return TradeSymbol.NANOBOTS;
-        case r'AI_MAINFRAMES':
-          return TradeSymbol.AI_MAINFRAMES;
-        case r'QUANTUM_DRIVES':
-          return TradeSymbol.QUANTUM_DRIVES;
-        case r'ROBOTIC_DRONES':
-          return TradeSymbol.ROBOTIC_DRONES;
-        case r'CYBER_IMPLANTS':
-          return TradeSymbol.CYBER_IMPLANTS;
-        case r'GENE_THERAPEUTICS':
-          return TradeSymbol.GENE_THERAPEUTICS;
-        case r'NEURAL_CHIPS':
-          return TradeSymbol.NEURAL_CHIPS;
-        case r'MOOD_REGULATORS':
-          return TradeSymbol.MOOD_REGULATORS;
-        case r'VIRAL_AGENTS':
-          return TradeSymbol.VIRAL_AGENTS;
-        case r'MICRO_FUSION_GENERATORS':
-          return TradeSymbol.MICRO_FUSION_GENERATORS;
-        case r'SUPERGRAINS':
-          return TradeSymbol.SUPERGRAINS;
-        case r'LASER_RIFLES':
-          return TradeSymbol.LASER_RIFLES;
-        case r'HOLOGRAPHICS':
-          return TradeSymbol.HOLOGRAPHICS;
-        case r'SHIP_SALVAGE':
-          return TradeSymbol.SHIP_SALVAGE;
-        case r'RELIC_TECH':
-          return TradeSymbol.RELIC_TECH;
-        case r'NOVEL_LIFEFORMS':
-          return TradeSymbol.NOVEL_LIFEFORMS;
-        case r'BOTANICAL_SPECIMENS':
-          return TradeSymbol.BOTANICAL_SPECIMENS;
-        case r'CULTURAL_ARTIFACTS':
-          return TradeSymbol.CULTURAL_ARTIFACTS;
-        case r'FRAME_PROBE':
-          return TradeSymbol.FRAME_PROBE;
-        case r'FRAME_DRONE':
-          return TradeSymbol.FRAME_DRONE;
-        case r'FRAME_INTERCEPTOR':
-          return TradeSymbol.FRAME_INTERCEPTOR;
-        case r'FRAME_RACER':
-          return TradeSymbol.FRAME_RACER;
-        case r'FRAME_FIGHTER':
-          return TradeSymbol.FRAME_FIGHTER;
-        case r'FRAME_FRIGATE':
-          return TradeSymbol.FRAME_FRIGATE;
-        case r'FRAME_SHUTTLE':
-          return TradeSymbol.FRAME_SHUTTLE;
-        case r'FRAME_EXPLORER':
-          return TradeSymbol.FRAME_EXPLORER;
-        case r'FRAME_MINER':
-          return TradeSymbol.FRAME_MINER;
-        case r'FRAME_LIGHT_FREIGHTER':
-          return TradeSymbol.FRAME_LIGHT_FREIGHTER;
-        case r'FRAME_HEAVY_FREIGHTER':
-          return TradeSymbol.FRAME_HEAVY_FREIGHTER;
-        case r'FRAME_TRANSPORT':
-          return TradeSymbol.FRAME_TRANSPORT;
-        case r'FRAME_DESTROYER':
-          return TradeSymbol.FRAME_DESTROYER;
-        case r'FRAME_CRUISER':
-          return TradeSymbol.FRAME_CRUISER;
-        case r'FRAME_CARRIER':
-          return TradeSymbol.FRAME_CARRIER;
-        case r'FRAME_BULK_FREIGHTER':
-          return TradeSymbol.FRAME_BULK_FREIGHTER;
-        case r'REACTOR_SOLAR_I':
-          return TradeSymbol.REACTOR_SOLAR_I;
-        case r'REACTOR_FUSION_I':
-          return TradeSymbol.REACTOR_FUSION_I;
-        case r'REACTOR_FISSION_I':
-          return TradeSymbol.REACTOR_FISSION_I;
-        case r'REACTOR_CHEMICAL_I':
-          return TradeSymbol.REACTOR_CHEMICAL_I;
-        case r'REACTOR_ANTIMATTER_I':
-          return TradeSymbol.REACTOR_ANTIMATTER_I;
-        case r'ENGINE_IMPULSE_DRIVE_I':
-          return TradeSymbol.ENGINE_IMPULSE_DRIVE_I;
-        case r'ENGINE_ION_DRIVE_I':
-          return TradeSymbol.ENGINE_ION_DRIVE_I;
-        case r'ENGINE_ION_DRIVE_II':
-          return TradeSymbol.ENGINE_ION_DRIVE_II;
-        case r'ENGINE_HYPER_DRIVE_I':
-          return TradeSymbol.ENGINE_HYPER_DRIVE_I;
-        case r'MODULE_MINERAL_PROCESSOR_I':
-          return TradeSymbol.MODULE_MINERAL_PROCESSOR_I;
-        case r'MODULE_GAS_PROCESSOR_I':
-          return TradeSymbol.MODULE_GAS_PROCESSOR_I;
-        case r'MODULE_CARGO_HOLD_I':
-          return TradeSymbol.MODULE_CARGO_HOLD_I;
-        case r'MODULE_CARGO_HOLD_II':
-          return TradeSymbol.MODULE_CARGO_HOLD_II;
-        case r'MODULE_CARGO_HOLD_III':
-          return TradeSymbol.MODULE_CARGO_HOLD_III;
-        case r'MODULE_CREW_QUARTERS_I':
-          return TradeSymbol.MODULE_CREW_QUARTERS_I;
-        case r'MODULE_ENVOY_QUARTERS_I':
-          return TradeSymbol.MODULE_ENVOY_QUARTERS_I;
-        case r'MODULE_PASSENGER_CABIN_I':
-          return TradeSymbol.MODULE_PASSENGER_CABIN_I;
-        case r'MODULE_MICRO_REFINERY_I':
-          return TradeSymbol.MODULE_MICRO_REFINERY_I;
-        case r'MODULE_SCIENCE_LAB_I':
-          return TradeSymbol.MODULE_SCIENCE_LAB_I;
-        case r'MODULE_JUMP_DRIVE_I':
-          return TradeSymbol.MODULE_JUMP_DRIVE_I;
-        case r'MODULE_JUMP_DRIVE_II':
-          return TradeSymbol.MODULE_JUMP_DRIVE_II;
-        case r'MODULE_JUMP_DRIVE_III':
-          return TradeSymbol.MODULE_JUMP_DRIVE_III;
-        case r'MODULE_WARP_DRIVE_I':
-          return TradeSymbol.MODULE_WARP_DRIVE_I;
-        case r'MODULE_WARP_DRIVE_II':
-          return TradeSymbol.MODULE_WARP_DRIVE_II;
-        case r'MODULE_WARP_DRIVE_III':
-          return TradeSymbol.MODULE_WARP_DRIVE_III;
-        case r'MODULE_SHIELD_GENERATOR_I':
-          return TradeSymbol.MODULE_SHIELD_GENERATOR_I;
-        case r'MODULE_SHIELD_GENERATOR_II':
-          return TradeSymbol.MODULE_SHIELD_GENERATOR_II;
-        case r'MODULE_ORE_REFINERY_I':
-          return TradeSymbol.MODULE_ORE_REFINERY_I;
-        case r'MODULE_FUEL_REFINERY_I':
-          return TradeSymbol.MODULE_FUEL_REFINERY_I;
-        case r'MOUNT_GAS_SIPHON_I':
-          return TradeSymbol.MOUNT_GAS_SIPHON_I;
-        case r'MOUNT_GAS_SIPHON_II':
-          return TradeSymbol.MOUNT_GAS_SIPHON_II;
-        case r'MOUNT_GAS_SIPHON_III':
-          return TradeSymbol.MOUNT_GAS_SIPHON_III;
-        case r'MOUNT_SURVEYOR_I':
-          return TradeSymbol.MOUNT_SURVEYOR_I;
-        case r'MOUNT_SURVEYOR_II':
-          return TradeSymbol.MOUNT_SURVEYOR_II;
-        case r'MOUNT_SURVEYOR_III':
-          return TradeSymbol.MOUNT_SURVEYOR_III;
-        case r'MOUNT_SENSOR_ARRAY_I':
-          return TradeSymbol.MOUNT_SENSOR_ARRAY_I;
-        case r'MOUNT_SENSOR_ARRAY_II':
-          return TradeSymbol.MOUNT_SENSOR_ARRAY_II;
-        case r'MOUNT_SENSOR_ARRAY_III':
-          return TradeSymbol.MOUNT_SENSOR_ARRAY_III;
-        case r'MOUNT_MINING_LASER_I':
-          return TradeSymbol.MOUNT_MINING_LASER_I;
-        case r'MOUNT_MINING_LASER_II':
-          return TradeSymbol.MOUNT_MINING_LASER_II;
-        case r'MOUNT_MINING_LASER_III':
-          return TradeSymbol.MOUNT_MINING_LASER_III;
-        case r'MOUNT_LASER_CANNON_I':
-          return TradeSymbol.MOUNT_LASER_CANNON_I;
-        case r'MOUNT_MISSILE_LAUNCHER_I':
-          return TradeSymbol.MOUNT_MISSILE_LAUNCHER_I;
-        case r'MOUNT_TURRET_I':
-          return TradeSymbol.MOUNT_TURRET_I;
-        case r'SHIP_PROBE':
-          return TradeSymbol.SHIP_PROBE;
-        case r'SHIP_MINING_DRONE':
-          return TradeSymbol.SHIP_MINING_DRONE;
-        case r'SHIP_SIPHON_DRONE':
-          return TradeSymbol.SHIP_SIPHON_DRONE;
-        case r'SHIP_INTERCEPTOR':
-          return TradeSymbol.SHIP_INTERCEPTOR;
-        case r'SHIP_LIGHT_HAULER':
-          return TradeSymbol.SHIP_LIGHT_HAULER;
-        case r'SHIP_COMMAND_FRIGATE':
-          return TradeSymbol.SHIP_COMMAND_FRIGATE;
-        case r'SHIP_EXPLORER':
-          return TradeSymbol.SHIP_EXPLORER;
-        case r'SHIP_HEAVY_FREIGHTER':
-          return TradeSymbol.SHIP_HEAVY_FREIGHTER;
-        case r'SHIP_LIGHT_SHUTTLE':
-          return TradeSymbol.SHIP_LIGHT_SHUTTLE;
-        case r'SHIP_ORE_HOUND':
-          return TradeSymbol.SHIP_ORE_HOUND;
-        case r'SHIP_REFINING_FREIGHTER':
-          return TradeSymbol.SHIP_REFINING_FREIGHTER;
-        case r'SHIP_SURVEYOR':
-          return TradeSymbol.SHIP_SURVEYOR;
-        case r'SHIP_BULK_FREIGHTER':
-          return TradeSymbol.SHIP_BULK_FREIGHTER;
-        default:
-          if (!allowNull) {
-            throw ArgumentError('Unknown enum value to decode: $data');
-          }
-      }
-    }
-    return null;
-  }
-
-  /// Singleton [TradeSymbolTypeTransformer] instance.
-  static TradeSymbolTypeTransformer? _instance;
 }
