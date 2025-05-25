@@ -59,6 +59,19 @@ void main() {
         'paths': {
           '/users': {
             'get': {'summary': 'Get user'},
+            'parameters': [
+              {'name': 'foo', 'in': 'query', 'required': true},
+            ],
+            'responses': {
+              '200': {
+                'description': 'OK',
+                'content': {
+                  'application/json': {
+                    'schema': {'type': 'object'},
+                  },
+                },
+              },
+            },
           },
         },
         'components': {
