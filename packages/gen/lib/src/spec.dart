@@ -786,10 +786,10 @@ class RefRegistry {
   T get<T>(Uri uri) {
     final object = objectsByUri[uri];
     if (object == null) {
-      throw Exception('$T not found: $uri');
+      throw StateError('$T not found: $uri');
     }
     if (object is! T) {
-      throw Exception('Expected $T, got $object');
+      throw StateError('Expected $T, got $object');
     }
     return object;
   }
@@ -826,7 +826,7 @@ class RefRegistry {
       (e) => e.value == object,
     );
     if (entry == null) {
-      throw Exception('Url not found for object: $object');
+      throw StateError('Url not found for object: $object');
     }
     return entry.key;
   }
