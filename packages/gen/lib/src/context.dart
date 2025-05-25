@@ -218,7 +218,7 @@ extension _SchemaGeneration on Schema {
       case SchemaType.boolean:
         return '$name == other.$name';
       case SchemaType.unknown:
-        return 'true';
+        return 'identical($name, other.$name)';
     }
   }
 
