@@ -20,7 +20,7 @@ class ShipMount {
       symbol: ShipMountSymbol.fromJson(json['symbol'] as String),
       name: json['name'] as String,
       description: json['description'] as String,
-      strength: json['strength'] as int,
+      strength: json['strength'] as int?,
       deposits:
           (json['deposits'] as List<dynamic>).cast<ShipMountDepositsInner>(),
       requirements: ShipRequirements.fromJson(
@@ -42,7 +42,7 @@ class ShipMount {
   final String name;
   final String description;
   final int? strength;
-  final List<ShipMountDepositsInner>? deposits;
+  final List<ShipMountDepositsInner> deposits;
   final ShipRequirements requirements;
 
   Map<String, dynamic> toJson() {

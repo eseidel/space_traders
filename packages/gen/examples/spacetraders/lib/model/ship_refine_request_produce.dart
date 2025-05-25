@@ -16,7 +16,9 @@ enum ShipRefineRequestProduce {
       (value) => value.value == json,
       orElse:
           () =>
-              throw Exception('Unknown ShipRefineRequestProduce value: $json'),
+              throw FormatException(
+                'Unknown ShipRefineRequestProduce value: $json',
+              ),
     );
   }
 
@@ -32,4 +34,7 @@ enum ShipRefineRequestProduce {
   final String value;
 
   String toJson() => value;
+
+  @override
+  String toString() => value;
 }

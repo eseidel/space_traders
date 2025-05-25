@@ -21,7 +21,8 @@ enum ShipFrameSymbol {
   factory ShipFrameSymbol.fromJson(String json) {
     return ShipFrameSymbol.values.firstWhere(
       (value) => value.value == json,
-      orElse: () => throw Exception('Unknown ShipFrameSymbol value: $json'),
+      orElse:
+          () => throw FormatException('Unknown ShipFrameSymbol value: $json'),
     );
   }
 
@@ -37,4 +38,7 @@ enum ShipFrameSymbol {
   final String value;
 
   String toJson() => value;
+
+  @override
+  String toString() => value;
 }

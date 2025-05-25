@@ -8,7 +8,7 @@ enum SurveySize {
   factory SurveySize.fromJson(String json) {
     return SurveySize.values.firstWhere(
       (value) => value.value == json,
-      orElse: () => throw Exception('Unknown SurveySize value: $json'),
+      orElse: () => throw FormatException('Unknown SurveySize value: $json'),
     );
   }
 
@@ -24,4 +24,7 @@ enum SurveySize {
   final String value;
 
   String toJson() => value;
+
+  @override
+  String toString() => value;
 }

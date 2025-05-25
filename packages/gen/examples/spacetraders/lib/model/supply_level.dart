@@ -10,7 +10,7 @@ enum SupplyLevel {
   factory SupplyLevel.fromJson(String json) {
     return SupplyLevel.values.firstWhere(
       (value) => value.value == json,
-      orElse: () => throw Exception('Unknown SupplyLevel value: $json'),
+      orElse: () => throw FormatException('Unknown SupplyLevel value: $json'),
     );
   }
 
@@ -26,4 +26,7 @@ enum SupplyLevel {
   final String value;
 
   String toJson() => value;
+
+  @override
+  String toString() => value;
 }

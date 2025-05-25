@@ -10,7 +10,8 @@ enum ShipReactorSymbol {
   factory ShipReactorSymbol.fromJson(String json) {
     return ShipReactorSymbol.values.firstWhere(
       (value) => value.value == json,
-      orElse: () => throw Exception('Unknown ShipReactorSymbol value: $json'),
+      orElse:
+          () => throw FormatException('Unknown ShipReactorSymbol value: $json'),
     );
   }
 
@@ -26,4 +27,7 @@ enum ShipReactorSymbol {
   final String value;
 
   String toJson() => value;
+
+  @override
+  String toString() => value;
 }

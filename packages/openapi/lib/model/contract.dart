@@ -1,5 +1,6 @@
 import 'package:openapi/model/contract_terms.dart';
 import 'package:openapi/model/contract_type.dart';
+import 'package:openapi/model_helpers.dart';
 
 class Contract {
   Contract({

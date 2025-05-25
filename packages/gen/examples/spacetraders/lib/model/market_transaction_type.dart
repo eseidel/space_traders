@@ -8,7 +8,10 @@ enum MarketTransactionType {
     return MarketTransactionType.values.firstWhere(
       (value) => value.value == json,
       orElse:
-          () => throw Exception('Unknown MarketTransactionType value: $json'),
+          () =>
+              throw FormatException(
+                'Unknown MarketTransactionType value: $json',
+              ),
     );
   }
 
@@ -24,4 +27,7 @@ enum MarketTransactionType {
   final String value;
 
   String toJson() => value;
+
+  @override
+  String toString() => value;
 }

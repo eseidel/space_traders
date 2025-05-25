@@ -9,7 +9,8 @@ enum ShipNavFlightMode {
   factory ShipNavFlightMode.fromJson(String json) {
     return ShipNavFlightMode.values.firstWhere(
       (value) => value.value == json,
-      orElse: () => throw Exception('Unknown ShipNavFlightMode value: $json'),
+      orElse:
+          () => throw FormatException('Unknown ShipNavFlightMode value: $json'),
     );
   }
 
@@ -25,4 +26,7 @@ enum ShipNavFlightMode {
   final String value;
 
   String toJson() => value;
+
+  @override
+  String toString() => value;
 }

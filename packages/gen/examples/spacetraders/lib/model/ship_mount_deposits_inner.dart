@@ -20,7 +20,10 @@ enum ShipMountDepositsInner {
     return ShipMountDepositsInner.values.firstWhere(
       (value) => value.value == json,
       orElse:
-          () => throw Exception('Unknown ShipMountDepositsInner value: $json'),
+          () =>
+              throw FormatException(
+                'Unknown ShipMountDepositsInner value: $json',
+              ),
     );
   }
 
@@ -36,4 +39,7 @@ enum ShipMountDepositsInner {
   final String value;
 
   String toJson() => value;
+
+  @override
+  String toString() => value;
 }

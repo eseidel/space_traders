@@ -10,7 +10,7 @@ enum ShipConditionEventComponent {
       (value) => value.value == json,
       orElse:
           () =>
-              throw Exception(
+              throw FormatException(
                 'Unknown ShipConditionEventComponent value: $json',
               ),
     );
@@ -28,4 +28,7 @@ enum ShipConditionEventComponent {
   final String value;
 
   String toJson() => value;
+
+  @override
+  String toString() => value;
 }

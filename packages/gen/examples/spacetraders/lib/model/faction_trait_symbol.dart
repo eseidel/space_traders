@@ -64,7 +64,9 @@ enum FactionTraitSymbol {
   factory FactionTraitSymbol.fromJson(String json) {
     return FactionTraitSymbol.values.firstWhere(
       (value) => value.value == json,
-      orElse: () => throw Exception('Unknown FactionTraitSymbol value: $json'),
+      orElse:
+          () =>
+              throw FormatException('Unknown FactionTraitSymbol value: $json'),
     );
   }
 
@@ -80,4 +82,7 @@ enum FactionTraitSymbol {
   final String value;
 
   String toJson() => value;
+
+  @override
+  String toString() => value;
 }

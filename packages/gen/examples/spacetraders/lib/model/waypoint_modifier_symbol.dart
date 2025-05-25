@@ -11,7 +11,10 @@ enum WaypointModifierSymbol {
     return WaypointModifierSymbol.values.firstWhere(
       (value) => value.value == json,
       orElse:
-          () => throw Exception('Unknown WaypointModifierSymbol value: $json'),
+          () =>
+              throw FormatException(
+                'Unknown WaypointModifierSymbol value: $json',
+              ),
     );
   }
 
@@ -27,4 +30,7 @@ enum WaypointModifierSymbol {
   final String value;
 
   String toJson() => value;
+
+  @override
+  String toString() => value;
 }

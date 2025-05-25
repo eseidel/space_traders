@@ -8,7 +8,7 @@ enum ShipNavStatus {
   factory ShipNavStatus.fromJson(String json) {
     return ShipNavStatus.values.firstWhere(
       (value) => value.value == json,
-      orElse: () => throw Exception('Unknown ShipNavStatus value: $json'),
+      orElse: () => throw FormatException('Unknown ShipNavStatus value: $json'),
     );
   }
 
@@ -24,4 +24,7 @@ enum ShipNavStatus {
   final String value;
 
   String toJson() => value;
+
+  @override
+  String toString() => value;
 }

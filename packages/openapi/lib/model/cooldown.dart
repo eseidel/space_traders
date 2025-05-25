@@ -1,3 +1,5 @@
+import 'package:openapi/model_helpers.dart';
+
 class Cooldown {
   Cooldown({
     required this.shipSymbol,
