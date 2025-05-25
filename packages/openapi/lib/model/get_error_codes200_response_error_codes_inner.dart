@@ -4,9 +4,8 @@ class GetErrorCodes200ResponseErrorCodesInner {
     required this.name,
   });
 
-  factory GetErrorCodes200ResponseErrorCodesInner.fromJson(
-    Map<String, dynamic> json,
-  ) {
+  factory GetErrorCodes200ResponseErrorCodesInner.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetErrorCodes200ResponseErrorCodesInner(
       code: json['code'] as double,
       name: json['name'] as String,
@@ -24,8 +23,8 @@ class GetErrorCodes200ResponseErrorCodesInner {
     return GetErrorCodes200ResponseErrorCodesInner.fromJson(json);
   }
 
-  final double code;
-  final String name;
+  double code;
+  String name;
 
   Map<String, dynamic> toJson() {
     return {'code': code, 'name': name};

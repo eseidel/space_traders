@@ -7,7 +7,8 @@ class ShipFuel {
     required this.consumed,
   });
 
-  factory ShipFuel.fromJson(Map<String, dynamic> json) {
+  factory ShipFuel.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return ShipFuel(
       current: json['current'] as int,
       capacity: json['capacity'] as int,
@@ -26,9 +27,9 @@ class ShipFuel {
     return ShipFuel.fromJson(json);
   }
 
-  final int current;
-  final int capacity;
-  final ShipFuelConsumed consumed;
+  int current;
+  int capacity;
+  ShipFuelConsumed consumed;
 
   Map<String, dynamic> toJson() {
     return {

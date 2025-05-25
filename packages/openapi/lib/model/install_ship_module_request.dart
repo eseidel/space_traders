@@ -1,7 +1,8 @@
 class InstallShipModuleRequest {
   InstallShipModuleRequest({required this.symbol});
 
-  factory InstallShipModuleRequest.fromJson(Map<String, dynamic> json) {
+  factory InstallShipModuleRequest.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return InstallShipModuleRequest(symbol: json['symbol'] as String);
   }
 
@@ -14,7 +15,7 @@ class InstallShipModuleRequest {
     return InstallShipModuleRequest.fromJson(json);
   }
 
-  final String symbol;
+  String symbol;
 
   Map<String, dynamic> toJson() {
     return {'symbol': symbol};

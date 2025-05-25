@@ -11,7 +11,8 @@ class Shipyard {
     required this.modificationsFee,
   });
 
-  factory Shipyard.fromJson(Map<String, dynamic> json) {
+  factory Shipyard.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return Shipyard(
       symbol: json['symbol'] as String,
       shipTypes:
@@ -46,11 +47,11 @@ class Shipyard {
     return Shipyard.fromJson(json);
   }
 
-  final String symbol;
-  final List<ShipyardShipTypesInner> shipTypes;
-  final List<ShipyardTransaction> transactions;
-  final List<ShipyardShip> ships;
-  final int modificationsFee;
+  String symbol;
+  List<ShipyardShipTypesInner> shipTypes;
+  List<ShipyardTransaction> transactions;
+  List<ShipyardShip> ships;
+  int modificationsFee;
 
   Map<String, dynamic> toJson() {
     return {

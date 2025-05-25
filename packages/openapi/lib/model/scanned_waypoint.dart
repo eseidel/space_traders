@@ -17,7 +17,8 @@ class ScannedWaypoint {
     required this.chart,
   });
 
-  factory ScannedWaypoint.fromJson(Map<String, dynamic> json) {
+  factory ScannedWaypoint.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return ScannedWaypoint(
       symbol: json['symbol'] as String,
       type: WaypointType.fromJson(json['type'] as String),
@@ -52,15 +53,15 @@ class ScannedWaypoint {
     return ScannedWaypoint.fromJson(json);
   }
 
-  final String symbol;
-  final WaypointType type;
-  final String systemSymbol;
-  final int x;
-  final int y;
-  final List<WaypointOrbital> orbitals;
-  final WaypointFaction faction;
-  final List<WaypointTrait> traits;
-  final Chart chart;
+  String symbol;
+  WaypointType type;
+  String systemSymbol;
+  int x;
+  int y;
+  List<WaypointOrbital> orbitals;
+  WaypointFaction faction;
+  List<WaypointTrait> traits;
+  Chart chart;
 
   Map<String, dynamic> toJson() {
     return {

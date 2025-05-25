@@ -7,7 +7,8 @@ class Construction {
     required this.isComplete,
   });
 
-  factory Construction.fromJson(Map<String, dynamic> json) {
+  factory Construction.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return Construction(
       symbol: json['symbol'] as String,
       materials:
@@ -29,9 +30,9 @@ class Construction {
     return Construction.fromJson(json);
   }
 
-  final String symbol;
-  final List<ConstructionMaterial> materials;
-  final bool isComplete;
+  String symbol;
+  List<ConstructionMaterial> materials;
+  bool isComplete;
 
   Map<String, dynamic> toJson() {
     return {

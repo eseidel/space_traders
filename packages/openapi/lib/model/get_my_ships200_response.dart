@@ -4,7 +4,8 @@ import 'package:openapi/model/ship.dart';
 class GetMyShips200Response {
   GetMyShips200Response({required this.data, required this.meta});
 
-  factory GetMyShips200Response.fromJson(Map<String, dynamic> json) {
+  factory GetMyShips200Response.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetMyShips200Response(
       data:
           (json['data'] as List<dynamic>)
@@ -23,8 +24,8 @@ class GetMyShips200Response {
     return GetMyShips200Response.fromJson(json);
   }
 
-  final List<Ship> data;
-  final Meta meta;
+  List<Ship> data;
+  Meta meta;
 
   Map<String, dynamic> toJson() {
     return {

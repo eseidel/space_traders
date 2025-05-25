@@ -3,7 +3,8 @@ import 'package:openapi/model/siphon_yield.dart';
 class Siphon {
   Siphon({required this.shipSymbol, required this.yield_});
 
-  factory Siphon.fromJson(Map<String, dynamic> json) {
+  factory Siphon.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return Siphon(
       shipSymbol: json['shipSymbol'] as String,
       yield_: SiphonYield.fromJson(json['yield'] as Map<String, dynamic>),
@@ -19,8 +20,8 @@ class Siphon {
     return Siphon.fromJson(json);
   }
 
-  final String shipSymbol;
-  final SiphonYield yield_;
+  String shipSymbol;
+  SiphonYield yield_;
 
   Map<String, dynamic> toJson() {
     return {'shipSymbol': shipSymbol, 'yield_': yield_.toJson()};

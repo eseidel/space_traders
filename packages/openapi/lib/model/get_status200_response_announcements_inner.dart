@@ -4,9 +4,8 @@ class GetStatus200ResponseAnnouncementsInner {
     required this.body,
   });
 
-  factory GetStatus200ResponseAnnouncementsInner.fromJson(
-    Map<String, dynamic> json,
-  ) {
+  factory GetStatus200ResponseAnnouncementsInner.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetStatus200ResponseAnnouncementsInner(
       title: json['title'] as String,
       body: json['body'] as String,
@@ -24,8 +23,8 @@ class GetStatus200ResponseAnnouncementsInner {
     return GetStatus200ResponseAnnouncementsInner.fromJson(json);
   }
 
-  final String title;
-  final String body;
+  String title;
+  String body;
 
   Map<String, dynamic> toJson() {
     return {'title': title, 'body': body};

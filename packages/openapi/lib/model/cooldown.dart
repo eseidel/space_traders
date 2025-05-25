@@ -6,7 +6,8 @@ class Cooldown {
     required this.expiration,
   });
 
-  factory Cooldown.fromJson(Map<String, dynamic> json) {
+  factory Cooldown.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return Cooldown(
       shipSymbol: json['shipSymbol'] as String,
       totalSeconds: json['totalSeconds'] as int,
@@ -24,10 +25,10 @@ class Cooldown {
     return Cooldown.fromJson(json);
   }
 
-  final String shipSymbol;
-  final int totalSeconds;
-  final int remainingSeconds;
-  final DateTime expiration;
+  String shipSymbol;
+  int totalSeconds;
+  int remainingSeconds;
+  DateTime expiration;
 
   Map<String, dynamic> toJson() {
     return {

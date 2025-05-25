@@ -8,7 +8,8 @@ class ContractTerms {
     required this.deliver,
   });
 
-  factory ContractTerms.fromJson(Map<String, dynamic> json) {
+  factory ContractTerms.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return ContractTerms(
       deadline: DateTime.parse(json['deadline'] as String),
       payment: ContractPayment.fromJson(
@@ -32,9 +33,9 @@ class ContractTerms {
     return ContractTerms.fromJson(json);
   }
 
-  final DateTime deadline;
-  final ContractPayment payment;
-  final List<ContractDeliverGood> deliver;
+  DateTime deadline;
+  ContractPayment payment;
+  List<ContractDeliverGood> deliver;
 
   Map<String, dynamic> toJson() {
     return {

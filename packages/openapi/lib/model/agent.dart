@@ -8,7 +8,8 @@ class Agent {
     required this.shipCount,
   });
 
-  factory Agent.fromJson(Map<String, dynamic> json) {
+  factory Agent.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return Agent(
       accountId: json['accountId'] as String,
       symbol: json['symbol'] as String,
@@ -28,12 +29,12 @@ class Agent {
     return Agent.fromJson(json);
   }
 
-  final String accountId;
-  final String symbol;
-  final String headquarters;
-  final int credits;
-  final String startingFaction;
-  final int shipCount;
+  String accountId;
+  String symbol;
+  String headquarters;
+  int credits;
+  String startingFaction;
+  int shipCount;
 
   Map<String, dynamic> toJson() {
     return {

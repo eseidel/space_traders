@@ -4,7 +4,8 @@ import 'package:openapi/model/meta.dart';
 class GetFactions200Response {
   GetFactions200Response({required this.data, required this.meta});
 
-  factory GetFactions200Response.fromJson(Map<String, dynamic> json) {
+  factory GetFactions200Response.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetFactions200Response(
       data:
           (json['data'] as List<dynamic>)
@@ -23,8 +24,8 @@ class GetFactions200Response {
     return GetFactions200Response.fromJson(json);
   }
 
-  final List<Faction> data;
-  final Meta meta;
+  List<Faction> data;
+  Meta meta;
 
   Map<String, dynamic> toJson() {
     return {

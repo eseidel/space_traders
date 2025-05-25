@@ -5,8 +5,9 @@ class GetStatus200ResponseLeaderboardsMostSubmittedChartsInner {
   });
 
   factory GetStatus200ResponseLeaderboardsMostSubmittedChartsInner.fromJson(
-    Map<String, dynamic> json,
+    dynamic jsonArg,
   ) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetStatus200ResponseLeaderboardsMostSubmittedChartsInner(
       agentSymbol: json['agentSymbol'] as String,
       chartCount: json['chartCount'] as int,
@@ -25,8 +26,8 @@ class GetStatus200ResponseLeaderboardsMostSubmittedChartsInner {
     );
   }
 
-  final String agentSymbol;
-  final int chartCount;
+  String agentSymbol;
+  int chartCount;
 
   Map<String, dynamic> toJson() {
     return {'agentSymbol': agentSymbol, 'chartCount': chartCount};

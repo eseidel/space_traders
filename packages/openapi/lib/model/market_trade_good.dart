@@ -14,7 +14,8 @@ class MarketTradeGood {
     required this.sellPrice,
   });
 
-  factory MarketTradeGood.fromJson(Map<String, dynamic> json) {
+  factory MarketTradeGood.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return MarketTradeGood(
       symbol: TradeSymbol.fromJson(json['symbol'] as String),
       type: MarketTradeGoodType.fromJson(json['type'] as String),
@@ -35,13 +36,13 @@ class MarketTradeGood {
     return MarketTradeGood.fromJson(json);
   }
 
-  final TradeSymbol symbol;
-  final MarketTradeGoodType type;
-  final int tradeVolume;
-  final SupplyLevel supply;
-  final ActivityLevel activity;
-  final int purchasePrice;
-  final int sellPrice;
+  TradeSymbol symbol;
+  MarketTradeGoodType type;
+  int tradeVolume;
+  SupplyLevel supply;
+  ActivityLevel activity;
+  int purchasePrice;
+  int sellPrice;
 
   Map<String, dynamic> toJson() {
     return {

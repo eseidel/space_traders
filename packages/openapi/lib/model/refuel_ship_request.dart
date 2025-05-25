@@ -1,7 +1,8 @@
 class RefuelShipRequest {
   RefuelShipRequest({required this.units, this.fromCargo = false});
 
-  factory RefuelShipRequest.fromJson(Map<String, dynamic> json) {
+  factory RefuelShipRequest.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return RefuelShipRequest(
       units: json['units'] as int,
       fromCargo: json['fromCargo'],
@@ -17,8 +18,8 @@ class RefuelShipRequest {
     return RefuelShipRequest.fromJson(json);
   }
 
-  final int units;
-  final dynamic fromCargo;
+  int units;
+  dynamic fromCargo;
 
   Map<String, dynamic> toJson() {
     return {'units': units, 'fromCargo': fromCargo};

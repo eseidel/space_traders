@@ -3,7 +3,8 @@ import 'package:openapi/model/ship_type.dart';
 class ShipyardShipTypesInner {
   ShipyardShipTypesInner({required this.type});
 
-  factory ShipyardShipTypesInner.fromJson(Map<String, dynamic> json) {
+  factory ShipyardShipTypesInner.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return ShipyardShipTypesInner(
       type: ShipType.fromJson(json['type'] as String),
     );
@@ -18,7 +19,7 @@ class ShipyardShipTypesInner {
     return ShipyardShipTypesInner.fromJson(json);
   }
 
-  final ShipType type;
+  ShipType type;
 
   Map<String, dynamic> toJson() {
     return {'type': type.toJson()};

@@ -12,7 +12,8 @@ class Register201ResponseData {
     required this.ships,
   });
 
-  factory Register201ResponseData.fromJson(Map<String, dynamic> json) {
+  factory Register201ResponseData.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return Register201ResponseData(
       token: json['token'] as String,
       agent: Agent.fromJson(json['agent'] as Map<String, dynamic>),
@@ -34,11 +35,11 @@ class Register201ResponseData {
     return Register201ResponseData.fromJson(json);
   }
 
-  final String token;
-  final Agent agent;
-  final Faction faction;
-  final Contract contract;
-  final List<Ship> ships;
+  String token;
+  Agent agent;
+  Faction faction;
+  Contract contract;
+  List<Ship> ships;
 
   Map<String, dynamic> toJson() {
     return {

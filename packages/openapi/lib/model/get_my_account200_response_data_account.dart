@@ -6,9 +6,8 @@ class GetMyAccount200ResponseDataAccount {
     required this.createdAt,
   });
 
-  factory GetMyAccount200ResponseDataAccount.fromJson(
-    Map<String, dynamic> json,
-  ) {
+  factory GetMyAccount200ResponseDataAccount.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetMyAccount200ResponseDataAccount(
       id: json['id'] as String,
       email: json['email'] as String,
@@ -28,10 +27,10 @@ class GetMyAccount200ResponseDataAccount {
     return GetMyAccount200ResponseDataAccount.fromJson(json);
   }
 
-  final String id;
-  final String email;
-  final String token;
-  final DateTime createdAt;
+  String id;
+  String email;
+  String token;
+  DateTime createdAt;
 
   Map<String, dynamic> toJson() {
     return {

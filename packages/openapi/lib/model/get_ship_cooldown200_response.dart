@@ -3,7 +3,8 @@ import 'package:openapi/model/cooldown.dart';
 class GetShipCooldown200Response {
   GetShipCooldown200Response({required this.data});
 
-  factory GetShipCooldown200Response.fromJson(Map<String, dynamic> json) {
+  factory GetShipCooldown200Response.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetShipCooldown200Response(
       data: Cooldown.fromJson(json['data'] as Map<String, dynamic>),
     );
@@ -18,7 +19,7 @@ class GetShipCooldown200Response {
     return GetShipCooldown200Response.fromJson(json);
   }
 
-  final Cooldown data;
+  Cooldown data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

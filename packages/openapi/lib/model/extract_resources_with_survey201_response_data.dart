@@ -13,9 +13,8 @@ class ExtractResourcesWithSurvey201ResponseData {
     required this.events,
   });
 
-  factory ExtractResourcesWithSurvey201ResponseData.fromJson(
-    Map<String, dynamic> json,
-  ) {
+  factory ExtractResourcesWithSurvey201ResponseData.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return ExtractResourcesWithSurvey201ResponseData(
       extraction: Extraction.fromJson(
         json['extraction'] as Map<String, dynamic>,
@@ -48,11 +47,11 @@ class ExtractResourcesWithSurvey201ResponseData {
     return ExtractResourcesWithSurvey201ResponseData.fromJson(json);
   }
 
-  final Extraction extraction;
-  final Cooldown cooldown;
-  final ShipCargo cargo;
-  final List<WaypointModifier> modifiers;
-  final List<ShipConditionEvent> events;
+  Extraction extraction;
+  Cooldown cooldown;
+  ShipCargo cargo;
+  List<WaypointModifier> modifiers;
+  List<ShipConditionEvent> events;
 
   Map<String, dynamic> toJson() {
     return {

@@ -4,9 +4,8 @@ class GetMyFactions200ResponseDataInner {
     required this.reputation,
   });
 
-  factory GetMyFactions200ResponseDataInner.fromJson(
-    Map<String, dynamic> json,
-  ) {
+  factory GetMyFactions200ResponseDataInner.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetMyFactions200ResponseDataInner(
       symbol: json['symbol'] as String,
       reputation: json['reputation'] as int,
@@ -24,8 +23,8 @@ class GetMyFactions200ResponseDataInner {
     return GetMyFactions200ResponseDataInner.fromJson(json);
   }
 
-  final String symbol;
-  final int reputation;
+  String symbol;
+  int reputation;
 
   Map<String, dynamic> toJson() {
     return {'symbol': symbol, 'reputation': reputation};

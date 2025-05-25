@@ -3,7 +3,8 @@ import 'package:openapi/model/get_error_codes200_response_error_codes_inner.dart
 class GetErrorCodes200Response {
   GetErrorCodes200Response({required this.errorCodes});
 
-  factory GetErrorCodes200Response.fromJson(Map<String, dynamic> json) {
+  factory GetErrorCodes200Response.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetErrorCodes200Response(
       errorCodes:
           (json['errorCodes'] as List<dynamic>)
@@ -25,7 +26,7 @@ class GetErrorCodes200Response {
     return GetErrorCodes200Response.fromJson(json);
   }
 
-  final List<GetErrorCodes200ResponseErrorCodesInner> errorCodes;
+  List<GetErrorCodes200ResponseErrorCodesInner> errorCodes;
 
   Map<String, dynamic> toJson() {
     return {'errorCodes': errorCodes.map((e) => e.toJson()).toList()};

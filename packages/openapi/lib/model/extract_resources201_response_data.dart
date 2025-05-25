@@ -13,7 +13,8 @@ class ExtractResources201ResponseData {
     required this.events,
   });
 
-  factory ExtractResources201ResponseData.fromJson(Map<String, dynamic> json) {
+  factory ExtractResources201ResponseData.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return ExtractResources201ResponseData(
       extraction: Extraction.fromJson(
         json['extraction'] as Map<String, dynamic>,
@@ -46,11 +47,11 @@ class ExtractResources201ResponseData {
     return ExtractResources201ResponseData.fromJson(json);
   }
 
-  final Extraction extraction;
-  final Cooldown cooldown;
-  final ShipCargo cargo;
-  final List<WaypointModifier> modifiers;
-  final List<ShipConditionEvent> events;
+  Extraction extraction;
+  Cooldown cooldown;
+  ShipCargo cargo;
+  List<WaypointModifier> modifiers;
+  List<ShipConditionEvent> events;
 
   Map<String, dynamic> toJson() {
     return {

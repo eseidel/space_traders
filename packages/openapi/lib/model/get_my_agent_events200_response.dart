@@ -3,7 +3,8 @@ import 'package:openapi/model/agent_event.dart';
 class GetMyAgentEvents200Response {
   GetMyAgentEvents200Response({required this.data});
 
-  factory GetMyAgentEvents200Response.fromJson(Map<String, dynamic> json) {
+  factory GetMyAgentEvents200Response.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetMyAgentEvents200Response(
       data:
           (json['data'] as List<dynamic>)
@@ -25,7 +26,7 @@ class GetMyAgentEvents200Response {
     return GetMyAgentEvents200Response.fromJson(json);
   }
 
-  final List<AgentEvent> data;
+  List<AgentEvent> data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.map((e) => e.toJson()).toList()};

@@ -4,7 +4,8 @@ import 'package:openapi/model/waypoint.dart';
 class GetSystemWaypoints200Response {
   GetSystemWaypoints200Response({required this.data, required this.meta});
 
-  factory GetSystemWaypoints200Response.fromJson(Map<String, dynamic> json) {
+  factory GetSystemWaypoints200Response.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetSystemWaypoints200Response(
       data:
           (json['data'] as List<dynamic>)
@@ -27,8 +28,8 @@ class GetSystemWaypoints200Response {
     return GetSystemWaypoints200Response.fromJson(json);
   }
 
-  final List<Waypoint> data;
-  final Meta meta;
+  List<Waypoint> data;
+  Meta meta;
 
   Map<String, dynamic> toJson() {
     return {

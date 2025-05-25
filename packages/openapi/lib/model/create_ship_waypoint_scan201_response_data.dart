@@ -7,9 +7,8 @@ class CreateShipWaypointScan201ResponseData {
     required this.waypoints,
   });
 
-  factory CreateShipWaypointScan201ResponseData.fromJson(
-    Map<String, dynamic> json,
-  ) {
+  factory CreateShipWaypointScan201ResponseData.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return CreateShipWaypointScan201ResponseData(
       cooldown: Cooldown.fromJson(json['cooldown'] as Map<String, dynamic>),
       waypoints:
@@ -32,8 +31,8 @@ class CreateShipWaypointScan201ResponseData {
     return CreateShipWaypointScan201ResponseData.fromJson(json);
   }
 
-  final Cooldown cooldown;
-  final List<ScannedWaypoint> waypoints;
+  Cooldown cooldown;
+  List<ScannedWaypoint> waypoints;
 
   Map<String, dynamic> toJson() {
     return {

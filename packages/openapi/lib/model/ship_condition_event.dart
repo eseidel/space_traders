@@ -9,7 +9,8 @@ class ShipConditionEvent {
     required this.description,
   });
 
-  factory ShipConditionEvent.fromJson(Map<String, dynamic> json) {
+  factory ShipConditionEvent.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return ShipConditionEvent(
       symbol: ShipConditionEventSymbol.fromJson(json['symbol'] as String),
       component: ShipConditionEventComponent.fromJson(
@@ -29,10 +30,10 @@ class ShipConditionEvent {
     return ShipConditionEvent.fromJson(json);
   }
 
-  final ShipConditionEventSymbol symbol;
-  final ShipConditionEventComponent component;
-  final String name;
-  final String description;
+  ShipConditionEventSymbol symbol;
+  ShipConditionEventComponent component;
+  String name;
+  String description;
 
   Map<String, dynamic> toJson() {
     return {

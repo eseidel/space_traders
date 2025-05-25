@@ -1,7 +1,8 @@
 class GetStatus200ResponseHealth {
   GetStatus200ResponseHealth({required this.lastMarketUpdate});
 
-  factory GetStatus200ResponseHealth.fromJson(Map<String, dynamic> json) {
+  factory GetStatus200ResponseHealth.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetStatus200ResponseHealth(
       lastMarketUpdate: json['lastMarketUpdate'] as String,
     );
@@ -16,7 +17,7 @@ class GetStatus200ResponseHealth {
     return GetStatus200ResponseHealth.fromJson(json);
   }
 
-  final String lastMarketUpdate;
+  String lastMarketUpdate;
 
   Map<String, dynamic> toJson() {
     return {'lastMarketUpdate': lastMarketUpdate};

@@ -7,7 +7,8 @@ class WaypointTrait {
     required this.description,
   });
 
-  factory WaypointTrait.fromJson(Map<String, dynamic> json) {
+  factory WaypointTrait.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return WaypointTrait(
       symbol: WaypointTraitSymbol.fromJson(json['symbol'] as String),
       name: json['name'] as String,
@@ -24,9 +25,9 @@ class WaypointTrait {
     return WaypointTrait.fromJson(json);
   }
 
-  final WaypointTraitSymbol symbol;
-  final String name;
-  final String description;
+  WaypointTraitSymbol symbol;
+  String name;
+  String description;
 
   Map<String, dynamic> toJson() {
     return {

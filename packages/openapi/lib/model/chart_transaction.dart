@@ -6,7 +6,8 @@ class ChartTransaction {
     required this.timestamp,
   });
 
-  factory ChartTransaction.fromJson(Map<String, dynamic> json) {
+  factory ChartTransaction.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return ChartTransaction(
       waypointSymbol: json['waypointSymbol'] as String,
       shipSymbol: json['shipSymbol'] as String,
@@ -24,10 +25,10 @@ class ChartTransaction {
     return ChartTransaction.fromJson(json);
   }
 
-  final String waypointSymbol;
-  final String shipSymbol;
-  final int totalPrice;
-  final DateTime timestamp;
+  String waypointSymbol;
+  String shipSymbol;
+  int totalPrice;
+  DateTime timestamp;
 
   Map<String, dynamic> toJson() {
     return {

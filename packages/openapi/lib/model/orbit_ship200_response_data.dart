@@ -3,7 +3,8 @@ import 'package:openapi/model/ship_nav.dart';
 class OrbitShip200ResponseData {
   OrbitShip200ResponseData({required this.nav});
 
-  factory OrbitShip200ResponseData.fromJson(Map<String, dynamic> json) {
+  factory OrbitShip200ResponseData.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return OrbitShip200ResponseData(
       nav: ShipNav.fromJson(json['nav'] as Map<String, dynamic>),
     );
@@ -18,7 +19,7 @@ class OrbitShip200ResponseData {
     return OrbitShip200ResponseData.fromJson(json);
   }
 
-  final ShipNav nav;
+  ShipNav nav;
 
   Map<String, dynamic> toJson() {
     return {'nav': nav.toJson()};

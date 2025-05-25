@@ -11,7 +11,8 @@ class SystemWaypoint {
     required this.orbits,
   });
 
-  factory SystemWaypoint.fromJson(Map<String, dynamic> json) {
+  factory SystemWaypoint.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return SystemWaypoint(
       symbol: json['symbol'] as String,
       type: WaypointType.fromJson(json['type'] as String),
@@ -36,12 +37,12 @@ class SystemWaypoint {
     return SystemWaypoint.fromJson(json);
   }
 
-  final String symbol;
-  final WaypointType type;
-  final int x;
-  final int y;
-  final List<WaypointOrbital> orbitals;
-  final String orbits;
+  String symbol;
+  WaypointType type;
+  int x;
+  int y;
+  List<WaypointOrbital> orbitals;
+  String orbits;
 
   Map<String, dynamic> toJson() {
     return {

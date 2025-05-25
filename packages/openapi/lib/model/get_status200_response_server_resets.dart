@@ -4,7 +4,8 @@ class GetStatus200ResponseServerResets {
     required this.frequency,
   });
 
-  factory GetStatus200ResponseServerResets.fromJson(Map<String, dynamic> json) {
+  factory GetStatus200ResponseServerResets.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetStatus200ResponseServerResets(
       next: json['next'] as String,
       frequency: json['frequency'] as String,
@@ -22,8 +23,8 @@ class GetStatus200ResponseServerResets {
     return GetStatus200ResponseServerResets.fromJson(json);
   }
 
-  final String next;
-  final String frequency;
+  String next;
+  String frequency;
 
   Map<String, dynamic> toJson() {
     return {'next': next, 'frequency': frequency};

@@ -7,7 +7,8 @@ class GetStatus200ResponseLeaderboards {
     required this.mostSubmittedCharts,
   });
 
-  factory GetStatus200ResponseLeaderboards.fromJson(Map<String, dynamic> json) {
+  factory GetStatus200ResponseLeaderboards.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetStatus200ResponseLeaderboards(
       mostCredits:
           (json['mostCredits'] as List<dynamic>)
@@ -41,8 +42,8 @@ class GetStatus200ResponseLeaderboards {
     return GetStatus200ResponseLeaderboards.fromJson(json);
   }
 
-  final List<GetStatus200ResponseLeaderboardsMostCreditsInner> mostCredits;
-  final List<GetStatus200ResponseLeaderboardsMostSubmittedChartsInner>
+  List<GetStatus200ResponseLeaderboardsMostCreditsInner> mostCredits;
+  List<GetStatus200ResponseLeaderboardsMostSubmittedChartsInner>
   mostSubmittedCharts;
 
   Map<String, dynamic> toJson() {

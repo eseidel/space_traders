@@ -3,7 +3,8 @@ import 'package:openapi/model/faction.dart';
 class GetFaction200Response {
   GetFaction200Response({required this.data});
 
-  factory GetFaction200Response.fromJson(Map<String, dynamic> json) {
+  factory GetFaction200Response.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetFaction200Response(
       data: Faction.fromJson(json['data'] as Map<String, dynamic>),
     );
@@ -18,7 +19,7 @@ class GetFaction200Response {
     return GetFaction200Response.fromJson(json);
   }
 
-  final Faction data;
+  Faction data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

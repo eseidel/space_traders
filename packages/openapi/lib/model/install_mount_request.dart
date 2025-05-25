@@ -1,7 +1,8 @@
 class InstallMountRequest {
   InstallMountRequest({required this.symbol});
 
-  factory InstallMountRequest.fromJson(Map<String, dynamic> json) {
+  factory InstallMountRequest.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return InstallMountRequest(symbol: json['symbol'] as String);
   }
 
@@ -14,7 +15,7 @@ class InstallMountRequest {
     return InstallMountRequest.fromJson(json);
   }
 
-  final String symbol;
+  String symbol;
 
   Map<String, dynamic> toJson() {
     return {'symbol': symbol};

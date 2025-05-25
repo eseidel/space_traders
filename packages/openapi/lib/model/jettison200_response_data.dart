@@ -3,7 +3,8 @@ import 'package:openapi/model/ship_cargo.dart';
 class Jettison200ResponseData {
   Jettison200ResponseData({required this.cargo});
 
-  factory Jettison200ResponseData.fromJson(Map<String, dynamic> json) {
+  factory Jettison200ResponseData.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return Jettison200ResponseData(
       cargo: ShipCargo.fromJson(json['cargo'] as Map<String, dynamic>),
     );
@@ -18,7 +19,7 @@ class Jettison200ResponseData {
     return Jettison200ResponseData.fromJson(json);
   }
 
-  final ShipCargo cargo;
+  ShipCargo cargo;
 
   Map<String, dynamic> toJson() {
     return {'cargo': cargo.toJson()};

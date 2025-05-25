@@ -3,7 +3,8 @@ import 'package:openapi/model/create_chart201_response_data.dart';
 class CreateChart201Response {
   CreateChart201Response({required this.data});
 
-  factory CreateChart201Response.fromJson(Map<String, dynamic> json) {
+  factory CreateChart201Response.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return CreateChart201Response(
       data: CreateChart201ResponseData.fromJson(
         json['data'] as Map<String, dynamic>,
@@ -20,7 +21,7 @@ class CreateChart201Response {
     return CreateChart201Response.fromJson(json);
   }
 
-  final CreateChart201ResponseData data;
+  CreateChart201ResponseData data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

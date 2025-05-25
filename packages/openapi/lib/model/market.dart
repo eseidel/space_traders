@@ -12,7 +12,8 @@ class Market {
     required this.tradeGoods,
   });
 
-  factory Market.fromJson(Map<String, dynamic> json) {
+  factory Market.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return Market(
       symbol: json['symbol'] as String,
       exports:
@@ -57,12 +58,12 @@ class Market {
     return Market.fromJson(json);
   }
 
-  final String symbol;
-  final List<TradeGood> exports;
-  final List<TradeGood> imports;
-  final List<TradeGood> exchange;
-  final List<MarketTransaction> transactions;
-  final List<MarketTradeGood> tradeGoods;
+  String symbol;
+  List<TradeGood> exports;
+  List<TradeGood> imports;
+  List<TradeGood> exchange;
+  List<MarketTransaction> transactions;
+  List<MarketTradeGood> tradeGoods;
 
   Map<String, dynamic> toJson() {
     return {

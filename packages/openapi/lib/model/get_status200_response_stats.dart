@@ -7,7 +7,8 @@ class GetStatus200ResponseStats {
     required this.waypoints,
   });
 
-  factory GetStatus200ResponseStats.fromJson(Map<String, dynamic> json) {
+  factory GetStatus200ResponseStats.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetStatus200ResponseStats(
       accounts: json['accounts'] as int,
       agents: json['agents'] as int,
@@ -26,11 +27,11 @@ class GetStatus200ResponseStats {
     return GetStatus200ResponseStats.fromJson(json);
   }
 
-  final int accounts;
-  final int agents;
-  final int ships;
-  final int systems;
-  final int waypoints;
+  int accounts;
+  int agents;
+  int ships;
+  int systems;
+  int waypoints;
 
   Map<String, dynamic> toJson() {
     return {

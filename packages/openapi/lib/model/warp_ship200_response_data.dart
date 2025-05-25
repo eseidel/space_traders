@@ -9,7 +9,8 @@ class WarpShip200ResponseData {
     required this.events,
   });
 
-  factory WarpShip200ResponseData.fromJson(Map<String, dynamic> json) {
+  factory WarpShip200ResponseData.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return WarpShip200ResponseData(
       nav: ShipNav.fromJson(json['nav'] as Map<String, dynamic>),
       fuel: ShipFuel.fromJson(json['fuel'] as Map<String, dynamic>),
@@ -31,9 +32,9 @@ class WarpShip200ResponseData {
     return WarpShip200ResponseData.fromJson(json);
   }
 
-  final ShipNav nav;
-  final ShipFuel fuel;
-  final List<ShipConditionEvent> events;
+  ShipNav nav;
+  ShipFuel fuel;
+  List<ShipConditionEvent> events;
 
   Map<String, dynamic> toJson() {
     return {

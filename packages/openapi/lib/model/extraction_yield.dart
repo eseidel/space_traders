@@ -3,7 +3,8 @@ import 'package:openapi/model/trade_symbol.dart';
 class ExtractionYield {
   ExtractionYield({required this.symbol, required this.units});
 
-  factory ExtractionYield.fromJson(Map<String, dynamic> json) {
+  factory ExtractionYield.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return ExtractionYield(
       symbol: TradeSymbol.fromJson(json['symbol'] as String),
       units: json['units'] as int,
@@ -19,8 +20,8 @@ class ExtractionYield {
     return ExtractionYield.fromJson(json);
   }
 
-  final TradeSymbol symbol;
-  final int units;
+  TradeSymbol symbol;
+  int units;
 
   Map<String, dynamic> toJson() {
     return {'symbol': symbol.toJson(), 'units': units};

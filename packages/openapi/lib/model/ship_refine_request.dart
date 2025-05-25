@@ -3,7 +3,8 @@ import 'package:openapi/model/ship_refine_request_produce.dart';
 class ShipRefineRequest {
   ShipRefineRequest({required this.produce});
 
-  factory ShipRefineRequest.fromJson(Map<String, dynamic> json) {
+  factory ShipRefineRequest.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return ShipRefineRequest(
       produce: ShipRefineRequestProduce.fromJson(json['produce'] as String),
     );
@@ -18,7 +19,7 @@ class ShipRefineRequest {
     return ShipRefineRequest.fromJson(json);
   }
 
-  final ShipRefineRequestProduce produce;
+  ShipRefineRequestProduce produce;
 
   Map<String, dynamic> toJson() {
     return {'produce': produce.toJson()};

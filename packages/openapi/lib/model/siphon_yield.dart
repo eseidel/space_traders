@@ -3,7 +3,8 @@ import 'package:openapi/model/trade_symbol.dart';
 class SiphonYield {
   SiphonYield({required this.symbol, required this.units});
 
-  factory SiphonYield.fromJson(Map<String, dynamic> json) {
+  factory SiphonYield.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return SiphonYield(
       symbol: TradeSymbol.fromJson(json['symbol'] as String),
       units: json['units'] as int,
@@ -19,8 +20,8 @@ class SiphonYield {
     return SiphonYield.fromJson(json);
   }
 
-  final TradeSymbol symbol;
-  final int units;
+  TradeSymbol symbol;
+  int units;
 
   Map<String, dynamic> toJson() {
     return {'symbol': symbol.toJson(), 'units': units};

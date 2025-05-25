@@ -10,7 +10,8 @@ class ShipCrew {
     this.rotation = ShipCrewRotation.STRICT,
   });
 
-  factory ShipCrew.fromJson(Map<String, dynamic> json) {
+  factory ShipCrew.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return ShipCrew(
       current: json['current'] as int,
       required_: json['required'] as int,
@@ -30,12 +31,12 @@ class ShipCrew {
     return ShipCrew.fromJson(json);
   }
 
-  final int current;
-  final int required_;
-  final int capacity;
-  final ShipCrewRotation rotation;
-  final int morale;
-  final int wages;
+  int current;
+  int required_;
+  int capacity;
+  ShipCrewRotation rotation;
+  int morale;
+  int wages;
 
   Map<String, dynamic> toJson() {
     return {

@@ -9,7 +9,8 @@ class ShipNavRouteWaypoint {
     required this.y,
   });
 
-  factory ShipNavRouteWaypoint.fromJson(Map<String, dynamic> json) {
+  factory ShipNavRouteWaypoint.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return ShipNavRouteWaypoint(
       symbol: json['symbol'] as String,
       type: WaypointType.fromJson(json['type'] as String),
@@ -28,11 +29,11 @@ class ShipNavRouteWaypoint {
     return ShipNavRouteWaypoint.fromJson(json);
   }
 
-  final String symbol;
-  final WaypointType type;
-  final String systemSymbol;
-  final int x;
-  final int y;
+  String symbol;
+  WaypointType type;
+  String systemSymbol;
+  int x;
+  int y;
 
   Map<String, dynamic> toJson() {
     return {

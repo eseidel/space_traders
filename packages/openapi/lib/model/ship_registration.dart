@@ -7,7 +7,8 @@ class ShipRegistration {
     required this.role,
   });
 
-  factory ShipRegistration.fromJson(Map<String, dynamic> json) {
+  factory ShipRegistration.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return ShipRegistration(
       name: json['name'] as String,
       factionSymbol: json['factionSymbol'] as String,
@@ -24,9 +25,9 @@ class ShipRegistration {
     return ShipRegistration.fromJson(json);
   }
 
-  final String name;
-  final String factionSymbol;
-  final ShipRole role;
+  String name;
+  String factionSymbol;
+  ShipRole role;
 
   Map<String, dynamic> toJson() {
     return {

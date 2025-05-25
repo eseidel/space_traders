@@ -5,7 +5,8 @@ class Chart {
     required this.submittedOn,
   });
 
-  factory Chart.fromJson(Map<String, dynamic> json) {
+  factory Chart.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return Chart(
       waypointSymbol: json['waypointSymbol'] as String,
       submittedBy: json['submittedBy'] as String,
@@ -22,9 +23,9 @@ class Chart {
     return Chart.fromJson(json);
   }
 
-  final String waypointSymbol;
-  final String submittedBy;
-  final DateTime submittedOn;
+  String waypointSymbol;
+  String submittedBy;
+  DateTime submittedOn;
 
   Map<String, dynamic> toJson() {
     return {

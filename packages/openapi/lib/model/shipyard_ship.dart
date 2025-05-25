@@ -24,7 +24,8 @@ class ShipyardShip {
     required this.crew,
   });
 
-  factory ShipyardShip.fromJson(Map<String, dynamic> json) {
+  factory ShipyardShip.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return ShipyardShip(
       type: ShipType.fromJson(json['type'] as String),
       name: json['name'] as String,
@@ -60,18 +61,18 @@ class ShipyardShip {
     return ShipyardShip.fromJson(json);
   }
 
-  final ShipType type;
-  final String name;
-  final String description;
-  final ActivityLevel activity;
-  final SupplyLevel supply;
-  final int purchasePrice;
-  final ShipFrame frame;
-  final ShipReactor reactor;
-  final ShipEngine engine;
-  final List<ShipModule> modules;
-  final List<ShipMount> mounts;
-  final ShipyardShipCrew crew;
+  ShipType type;
+  String name;
+  String description;
+  ActivityLevel activity;
+  SupplyLevel supply;
+  int purchasePrice;
+  ShipFrame frame;
+  ShipReactor reactor;
+  ShipEngine engine;
+  List<ShipModule> modules;
+  List<ShipMount> mounts;
+  ShipyardShipCrew crew;
 
   Map<String, dynamic> toJson() {
     return {

@@ -3,7 +3,8 @@ import 'package:openapi/model/get_supply_chain200_response_data_export_to_import
 class GetSupplyChain200ResponseData {
   GetSupplyChain200ResponseData({required this.exportToImportMap});
 
-  factory GetSupplyChain200ResponseData.fromJson(Map<String, dynamic> json) {
+  factory GetSupplyChain200ResponseData.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetSupplyChain200ResponseData(
       exportToImportMap:
           GetSupplyChain200ResponseDataExportToImportMap.fromJson(
@@ -23,7 +24,7 @@ class GetSupplyChain200ResponseData {
     return GetSupplyChain200ResponseData.fromJson(json);
   }
 
-  final GetSupplyChain200ResponseDataExportToImportMap exportToImportMap;
+  GetSupplyChain200ResponseDataExportToImportMap exportToImportMap;
 
   Map<String, dynamic> toJson() {
     return {'exportToImportMap': exportToImportMap.toJson()};

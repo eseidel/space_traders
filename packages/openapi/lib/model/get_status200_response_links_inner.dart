@@ -1,7 +1,8 @@
 class GetStatus200ResponseLinksInner {
   GetStatus200ResponseLinksInner({required this.name, required this.url});
 
-  factory GetStatus200ResponseLinksInner.fromJson(Map<String, dynamic> json) {
+  factory GetStatus200ResponseLinksInner.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetStatus200ResponseLinksInner(
       name: json['name'] as String,
       url: json['url'] as String,
@@ -19,8 +20,8 @@ class GetStatus200ResponseLinksInner {
     return GetStatus200ResponseLinksInner.fromJson(json);
   }
 
-  final String name;
-  final String url;
+  String name;
+  String url;
 
   Map<String, dynamic> toJson() {
     return {'name': name, 'url': url};

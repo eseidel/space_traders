@@ -10,7 +10,8 @@ class Survey {
     required this.size,
   });
 
-  factory Survey.fromJson(Map<String, dynamic> json) {
+  factory Survey.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return Survey(
       signature: json['signature'] as String,
       symbol: json['symbol'] as String,
@@ -34,11 +35,11 @@ class Survey {
     return Survey.fromJson(json);
   }
 
-  final String signature;
-  final String symbol;
-  final List<SurveyDeposit> deposits;
-  final DateTime expiration;
-  final SurveySize size;
+  String signature;
+  String symbol;
+  List<SurveyDeposit> deposits;
+  DateTime expiration;
+  SurveySize size;
 
   Map<String, dynamic> toJson() {
     return {

@@ -11,7 +11,8 @@ class CreateChart201ResponseData {
     required this.agent,
   });
 
-  factory CreateChart201ResponseData.fromJson(Map<String, dynamic> json) {
+  factory CreateChart201ResponseData.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return CreateChart201ResponseData(
       chart: Chart.fromJson(json['chart'] as Map<String, dynamic>),
       waypoint: Waypoint.fromJson(json['waypoint'] as Map<String, dynamic>),
@@ -31,10 +32,10 @@ class CreateChart201ResponseData {
     return CreateChart201ResponseData.fromJson(json);
   }
 
-  final Chart chart;
-  final Waypoint waypoint;
-  final ChartTransaction transaction;
-  final Agent agent;
+  Chart chart;
+  Waypoint waypoint;
+  ChartTransaction transaction;
+  Agent agent;
 
   Map<String, dynamic> toJson() {
     return {

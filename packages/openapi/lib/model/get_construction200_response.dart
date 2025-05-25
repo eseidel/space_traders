@@ -3,7 +3,8 @@ import 'package:openapi/model/construction.dart';
 class GetConstruction200Response {
   GetConstruction200Response({required this.data});
 
-  factory GetConstruction200Response.fromJson(Map<String, dynamic> json) {
+  factory GetConstruction200Response.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetConstruction200Response(
       data: Construction.fromJson(json['data'] as Map<String, dynamic>),
     );
@@ -18,7 +19,7 @@ class GetConstruction200Response {
     return GetConstruction200Response.fromJson(json);
   }
 
-  final Construction data;
+  Construction data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

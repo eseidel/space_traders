@@ -4,7 +4,8 @@ import 'package:openapi/model/system.dart';
 class GetSystems200Response {
   GetSystems200Response({required this.data, required this.meta});
 
-  factory GetSystems200Response.fromJson(Map<String, dynamic> json) {
+  factory GetSystems200Response.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetSystems200Response(
       data:
           (json['data'] as List<dynamic>)
@@ -23,8 +24,8 @@ class GetSystems200Response {
     return GetSystems200Response.fromJson(json);
   }
 
-  final List<System> data;
-  final Meta meta;
+  List<System> data;
+  Meta meta;
 
   Map<String, dynamic> toJson() {
     return {

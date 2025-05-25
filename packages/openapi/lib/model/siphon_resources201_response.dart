@@ -3,7 +3,8 @@ import 'package:openapi/model/siphon_resources201_response_data.dart';
 class SiphonResources201Response {
   SiphonResources201Response({required this.data});
 
-  factory SiphonResources201Response.fromJson(Map<String, dynamic> json) {
+  factory SiphonResources201Response.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return SiphonResources201Response(
       data: SiphonResources201ResponseData.fromJson(
         json['data'] as Map<String, dynamic>,
@@ -20,7 +21,7 @@ class SiphonResources201Response {
     return SiphonResources201Response.fromJson(json);
   }
 
-  final SiphonResources201ResponseData data;
+  SiphonResources201ResponseData data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

@@ -3,7 +3,8 @@ import 'package:openapi/model/ship_mount.dart';
 class GetMounts200Response {
   GetMounts200Response({required this.data});
 
-  factory GetMounts200Response.fromJson(Map<String, dynamic> json) {
+  factory GetMounts200Response.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetMounts200Response(
       data:
           (json['data'] as List<dynamic>)
@@ -23,7 +24,7 @@ class GetMounts200Response {
     return GetMounts200Response.fromJson(json);
   }
 
-  final List<ShipMount> data;
+  List<ShipMount> data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.map((e) => e.toJson()).toList()};

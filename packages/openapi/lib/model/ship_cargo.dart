@@ -7,7 +7,8 @@ class ShipCargo {
     required this.inventory,
   });
 
-  factory ShipCargo.fromJson(Map<String, dynamic> json) {
+  factory ShipCargo.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return ShipCargo(
       capacity: json['capacity'] as int,
       units: json['units'] as int,
@@ -29,9 +30,9 @@ class ShipCargo {
     return ShipCargo.fromJson(json);
   }
 
-  final int capacity;
-  final int units;
-  final List<ShipCargoItem> inventory;
+  int capacity;
+  int units;
+  List<ShipCargoItem> inventory;
 
   Map<String, dynamic> toJson() {
     return {

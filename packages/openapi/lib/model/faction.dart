@@ -11,7 +11,8 @@ class Faction {
     required this.isRecruiting,
   });
 
-  factory Faction.fromJson(Map<String, dynamic> json) {
+  factory Faction.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return Faction(
       symbol: FactionSymbol.fromJson(json['symbol'] as String),
       name: json['name'] as String,
@@ -36,12 +37,12 @@ class Faction {
     return Faction.fromJson(json);
   }
 
-  final FactionSymbol symbol;
-  final String name;
-  final String description;
-  final String headquarters;
-  final List<FactionTrait> traits;
-  final bool isRecruiting;
+  FactionSymbol symbol;
+  String name;
+  String description;
+  String headquarters;
+  List<FactionTrait> traits;
+  bool isRecruiting;
 
   Map<String, dynamic> toJson() {
     return {

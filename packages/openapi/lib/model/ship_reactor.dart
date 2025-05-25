@@ -13,7 +13,8 @@ class ShipReactor {
     required this.quality,
   });
 
-  factory ShipReactor.fromJson(Map<String, dynamic> json) {
+  factory ShipReactor.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return ShipReactor(
       symbol: ShipReactorSymbol.fromJson(json['symbol'] as String),
       name: json['name'] as String,
@@ -37,14 +38,14 @@ class ShipReactor {
     return ShipReactor.fromJson(json);
   }
 
-  final ShipReactorSymbol symbol;
-  final String name;
-  final double condition;
-  final double integrity;
-  final String description;
-  final int powerOutput;
-  final ShipRequirements requirements;
-  final double quality;
+  ShipReactorSymbol symbol;
+  String name;
+  double condition;
+  double integrity;
+  String description;
+  int powerOutput;
+  ShipRequirements requirements;
+  double quality;
 
   Map<String, dynamic> toJson() {
     return {

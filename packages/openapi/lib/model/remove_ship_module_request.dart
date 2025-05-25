@@ -1,7 +1,8 @@
 class RemoveShipModuleRequest {
   RemoveShipModuleRequest({required this.symbol});
 
-  factory RemoveShipModuleRequest.fromJson(Map<String, dynamic> json) {
+  factory RemoveShipModuleRequest.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return RemoveShipModuleRequest(symbol: json['symbol'] as String);
   }
 
@@ -14,7 +15,7 @@ class RemoveShipModuleRequest {
     return RemoveShipModuleRequest.fromJson(json);
   }
 
-  final String symbol;
+  String symbol;
 
   Map<String, dynamic> toJson() {
     return {'symbol': symbol};

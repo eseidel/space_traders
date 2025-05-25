@@ -7,7 +7,8 @@ class SupplyConstructionRequest {
     required this.units,
   });
 
-  factory SupplyConstructionRequest.fromJson(Map<String, dynamic> json) {
+  factory SupplyConstructionRequest.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return SupplyConstructionRequest(
       shipSymbol: json['shipSymbol'] as String,
       tradeSymbol: TradeSymbol.fromJson(json['tradeSymbol'] as String),
@@ -24,9 +25,9 @@ class SupplyConstructionRequest {
     return SupplyConstructionRequest.fromJson(json);
   }
 
-  final String shipSymbol;
-  final TradeSymbol tradeSymbol;
-  final int units;
+  String shipSymbol;
+  TradeSymbol tradeSymbol;
+  int units;
 
   Map<String, dynamic> toJson() {
     return {

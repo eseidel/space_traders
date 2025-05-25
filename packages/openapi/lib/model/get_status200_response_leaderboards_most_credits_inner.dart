@@ -5,8 +5,9 @@ class GetStatus200ResponseLeaderboardsMostCreditsInner {
   });
 
   factory GetStatus200ResponseLeaderboardsMostCreditsInner.fromJson(
-    Map<String, dynamic> json,
+    dynamic jsonArg,
   ) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetStatus200ResponseLeaderboardsMostCreditsInner(
       agentSymbol: json['agentSymbol'] as String,
       credits: json['credits'] as int,
@@ -24,8 +25,8 @@ class GetStatus200ResponseLeaderboardsMostCreditsInner {
     return GetStatus200ResponseLeaderboardsMostCreditsInner.fromJson(json);
   }
 
-  final String agentSymbol;
-  final int credits;
+  String agentSymbol;
+  int credits;
 
   Map<String, dynamic> toJson() {
     return {'agentSymbol': agentSymbol, 'credits': credits};

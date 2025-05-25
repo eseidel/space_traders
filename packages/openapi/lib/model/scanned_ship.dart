@@ -16,7 +16,8 @@ class ScannedShip {
     required this.mounts,
   });
 
-  factory ScannedShip.fromJson(Map<String, dynamic> json) {
+  factory ScannedShip.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return ScannedShip(
       symbol: json['symbol'] as String,
       registration: ShipRegistration.fromJson(
@@ -49,13 +50,13 @@ class ScannedShip {
     return ScannedShip.fromJson(json);
   }
 
-  final String symbol;
-  final ShipRegistration registration;
-  final ShipNav nav;
-  final ScannedShipFrame frame;
-  final ScannedShipReactor reactor;
-  final ScannedShipEngine engine;
-  final List<ScannedShipMountsInner> mounts;
+  String symbol;
+  ShipRegistration registration;
+  ShipNav nav;
+  ScannedShipFrame frame;
+  ScannedShipReactor reactor;
+  ScannedShipEngine engine;
+  List<ScannedShipMountsInner> mounts;
 
   Map<String, dynamic> toJson() {
     return {

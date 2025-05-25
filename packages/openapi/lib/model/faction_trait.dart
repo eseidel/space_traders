@@ -7,7 +7,8 @@ class FactionTrait {
     required this.description,
   });
 
-  factory FactionTrait.fromJson(Map<String, dynamic> json) {
+  factory FactionTrait.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return FactionTrait(
       symbol: FactionTraitSymbol.fromJson(json['symbol'] as String),
       name: json['name'] as String,
@@ -24,9 +25,9 @@ class FactionTrait {
     return FactionTrait.fromJson(json);
   }
 
-  final FactionTraitSymbol symbol;
-  final String name;
-  final String description;
+  FactionTraitSymbol symbol;
+  String name;
+  String description;
 
   Map<String, dynamic> toJson() {
     return {

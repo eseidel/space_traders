@@ -3,7 +3,8 @@ import 'package:openapi/model/faction_symbol.dart';
 class RegisterRequest {
   RegisterRequest({required this.symbol, required this.faction});
 
-  factory RegisterRequest.fromJson(Map<String, dynamic> json) {
+  factory RegisterRequest.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return RegisterRequest(
       symbol: json['symbol'] as String,
       faction: FactionSymbol.fromJson(json['faction'] as String),
@@ -19,8 +20,8 @@ class RegisterRequest {
     return RegisterRequest.fromJson(json);
   }
 
-  final String symbol;
-  final FactionSymbol faction;
+  String symbol;
+  FactionSymbol faction;
 
   Map<String, dynamic> toJson() {
     return {'symbol': symbol, 'faction': faction.toJson()};

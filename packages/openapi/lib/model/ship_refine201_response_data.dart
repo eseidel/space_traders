@@ -11,7 +11,8 @@ class ShipRefine201ResponseData {
     required this.consumed,
   });
 
-  factory ShipRefine201ResponseData.fromJson(Map<String, dynamic> json) {
+  factory ShipRefine201ResponseData.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return ShipRefine201ResponseData(
       cargo: ShipCargo.fromJson(json['cargo'] as Map<String, dynamic>),
       cooldown: Cooldown.fromJson(json['cooldown'] as Map<String, dynamic>),
@@ -43,10 +44,10 @@ class ShipRefine201ResponseData {
     return ShipRefine201ResponseData.fromJson(json);
   }
 
-  final ShipCargo cargo;
-  final Cooldown cooldown;
-  final List<ShipRefine201ResponseDataProducedInner> produced;
-  final List<ShipRefine201ResponseDataConsumedInner> consumed;
+  ShipCargo cargo;
+  Cooldown cooldown;
+  List<ShipRefine201ResponseDataProducedInner> produced;
+  List<ShipRefine201ResponseDataConsumedInner> consumed;
 
   Map<String, dynamic> toJson() {
     return {

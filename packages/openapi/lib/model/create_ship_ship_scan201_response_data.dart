@@ -7,9 +7,8 @@ class CreateShipShipScan201ResponseData {
     required this.ships,
   });
 
-  factory CreateShipShipScan201ResponseData.fromJson(
-    Map<String, dynamic> json,
-  ) {
+  factory CreateShipShipScan201ResponseData.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return CreateShipShipScan201ResponseData(
       cooldown: Cooldown.fromJson(json['cooldown'] as Map<String, dynamic>),
       ships:
@@ -32,8 +31,8 @@ class CreateShipShipScan201ResponseData {
     return CreateShipShipScan201ResponseData.fromJson(json);
   }
 
-  final Cooldown cooldown;
-  final List<ScannedShip> ships;
+  Cooldown cooldown;
+  List<ScannedShip> ships;
 
   Map<String, dynamic> toJson() {
     return {

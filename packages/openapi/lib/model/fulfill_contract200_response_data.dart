@@ -4,7 +4,8 @@ import 'package:openapi/model/contract.dart';
 class FulfillContract200ResponseData {
   FulfillContract200ResponseData({required this.contract, required this.agent});
 
-  factory FulfillContract200ResponseData.fromJson(Map<String, dynamic> json) {
+  factory FulfillContract200ResponseData.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return FulfillContract200ResponseData(
       contract: Contract.fromJson(json['contract'] as Map<String, dynamic>),
       agent: Agent.fromJson(json['agent'] as Map<String, dynamic>),
@@ -22,8 +23,8 @@ class FulfillContract200ResponseData {
     return FulfillContract200ResponseData.fromJson(json);
   }
 
-  final Contract contract;
-  final Agent agent;
+  Contract contract;
+  Agent agent;
 
   Map<String, dynamic> toJson() {
     return {'contract': contract.toJson(), 'agent': agent.toJson()};

@@ -3,7 +3,8 @@ import 'package:openapi/model/market.dart';
 class GetMarket200Response {
   GetMarket200Response({required this.data});
 
-  factory GetMarket200Response.fromJson(Map<String, dynamic> json) {
+  factory GetMarket200Response.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetMarket200Response(
       data: Market.fromJson(json['data'] as Map<String, dynamic>),
     );
@@ -18,7 +19,7 @@ class GetMarket200Response {
     return GetMarket200Response.fromJson(json);
   }
 
-  final Market data;
+  Market data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

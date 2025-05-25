@@ -10,7 +10,8 @@ class ScannedSystem {
     required this.distance,
   });
 
-  factory ScannedSystem.fromJson(Map<String, dynamic> json) {
+  factory ScannedSystem.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return ScannedSystem(
       symbol: json['symbol'] as String,
       sectorSymbol: json['sectorSymbol'] as String,
@@ -30,12 +31,12 @@ class ScannedSystem {
     return ScannedSystem.fromJson(json);
   }
 
-  final String symbol;
-  final String sectorSymbol;
-  final SystemType type;
-  final int x;
-  final int y;
-  final int distance;
+  String symbol;
+  String sectorSymbol;
+  SystemType type;
+  int x;
+  int y;
+  int distance;
 
   Map<String, dynamic> toJson() {
     return {

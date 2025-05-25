@@ -6,7 +6,8 @@ class ContractDeliverGood {
     required this.unitsFulfilled,
   });
 
-  factory ContractDeliverGood.fromJson(Map<String, dynamic> json) {
+  factory ContractDeliverGood.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return ContractDeliverGood(
       tradeSymbol: json['tradeSymbol'] as String,
       destinationSymbol: json['destinationSymbol'] as String,
@@ -24,10 +25,10 @@ class ContractDeliverGood {
     return ContractDeliverGood.fromJson(json);
   }
 
-  final String tradeSymbol;
-  final String destinationSymbol;
-  final int unitsRequired;
-  final int unitsFulfilled;
+  String tradeSymbol;
+  String destinationSymbol;
+  int unitsRequired;
+  int unitsFulfilled;
 
   Map<String, dynamic> toJson() {
     return {

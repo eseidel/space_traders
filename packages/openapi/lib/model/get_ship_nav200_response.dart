@@ -3,7 +3,8 @@ import 'package:openapi/model/ship_nav.dart';
 class GetShipNav200Response {
   GetShipNav200Response({required this.data});
 
-  factory GetShipNav200Response.fromJson(Map<String, dynamic> json) {
+  factory GetShipNav200Response.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetShipNav200Response(
       data: ShipNav.fromJson(json['data'] as Map<String, dynamic>),
     );
@@ -18,7 +19,7 @@ class GetShipNav200Response {
     return GetShipNav200Response.fromJson(json);
   }
 
-  final ShipNav data;
+  ShipNav data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

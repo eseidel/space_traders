@@ -6,7 +6,8 @@ class RepairTransaction {
     required this.timestamp,
   });
 
-  factory RepairTransaction.fromJson(Map<String, dynamic> json) {
+  factory RepairTransaction.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return RepairTransaction(
       waypointSymbol: json['waypointSymbol'] as String,
       shipSymbol: json['shipSymbol'] as String,
@@ -24,10 +25,10 @@ class RepairTransaction {
     return RepairTransaction.fromJson(json);
   }
 
-  final String waypointSymbol;
-  final String shipSymbol;
-  final int totalPrice;
-  final DateTime timestamp;
+  String waypointSymbol;
+  String shipSymbol;
+  int totalPrice;
+  DateTime timestamp;
 
   Map<String, dynamic> toJson() {
     return {

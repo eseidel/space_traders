@@ -3,7 +3,8 @@ import 'package:openapi/model/accept_contract200_response_data.dart';
 class AcceptContract200Response {
   AcceptContract200Response({required this.data});
 
-  factory AcceptContract200Response.fromJson(Map<String, dynamic> json) {
+  factory AcceptContract200Response.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return AcceptContract200Response(
       data: AcceptContract200ResponseData.fromJson(
         json['data'] as Map<String, dynamic>,
@@ -20,7 +21,7 @@ class AcceptContract200Response {
     return AcceptContract200Response.fromJson(json);
   }
 
-  final AcceptContract200ResponseData data;
+  AcceptContract200ResponseData data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

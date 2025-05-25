@@ -19,7 +19,8 @@ class GetStatus200Response {
     required this.links,
   });
 
-  factory GetStatus200Response.fromJson(Map<String, dynamic> json) {
+  factory GetStatus200Response.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetStatus200Response(
       status: json['status'] as String,
       version: json['version'] as String,
@@ -65,16 +66,16 @@ class GetStatus200Response {
     return GetStatus200Response.fromJson(json);
   }
 
-  final String status;
-  final String version;
-  final String resetDate;
-  final String description;
-  final GetStatus200ResponseStats stats;
-  final GetStatus200ResponseHealth health;
-  final GetStatus200ResponseLeaderboards leaderboards;
-  final GetStatus200ResponseServerResets serverResets;
-  final List<GetStatus200ResponseAnnouncementsInner> announcements;
-  final List<GetStatus200ResponseLinksInner> links;
+  String status;
+  String version;
+  String resetDate;
+  String description;
+  GetStatus200ResponseStats stats;
+  GetStatus200ResponseHealth health;
+  GetStatus200ResponseLeaderboards leaderboards;
+  GetStatus200ResponseServerResets serverResets;
+  List<GetStatus200ResponseAnnouncementsInner> announcements;
+  List<GetStatus200ResponseLinksInner> links;
 
   Map<String, dynamic> toJson() {
     return {

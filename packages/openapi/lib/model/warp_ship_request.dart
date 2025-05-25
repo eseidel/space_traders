@@ -1,7 +1,8 @@
 class WarpShipRequest {
   WarpShipRequest({required this.waypointSymbol});
 
-  factory WarpShipRequest.fromJson(Map<String, dynamic> json) {
+  factory WarpShipRequest.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return WarpShipRequest(waypointSymbol: json['waypointSymbol'] as String);
   }
 
@@ -14,7 +15,7 @@ class WarpShipRequest {
     return WarpShipRequest.fromJson(json);
   }
 
-  final String waypointSymbol;
+  String waypointSymbol;
 
   Map<String, dynamic> toJson() {
     return {'waypointSymbol': waypointSymbol};

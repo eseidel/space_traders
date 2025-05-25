@@ -7,7 +7,8 @@ class ConstructionMaterial {
     required this.fulfilled,
   });
 
-  factory ConstructionMaterial.fromJson(Map<String, dynamic> json) {
+  factory ConstructionMaterial.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return ConstructionMaterial(
       tradeSymbol: TradeSymbol.fromJson(json['tradeSymbol'] as String),
       required_: json['required'] as int,
@@ -24,9 +25,9 @@ class ConstructionMaterial {
     return ConstructionMaterial.fromJson(json);
   }
 
-  final TradeSymbol tradeSymbol;
-  final int required_;
-  final int fulfilled;
+  TradeSymbol tradeSymbol;
+  int required_;
+  int fulfilled;
 
   Map<String, dynamic> toJson() {
     return {

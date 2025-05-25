@@ -3,7 +3,8 @@ import 'package:openapi/model/refuel_ship200_response_data.dart';
 class RefuelShip200Response {
   RefuelShip200Response({required this.data});
 
-  factory RefuelShip200Response.fromJson(Map<String, dynamic> json) {
+  factory RefuelShip200Response.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return RefuelShip200Response(
       data: RefuelShip200ResponseData.fromJson(
         json['data'] as Map<String, dynamic>,
@@ -20,7 +21,7 @@ class RefuelShip200Response {
     return RefuelShip200Response.fromJson(json);
   }
 
-  final RefuelShip200ResponseData data;
+  RefuelShip200ResponseData data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

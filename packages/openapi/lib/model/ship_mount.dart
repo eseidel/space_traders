@@ -12,7 +12,8 @@ class ShipMount {
     required this.requirements,
   });
 
-  factory ShipMount.fromJson(Map<String, dynamic> json) {
+  factory ShipMount.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return ShipMount(
       symbol: ShipMountSymbol.fromJson(json['symbol'] as String),
       name: json['name'] as String,
@@ -35,12 +36,12 @@ class ShipMount {
     return ShipMount.fromJson(json);
   }
 
-  final ShipMountSymbol symbol;
-  final String name;
-  final String description;
-  final int strength;
-  final List<ShipMountDepositsInner> deposits;
-  final ShipRequirements requirements;
+  ShipMountSymbol symbol;
+  String name;
+  String description;
+  int strength;
+  List<ShipMountDepositsInner> deposits;
+  ShipRequirements requirements;
 
   Map<String, dynamic> toJson() {
     return {

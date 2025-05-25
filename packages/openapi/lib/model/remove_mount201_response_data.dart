@@ -11,7 +11,8 @@ class RemoveMount201ResponseData {
     required this.transaction,
   });
 
-  factory RemoveMount201ResponseData.fromJson(Map<String, dynamic> json) {
+  factory RemoveMount201ResponseData.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return RemoveMount201ResponseData(
       agent: Agent.fromJson(json['agent'] as Map<String, dynamic>),
       mounts:
@@ -36,10 +37,10 @@ class RemoveMount201ResponseData {
     return RemoveMount201ResponseData.fromJson(json);
   }
 
-  final Agent agent;
-  final List<ShipMount> mounts;
-  final ShipCargo cargo;
-  final ShipModificationTransaction transaction;
+  Agent agent;
+  List<ShipMount> mounts;
+  ShipCargo cargo;
+  ShipModificationTransaction transaction;
 
   Map<String, dynamic> toJson() {
     return {

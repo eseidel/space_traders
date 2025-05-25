@@ -3,9 +3,8 @@ import 'package:openapi/model/extract_resources_with_survey201_response_data.dar
 class ExtractResourcesWithSurvey201Response {
   ExtractResourcesWithSurvey201Response({required this.data});
 
-  factory ExtractResourcesWithSurvey201Response.fromJson(
-    Map<String, dynamic> json,
-  ) {
+  factory ExtractResourcesWithSurvey201Response.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return ExtractResourcesWithSurvey201Response(
       data: ExtractResourcesWithSurvey201ResponseData.fromJson(
         json['data'] as Map<String, dynamic>,
@@ -24,7 +23,7 @@ class ExtractResourcesWithSurvey201Response {
     return ExtractResourcesWithSurvey201Response.fromJson(json);
   }
 
-  final ExtractResourcesWithSurvey201ResponseData data;
+  ExtractResourcesWithSurvey201ResponseData data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

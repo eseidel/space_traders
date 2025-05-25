@@ -6,7 +6,8 @@ class ScrapTransaction {
     required this.timestamp,
   });
 
-  factory ScrapTransaction.fromJson(Map<String, dynamic> json) {
+  factory ScrapTransaction.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return ScrapTransaction(
       waypointSymbol: json['waypointSymbol'] as String,
       shipSymbol: json['shipSymbol'] as String,
@@ -24,10 +25,10 @@ class ScrapTransaction {
     return ScrapTransaction.fromJson(json);
   }
 
-  final String waypointSymbol;
-  final String shipSymbol;
-  final int totalPrice;
-  final DateTime timestamp;
+  String waypointSymbol;
+  String shipSymbol;
+  int totalPrice;
+  DateTime timestamp;
 
   Map<String, dynamic> toJson() {
     return {

@@ -7,9 +7,8 @@ class SupplyConstruction201ResponseData {
     required this.cargo,
   });
 
-  factory SupplyConstruction201ResponseData.fromJson(
-    Map<String, dynamic> json,
-  ) {
+  factory SupplyConstruction201ResponseData.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return SupplyConstruction201ResponseData(
       construction: Construction.fromJson(
         json['construction'] as Map<String, dynamic>,
@@ -29,8 +28,8 @@ class SupplyConstruction201ResponseData {
     return SupplyConstruction201ResponseData.fromJson(json);
   }
 
-  final Construction construction;
-  final ShipCargo cargo;
+  Construction construction;
+  ShipCargo cargo;
 
   Map<String, dynamic> toJson() {
     return {'construction': construction.toJson(), 'cargo': cargo.toJson()};

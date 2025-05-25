@@ -3,7 +3,8 @@ import 'package:openapi/model/trade_symbol.dart';
 class SurveyDeposit {
   SurveyDeposit({required this.symbol});
 
-  factory SurveyDeposit.fromJson(Map<String, dynamic> json) {
+  factory SurveyDeposit.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return SurveyDeposit(
       symbol: TradeSymbol.fromJson(json['symbol'] as String),
     );
@@ -18,7 +19,7 @@ class SurveyDeposit {
     return SurveyDeposit.fromJson(json);
   }
 
-  final TradeSymbol symbol;
+  TradeSymbol symbol;
 
   Map<String, dynamic> toJson() {
     return {'symbol': symbol.toJson()};

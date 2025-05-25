@@ -26,7 +26,8 @@ class Ship {
     required this.cooldown,
   });
 
-  factory Ship.fromJson(Map<String, dynamic> json) {
+  factory Ship.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return Ship(
       symbol: json['symbol'] as String,
       registration: ShipRegistration.fromJson(
@@ -64,18 +65,18 @@ class Ship {
     return Ship.fromJson(json);
   }
 
-  final String symbol;
-  final ShipRegistration registration;
-  final ShipNav nav;
-  final ShipCrew crew;
-  final ShipFrame frame;
-  final ShipReactor reactor;
-  final ShipEngine engine;
-  final List<ShipModule> modules;
-  final List<ShipMount> mounts;
-  final ShipCargo cargo;
-  final ShipFuel fuel;
-  final Cooldown cooldown;
+  String symbol;
+  ShipRegistration registration;
+  ShipNav nav;
+  ShipCrew crew;
+  ShipFrame frame;
+  ShipReactor reactor;
+  ShipEngine engine;
+  List<ShipModule> modules;
+  List<ShipMount> mounts;
+  ShipCargo cargo;
+  ShipFuel fuel;
+  Cooldown cooldown;
 
   Map<String, dynamic> toJson() {
     return {

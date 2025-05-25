@@ -6,9 +6,8 @@ class ShipRefine201ResponseDataProducedInner {
     required this.units,
   });
 
-  factory ShipRefine201ResponseDataProducedInner.fromJson(
-    Map<String, dynamic> json,
-  ) {
+  factory ShipRefine201ResponseDataProducedInner.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return ShipRefine201ResponseDataProducedInner(
       tradeSymbol: TradeSymbol.fromJson(json['tradeSymbol'] as String),
       units: json['units'] as int,
@@ -26,8 +25,8 @@ class ShipRefine201ResponseDataProducedInner {
     return ShipRefine201ResponseDataProducedInner.fromJson(json);
   }
 
-  final TradeSymbol tradeSymbol;
-  final int units;
+  TradeSymbol tradeSymbol;
+  int units;
 
   Map<String, dynamic> toJson() {
     return {'tradeSymbol': tradeSymbol.toJson(), 'units': units};

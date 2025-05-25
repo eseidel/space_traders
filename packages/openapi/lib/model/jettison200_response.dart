@@ -3,7 +3,8 @@ import 'package:openapi/model/jettison200_response_data.dart';
 class Jettison200Response {
   Jettison200Response({required this.data});
 
-  factory Jettison200Response.fromJson(Map<String, dynamic> json) {
+  factory Jettison200Response.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return Jettison200Response(
       data: Jettison200ResponseData.fromJson(
         json['data'] as Map<String, dynamic>,
@@ -20,7 +21,7 @@ class Jettison200Response {
     return Jettison200Response.fromJson(json);
   }
 
-  final Jettison200ResponseData data;
+  Jettison200ResponseData data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

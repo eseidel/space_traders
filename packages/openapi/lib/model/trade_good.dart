@@ -7,7 +7,8 @@ class TradeGood {
     required this.description,
   });
 
-  factory TradeGood.fromJson(Map<String, dynamic> json) {
+  factory TradeGood.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return TradeGood(
       symbol: TradeSymbol.fromJson(json['symbol'] as String),
       name: json['name'] as String,
@@ -24,9 +25,9 @@ class TradeGood {
     return TradeGood.fromJson(json);
   }
 
-  final TradeSymbol symbol;
-  final String name;
-  final String description;
+  TradeSymbol symbol;
+  String name;
+  String description;
 
   Map<String, dynamic> toJson() {
     return {

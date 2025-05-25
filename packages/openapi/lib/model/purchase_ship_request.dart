@@ -3,7 +3,8 @@ import 'package:openapi/model/ship_type.dart';
 class PurchaseShipRequest {
   PurchaseShipRequest({required this.shipType, required this.waypointSymbol});
 
-  factory PurchaseShipRequest.fromJson(Map<String, dynamic> json) {
+  factory PurchaseShipRequest.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return PurchaseShipRequest(
       shipType: ShipType.fromJson(json['shipType'] as String),
       waypointSymbol: json['waypointSymbol'] as String,
@@ -19,8 +20,8 @@ class PurchaseShipRequest {
     return PurchaseShipRequest.fromJson(json);
   }
 
-  final ShipType shipType;
-  final String waypointSymbol;
+  ShipType shipType;
+  String waypointSymbol;
 
   Map<String, dynamic> toJson() {
     return {'shipType': shipType.toJson(), 'waypointSymbol': waypointSymbol};

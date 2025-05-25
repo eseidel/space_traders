@@ -3,7 +3,8 @@ import 'package:openapi/model/waypoint.dart';
 class GetWaypoint200Response {
   GetWaypoint200Response({required this.data});
 
-  factory GetWaypoint200Response.fromJson(Map<String, dynamic> json) {
+  factory GetWaypoint200Response.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetWaypoint200Response(
       data: Waypoint.fromJson(json['data'] as Map<String, dynamic>),
     );
@@ -18,7 +19,7 @@ class GetWaypoint200Response {
     return GetWaypoint200Response.fromJson(json);
   }
 
-  final Waypoint data;
+  Waypoint data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

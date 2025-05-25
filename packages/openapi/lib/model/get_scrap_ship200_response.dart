@@ -3,7 +3,8 @@ import 'package:openapi/model/get_scrap_ship200_response_data.dart';
 class GetScrapShip200Response {
   GetScrapShip200Response({required this.data});
 
-  factory GetScrapShip200Response.fromJson(Map<String, dynamic> json) {
+  factory GetScrapShip200Response.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetScrapShip200Response(
       data: GetScrapShip200ResponseData.fromJson(
         json['data'] as Map<String, dynamic>,
@@ -20,7 +21,7 @@ class GetScrapShip200Response {
     return GetScrapShip200Response.fromJson(json);
   }
 
-  final GetScrapShip200ResponseData data;
+  GetScrapShip200ResponseData data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

@@ -7,7 +7,8 @@ class WaypointModifier {
     required this.description,
   });
 
-  factory WaypointModifier.fromJson(Map<String, dynamic> json) {
+  factory WaypointModifier.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return WaypointModifier(
       symbol: WaypointModifierSymbol.fromJson(json['symbol'] as String),
       name: json['name'] as String,
@@ -24,9 +25,9 @@ class WaypointModifier {
     return WaypointModifier.fromJson(json);
   }
 
-  final WaypointModifierSymbol symbol;
-  final String name;
-  final String description;
+  WaypointModifierSymbol symbol;
+  String name;
+  String description;
 
   Map<String, dynamic> toJson() {
     return {

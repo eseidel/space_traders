@@ -11,7 +11,8 @@ class JumpShip200ResponseData {
     required this.agent,
   });
 
-  factory JumpShip200ResponseData.fromJson(Map<String, dynamic> json) {
+  factory JumpShip200ResponseData.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return JumpShip200ResponseData(
       nav: ShipNav.fromJson(json['nav'] as Map<String, dynamic>),
       cooldown: Cooldown.fromJson(json['cooldown'] as Map<String, dynamic>),
@@ -31,10 +32,10 @@ class JumpShip200ResponseData {
     return JumpShip200ResponseData.fromJson(json);
   }
 
-  final ShipNav nav;
-  final Cooldown cooldown;
-  final MarketTransaction transaction;
-  final Agent agent;
+  ShipNav nav;
+  Cooldown cooldown;
+  MarketTransaction transaction;
+  Agent agent;
 
   Map<String, dynamic> toJson() {
     return {

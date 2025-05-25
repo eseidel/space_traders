@@ -3,7 +3,8 @@ import 'package:openapi/model/faction_symbol.dart';
 class WaypointFaction {
   WaypointFaction({required this.symbol});
 
-  factory WaypointFaction.fromJson(Map<String, dynamic> json) {
+  factory WaypointFaction.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return WaypointFaction(
       symbol: FactionSymbol.fromJson(json['symbol'] as String),
     );
@@ -18,7 +19,7 @@ class WaypointFaction {
     return WaypointFaction.fromJson(json);
   }
 
-  final FactionSymbol symbol;
+  FactionSymbol symbol;
 
   Map<String, dynamic> toJson() {
     return {'symbol': symbol.toJson()};

@@ -7,7 +7,8 @@ class AgentEvent {
     required this.createdAt,
   });
 
-  factory AgentEvent.fromJson(Map<String, dynamic> json) {
+  factory AgentEvent.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return AgentEvent(
       id: json['id'] as String,
       type: json['type'] as String,
@@ -26,11 +27,11 @@ class AgentEvent {
     return AgentEvent.fromJson(json);
   }
 
-  final String id;
-  final String type;
-  final String message;
-  final dynamic data;
-  final DateTime createdAt;
+  String id;
+  String type;
+  String message;
+  dynamic data;
+  DateTime createdAt;
 
   Map<String, dynamic> toJson() {
     return {

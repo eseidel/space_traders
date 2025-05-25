@@ -12,7 +12,8 @@ class MarketTransaction {
     required this.timestamp,
   });
 
-  factory MarketTransaction.fromJson(Map<String, dynamic> json) {
+  factory MarketTransaction.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return MarketTransaction(
       waypointSymbol: json['waypointSymbol'] as String,
       shipSymbol: json['shipSymbol'] as String,
@@ -34,14 +35,14 @@ class MarketTransaction {
     return MarketTransaction.fromJson(json);
   }
 
-  final String waypointSymbol;
-  final String shipSymbol;
-  final String tradeSymbol;
-  final MarketTransactionType type;
-  final int units;
-  final int pricePerUnit;
-  final int totalPrice;
-  final DateTime timestamp;
+  String waypointSymbol;
+  String shipSymbol;
+  String tradeSymbol;
+  MarketTransactionType type;
+  int units;
+  int pricePerUnit;
+  int totalPrice;
+  DateTime timestamp;
 
   Map<String, dynamic> toJson() {
     return {

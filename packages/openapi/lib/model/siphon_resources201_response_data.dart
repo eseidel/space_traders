@@ -11,7 +11,8 @@ class SiphonResources201ResponseData {
     required this.events,
   });
 
-  factory SiphonResources201ResponseData.fromJson(Map<String, dynamic> json) {
+  factory SiphonResources201ResponseData.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return SiphonResources201ResponseData(
       siphon: Siphon.fromJson(json['siphon'] as Map<String, dynamic>),
       cooldown: Cooldown.fromJson(json['cooldown'] as Map<String, dynamic>),
@@ -36,10 +37,10 @@ class SiphonResources201ResponseData {
     return SiphonResources201ResponseData.fromJson(json);
   }
 
-  final Siphon siphon;
-  final Cooldown cooldown;
-  final ShipCargo cargo;
-  final List<ShipConditionEvent> events;
+  Siphon siphon;
+  Cooldown cooldown;
+  ShipCargo cargo;
+  List<ShipConditionEvent> events;
 
   Map<String, dynamic> toJson() {
     return {

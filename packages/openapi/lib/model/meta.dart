@@ -1,7 +1,8 @@
 class Meta {
   Meta({required this.total, this.page = 1, this.limit = 10});
 
-  factory Meta.fromJson(Map<String, dynamic> json) {
+  factory Meta.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return Meta(
       total: json['total'] as int,
       page: json['page'] as int,
@@ -18,9 +19,9 @@ class Meta {
     return Meta.fromJson(json);
   }
 
-  final int total;
-  final int page;
-  final int limit;
+  int total;
+  int page;
+  int limit;
 
   Map<String, dynamic> toJson() {
     return {'total': total, 'page': page, 'limit': limit};

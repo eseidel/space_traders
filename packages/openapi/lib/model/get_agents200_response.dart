@@ -4,7 +4,8 @@ import 'package:openapi/model/public_agent.dart';
 class GetAgents200Response {
   GetAgents200Response({required this.data, required this.meta});
 
-  factory GetAgents200Response.fromJson(Map<String, dynamic> json) {
+  factory GetAgents200Response.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetAgents200Response(
       data:
           (json['data'] as List<dynamic>)
@@ -25,8 +26,8 @@ class GetAgents200Response {
     return GetAgents200Response.fromJson(json);
   }
 
-  final List<PublicAgent> data;
-  final Meta meta;
+  List<PublicAgent> data;
+  Meta meta;
 
   Map<String, dynamic> toJson() {
     return {

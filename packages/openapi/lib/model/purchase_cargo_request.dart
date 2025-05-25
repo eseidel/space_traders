@@ -3,7 +3,8 @@ import 'package:openapi/model/trade_symbol.dart';
 class PurchaseCargoRequest {
   PurchaseCargoRequest({required this.symbol, required this.units});
 
-  factory PurchaseCargoRequest.fromJson(Map<String, dynamic> json) {
+  factory PurchaseCargoRequest.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return PurchaseCargoRequest(
       symbol: TradeSymbol.fromJson(json['symbol'] as String),
       units: json['units'] as int,
@@ -19,8 +20,8 @@ class PurchaseCargoRequest {
     return PurchaseCargoRequest.fromJson(json);
   }
 
-  final TradeSymbol symbol;
-  final int units;
+  TradeSymbol symbol;
+  int units;
 
   Map<String, dynamic> toJson() {
     return {'symbol': symbol.toJson(), 'units': units};

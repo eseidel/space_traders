@@ -1,7 +1,8 @@
 class WaypointOrbital {
   WaypointOrbital({required this.symbol});
 
-  factory WaypointOrbital.fromJson(Map<String, dynamic> json) {
+  factory WaypointOrbital.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return WaypointOrbital(symbol: json['symbol'] as String);
   }
 
@@ -14,7 +15,7 @@ class WaypointOrbital {
     return WaypointOrbital.fromJson(json);
   }
 
-  final String symbol;
+  String symbol;
 
   Map<String, dynamic> toJson() {
     return {'symbol': symbol};

@@ -11,7 +11,8 @@ class InstallMount201ResponseData {
     required this.transaction,
   });
 
-  factory InstallMount201ResponseData.fromJson(Map<String, dynamic> json) {
+  factory InstallMount201ResponseData.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return InstallMount201ResponseData(
       agent: Agent.fromJson(json['agent'] as Map<String, dynamic>),
       mounts:
@@ -38,10 +39,10 @@ class InstallMount201ResponseData {
     return InstallMount201ResponseData.fromJson(json);
   }
 
-  final Agent agent;
-  final List<ShipMount> mounts;
-  final ShipCargo cargo;
-  final ShipModificationTransaction transaction;
+  Agent agent;
+  List<ShipMount> mounts;
+  ShipCargo cargo;
+  ShipModificationTransaction transaction;
 
   Map<String, dynamic> toJson() {
     return {

@@ -9,7 +9,8 @@ class PurchaseShip201ResponseData {
     required this.transaction,
   });
 
-  factory PurchaseShip201ResponseData.fromJson(Map<String, dynamic> json) {
+  factory PurchaseShip201ResponseData.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return PurchaseShip201ResponseData(
       ship: Ship.fromJson(json['ship'] as Map<String, dynamic>),
       agent: Agent.fromJson(json['agent'] as Map<String, dynamic>),
@@ -30,9 +31,9 @@ class PurchaseShip201ResponseData {
     return PurchaseShip201ResponseData.fromJson(json);
   }
 
-  final Ship ship;
-  final Agent agent;
-  final ShipyardTransaction transaction;
+  Ship ship;
+  Agent agent;
+  ShipyardTransaction transaction;
 
   Map<String, dynamic> toJson() {
     return {

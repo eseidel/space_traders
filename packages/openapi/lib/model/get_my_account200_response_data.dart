@@ -3,7 +3,8 @@ import 'package:openapi/model/get_my_account200_response_data_account.dart';
 class GetMyAccount200ResponseData {
   GetMyAccount200ResponseData({required this.account});
 
-  factory GetMyAccount200ResponseData.fromJson(Map<String, dynamic> json) {
+  factory GetMyAccount200ResponseData.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetMyAccount200ResponseData(
       account: GetMyAccount200ResponseDataAccount.fromJson(
         json['account'] as Map<String, dynamic>,
@@ -22,7 +23,7 @@ class GetMyAccount200ResponseData {
     return GetMyAccount200ResponseData.fromJson(json);
   }
 
-  final GetMyAccount200ResponseDataAccount account;
+  GetMyAccount200ResponseDataAccount account;
 
   Map<String, dynamic> toJson() {
     return {'account': account.toJson()};

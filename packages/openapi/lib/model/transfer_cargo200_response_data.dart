@@ -6,7 +6,8 @@ class TransferCargo200ResponseData {
     required this.targetCargo,
   });
 
-  factory TransferCargo200ResponseData.fromJson(Map<String, dynamic> json) {
+  factory TransferCargo200ResponseData.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return TransferCargo200ResponseData(
       cargo: ShipCargo.fromJson(json['cargo'] as Map<String, dynamic>),
       targetCargo: ShipCargo.fromJson(
@@ -26,8 +27,8 @@ class TransferCargo200ResponseData {
     return TransferCargo200ResponseData.fromJson(json);
   }
 
-  final ShipCargo cargo;
-  final ShipCargo targetCargo;
+  ShipCargo cargo;
+  ShipCargo targetCargo;
 
   Map<String, dynamic> toJson() {
     return {'cargo': cargo.toJson(), 'targetCargo': targetCargo.toJson()};

@@ -7,9 +7,8 @@ class CreateShipSystemScan201ResponseData {
     required this.systems,
   });
 
-  factory CreateShipSystemScan201ResponseData.fromJson(
-    Map<String, dynamic> json,
-  ) {
+  factory CreateShipSystemScan201ResponseData.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return CreateShipSystemScan201ResponseData(
       cooldown: Cooldown.fromJson(json['cooldown'] as Map<String, dynamic>),
       systems:
@@ -32,8 +31,8 @@ class CreateShipSystemScan201ResponseData {
     return CreateShipSystemScan201ResponseData.fromJson(json);
   }
 
-  final Cooldown cooldown;
-  final List<ScannedSystem> systems;
+  Cooldown cooldown;
+  List<ScannedSystem> systems;
 
   Map<String, dynamic> toJson() {
     return {

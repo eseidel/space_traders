@@ -3,7 +3,8 @@ import 'package:openapi/model/dock_ship200_response_data.dart';
 class DockShip200Response {
   DockShip200Response({required this.data});
 
-  factory DockShip200Response.fromJson(Map<String, dynamic> json) {
+  factory DockShip200Response.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return DockShip200Response(
       data: DockShip200ResponseData.fromJson(
         json['data'] as Map<String, dynamic>,
@@ -20,7 +21,7 @@ class DockShip200Response {
     return DockShip200Response.fromJson(json);
   }
 
-  final DockShip200ResponseData data;
+  DockShip200ResponseData data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

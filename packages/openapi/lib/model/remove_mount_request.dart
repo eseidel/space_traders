@@ -1,7 +1,8 @@
 class RemoveMountRequest {
   RemoveMountRequest({required this.symbol});
 
-  factory RemoveMountRequest.fromJson(Map<String, dynamic> json) {
+  factory RemoveMountRequest.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return RemoveMountRequest(symbol: json['symbol'] as String);
   }
 
@@ -14,7 +15,7 @@ class RemoveMountRequest {
     return RemoveMountRequest.fromJson(json);
   }
 
-  final String symbol;
+  String symbol;
 
   Map<String, dynamic> toJson() {
     return {'symbol': symbol};

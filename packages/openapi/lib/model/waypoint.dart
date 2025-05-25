@@ -21,7 +21,8 @@ class Waypoint {
     required this.isUnderConstruction,
   });
 
-  factory Waypoint.fromJson(Map<String, dynamic> json) {
+  factory Waypoint.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return Waypoint(
       symbol: json['symbol'] as String,
       type: WaypointType.fromJson(json['type'] as String),
@@ -64,18 +65,18 @@ class Waypoint {
     return Waypoint.fromJson(json);
   }
 
-  final String symbol;
-  final WaypointType type;
-  final String systemSymbol;
-  final int x;
-  final int y;
-  final List<WaypointOrbital> orbitals;
-  final String orbits;
-  final WaypointFaction faction;
-  final List<WaypointTrait> traits;
-  final List<WaypointModifier> modifiers;
-  final Chart chart;
-  final bool isUnderConstruction;
+  String symbol;
+  WaypointType type;
+  String systemSymbol;
+  int x;
+  int y;
+  List<WaypointOrbital> orbitals;
+  String orbits;
+  WaypointFaction faction;
+  List<WaypointTrait> traits;
+  List<WaypointModifier> modifiers;
+  Chart chart;
+  bool isUnderConstruction;
 
   Map<String, dynamic> toJson() {
     return {

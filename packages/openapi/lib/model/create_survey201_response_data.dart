@@ -4,7 +4,8 @@ import 'package:openapi/model/survey.dart';
 class CreateSurvey201ResponseData {
   CreateSurvey201ResponseData({required this.cooldown, required this.surveys});
 
-  factory CreateSurvey201ResponseData.fromJson(Map<String, dynamic> json) {
+  factory CreateSurvey201ResponseData.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return CreateSurvey201ResponseData(
       cooldown: Cooldown.fromJson(json['cooldown'] as Map<String, dynamic>),
       surveys:
@@ -25,8 +26,8 @@ class CreateSurvey201ResponseData {
     return CreateSurvey201ResponseData.fromJson(json);
   }
 
-  final Cooldown cooldown;
-  final List<Survey> surveys;
+  Cooldown cooldown;
+  List<Survey> surveys;
 
   Map<String, dynamic> toJson() {
     return {

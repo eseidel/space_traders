@@ -3,7 +3,8 @@ import 'package:openapi/model/faction_symbol.dart';
 class SystemFaction {
   SystemFaction({required this.symbol});
 
-  factory SystemFaction.fromJson(Map<String, dynamic> json) {
+  factory SystemFaction.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return SystemFaction(
       symbol: FactionSymbol.fromJson(json['symbol'] as String),
     );
@@ -18,7 +19,7 @@ class SystemFaction {
     return SystemFaction.fromJson(json);
   }
 
-  final FactionSymbol symbol;
+  FactionSymbol symbol;
 
   Map<String, dynamic> toJson() {
     return {'symbol': symbol.toJson()};

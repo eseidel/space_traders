@@ -1,7 +1,8 @@
 class ScannedShipEngine {
   ScannedShipEngine({required this.symbol});
 
-  factory ScannedShipEngine.fromJson(Map<String, dynamic> json) {
+  factory ScannedShipEngine.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return ScannedShipEngine(symbol: json['symbol'] as String);
   }
 
@@ -14,7 +15,7 @@ class ScannedShipEngine {
     return ScannedShipEngine.fromJson(json);
   }
 
-  final String symbol;
+  String symbol;
 
   Map<String, dynamic> toJson() {
     return {'symbol': symbol};

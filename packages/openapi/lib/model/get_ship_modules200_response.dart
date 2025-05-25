@@ -3,7 +3,8 @@ import 'package:openapi/model/ship_module.dart';
 class GetShipModules200Response {
   GetShipModules200Response({required this.data});
 
-  factory GetShipModules200Response.fromJson(Map<String, dynamic> json) {
+  factory GetShipModules200Response.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetShipModules200Response(
       data:
           (json['data'] as List<dynamic>)
@@ -23,7 +24,7 @@ class GetShipModules200Response {
     return GetShipModules200Response.fromJson(json);
   }
 
-  final List<ShipModule> data;
+  List<ShipModule> data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.map((e) => e.toJson()).toList()};

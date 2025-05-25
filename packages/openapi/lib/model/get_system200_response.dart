@@ -3,7 +3,8 @@ import 'package:openapi/model/system.dart';
 class GetSystem200Response {
   GetSystem200Response({required this.data});
 
-  factory GetSystem200Response.fromJson(Map<String, dynamic> json) {
+  factory GetSystem200Response.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetSystem200Response(
       data: System.fromJson(json['data'] as Map<String, dynamic>),
     );
@@ -18,7 +19,7 @@ class GetSystem200Response {
     return GetSystem200Response.fromJson(json);
   }
 
-  final System data;
+  System data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

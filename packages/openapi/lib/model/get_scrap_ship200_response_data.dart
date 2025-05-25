@@ -3,7 +3,8 @@ import 'package:openapi/model/scrap_transaction.dart';
 class GetScrapShip200ResponseData {
   GetScrapShip200ResponseData({required this.transaction});
 
-  factory GetScrapShip200ResponseData.fromJson(Map<String, dynamic> json) {
+  factory GetScrapShip200ResponseData.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return GetScrapShip200ResponseData(
       transaction: ScrapTransaction.fromJson(
         json['transaction'] as Map<String, dynamic>,
@@ -22,7 +23,7 @@ class GetScrapShip200ResponseData {
     return GetScrapShip200ResponseData.fromJson(json);
   }
 
-  final ScrapTransaction transaction;
+  ScrapTransaction transaction;
 
   Map<String, dynamic> toJson() {
     return {'transaction': transaction.toJson()};

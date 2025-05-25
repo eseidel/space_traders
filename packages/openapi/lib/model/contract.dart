@@ -13,7 +13,8 @@ class Contract {
     this.fulfilled = false,
   });
 
-  factory Contract.fromJson(Map<String, dynamic> json) {
+  factory Contract.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return Contract(
       id: json['id'] as String,
       factionSymbol: json['factionSymbol'] as String,
@@ -35,14 +36,14 @@ class Contract {
     return Contract.fromJson(json);
   }
 
-  final String id;
-  final String factionSymbol;
-  final ContractType type;
-  final ContractTerms terms;
-  final bool accepted;
-  final bool fulfilled;
-  final DateTime expiration;
-  final DateTime deadlineToAccept;
+  String id;
+  String factionSymbol;
+  ContractType type;
+  ContractTerms terms;
+  bool accepted;
+  bool fulfilled;
+  DateTime expiration;
+  DateTime deadlineToAccept;
 
   Map<String, dynamic> toJson() {
     return {

@@ -3,7 +3,8 @@ import 'package:openapi/model/create_ship_system_scan201_response_data.dart';
 class CreateShipSystemScan201Response {
   CreateShipSystemScan201Response({required this.data});
 
-  factory CreateShipSystemScan201Response.fromJson(Map<String, dynamic> json) {
+  factory CreateShipSystemScan201Response.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return CreateShipSystemScan201Response(
       data: CreateShipSystemScan201ResponseData.fromJson(
         json['data'] as Map<String, dynamic>,
@@ -22,7 +23,7 @@ class CreateShipSystemScan201Response {
     return CreateShipSystemScan201Response.fromJson(json);
   }
 
-  final CreateShipSystemScan201ResponseData data;
+  CreateShipSystemScan201ResponseData data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

@@ -7,7 +7,8 @@ class TransferCargoRequest {
     required this.shipSymbol,
   });
 
-  factory TransferCargoRequest.fromJson(Map<String, dynamic> json) {
+  factory TransferCargoRequest.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return TransferCargoRequest(
       tradeSymbol: TradeSymbol.fromJson(json['tradeSymbol'] as String),
       units: json['units'] as int,
@@ -24,9 +25,9 @@ class TransferCargoRequest {
     return TransferCargoRequest.fromJson(json);
   }
 
-  final TradeSymbol tradeSymbol;
-  final int units;
-  final String shipSymbol;
+  TradeSymbol tradeSymbol;
+  int units;
+  String shipSymbol;
 
   Map<String, dynamic> toJson() {
     return {

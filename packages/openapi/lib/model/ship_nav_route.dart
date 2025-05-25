@@ -8,7 +8,8 @@ class ShipNavRoute {
     required this.arrival,
   });
 
-  factory ShipNavRoute.fromJson(Map<String, dynamic> json) {
+  factory ShipNavRoute.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return ShipNavRoute(
       destination: ShipNavRouteWaypoint.fromJson(
         json['destination'] as Map<String, dynamic>,
@@ -30,10 +31,10 @@ class ShipNavRoute {
     return ShipNavRoute.fromJson(json);
   }
 
-  final ShipNavRouteWaypoint destination;
-  final ShipNavRouteWaypoint origin;
-  final DateTime departureTime;
-  final DateTime arrival;
+  ShipNavRouteWaypoint destination;
+  ShipNavRouteWaypoint origin;
+  DateTime departureTime;
+  DateTime arrival;
 
   Map<String, dynamic> toJson() {
     return {

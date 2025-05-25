@@ -8,7 +8,8 @@ class ShipCargoItem {
     required this.units,
   });
 
-  factory ShipCargoItem.fromJson(Map<String, dynamic> json) {
+  factory ShipCargoItem.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
     return ShipCargoItem(
       symbol: TradeSymbol.fromJson(json['symbol'] as String),
       name: json['name'] as String,
@@ -26,10 +27,10 @@ class ShipCargoItem {
     return ShipCargoItem.fromJson(json);
   }
 
-  final TradeSymbol symbol;
-  final String name;
-  final String description;
-  final int units;
+  TradeSymbol symbol;
+  String name;
+  String description;
+  int units;
 
   Map<String, dynamic> toJson() {
     return {
