@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class RemoveShipModuleRequest {
-  RemoveShipModuleRequest({required this.symbol});
+  const RemoveShipModuleRequest({required this.symbol});
 
   factory RemoveShipModuleRequest.fromJson(Map<String, dynamic> json) {
     return RemoveShipModuleRequest(symbol: json['symbol'] as String);

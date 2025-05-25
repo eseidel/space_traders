@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/contract.dart';
 
+@immutable
 class NegotiateContract201ResponseData {
-  NegotiateContract201ResponseData({required this.contract});
+  const NegotiateContract201ResponseData({required this.contract});
 
   factory NegotiateContract201ResponseData.fromJson(Map<String, dynamic> json) {
     return NegotiateContract201ResponseData(

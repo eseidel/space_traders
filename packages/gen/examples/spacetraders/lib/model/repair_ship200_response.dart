@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/repair_ship200_response_data.dart';
 
+@immutable
 class RepairShip200Response {
-  RepairShip200Response({required this.data});
+  const RepairShip200Response({required this.data});
 
   factory RepairShip200Response.fromJson(Map<String, dynamic> json) {
     return RepairShip200Response(

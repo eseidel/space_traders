@@ -1,8 +1,11 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/cooldown.dart';
 import 'package:spacetraders/model/scanned_system.dart';
+import 'package:spacetraders/model_helpers.dart';
 
+@immutable
 class CreateShipSystemScan201ResponseData {
-  CreateShipSystemScan201ResponseData({
+  const CreateShipSystemScan201ResponseData({
     required this.cooldown,
     this.systems = const [],
   });

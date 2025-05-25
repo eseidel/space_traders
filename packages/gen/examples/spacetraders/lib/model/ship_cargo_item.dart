@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/trade_symbol.dart';
 
+@immutable
 class ShipCargoItem {
-  ShipCargoItem({
+  const ShipCargoItem({
     required this.symbol,
     required this.name,
     required this.description,

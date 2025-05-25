@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/create_ship_ship_scan201_response_data.dart';
 
+@immutable
 class CreateShipShipScan201Response {
-  CreateShipShipScan201Response({required this.data});
+  const CreateShipShipScan201Response({required this.data});
 
   factory CreateShipShipScan201Response.fromJson(Map<String, dynamic> json) {
     return CreateShipShipScan201Response(

@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/ship_role.dart';
 
+@immutable
 class ShipRegistration {
-  ShipRegistration({
+  const ShipRegistration({
     required this.name,
     required this.factionSymbol,
     required this.role,

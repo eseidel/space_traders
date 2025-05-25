@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/extract_resources201_response_data.dart';
 
+@immutable
 class ExtractResources201Response {
-  ExtractResources201Response({required this.data});
+  const ExtractResources201Response({required this.data});
 
   factory ExtractResources201Response.fromJson(Map<String, dynamic> json) {
     return ExtractResources201Response(

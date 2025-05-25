@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class RefuelShipRequest {
-  RefuelShipRequest({this.units, this.fromCargo = false});
+  const RefuelShipRequest({this.units, this.fromCargo = false});
 
   factory RefuelShipRequest.fromJson(Map<String, dynamic> json) {
     return RefuelShipRequest(

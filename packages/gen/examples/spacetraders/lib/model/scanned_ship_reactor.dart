@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class ScannedShipReactor {
-  ScannedShipReactor({required this.symbol});
+  const ScannedShipReactor({required this.symbol});
 
   factory ScannedShipReactor.fromJson(Map<String, dynamic> json) {
     return ScannedShipReactor(symbol: json['symbol'] as String);

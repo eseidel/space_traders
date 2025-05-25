@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/install_ship_module201_response_data.dart';
 
+@immutable
 class InstallShipModule201Response {
-  InstallShipModule201Response({required this.data});
+  const InstallShipModule201Response({required this.data});
 
   factory InstallShipModule201Response.fromJson(Map<String, dynamic> json) {
     return InstallShipModule201Response(

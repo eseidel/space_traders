@@ -1,8 +1,10 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/ship_condition_event_component.dart';
 import 'package:spacetraders/model/ship_condition_event_symbol.dart';
 
+@immutable
 class ShipConditionEvent {
-  ShipConditionEvent({
+  const ShipConditionEvent({
     required this.symbol,
     required this.component,
     required this.name,

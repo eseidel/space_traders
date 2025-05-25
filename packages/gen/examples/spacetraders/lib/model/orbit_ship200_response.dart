@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/orbit_ship200_response_data.dart';
 
+@immutable
 class OrbitShip200Response {
-  OrbitShip200Response({required this.data});
+  const OrbitShip200Response({required this.data});
 
   factory OrbitShip200Response.fromJson(Map<String, dynamic> json) {
     return OrbitShip200Response(

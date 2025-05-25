@@ -709,6 +709,10 @@ class _Context {
       outPath: 'lib/api_client.dart',
       context: {'baseUri': spec.serverUrl, 'packageName': packageName},
     );
+    _renderTemplate(
+      template: 'model_helpers',
+      outPath: 'lib/model_helpers.dart',
+    );
   }
 
   /// Run a dart command.
@@ -916,6 +920,8 @@ _RenderContext _renderSchema(_Context context, Schema schema) {
     case SchemaRenderType.pod:
       throw StateError('Pod schemas should not be rendered: $schema');
   }
+
+  imports.add('package:${context.packageName}/model_helpers.dart');
 
   final outPath = Paths.modelFilePath(schema);
   logger.detail('rendering $outPath from ${schema.pointer}');

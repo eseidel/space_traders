@@ -1,8 +1,11 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/cooldown.dart';
 import 'package:spacetraders/model/scanned_waypoint.dart';
+import 'package:spacetraders/model_helpers.dart';
 
+@immutable
 class CreateShipWaypointScan201ResponseData {
-  CreateShipWaypointScan201ResponseData({
+  const CreateShipWaypointScan201ResponseData({
     required this.cooldown,
     this.waypoints = const [],
   });

@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class ContractDeliverGood {
-  ContractDeliverGood({
+  const ContractDeliverGood({
     required this.tradeSymbol,
     required this.destinationSymbol,
     required this.unitsRequired,

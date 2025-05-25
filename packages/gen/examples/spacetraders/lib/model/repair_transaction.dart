@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class RepairTransaction {
-  RepairTransaction({
+  const RepairTransaction({
     required this.waypointSymbol,
     required this.shipSymbol,
     required this.totalPrice,

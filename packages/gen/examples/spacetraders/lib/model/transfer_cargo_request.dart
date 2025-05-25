@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/trade_symbol.dart';
 
+@immutable
 class TransferCargoRequest {
-  TransferCargoRequest({
+  const TransferCargoRequest({
     required this.tradeSymbol,
     required this.units,
     required this.shipSymbol,

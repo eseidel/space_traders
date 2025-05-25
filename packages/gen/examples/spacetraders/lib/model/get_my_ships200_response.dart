@@ -1,8 +1,11 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/meta.dart';
 import 'package:spacetraders/model/ship.dart';
+import 'package:spacetraders/model_helpers.dart';
 
+@immutable
 class GetMyShips200Response {
-  GetMyShips200Response({required this.meta, this.data = const []});
+  const GetMyShips200Response({required this.meta, this.data = const []});
 
   factory GetMyShips200Response.fromJson(Map<String, dynamic> json) {
     return GetMyShips200Response(

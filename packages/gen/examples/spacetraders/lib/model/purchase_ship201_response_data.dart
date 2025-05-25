@@ -1,9 +1,11 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/agent.dart';
 import 'package:spacetraders/model/ship.dart';
 import 'package:spacetraders/model/shipyard_transaction.dart';
 
+@immutable
 class PurchaseShip201ResponseData {
-  PurchaseShip201ResponseData({
+  const PurchaseShip201ResponseData({
     required this.ship,
     required this.agent,
     required this.transaction,

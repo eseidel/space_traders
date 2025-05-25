@@ -1,10 +1,12 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/agent.dart';
 import 'package:spacetraders/model/chart.dart';
 import 'package:spacetraders/model/chart_transaction.dart';
 import 'package:spacetraders/model/waypoint.dart';
 
+@immutable
 class CreateChart201ResponseData {
-  CreateChart201ResponseData({
+  const CreateChart201ResponseData({
     required this.chart,
     required this.waypoint,
     required this.transaction,

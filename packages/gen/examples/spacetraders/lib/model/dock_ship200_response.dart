@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/dock_ship200_response_data.dart';
 
+@immutable
 class DockShip200Response {
-  DockShip200Response({required this.data});
+  const DockShip200Response({required this.data});
 
   factory DockShip200Response.fromJson(Map<String, dynamic> json) {
     return DockShip200Response(

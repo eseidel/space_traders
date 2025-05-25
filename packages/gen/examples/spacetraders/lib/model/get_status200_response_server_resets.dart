@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class GetStatus200ResponseServerResets {
-  GetStatus200ResponseServerResets({
+  const GetStatus200ResponseServerResets({
     required this.next,
     required this.frequency,
   });

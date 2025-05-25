@@ -1,12 +1,15 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/get_status200_response_announcements_inner.dart';
 import 'package:spacetraders/model/get_status200_response_health.dart';
 import 'package:spacetraders/model/get_status200_response_leaderboards.dart';
 import 'package:spacetraders/model/get_status200_response_links_inner.dart';
 import 'package:spacetraders/model/get_status200_response_server_resets.dart';
 import 'package:spacetraders/model/get_status200_response_stats.dart';
+import 'package:spacetraders/model_helpers.dart';
 
+@immutable
 class GetStatus200Response {
-  GetStatus200Response({
+  const GetStatus200Response({
     required this.status,
     required this.version,
     required this.resetDate,

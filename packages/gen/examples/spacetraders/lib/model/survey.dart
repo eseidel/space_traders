@@ -1,8 +1,11 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/survey_deposit.dart';
 import 'package:spacetraders/model/survey_size.dart';
+import 'package:spacetraders/model_helpers.dart';
 
+@immutable
 class Survey {
-  Survey({
+  const Survey({
     required this.signature,
     required this.symbol,
     required this.expiration,

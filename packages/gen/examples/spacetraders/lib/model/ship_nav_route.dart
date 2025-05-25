@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/ship_nav_route_waypoint.dart';
 
+@immutable
 class ShipNavRoute {
-  ShipNavRoute({
+  const ShipNavRoute({
     required this.destination,
     required this.origin,
     required this.departureTime,

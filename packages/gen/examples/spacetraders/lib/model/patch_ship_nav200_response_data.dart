@@ -1,9 +1,12 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/ship_condition_event.dart';
 import 'package:spacetraders/model/ship_fuel.dart';
 import 'package:spacetraders/model/ship_nav.dart';
+import 'package:spacetraders/model_helpers.dart';
 
+@immutable
 class PatchShipNav200ResponseData {
-  PatchShipNav200ResponseData({
+  const PatchShipNav200ResponseData({
     required this.nav,
     required this.fuel,
     this.events = const [],

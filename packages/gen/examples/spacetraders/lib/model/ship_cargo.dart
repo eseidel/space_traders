@@ -1,7 +1,10 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/ship_cargo_item.dart';
+import 'package:spacetraders/model_helpers.dart';
 
+@immutable
 class ShipCargo {
-  ShipCargo({
+  const ShipCargo({
     required this.capacity,
     required this.units,
     this.inventory = const [],

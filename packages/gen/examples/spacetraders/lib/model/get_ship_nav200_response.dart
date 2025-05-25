@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/ship_nav.dart';
 
+@immutable
 class GetShipNav200Response {
-  GetShipNav200Response({required this.data});
+  const GetShipNav200Response({required this.data});
 
   factory GetShipNav200Response.fromJson(Map<String, dynamic> json) {
     return GetShipNav200Response(

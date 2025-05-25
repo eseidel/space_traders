@@ -1,7 +1,10 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/get_error_codes200_response_error_codes_inner.dart';
+import 'package:spacetraders/model_helpers.dart';
 
+@immutable
 class GetErrorCodes200Response {
-  GetErrorCodes200Response({this.errorCodes = const []});
+  const GetErrorCodes200Response({this.errorCodes = const []});
 
   factory GetErrorCodes200Response.fromJson(Map<String, dynamic> json) {
     return GetErrorCodes200Response(

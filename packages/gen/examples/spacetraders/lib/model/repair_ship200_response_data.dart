@@ -1,9 +1,11 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/agent.dart';
 import 'package:spacetraders/model/repair_transaction.dart';
 import 'package:spacetraders/model/ship.dart';
 
+@immutable
 class RepairShip200ResponseData {
-  RepairShip200ResponseData({
+  const RepairShip200ResponseData({
     required this.agent,
     required this.ship,
     required this.transaction,

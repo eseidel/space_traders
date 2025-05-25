@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/extraction_yield.dart';
 
+@immutable
 class Extraction {
-  Extraction({required this.shipSymbol, required this.yield_});
+  const Extraction({required this.shipSymbol, required this.yield_});
 
   factory Extraction.fromJson(Map<String, dynamic> json) {
     return Extraction(

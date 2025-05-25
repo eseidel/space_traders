@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/trade_symbol.dart';
 
+@immutable
 class JettisonRequest {
-  JettisonRequest({required this.symbol, required this.units});
+  const JettisonRequest({required this.symbol, required this.units});
 
   factory JettisonRequest.fromJson(Map<String, dynamic> json) {
     return JettisonRequest(

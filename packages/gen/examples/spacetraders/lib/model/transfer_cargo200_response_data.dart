@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/ship_cargo.dart';
 
+@immutable
 class TransferCargo200ResponseData {
-  TransferCargo200ResponseData({
+  const TransferCargo200ResponseData({
     required this.cargo,
     required this.targetCargo,
   });

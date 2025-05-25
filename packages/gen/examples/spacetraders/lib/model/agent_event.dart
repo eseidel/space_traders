@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class AgentEvent {
-  AgentEvent({
+  const AgentEvent({
     required this.id,
     required this.type,
     required this.message,

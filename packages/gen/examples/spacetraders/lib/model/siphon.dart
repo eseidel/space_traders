@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/siphon_yield.dart';
 
+@immutable
 class Siphon {
-  Siphon({required this.shipSymbol, required this.yield_});
+  const Siphon({required this.shipSymbol, required this.yield_});
 
   factory Siphon.fromJson(Map<String, dynamic> json) {
     return Siphon(

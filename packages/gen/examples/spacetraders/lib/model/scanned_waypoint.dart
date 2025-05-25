@@ -1,11 +1,14 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/chart.dart';
 import 'package:spacetraders/model/waypoint_faction.dart';
 import 'package:spacetraders/model/waypoint_orbital.dart';
 import 'package:spacetraders/model/waypoint_trait.dart';
 import 'package:spacetraders/model/waypoint_type.dart';
+import 'package:spacetraders/model_helpers.dart';
 
+@immutable
 class ScannedWaypoint {
-  ScannedWaypoint({
+  const ScannedWaypoint({
     required this.symbol,
     required this.type,
     required this.systemSymbol,

@@ -1,8 +1,11 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/waypoint_orbital.dart';
 import 'package:spacetraders/model/waypoint_type.dart';
+import 'package:spacetraders/model_helpers.dart';
 
+@immutable
 class SystemWaypoint {
-  SystemWaypoint({
+  const SystemWaypoint({
     required this.symbol,
     required this.type,
     required this.x,

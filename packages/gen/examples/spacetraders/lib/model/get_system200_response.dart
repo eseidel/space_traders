@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/system.dart';
 
+@immutable
 class GetSystem200Response {
-  GetSystem200Response({required this.data});
+  const GetSystem200Response({required this.data});
 
   factory GetSystem200Response.fromJson(Map<String, dynamic> json) {
     return GetSystem200Response(

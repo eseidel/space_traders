@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class ShipRequirements {
-  ShipRequirements({this.power, this.crew, this.slots});
+  const ShipRequirements({this.power, this.crew, this.slots});
 
   factory ShipRequirements.fromJson(Map<String, dynamic> json) {
     return ShipRequirements(

@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/siphon_resources201_response_data.dart';
 
+@immutable
 class SiphonResources201Response {
-  SiphonResources201Response({required this.data});
+  const SiphonResources201Response({required this.data});
 
   factory SiphonResources201Response.fromJson(Map<String, dynamic> json) {
     return SiphonResources201Response(

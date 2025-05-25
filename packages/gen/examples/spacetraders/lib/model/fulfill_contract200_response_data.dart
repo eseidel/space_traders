@@ -1,8 +1,13 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/agent.dart';
 import 'package:spacetraders/model/contract.dart';
 
+@immutable
 class FulfillContract200ResponseData {
-  FulfillContract200ResponseData({required this.contract, required this.agent});
+  const FulfillContract200ResponseData({
+    required this.contract,
+    required this.agent,
+  });
 
   factory FulfillContract200ResponseData.fromJson(Map<String, dynamic> json) {
     return FulfillContract200ResponseData(

@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/remove_mount201_response_data.dart';
 
+@immutable
 class RemoveMount201Response {
-  RemoveMount201Response({required this.data});
+  const RemoveMount201Response({required this.data});
 
   factory RemoveMount201Response.fromJson(Map<String, dynamic> json) {
     return RemoveMount201Response(

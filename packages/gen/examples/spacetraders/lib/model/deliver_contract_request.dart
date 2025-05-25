@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class DeliverContractRequest {
-  DeliverContractRequest({
+  const DeliverContractRequest({
     required this.shipSymbol,
     required this.tradeSymbol,
     required this.units,

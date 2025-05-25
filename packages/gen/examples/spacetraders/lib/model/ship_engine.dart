@@ -1,8 +1,10 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/ship_engine_symbol.dart';
 import 'package:spacetraders/model/ship_requirements.dart';
 
+@immutable
 class ShipEngine {
-  ShipEngine({
+  const ShipEngine({
     required this.symbol,
     required this.name,
     required this.condition,

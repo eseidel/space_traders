@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class GetStatus200ResponseLeaderboardsMostCreditsInner {
-  GetStatus200ResponseLeaderboardsMostCreditsInner({
+  const GetStatus200ResponseLeaderboardsMostCreditsInner({
     required this.agentSymbol,
     required this.credits,
   });

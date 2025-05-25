@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/ship_cargo.dart';
 
+@immutable
 class Jettison200ResponseData {
-  Jettison200ResponseData({required this.cargo});
+  const Jettison200ResponseData({required this.cargo});
 
   factory Jettison200ResponseData.fromJson(Map<String, dynamic> json) {
     return Jettison200ResponseData(

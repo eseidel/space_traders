@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/faction_symbol.dart';
 
+@immutable
 class SystemFaction {
-  SystemFaction({required this.symbol});
+  const SystemFaction({required this.symbol});
 
   factory SystemFaction.fromJson(Map<String, dynamic> json) {
     return SystemFaction(

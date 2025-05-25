@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class GetStatus200ResponseAnnouncementsInner {
-  GetStatus200ResponseAnnouncementsInner({
+  const GetStatus200ResponseAnnouncementsInner({
     required this.title,
     required this.body,
   });

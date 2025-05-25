@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/waypoint_modifier_symbol.dart';
 
+@immutable
 class WaypointModifier {
-  WaypointModifier({
+  const WaypointModifier({
     required this.symbol,
     required this.name,
     required this.description,

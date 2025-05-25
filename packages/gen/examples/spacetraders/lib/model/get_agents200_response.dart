@@ -1,8 +1,11 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/meta.dart';
 import 'package:spacetraders/model/public_agent.dart';
+import 'package:spacetraders/model_helpers.dart';
 
+@immutable
 class GetAgents200Response {
-  GetAgents200Response({required this.meta, this.data = const []});
+  const GetAgents200Response({required this.meta, this.data = const []});
 
   factory GetAgents200Response.fromJson(Map<String, dynamic> json) {
     return GetAgents200Response(

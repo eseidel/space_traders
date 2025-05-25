@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class InstallShipModuleRequest {
-  InstallShipModuleRequest({required this.symbol});
+  const InstallShipModuleRequest({required this.symbol});
 
   factory InstallShipModuleRequest.fromJson(Map<String, dynamic> json) {
     return InstallShipModuleRequest(symbol: json['symbol'] as String);

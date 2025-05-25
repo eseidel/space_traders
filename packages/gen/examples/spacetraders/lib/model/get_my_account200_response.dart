@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/get_my_account200_response_data.dart';
 
+@immutable
 class GetMyAccount200Response {
-  GetMyAccount200Response({required this.data});
+  const GetMyAccount200Response({required this.data});
 
   factory GetMyAccount200Response.fromJson(Map<String, dynamic> json) {
     return GetMyAccount200Response(

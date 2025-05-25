@@ -1,9 +1,11 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/agent.dart';
 import 'package:spacetraders/model/market_transaction.dart';
 import 'package:spacetraders/model/ship_cargo.dart';
 
+@immutable
 class SellCargo201ResponseData {
-  SellCargo201ResponseData({
+  const SellCargo201ResponseData({
     required this.cargo,
     required this.transaction,
     required this.agent,

@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class GetMyAccount200ResponseDataAccount {
-  GetMyAccount200ResponseDataAccount({
+  const GetMyAccount200ResponseDataAccount({
     required this.id,
     required this.email,
     required this.createdAt,

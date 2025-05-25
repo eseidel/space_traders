@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/trade_symbol.dart';
 
+@immutable
 class SiphonYield {
-  SiphonYield({required this.symbol, required this.units});
+  const SiphonYield({required this.symbol, required this.units});
 
   factory SiphonYield.fromJson(Map<String, dynamic> json) {
     return SiphonYield(

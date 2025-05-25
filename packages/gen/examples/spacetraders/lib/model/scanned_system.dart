@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/system_type.dart';
 
+@immutable
 class ScannedSystem {
-  ScannedSystem({
+  const ScannedSystem({
     required this.symbol,
     required this.sectorSymbol,
     required this.type,

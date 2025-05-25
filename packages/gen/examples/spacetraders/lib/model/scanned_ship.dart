@@ -1,12 +1,15 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/scanned_ship_engine.dart';
 import 'package:spacetraders/model/scanned_ship_frame.dart';
 import 'package:spacetraders/model/scanned_ship_mounts_inner.dart';
 import 'package:spacetraders/model/scanned_ship_reactor.dart';
 import 'package:spacetraders/model/ship_nav.dart';
 import 'package:spacetraders/model/ship_registration.dart';
+import 'package:spacetraders/model_helpers.dart';
 
+@immutable
 class ScannedShip {
-  ScannedShip({
+  const ScannedShip({
     required this.symbol,
     required this.registration,
     required this.nav,

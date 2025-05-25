@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/register201_response_data.dart';
 
+@immutable
 class Register201Response {
-  Register201Response({required this.data});
+  const Register201Response({required this.data});
 
   factory Register201Response.fromJson(Map<String, dynamic> json) {
     return Register201Response(

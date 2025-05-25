@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class GetStatus200ResponseLinksInner {
-  GetStatus200ResponseLinksInner({required this.name, required this.url});
+  const GetStatus200ResponseLinksInner({required this.name, required this.url});
 
   factory GetStatus200ResponseLinksInner.fromJson(Map<String, dynamic> json) {
     return GetStatus200ResponseLinksInner(

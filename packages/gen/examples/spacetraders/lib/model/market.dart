@@ -1,9 +1,12 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/market_trade_good.dart';
 import 'package:spacetraders/model/market_transaction.dart';
 import 'package:spacetraders/model/trade_good.dart';
+import 'package:spacetraders/model_helpers.dart';
 
+@immutable
 class Market {
-  Market({
+  const Market({
     required this.symbol,
     this.exports = const [],
     this.imports = const [],

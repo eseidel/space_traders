@@ -1,3 +1,4 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/cooldown.dart';
 import 'package:spacetraders/model/ship_cargo.dart';
 import 'package:spacetraders/model/ship_crew.dart';
@@ -9,9 +10,11 @@ import 'package:spacetraders/model/ship_mount.dart';
 import 'package:spacetraders/model/ship_nav.dart';
 import 'package:spacetraders/model/ship_reactor.dart';
 import 'package:spacetraders/model/ship_registration.dart';
+import 'package:spacetraders/model_helpers.dart';
 
+@immutable
 class Ship {
-  Ship({
+  const Ship({
     required this.symbol,
     required this.registration,
     required this.nav,

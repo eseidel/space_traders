@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class ShipyardShipCrew {
-  ShipyardShipCrew({required this.required_, required this.capacity});
+  const ShipyardShipCrew({required this.required_, required this.capacity});
 
   factory ShipyardShipCrew.fromJson(Map<String, dynamic> json) {
     return ShipyardShipCrew(

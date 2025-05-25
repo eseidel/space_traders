@@ -1,8 +1,10 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/construction.dart';
 import 'package:spacetraders/model/ship_cargo.dart';
 
+@immutable
 class SupplyConstruction201ResponseData {
-  SupplyConstruction201ResponseData({
+  const SupplyConstruction201ResponseData({
     required this.construction,
     required this.cargo,
   });

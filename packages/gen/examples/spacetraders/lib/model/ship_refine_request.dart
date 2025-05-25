@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/ship_refine_request_produce.dart';
 
+@immutable
 class ShipRefineRequest {
-  ShipRefineRequest({required this.produce});
+  const ShipRefineRequest({required this.produce});
 
   factory ShipRefineRequest.fromJson(Map<String, dynamic> json) {
     return ShipRefineRequest(

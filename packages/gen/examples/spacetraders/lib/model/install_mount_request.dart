@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class InstallMountRequest {
-  InstallMountRequest({required this.symbol});
+  const InstallMountRequest({required this.symbol});
 
   factory InstallMountRequest.fromJson(Map<String, dynamic> json) {
     return InstallMountRequest(symbol: json['symbol'] as String);

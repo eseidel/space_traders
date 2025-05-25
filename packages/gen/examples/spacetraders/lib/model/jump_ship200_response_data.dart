@@ -1,10 +1,12 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/agent.dart';
 import 'package:spacetraders/model/cooldown.dart';
 import 'package:spacetraders/model/market_transaction.dart';
 import 'package:spacetraders/model/ship_nav.dart';
 
+@immutable
 class JumpShip200ResponseData {
-  JumpShip200ResponseData({
+  const JumpShip200ResponseData({
     required this.nav,
     required this.cooldown,
     required this.transaction,

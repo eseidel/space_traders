@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/construction.dart';
 
+@immutable
 class GetConstruction200Response {
-  GetConstruction200Response({required this.data});
+  const GetConstruction200Response({required this.data});
 
   factory GetConstruction200Response.fromJson(Map<String, dynamic> json) {
     return GetConstruction200Response(

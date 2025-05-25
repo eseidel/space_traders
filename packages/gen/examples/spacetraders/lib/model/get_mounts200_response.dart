@@ -1,7 +1,10 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/ship_mount.dart';
+import 'package:spacetraders/model_helpers.dart';
 
+@immutable
 class GetMounts200Response {
-  GetMounts200Response({this.data = const []});
+  const GetMounts200Response({this.data = const []});
 
   factory GetMounts200Response.fromJson(Map<String, dynamic> json) {
     return GetMounts200Response(

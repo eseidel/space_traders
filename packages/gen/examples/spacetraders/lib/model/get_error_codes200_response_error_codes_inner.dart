@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class GetErrorCodes200ResponseErrorCodesInner {
-  GetErrorCodes200ResponseErrorCodesInner({
+  const GetErrorCodes200ResponseErrorCodesInner({
     required this.code,
     required this.name,
   });

@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/faction_trait_symbol.dart';
 
+@immutable
 class FactionTrait {
-  FactionTrait({
+  const FactionTrait({
     required this.symbol,
     required this.name,
     required this.description,

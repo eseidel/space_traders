@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/trade_symbol.dart';
 
+@immutable
 class ConstructionMaterial {
-  ConstructionMaterial({
+  const ConstructionMaterial({
     required this.tradeSymbol,
     required this.required_,
     required this.fulfilled,

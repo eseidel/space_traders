@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/trade_symbol.dart';
 
+@immutable
 class SupplyConstructionRequest {
-  SupplyConstructionRequest({
+  const SupplyConstructionRequest({
     required this.shipSymbol,
     required this.tradeSymbol,
     required this.units,

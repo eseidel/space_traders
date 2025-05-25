@@ -1,3 +1,4 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/activity_level.dart';
 import 'package:spacetraders/model/ship_engine.dart';
 import 'package:spacetraders/model/ship_frame.dart';
@@ -7,9 +8,11 @@ import 'package:spacetraders/model/ship_reactor.dart';
 import 'package:spacetraders/model/ship_type.dart';
 import 'package:spacetraders/model/shipyard_ship_crew.dart';
 import 'package:spacetraders/model/supply_level.dart';
+import 'package:spacetraders/model_helpers.dart';
 
+@immutable
 class ShipyardShip {
-  ShipyardShip({
+  const ShipyardShip({
     required this.type,
     required this.name,
     required this.description,

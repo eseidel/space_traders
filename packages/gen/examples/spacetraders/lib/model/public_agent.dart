@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class PublicAgent {
-  PublicAgent({
+  const PublicAgent({
     required this.symbol,
     required this.headquarters,
     required this.credits,

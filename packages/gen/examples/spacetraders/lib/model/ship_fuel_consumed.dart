@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class ShipFuelConsumed {
-  ShipFuelConsumed({required this.amount, required this.timestamp});
+  const ShipFuelConsumed({required this.amount, required this.timestamp});
 
   factory ShipFuelConsumed.fromJson(Map<String, dynamic> json) {
     return ShipFuelConsumed(

@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class GetStatus200ResponseStats {
-  GetStatus200ResponseStats({
+  const GetStatus200ResponseStats({
     required this.agents,
     required this.ships,
     required this.systems,

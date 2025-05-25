@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/faction_symbol.dart';
 
+@immutable
 class WaypointFaction {
-  WaypointFaction({required this.symbol});
+  const WaypointFaction({required this.symbol});
 
   factory WaypointFaction.fromJson(Map<String, dynamic> json) {
     return WaypointFaction(

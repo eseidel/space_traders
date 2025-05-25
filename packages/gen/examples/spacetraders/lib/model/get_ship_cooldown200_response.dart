@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/cooldown.dart';
 
+@immutable
 class GetShipCooldown200Response {
-  GetShipCooldown200Response({required this.data});
+  const GetShipCooldown200Response({required this.data});
 
   factory GetShipCooldown200Response.fromJson(Map<String, dynamic> json) {
     return GetShipCooldown200Response(

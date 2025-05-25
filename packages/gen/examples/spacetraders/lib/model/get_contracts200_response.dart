@@ -1,8 +1,11 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/contract.dart';
 import 'package:spacetraders/model/meta.dart';
+import 'package:spacetraders/model_helpers.dart';
 
+@immutable
 class GetContracts200Response {
-  GetContracts200Response({required this.meta, this.data = const []});
+  const GetContracts200Response({required this.meta, this.data = const []});
 
   factory GetContracts200Response.fromJson(Map<String, dynamic> json) {
     return GetContracts200Response(

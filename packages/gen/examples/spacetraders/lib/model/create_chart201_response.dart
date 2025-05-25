@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/create_chart201_response_data.dart';
 
+@immutable
 class CreateChart201Response {
-  CreateChart201Response({required this.data});
+  const CreateChart201Response({required this.data});
 
   factory CreateChart201Response.fromJson(Map<String, dynamic> json) {
     return CreateChart201Response(

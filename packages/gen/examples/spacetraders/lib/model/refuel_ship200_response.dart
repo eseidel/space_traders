@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/refuel_ship200_response_data.dart';
 
+@immutable
 class RefuelShip200Response {
-  RefuelShip200Response({required this.data});
+  const RefuelShip200Response({required this.data});
 
   factory RefuelShip200Response.fromJson(Map<String, dynamic> json) {
     return RefuelShip200Response(

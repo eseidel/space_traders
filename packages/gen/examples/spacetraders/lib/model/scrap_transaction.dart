@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class ScrapTransaction {
-  ScrapTransaction({
+  const ScrapTransaction({
     required this.waypointSymbol,
     required this.shipSymbol,
     required this.totalPrice,

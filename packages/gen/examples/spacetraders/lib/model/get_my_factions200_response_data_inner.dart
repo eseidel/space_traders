@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class GetMyFactions200ResponseDataInner {
-  GetMyFactions200ResponseDataInner({
+  const GetMyFactions200ResponseDataInner({
     required this.symbol,
     required this.reputation,
   });

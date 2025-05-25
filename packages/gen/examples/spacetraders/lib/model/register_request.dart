@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/faction_symbol.dart';
 
+@immutable
 class RegisterRequest {
-  RegisterRequest({required this.symbol, required this.faction});
+  const RegisterRequest({required this.symbol, required this.faction});
 
   factory RegisterRequest.fromJson(Map<String, dynamic> json) {
     return RegisterRequest(

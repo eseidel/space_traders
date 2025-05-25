@@ -35,12 +35,14 @@ class _Exists extends Matcher {
 const exists = _Exists();
 
 class _HasFiles extends CustomMatcher {
-  _HasFiles(List<String> files) : super('has files', 'files', files);
+  _HasFiles(List<String> files)
+    : super('has files', 'files', unorderedEquals(files));
 
   @override
   Object? featureValueOf(dynamic actual) {
     return (actual as Directory)
         .listSync()
+        .whereType<File>()
         .map((e) => e.path.split('/').last)
         .toList();
   }
@@ -136,8 +138,15 @@ void main() {
       await renderToDirectory(spec: spec, outDir: out, logger: logger);
       expect(out, exists);
       expect(out.childFile('foo.txt'), isNot(exists));
-      expect(out.childFile('lib/api.dart'), exists);
-      expect(out.childFile('lib/api_client.dart'), exists);
+      expect(
+        out.childDirectory('lib'),
+        hasFiles([
+          'api.dart',
+          'api_exception.dart',
+          'api_client.dart',
+          'model_helpers.dart',
+        ]),
+      );
     });
 
     test('with real endpoints', () async {
@@ -574,7 +583,7 @@ void main() {
       expect(out.childFile('lib/api/default_api.dart'), exists);
     });
 
-    test('with boolean', () async {
+    test('with boolean and unknown type', () async {
       final fs = MemoryFileSystem.test();
       final spec = {
         'servers': [
@@ -589,7 +598,17 @@ void main() {
                   'description': 'Default Response',
                   'content': {
                     'application/json': {
-                      'schema': {'type': 'boolean'},
+                      'schema': {
+                        'type': 'object',
+                        'properties': {
+                          'foo': {'type': 'boolean', 'default': true},
+                          'bar': {
+                            // No type is unknown and renders as dynamic.
+                            'description': 'A description',
+                          },
+                        },
+                        'required': ['foo'],
+                      },
                     },
                   },
                 },

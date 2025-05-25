@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/trade_symbol.dart';
 
+@immutable
 class PurchaseCargoRequest {
-  PurchaseCargoRequest({required this.symbol, required this.units});
+  const PurchaseCargoRequest({required this.symbol, required this.units});
 
   factory PurchaseCargoRequest.fromJson(Map<String, dynamic> json) {
     return PurchaseCargoRequest(

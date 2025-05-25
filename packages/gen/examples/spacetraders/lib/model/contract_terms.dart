@@ -1,8 +1,11 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/contract_deliver_good.dart';
 import 'package:spacetraders/model/contract_payment.dart';
+import 'package:spacetraders/model_helpers.dart';
 
+@immutable
 class ContractTerms {
-  ContractTerms({
+  const ContractTerms({
     required this.deadline,
     required this.payment,
     this.deliver = const [],

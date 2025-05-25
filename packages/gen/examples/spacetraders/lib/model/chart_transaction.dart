@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class ChartTransaction {
-  ChartTransaction({
+  const ChartTransaction({
     required this.waypointSymbol,
     required this.shipSymbol,
     required this.totalPrice,

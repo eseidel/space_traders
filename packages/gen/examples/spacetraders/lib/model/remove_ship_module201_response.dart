@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/remove_ship_module201_response_data.dart';
 
+@immutable
 class RemoveShipModule201Response {
-  RemoveShipModule201Response({required this.data});
+  const RemoveShipModule201Response({required this.data});
 
   factory RemoveShipModule201Response.fromJson(Map<String, dynamic> json) {
     return RemoveShipModule201Response(

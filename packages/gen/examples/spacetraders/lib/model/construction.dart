@@ -1,7 +1,10 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/construction_material.dart';
+import 'package:spacetraders/model_helpers.dart';
 
+@immutable
 class Construction {
-  Construction({
+  const Construction({
     required this.symbol,
     required this.isComplete,
     this.materials = const [],

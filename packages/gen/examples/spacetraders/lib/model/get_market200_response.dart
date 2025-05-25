@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/market.dart';
 
+@immutable
 class GetMarket200Response {
-  GetMarket200Response({required this.data});
+  const GetMarket200Response({required this.data});
 
   factory GetMarket200Response.fromJson(Map<String, dynamic> json) {
     return GetMarket200Response(

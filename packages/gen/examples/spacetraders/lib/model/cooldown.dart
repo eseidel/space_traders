@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class Cooldown {
-  Cooldown({
+  const Cooldown({
     required this.shipSymbol,
     required this.totalSeconds,
     required this.remainingSeconds,

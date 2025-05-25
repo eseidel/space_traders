@@ -1,8 +1,10 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/contract_terms.dart';
 import 'package:spacetraders/model/contract_type.dart';
 
+@immutable
 class Contract {
-  Contract({
+  const Contract({
     required this.id,
     required this.factionSymbol,
     required this.type,

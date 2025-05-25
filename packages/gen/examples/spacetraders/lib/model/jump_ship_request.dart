@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class JumpShipRequest {
-  JumpShipRequest({required this.waypointSymbol});
+  const JumpShipRequest({required this.waypointSymbol});
 
   factory JumpShipRequest.fromJson(Map<String, dynamic> json) {
     return JumpShipRequest(waypointSymbol: json['waypointSymbol'] as String);

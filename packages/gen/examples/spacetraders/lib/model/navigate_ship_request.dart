@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class NavigateShipRequest {
-  NavigateShipRequest({required this.waypointSymbol});
+  const NavigateShipRequest({required this.waypointSymbol});
 
   factory NavigateShipRequest.fromJson(Map<String, dynamic> json) {
     return NavigateShipRequest(

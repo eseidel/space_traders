@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/ship_crew_rotation.dart';
 
+@immutable
 class ShipCrew {
-  ShipCrew({
+  const ShipCrew({
     required this.current,
     required this.required_,
     required this.capacity,

@@ -1,8 +1,10 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/ship_module_symbol.dart';
 import 'package:spacetraders/model/ship_requirements.dart';
 
+@immutable
 class ShipModule {
-  ShipModule({
+  const ShipModule({
     required this.symbol,
     required this.name,
     required this.description,

@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/get_supply_chain200_response_data_export_to_import_map.dart';
 
+@immutable
 class GetSupplyChain200ResponseData {
-  GetSupplyChain200ResponseData({required this.exportToImportMap});
+  const GetSupplyChain200ResponseData({required this.exportToImportMap});
 
   factory GetSupplyChain200ResponseData.fromJson(Map<String, dynamic> json) {
     return GetSupplyChain200ResponseData(

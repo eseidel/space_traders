@@ -1,10 +1,13 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/agent.dart';
 import 'package:spacetraders/model/ship_cargo.dart';
 import 'package:spacetraders/model/ship_modification_transaction.dart';
 import 'package:spacetraders/model/ship_mount.dart';
+import 'package:spacetraders/model_helpers.dart';
 
+@immutable
 class RemoveMount201ResponseData {
-  RemoveMount201ResponseData({
+  const RemoveMount201ResponseData({
     required this.agent,
     required this.cargo,
     required this.transaction,

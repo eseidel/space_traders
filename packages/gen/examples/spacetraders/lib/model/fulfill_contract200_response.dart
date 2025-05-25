@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/fulfill_contract200_response_data.dart';
 
+@immutable
 class FulfillContract200Response {
-  FulfillContract200Response({required this.data});
+  const FulfillContract200Response({required this.data});
 
   factory FulfillContract200Response.fromJson(Map<String, dynamic> json) {
     return FulfillContract200Response(

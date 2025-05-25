@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class GetStatus200ResponseLeaderboardsMostSubmittedChartsInner {
-  GetStatus200ResponseLeaderboardsMostSubmittedChartsInner({
+  const GetStatus200ResponseLeaderboardsMostSubmittedChartsInner({
     required this.agentSymbol,
     required this.chartCount,
   });

@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/trade_symbol.dart';
 
+@immutable
 class ExtractionYield {
-  ExtractionYield({required this.symbol, required this.units});
+  const ExtractionYield({required this.symbol, required this.units});
 
   factory ExtractionYield.fromJson(Map<String, dynamic> json) {
     return ExtractionYield(

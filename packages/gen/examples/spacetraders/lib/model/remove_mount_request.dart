@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class RemoveMountRequest {
-  RemoveMountRequest({required this.symbol});
+  const RemoveMountRequest({required this.symbol});
 
   factory RemoveMountRequest.fromJson(Map<String, dynamic> json) {
     return RemoveMountRequest(symbol: json['symbol'] as String);

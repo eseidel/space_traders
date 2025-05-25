@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class ContractPayment {
-  ContractPayment({required this.onAccepted, required this.onFulfilled});
+  const ContractPayment({required this.onAccepted, required this.onFulfilled});
 
   factory ContractPayment.fromJson(Map<String, dynamic> json) {
     return ContractPayment(

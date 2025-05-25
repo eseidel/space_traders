@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class ShipyardTransaction {
-  ShipyardTransaction({
+  const ShipyardTransaction({
     required this.waypointSymbol,
     required this.shipSymbol,
     required this.shipType,

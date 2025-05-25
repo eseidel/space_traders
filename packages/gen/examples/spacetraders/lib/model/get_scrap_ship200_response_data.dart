@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/scrap_transaction.dart';
 
+@immutable
 class GetScrapShip200ResponseData {
-  GetScrapShip200ResponseData({required this.transaction});
+  const GetScrapShip200ResponseData({required this.transaction});
 
   factory GetScrapShip200ResponseData.fromJson(Map<String, dynamic> json) {
     return GetScrapShip200ResponseData(

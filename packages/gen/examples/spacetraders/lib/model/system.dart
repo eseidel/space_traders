@@ -1,9 +1,12 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/system_faction.dart';
 import 'package:spacetraders/model/system_type.dart';
 import 'package:spacetraders/model/system_waypoint.dart';
+import 'package:spacetraders/model_helpers.dart';
 
+@immutable
 class System {
-  System({
+  const System({
     required this.symbol,
     required this.sectorSymbol,
     required this.type,

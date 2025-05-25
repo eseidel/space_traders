@@ -1,10 +1,12 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/agent.dart';
 import 'package:spacetraders/model/market_transaction.dart';
 import 'package:spacetraders/model/ship_cargo.dart';
 import 'package:spacetraders/model/ship_fuel.dart';
 
+@immutable
 class RefuelShip200ResponseData {
-  RefuelShip200ResponseData({
+  const RefuelShip200ResponseData({
     required this.agent,
     required this.fuel,
     required this.transaction,

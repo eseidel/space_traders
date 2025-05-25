@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/purchase_cargo201_response_data.dart';
 
+@immutable
 class PurchaseCargo201Response {
-  PurchaseCargo201Response({required this.data});
+  const PurchaseCargo201Response({required this.data});
 
   factory PurchaseCargo201Response.fromJson(Map<String, dynamic> json) {
     return PurchaseCargo201Response(

@@ -1,10 +1,13 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/cooldown.dart';
 import 'package:spacetraders/model/ship_cargo.dart';
 import 'package:spacetraders/model/ship_condition_event.dart';
 import 'package:spacetraders/model/siphon.dart';
+import 'package:spacetraders/model_helpers.dart';
 
+@immutable
 class SiphonResources201ResponseData {
-  SiphonResources201ResponseData({
+  const SiphonResources201ResponseData({
     required this.siphon,
     required this.cooldown,
     required this.cargo,

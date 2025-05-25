@@ -1,8 +1,11 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/cooldown.dart';
 import 'package:spacetraders/model/survey.dart';
+import 'package:spacetraders/model_helpers.dart';
 
+@immutable
 class CreateSurvey201ResponseData {
-  CreateSurvey201ResponseData({
+  const CreateSurvey201ResponseData({
     required this.cooldown,
     this.surveys = const [],
   });

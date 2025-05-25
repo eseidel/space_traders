@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class Agent {
-  Agent({
+  const Agent({
     required this.accountId,
     required this.symbol,
     required this.headquarters,

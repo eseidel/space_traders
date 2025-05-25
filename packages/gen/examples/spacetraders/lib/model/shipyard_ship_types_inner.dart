@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/ship_type.dart';
 
+@immutable
 class ShipyardShipTypesInner {
-  ShipyardShipTypesInner({required this.type});
+  const ShipyardShipTypesInner({required this.type});
 
   factory ShipyardShipTypesInner.fromJson(Map<String, dynamic> json) {
     return ShipyardShipTypesInner(

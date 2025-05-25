@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class Chart {
-  Chart({
+  const Chart({
     required this.waypointSymbol,
     required this.submittedBy,
     required this.submittedOn,

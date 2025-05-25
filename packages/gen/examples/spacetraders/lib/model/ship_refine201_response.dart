@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/ship_refine201_response_data.dart';
 
+@immutable
 class ShipRefine201Response {
-  ShipRefine201Response({required this.data});
+  const ShipRefine201Response({required this.data});
 
   factory ShipRefine201Response.fromJson(Map<String, dynamic> json) {
     return ShipRefine201Response(

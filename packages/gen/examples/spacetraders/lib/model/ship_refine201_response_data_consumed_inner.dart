@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/trade_symbol.dart';
 
+@immutable
 class ShipRefine201ResponseDataConsumedInner {
-  ShipRefine201ResponseDataConsumedInner({
+  const ShipRefine201ResponseDataConsumedInner({
     required this.tradeSymbol,
     required this.units,
   });

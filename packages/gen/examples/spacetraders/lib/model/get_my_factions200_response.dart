@@ -1,8 +1,11 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/get_my_factions200_response_data_inner.dart';
 import 'package:spacetraders/model/meta.dart';
+import 'package:spacetraders/model_helpers.dart';
 
+@immutable
 class GetMyFactions200Response {
-  GetMyFactions200Response({required this.meta, this.data = const []});
+  const GetMyFactions200Response({required this.meta, this.data = const []});
 
   factory GetMyFactions200Response.fromJson(Map<String, dynamic> json) {
     return GetMyFactions200Response(

@@ -1,10 +1,13 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/agent.dart';
 import 'package:spacetraders/model/ship_cargo.dart';
 import 'package:spacetraders/model/ship_modification_transaction.dart';
 import 'package:spacetraders/model/ship_module.dart';
+import 'package:spacetraders/model_helpers.dart';
 
+@immutable
 class InstallShipModule201ResponseData {
-  InstallShipModule201ResponseData({
+  const InstallShipModule201ResponseData({
     required this.agent,
     required this.cargo,
     required this.transaction,

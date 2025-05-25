@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class GetStatus200ResponseHealth {
-  GetStatus200ResponseHealth({this.lastMarketUpdate});
+  const GetStatus200ResponseHealth({this.lastMarketUpdate});
 
   factory GetStatus200ResponseHealth.fromJson(Map<String, dynamic> json) {
     return GetStatus200ResponseHealth(

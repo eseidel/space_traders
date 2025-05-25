@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/create_survey201_response_data.dart';
 
+@immutable
 class CreateSurvey201Response {
-  CreateSurvey201Response({required this.data});
+  const CreateSurvey201Response({required this.data});
 
   factory CreateSurvey201Response.fromJson(Map<String, dynamic> json) {
     return CreateSurvey201Response(

@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
+@immutable
 class WaypointOrbital {
-  WaypointOrbital({required this.symbol});
+  const WaypointOrbital({required this.symbol});
 
   factory WaypointOrbital.fromJson(Map<String, dynamic> json) {
     return WaypointOrbital(symbol: json['symbol'] as String);

@@ -1,7 +1,9 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/trade_symbol.dart';
 
+@immutable
 class SurveyDeposit {
-  SurveyDeposit({required this.symbol});
+  const SurveyDeposit({required this.symbol});
 
   factory SurveyDeposit.fromJson(Map<String, dynamic> json) {
     return SurveyDeposit(

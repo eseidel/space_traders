@@ -1,9 +1,12 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/ship_mount_deposits_inner.dart';
 import 'package:spacetraders/model/ship_mount_symbol.dart';
 import 'package:spacetraders/model/ship_requirements.dart';
+import 'package:spacetraders/model_helpers.dart';
 
+@immutable
 class ShipMount {
-  ShipMount({
+  const ShipMount({
     required this.symbol,
     required this.name,
     required this.description,

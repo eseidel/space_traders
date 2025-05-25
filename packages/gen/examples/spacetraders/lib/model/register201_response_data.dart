@@ -1,10 +1,13 @@
+import 'package:meta/meta.dart';
 import 'package:spacetraders/model/agent.dart';
 import 'package:spacetraders/model/contract.dart';
 import 'package:spacetraders/model/faction.dart';
 import 'package:spacetraders/model/ship.dart';
+import 'package:spacetraders/model_helpers.dart';
 
+@immutable
 class Register201ResponseData {
-  Register201ResponseData({
+  const Register201ResponseData({
     required this.token,
     required this.agent,
     required this.faction,
