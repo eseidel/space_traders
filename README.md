@@ -211,9 +211,12 @@ of other tools for viewing lcov.info files, including extensions for
 VSCode.  Mostly I just use codecov for viewing coverage.
 
 ## Reset day checklist
-* docker compose down (to shut down all services)
-* sudo chown eseidel db_data
-* mv db_data saved_db_data
+```
+./packages/db/tools/backup.sh # Optionally save the db contents.
+docker compose down # Shut down services
+sudo rm -rf db_data # Remove existing postgres.
+```
+
 * Update `open_api_config.yaml` to have the latest git hash.
 * regenerate space_traders_api
 * get a new token from my.spacetraders.io
