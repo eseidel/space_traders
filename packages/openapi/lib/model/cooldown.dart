@@ -1,3 +1,5 @@
+import 'package:openapi/api_helpers.dart';
+
 class Cooldown {
   Cooldown({
     required this.shipSymbol,
@@ -12,7 +14,7 @@ class Cooldown {
       shipSymbol: json['shipSymbol'] as String,
       totalSeconds: json['totalSeconds'] as int,
       remainingSeconds: json['remainingSeconds'] as int,
-      expiration: DateTime.parse(json['expiration'] as String),
+      expiration: maybeParseDateTime(json['expiration'] as String?),
     );
   }
 

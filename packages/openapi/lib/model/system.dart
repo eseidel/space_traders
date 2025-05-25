@@ -18,7 +18,7 @@ class System {
   factory System.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
     return System(
-      constellation: json['constellation'] as String,
+      constellation: json['constellation'] as String?,
       symbol: json['symbol'] as String,
       sectorSymbol: json['sectorSymbol'] as String,
       type: SystemType.fromJson(json['type'] as String),
@@ -36,7 +36,7 @@ class System {
                 (e) => SystemFaction.fromJson(e as Map<String, dynamic>),
               )
               .toList(),
-      name: json['name'] as String,
+      name: json['name'] as String?,
     );
   }
 

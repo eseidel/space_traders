@@ -83,7 +83,10 @@ void main() {
       expect(mountSymbolForTradeSymbol(tradeSymbol), mountSymbol);
     }
     // Non-mount symbols will fail however:
-    expect(mountSymbolForTradeSymbol(TradeSymbol.ADVANCED_CIRCUITRY), isNull);
+    expect(
+      () => mountSymbolForTradeSymbol(TradeSymbol.ADVANCED_CIRCUITRY),
+      throwsA(isA<FormatException>()),
+    );
   });
 
   test('isMinableTrait', () {

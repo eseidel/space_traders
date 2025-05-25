@@ -2,7 +2,16 @@ import 'package:collection/collection.dart';
 import 'package:types/types.dart';
 
 export 'package:openapi/api.dart'
-    hide Agent, Contract, JumpGate, Ship, System, SystemWaypoint, Waypoint;
+    hide
+        Agent,
+        Contract,
+        JumpGate,
+        Ship,
+        System,
+        SystemSymbol,
+        SystemWaypoint,
+        Waypoint,
+        WaypointSymbol;
 
 /// The default implementation of getNow for production.
 /// Used for tests for overriding the current time.

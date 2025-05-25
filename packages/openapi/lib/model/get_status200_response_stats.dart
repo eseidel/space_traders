@@ -10,7 +10,7 @@ class GetStatus200ResponseStats {
   factory GetStatus200ResponseStats.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
     return GetStatus200ResponseStats(
-      accounts: json['accounts'] as int,
+      accounts: json['accounts'] as int?,
       agents: json['agents'] as int,
       ships: json['ships'] as int,
       systems: json['systems'] as int,

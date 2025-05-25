@@ -1,3 +1,4 @@
+import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/contract_terms.dart';
 import 'package:openapi/model/contract_type.dart';
 
@@ -23,7 +24,7 @@ class Contract {
       accepted: json['accepted'] as bool,
       fulfilled: json['fulfilled'] as bool,
       expiration: DateTime.parse(json['expiration'] as String),
-      deadlineToAccept: DateTime.parse(json['deadlineToAccept'] as String),
+      deadlineToAccept: maybeParseDateTime(json['deadlineToAccept'] as String?),
     );
   }
 

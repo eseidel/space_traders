@@ -4,7 +4,7 @@ class RefuelShipRequest {
   factory RefuelShipRequest.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
     return RefuelShipRequest(
-      units: json['units'] as int,
+      units: json['units'] as int?,
       fromCargo: json['fromCargo'],
     );
   }

@@ -249,30 +249,61 @@ extension _SchemaGeneration on Schema {
     }
   }
 
+  String jsonStorageType({required bool isNullable}) {
+    switch (type) {
+      case SchemaType.string:
+        return isNullable ? 'String?' : 'String';
+      case SchemaType.integer:
+        return isNullable ? 'int?' : 'int';
+      case SchemaType.number:
+        return isNullable ? 'double?' : 'double';
+      case SchemaType.boolean:
+        return isNullable ? 'bool?' : 'bool';
+      case SchemaType.object:
+        return isNullable ? 'Map<String, dynamic>?' : 'Map<String, dynamic>';
+      case SchemaType.array:
+        return isNullable ? 'List<dynamic>?' : 'List<dynamic>';
+      case SchemaType.unknown:
+        return 'dynamic';
+    }
+  }
+
   /// The fromJson expression for this schema.
-  String fromJsonExpression(String jsonValue, _Context context) {
+  String fromJsonExpression(
+    String jsonValue,
+    _Context context, {
+    required bool isNullable,
+  }) {
+    final storageType = jsonStorageType(isNullable: isNullable);
     switch (type) {
       case SchemaType.string:
         if (isDateTime) {
-          return 'DateTime.parse($jsonValue as String)';
+          if (isNullable) {
+            return 'maybeParseDateTime($jsonValue as $storageType)';
+          } else {
+            return 'DateTime.parse($jsonValue as $storageType)';
+          }
         } else if (isEnum) {
-          return '$className.fromJson($jsonValue as String)';
+          final jsonMethod = isNullable ? 'maybeFromJson' : 'fromJson';
+          return '$className.$jsonMethod($jsonValue as $storageType)';
         }
-        return '$jsonValue as String';
+        return '$jsonValue as $storageType';
       case SchemaType.integer:
-        return '$jsonValue as int';
+        return '$jsonValue as $storageType';
       case SchemaType.number:
-        return '$jsonValue as double';
+        return '$jsonValue as $storageType';
       case SchemaType.boolean:
-        return '$jsonValue as bool';
+        return '$jsonValue as $storageType';
       case SchemaType.object:
-        return '$className.fromJson($jsonValue as Map<String, dynamic>)';
+        final jsonMethod = isNullable ? 'maybeFromJson' : 'fromJson';
+        return '$className.$jsonMethod($jsonValue as $storageType)';
       case SchemaType.array:
         final itemsSchema = context._maybeResolve(items);
         if (itemsSchema == null) {
           throw StateError('Items schema is null: $this');
         }
         final itemTypeName = itemsSchema.typeName(context);
+        // TODO(eseidel): this probably doesn't handle nullable correctly.
         if (itemsSchema.type == SchemaType.object) {
           return '($jsonValue as List<dynamic>).map<$itemTypeName>((e) => '
               '$itemTypeName.fromJson(e as Map<String, dynamic>)).toList()';
@@ -320,7 +351,11 @@ extension _SchemaGeneration on Schema {
         context,
         isNullable: isNullable,
       ),
-      'fromJson': schema.fromJsonExpression("json['$jsonName']", context),
+      'fromJson': schema.fromJsonExpression(
+        "json['$jsonName']",
+        context,
+        isNullable: isNullable,
+      ),
     };
   }
 
@@ -348,6 +383,7 @@ extension _SchemaGeneration on Schema {
     // Force named properties to be rendered if hasAdditionalProperties is true.
     final hasProperties =
         renderProperties.isNotEmpty || hasAdditionalProperties;
+    const isNullable = false;
     return {
       'typeName': className,
       'nullableTypeName': nullableTypeName(context),
@@ -359,9 +395,13 @@ extension _SchemaGeneration on Schema {
       'valueToJson': valueSchema?.toJsonExpression(
         'value',
         context,
-        isNullable: false,
+        isNullable: isNullable,
       ),
-      'valueFromJson': valueSchema?.fromJsonExpression('value', context),
+      'valueFromJson': valueSchema?.fromJsonExpression(
+        'value',
+        context,
+        isNullable: isNullable,
+      ),
       'fromJsonJsonType': context.fromJsonJsonType,
       'castFromJsonArg': context.quirks.dynamicJson,
       'mutableModels': context.quirks.mutableModels,
@@ -441,6 +481,7 @@ extension _ParameterGeneration on Parameter {
     if (typeSchema == null) {
       throw StateError('Type schema is null: $this');
     }
+    final isNullable = !isRequired;
     return {
       'name': name,
       'bracketedName': '{$name}',
@@ -453,9 +494,13 @@ extension _ParameterGeneration on Parameter {
       'toJson': typeSchema.toJsonExpression(
         name,
         context,
-        isNullable: !isRequired,
+        isNullable: isNullable,
       ),
-      'fromJson': typeSchema.fromJsonExpression("json['$name']", context),
+      'fromJson': typeSchema.fromJsonExpression(
+        "json['$name']",
+        context,
+        isNullable: isNullable,
+      ),
     };
   }
 }
@@ -469,6 +514,7 @@ extension _RequestBodyGeneration on RequestBody {
     final typeName = schema.typeName(context);
     final paramName = typeName[0].toLowerCase() + typeName.substring(1);
     // TODO(eseidel): Share code with Parameter.toTemplateContext.
+    final isNullable = !isRequired;
     return {
       'name': paramName,
       'bracketedName': '{$paramName}',
@@ -481,9 +527,13 @@ extension _RequestBodyGeneration on RequestBody {
       'toJson': schema.toJsonExpression(
         paramName,
         context,
-        isNullable: !isRequired,
+        isNullable: isNullable,
       ),
-      'fromJson': schema.fromJsonExpression('json', context),
+      'fromJson': schema.fromJsonExpression(
+        'json',
+        context,
+        isNullable: isNullable,
+      ),
     };
   }
 }
@@ -683,6 +733,7 @@ class _Context {
       outPath: 'lib/api_client.dart',
       context: {'baseUri': spec.serverUrl, 'packageName': packageName},
     );
+    _renderTemplate(template: 'api_helpers', outPath: 'lib/api_helpers.dart');
   }
 
   /// Run a dart command.
@@ -707,6 +758,7 @@ class _Context {
       ...renderedModels.map(Paths.modelPackagePath),
       'api_client.dart',
       'api_exception.dart',
+      'api_helpers.dart',
     ];
     final exports = paths
         .map((path) => 'package:$packageName/$path')
@@ -890,6 +942,8 @@ _RenderContext _renderSchema(_Context context, Schema schema) {
     case SchemaRenderType.pod:
       throw StateError('Pod schemas should not be rendered: $schema');
   }
+
+  imports.add('package:${context.packageName}/api_helpers.dart');
 
   final outPath = Paths.modelFilePath(schema);
   logger.detail('rendering $outPath from ${schema.pointer}');

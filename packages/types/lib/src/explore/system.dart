@@ -103,16 +103,9 @@ class SystemWaypoint extends Equatable {
     );
   }
 
-  /// Call toJson on the OpenAPI object and fix any issues.
-  static Map<String, dynamic> openApiToJson(openapi.SystemWaypoint waypoint) {
-    final json = waypoint.toJson();
-    json['type'] = (json['type'] as WaypointType).toJson();
-    return json;
-  }
-
   /// Converts to JSON.
   Map<String, dynamic> toJson() {
-    return openApiToJson(toOpenApi());
+    return toOpenApi().toJson();
   }
 
   @override
@@ -263,14 +256,7 @@ class System extends Equatable {
 
   /// Converts to JSON.
   Map<String, dynamic> toJson() {
-    final json = toOpenApi().toJson();
-    // Work around a bug in OpenApi's generated toJson method where it doesn't
-    // recursively call toJson.
-    json['type'] = (json['type'] as SystemType).toJson();
-    json['waypoints'] = (json['waypoints'] as List<openapi.SystemWaypoint>)
-        .map(SystemWaypoint.openApiToJson)
-        .toList();
-    return json;
+    return toOpenApi().toJson();
   }
 
   @override

@@ -35,9 +35,9 @@ class Waypoint {
                 (e) => WaypointOrbital.fromJson(e as Map<String, dynamic>),
               )
               .toList(),
-      orbits: json['orbits'] as String,
-      faction: WaypointFaction.fromJson(
-        json['faction'] as Map<String, dynamic>,
+      orbits: json['orbits'] as String?,
+      faction: WaypointFaction.maybeFromJson(
+        json['faction'] as Map<String, dynamic>?,
       ),
       traits:
           (json['traits'] as List<dynamic>)
@@ -51,7 +51,7 @@ class Waypoint {
                 (e) => WaypointModifier.fromJson(e as Map<String, dynamic>),
               )
               .toList(),
-      chart: Chart.fromJson(json['chart'] as Map<String, dynamic>),
+      chart: Chart.maybeFromJson(json['chart'] as Map<String, dynamic>?),
       isUnderConstruction: json['isUnderConstruction'] as bool,
     );
   }

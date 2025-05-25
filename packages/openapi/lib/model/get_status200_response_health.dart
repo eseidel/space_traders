@@ -4,7 +4,7 @@ class GetStatus200ResponseHealth {
   factory GetStatus200ResponseHealth.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
     return GetStatus200ResponseHealth(
-      lastMarketUpdate: json['lastMarketUpdate'] as String,
+      lastMarketUpdate: json['lastMarketUpdate'] as String?,
     );
   }
 
