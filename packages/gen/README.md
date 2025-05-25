@@ -16,8 +16,6 @@ dart run space_gen
 * Generates good quality, modern Dart code.
 * Gives readable errors on failure.
 * Generates much, but not all, of OpenAPI 3.0.
-* Generates independent classes, which can be used in pieces.
-* Supports immutable output.
 * Generates testable code.
 
 ## Design
@@ -34,6 +32,12 @@ dart run space_gen
 ## Advantages over Open API Generator 7.0.0
 * Dart 3.0+ only (sound null safety)
 * Model code round trips through JSON correctly (TBD)
+* toJson/fromJson are actually recursive and round-trip correctly!
+* Able to generate immutable models.
+* Uses real enum classes!
+* fromJson is non-nullable.
+* Generates maybeFromJson with explicit nullability.
+* Generates independent classes, which can be imported independently.
 
 ## Why not just contribute to OpenAPI?
 

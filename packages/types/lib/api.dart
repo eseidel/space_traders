@@ -289,7 +289,12 @@ TradeSymbol tradeSymbolForMountSymbol(ShipMountSymbol mountSymbol) {
 /// Compute the mount symbol for the given trade symbol.
 /// This will return null if the trade symbol is not a mount symbol.
 ShipMountSymbol? mountSymbolForTradeSymbol(TradeSymbol tradeSymbol) {
-  return ShipMountSymbol.fromJson(tradeSymbol.value);
+  try {
+    return ShipMountSymbol.fromJson(tradeSymbol.value);
+  } on FormatException {
+    // Will raise a FormatException if the trade symbol is not a mount symbol.
+    return null;
+  }
 }
 
 /// Extensions onto SupplyLevel to make it easier to work with.

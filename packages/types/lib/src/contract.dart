@@ -77,15 +77,11 @@ class Contract {
 
   /// Converts the Contract to JSON.
   Map<String, dynamic> toJson() {
-    // Work around OpenAPI not supporting toJson recursion.
-    final termsJson = terms.toJson();
-    termsJson['payment'] = (termsJson['payment'] as ContractPayment).toJson();
-
     return <String, dynamic>{
       'id': id,
       'factionSymbol': factionSymbol,
       'type': type.value,
-      'terms': termsJson,
+      'terms': terms.toJson(),
       'deadlineToAccept': deadlineToAccept.toIso8601String(),
       'accepted': accepted,
       'fulfilled': fulfilled,

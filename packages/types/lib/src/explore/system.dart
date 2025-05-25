@@ -410,26 +410,8 @@ class Waypoint {
     );
   }
 
-  // Work around a bug in OpenApi's generated toJson method where it doesn't
-  // recursively call toJson.
-  /// Call toJson on the OpenAPI object and fix any issues.
-  static Map<String, dynamic> openApiToJson(openapi.Waypoint waypoint) {
-    Map<String, dynamic> traitToJson(WaypointTrait trait) {
-      final json = trait.toJson();
-      json['symbol'] = trait.symbol.toJson();
-      return json;
-    }
-
-    final json = waypoint.toJson();
-    json['traits'] = (json['traits'] as List<WaypointTrait>)
-        .map(traitToJson)
-        .toList();
-    json['type'] = (json['type'] as WaypointType).toJson();
-    return json;
-  }
-
   /// Converts to JSON.
   Map<String, dynamic> toJson() {
-    return openApiToJson(toOpenApi());
+    return toOpenApi().toJson();
   }
 }
