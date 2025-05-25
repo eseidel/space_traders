@@ -26,4 +26,15 @@ class PurchaseShipRequest {
   Map<String, dynamic> toJson() {
     return {'shipType': shipType.toJson(), 'waypointSymbol': waypointSymbol};
   }
+
+  @override
+  int get hashCode => Object.hash(shipType, waypointSymbol);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is PurchaseShipRequest &&
+        shipType == other.shipType &&
+        waypointSymbol == other.waypointSymbol;
+  }
 }

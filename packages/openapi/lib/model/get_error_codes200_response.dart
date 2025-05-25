@@ -1,3 +1,4 @@
+import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/get_error_codes200_response_error_codes_inner.dart';
 
 class GetErrorCodes200Response {
@@ -30,5 +31,15 @@ class GetErrorCodes200Response {
 
   Map<String, dynamic> toJson() {
     return {'errorCodes': errorCodes.map((e) => e.toJson()).toList()};
+  }
+
+  @override
+  int get hashCode => errorCodes.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is GetErrorCodes200Response &&
+        listsEqual(errorCodes, other.errorCodes);
   }
 }

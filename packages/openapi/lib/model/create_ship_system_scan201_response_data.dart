@@ -1,3 +1,4 @@
+import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/cooldown.dart';
 import 'package:openapi/model/scanned_system.dart';
 
@@ -39,5 +40,16 @@ class CreateShipSystemScan201ResponseData {
       'cooldown': cooldown.toJson(),
       'systems': systems.map((e) => e.toJson()).toList(),
     };
+  }
+
+  @override
+  int get hashCode => Object.hash(cooldown, systems);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is CreateShipSystemScan201ResponseData &&
+        cooldown == other.cooldown &&
+        listsEqual(systems, other.systems);
   }
 }

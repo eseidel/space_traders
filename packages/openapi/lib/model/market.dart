@@ -1,3 +1,4 @@
+import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/market_trade_good.dart';
 import 'package:openapi/model/market_transaction.dart';
 import 'package:openapi/model/trade_good.dart';
@@ -74,5 +75,21 @@ class Market {
       'transactions': transactions.map((e) => e.toJson()).toList(),
       'tradeGoods': tradeGoods.map((e) => e.toJson()).toList(),
     };
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(symbol, exports, imports, exchange, transactions, tradeGoods);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Market &&
+        symbol == other.symbol &&
+        listsEqual(exports, other.exports) &&
+        listsEqual(imports, other.imports) &&
+        listsEqual(exchange, other.exchange) &&
+        listsEqual(transactions, other.transactions) &&
+        listsEqual(tradeGoods, other.tradeGoods);
   }
 }

@@ -59,4 +59,30 @@ class ShipEngine {
       'quality': quality,
     };
   }
+
+  @override
+  int get hashCode => Object.hash(
+    symbol,
+    name,
+    condition,
+    integrity,
+    description,
+    speed,
+    requirements,
+    quality,
+  );
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ShipEngine &&
+        symbol == other.symbol &&
+        name == other.name &&
+        condition == other.condition &&
+        integrity == other.integrity &&
+        description == other.description &&
+        speed == other.speed &&
+        requirements == other.requirements &&
+        quality == other.quality;
+  }
 }

@@ -28,4 +28,13 @@ class GetMyAccount200ResponseData {
   Map<String, dynamic> toJson() {
     return {'account': account.toJson()};
   }
+
+  @override
+  int get hashCode => account.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is GetMyAccount200ResponseData && account == other.account;
+  }
 }

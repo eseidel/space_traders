@@ -1,3 +1,4 @@
+import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/agent.dart';
 import 'package:openapi/model/ship_cargo.dart';
 import 'package:openapi/model/ship_modification_transaction.dart';
@@ -49,5 +50,18 @@ class RemoveMount201ResponseData {
       'cargo': cargo.toJson(),
       'transaction': transaction.toJson(),
     };
+  }
+
+  @override
+  int get hashCode => Object.hash(agent, mounts, cargo, transaction);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is RemoveMount201ResponseData &&
+        agent == other.agent &&
+        listsEqual(mounts, other.mounts) &&
+        cargo == other.cargo &&
+        transaction == other.transaction;
   }
 }

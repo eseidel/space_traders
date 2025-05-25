@@ -29,4 +29,15 @@ class GetStatus200ResponseServerResets {
   Map<String, dynamic> toJson() {
     return {'next': next, 'frequency': frequency};
   }
+
+  @override
+  int get hashCode => Object.hash(next, frequency);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is GetStatus200ResponseServerResets &&
+        next == other.next &&
+        frequency == other.frequency;
+  }
 }

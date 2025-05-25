@@ -42,4 +42,19 @@ class PublicAgent {
       'shipCount': shipCount,
     };
   }
+
+  @override
+  int get hashCode =>
+      Object.hash(symbol, headquarters, credits, startingFaction, shipCount);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is PublicAgent &&
+        symbol == other.symbol &&
+        headquarters == other.headquarters &&
+        credits == other.credits &&
+        startingFaction == other.startingFaction &&
+        shipCount == other.shipCount;
+  }
 }

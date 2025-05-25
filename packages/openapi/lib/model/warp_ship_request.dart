@@ -20,4 +20,13 @@ class WarpShipRequest {
   Map<String, dynamic> toJson() {
     return {'waypointSymbol': waypointSymbol};
   }
+
+  @override
+  int get hashCode => waypointSymbol.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is WarpShipRequest && waypointSymbol == other.waypointSymbol;
+  }
 }

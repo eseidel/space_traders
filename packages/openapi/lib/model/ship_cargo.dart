@@ -1,3 +1,4 @@
+import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/ship_cargo_item.dart';
 
 class ShipCargo {
@@ -40,5 +41,17 @@ class ShipCargo {
       'units': units,
       'inventory': inventory.map((e) => e.toJson()).toList(),
     };
+  }
+
+  @override
+  int get hashCode => Object.hash(capacity, units, inventory);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ShipCargo &&
+        capacity == other.capacity &&
+        units == other.units &&
+        listsEqual(inventory, other.inventory);
   }
 }

@@ -22,6 +22,17 @@ class ShipyardShipCrew {
   int capacity;
 
   Map<String, dynamic> toJson() {
-    return {'required_': required_, 'capacity': capacity};
+    return {'required': required_, 'capacity': capacity};
+  }
+
+  @override
+  int get hashCode => Object.hash(required_, capacity);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ShipyardShipCrew &&
+        required_ == other.required_ &&
+        capacity == other.capacity;
   }
 }

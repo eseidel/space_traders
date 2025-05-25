@@ -1,3 +1,4 @@
+import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/agent_event.dart';
 
 class GetMyAgentEvents200Response {
@@ -30,5 +31,14 @@ class GetMyAgentEvents200Response {
 
   Map<String, dynamic> toJson() {
     return {'data': data.map((e) => e.toJson()).toList()};
+  }
+
+  @override
+  int get hashCode => data.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is GetMyAgentEvents200Response && listsEqual(data, other.data);
   }
 }

@@ -1,3 +1,4 @@
+import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/shipyard_ship.dart';
 import 'package:openapi/model/shipyard_ship_types_inner.dart';
 import 'package:openapi/model/shipyard_transaction.dart';
@@ -61,5 +62,20 @@ class Shipyard {
       'ships': ships.map((e) => e.toJson()).toList(),
       'modificationsFee': modificationsFee,
     };
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(symbol, shipTypes, transactions, ships, modificationsFee);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Shipyard &&
+        symbol == other.symbol &&
+        listsEqual(shipTypes, other.shipTypes) &&
+        listsEqual(transactions, other.transactions) &&
+        listsEqual(ships, other.ships) &&
+        modificationsFee == other.modificationsFee;
   }
 }

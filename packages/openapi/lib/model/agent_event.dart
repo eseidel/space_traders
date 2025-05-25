@@ -42,4 +42,18 @@ class AgentEvent {
       'createdAt': createdAt.toIso8601String(),
     };
   }
+
+  @override
+  int get hashCode => Object.hash(id, type, message, data, createdAt);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is AgentEvent &&
+        id == other.id &&
+        type == other.type &&
+        message == other.message &&
+        true &&
+        createdAt == other.createdAt;
+  }
 }

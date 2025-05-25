@@ -1,3 +1,4 @@
+import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/ship_mount_deposits_inner.dart';
 import 'package:openapi/model/ship_mount_symbol.dart';
 import 'package:openapi/model/ship_requirements.dart';
@@ -52,5 +53,21 @@ class ShipMount {
       'deposits': deposits,
       'requirements': requirements.toJson(),
     };
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(symbol, name, description, strength, deposits, requirements);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ShipMount &&
+        symbol == other.symbol &&
+        name == other.name &&
+        description == other.description &&
+        strength == other.strength &&
+        listsEqual(deposits, other.deposits) &&
+        requirements == other.requirements;
   }
 }

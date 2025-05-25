@@ -1,3 +1,4 @@
+import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/faction_symbol.dart';
 import 'package:openapi/model/faction_trait.dart';
 
@@ -53,5 +54,27 @@ class Faction {
       'traits': traits.map((e) => e.toJson()).toList(),
       'isRecruiting': isRecruiting,
     };
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    symbol,
+    name,
+    description,
+    headquarters,
+    traits,
+    isRecruiting,
+  );
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Faction &&
+        symbol == other.symbol &&
+        name == other.name &&
+        description == other.description &&
+        headquarters == other.headquarters &&
+        listsEqual(traits, other.traits) &&
+        isRecruiting == other.isRecruiting;
   }
 }

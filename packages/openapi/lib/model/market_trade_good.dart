@@ -55,4 +55,28 @@ class MarketTradeGood {
       'sellPrice': sellPrice,
     };
   }
+
+  @override
+  int get hashCode => Object.hash(
+    symbol,
+    type,
+    tradeVolume,
+    supply,
+    activity,
+    purchasePrice,
+    sellPrice,
+  );
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is MarketTradeGood &&
+        symbol == other.symbol &&
+        type == other.type &&
+        tradeVolume == other.tradeVolume &&
+        supply == other.supply &&
+        activity == other.activity &&
+        purchasePrice == other.purchasePrice &&
+        sellPrice == other.sellPrice;
+  }
 }

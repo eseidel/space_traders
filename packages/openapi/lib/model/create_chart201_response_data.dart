@@ -45,4 +45,17 @@ class CreateChart201ResponseData {
       'agent': agent.toJson(),
     };
   }
+
+  @override
+  int get hashCode => Object.hash(chart, waypoint, transaction, agent);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is CreateChart201ResponseData &&
+        chart == other.chart &&
+        waypoint == other.waypoint &&
+        transaction == other.transaction &&
+        agent == other.agent;
+  }
 }

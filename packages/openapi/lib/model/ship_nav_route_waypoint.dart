@@ -44,4 +44,18 @@ class ShipNavRouteWaypoint {
       'y': y,
     };
   }
+
+  @override
+  int get hashCode => Object.hash(symbol, type, systemSymbol, x, y);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ShipNavRouteWaypoint &&
+        symbol == other.symbol &&
+        type == other.type &&
+        systemSymbol == other.systemSymbol &&
+        x == other.x &&
+        y == other.y;
+  }
 }

@@ -45,4 +45,17 @@ class JumpShip200ResponseData {
       'agent': agent.toJson(),
     };
   }
+
+  @override
+  int get hashCode => Object.hash(nav, cooldown, transaction, agent);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is JumpShip200ResponseData &&
+        nav == other.nav &&
+        cooldown == other.cooldown &&
+        transaction == other.transaction &&
+        agent == other.agent;
+  }
 }

@@ -26,4 +26,15 @@ class RegisterRequest {
   Map<String, dynamic> toJson() {
     return {'symbol': symbol, 'faction': faction.toJson()};
   }
+
+  @override
+  int get hashCode => Object.hash(symbol, faction);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is RegisterRequest &&
+        symbol == other.symbol &&
+        faction == other.faction;
+  }
 }

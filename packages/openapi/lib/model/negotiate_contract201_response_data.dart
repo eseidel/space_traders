@@ -26,4 +26,14 @@ class NegotiateContract201ResponseData {
   Map<String, dynamic> toJson() {
     return {'contract': contract.toJson()};
   }
+
+  @override
+  int get hashCode => contract.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is NegotiateContract201ResponseData &&
+        contract == other.contract;
+  }
 }

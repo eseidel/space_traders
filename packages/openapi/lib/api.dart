@@ -8,7 +8,6 @@ export 'package:openapi/api/global_api.dart';
 export 'package:openapi/api/systems_api.dart';
 export 'package:openapi/api_client.dart';
 export 'package:openapi/api_exception.dart';
-export 'package:openapi/api_helpers.dart';
 export 'package:openapi/model/accept_contract200_response.dart';
 export 'package:openapi/model/accept_contract200_response_data.dart';
 export 'package:openapi/model/activity_level.dart';

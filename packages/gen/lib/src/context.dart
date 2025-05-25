@@ -206,6 +206,22 @@ extension _SchemaGeneration on Schema {
     return typeName.endsWith('?') ? typeName : '$typeName?';
   }
 
+  String equalsExpression(String name, _Context context) {
+    switch (type) {
+      case SchemaType.object:
+        return '$name == other.$name';
+      case SchemaType.array:
+        return 'listsEqual($name, other.$name)';
+      case SchemaType.string:
+      case SchemaType.integer:
+      case SchemaType.number:
+      case SchemaType.boolean:
+        return '$name == other.$name';
+      case SchemaType.unknown:
+        return 'true';
+    }
+  }
+
   /// The toJson expression for this schema.
   String toJsonExpression(
     String name,
@@ -339,13 +355,15 @@ extension _SchemaGeneration on Schema {
     // isNullable means it's optional for the server, use nullable storage.
     final isNullable = !inRequiredList && !hasDefaultValue;
     return {
-      'name': dartName,
+      'dartName': dartName,
+      'jsonName': jsonName,
       'useRequired': useRequired,
       'isNullable': isNullable,
       'hasDefaultValue': hasDefaultValue,
       'defaultValue': defaultValueString,
       'type': schema.typeName(context),
       'nullableType': schema.nullableTypeName(context),
+      'equals': schema.equalsExpression(dartName, context),
       'toJson': schema.toJsonExpression(
         dartName,
         context,
@@ -384,10 +402,17 @@ extension _SchemaGeneration on Schema {
     final hasProperties =
         renderProperties.isNotEmpty || hasAdditionalProperties;
     const isNullable = false;
+    final propertiesCount =
+        renderProperties.length + (hasAdditionalProperties ? 1 : 0);
+    if (propertiesCount == 0) {
+      throw StateError('Object schema has no properties: $this');
+    }
     return {
       'typeName': className,
       'nullableTypeName': nullableTypeName(context),
       'hasProperties': hasProperties,
+      // Special case behavior hashCode with only one property.
+      'hasOneProperty': propertiesCount == 1,
       'properties': renderProperties,
       'hasAdditionalProperties': hasAdditionalProperties,
       'additionalPropertiesName': 'entries', // Matching OpenAPI.
@@ -758,7 +783,6 @@ class _Context {
       ...renderedModels.map(Paths.modelPackagePath),
       'api_client.dart',
       'api_exception.dart',
-      'api_helpers.dart',
     ];
     final exports = paths
         .map((path) => 'package:$packageName/$path')

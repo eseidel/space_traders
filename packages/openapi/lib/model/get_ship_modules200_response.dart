@@ -1,3 +1,4 @@
+import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/ship_module.dart';
 
 class GetShipModules200Response {
@@ -28,5 +29,14 @@ class GetShipModules200Response {
 
   Map<String, dynamic> toJson() {
     return {'data': data.map((e) => e.toJson()).toList()};
+  }
+
+  @override
+  int get hashCode => data.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is GetShipModules200Response && listsEqual(data, other.data);
   }
 }

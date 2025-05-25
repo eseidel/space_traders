@@ -40,4 +40,17 @@ class ShipCargoItem {
       'units': units,
     };
   }
+
+  @override
+  int get hashCode => Object.hash(symbol, name, description, units);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ShipCargoItem &&
+        symbol == other.symbol &&
+        name == other.name &&
+        description == other.description &&
+        units == other.units;
+  }
 }

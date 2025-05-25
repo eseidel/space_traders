@@ -1,3 +1,4 @@
+import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/meta.dart';
 import 'package:openapi/model/waypoint.dart';
 
@@ -36,5 +37,16 @@ class GetSystemWaypoints200Response {
       'data': data.map((e) => e.toJson()).toList(),
       'meta': meta.toJson(),
     };
+  }
+
+  @override
+  int get hashCode => Object.hash(data, meta);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is GetSystemWaypoints200Response &&
+        listsEqual(data, other.data) &&
+        meta == other.meta;
   }
 }

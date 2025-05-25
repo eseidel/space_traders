@@ -1,3 +1,4 @@
+import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/cooldown.dart';
 import 'package:openapi/model/scanned_waypoint.dart';
 
@@ -39,5 +40,16 @@ class CreateShipWaypointScan201ResponseData {
       'cooldown': cooldown.toJson(),
       'waypoints': waypoints.map((e) => e.toJson()).toList(),
     };
+  }
+
+  @override
+  int get hashCode => Object.hash(cooldown, waypoints);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is CreateShipWaypointScan201ResponseData &&
+        cooldown == other.cooldown &&
+        listsEqual(waypoints, other.waypoints);
   }
 }

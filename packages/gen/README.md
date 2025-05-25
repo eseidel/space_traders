@@ -28,16 +28,18 @@ dart run space_gen
 * Handle min/max in newtype types.
 * Wire up Authentication and sending of bearer header.
 * GetSupplyChain200ResponseDataExportToImportMap is unnecessary?
+* Simplify hasAdditionalProperties.
 
 ## Advantages over Open API Generator 7.0.0
 * Dart 3.0+ only (sound null safety)
 * Model code round trips through JSON correctly (TBD)
-* toJson/fromJson are actually recursive and round-trip correctly!
+* Generates properly recursive toJson/fromJson which round-trip fully!
 * Able to generate immutable models.
 * Uses real enum classes!
 * fromJson is non-nullable.
 * Generates maybeFromJson with explicit nullability.
 * Generates independent classes, which can be imported independently.
+* Better follows required vs. nullable semantics.
 
 ## Why not just contribute to OpenAPI?
 

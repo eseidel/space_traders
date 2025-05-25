@@ -1,3 +1,4 @@
+import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/agent.dart';
 import 'package:openapi/model/contract.dart';
 import 'package:openapi/model/faction.dart';
@@ -49,5 +50,19 @@ class Register201ResponseData {
       'contract': contract.toJson(),
       'ships': ships.map((e) => e.toJson()).toList(),
     };
+  }
+
+  @override
+  int get hashCode => Object.hash(token, agent, faction, contract, ships);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Register201ResponseData &&
+        token == other.token &&
+        agent == other.agent &&
+        faction == other.faction &&
+        contract == other.contract &&
+        listsEqual(ships, other.ships);
   }
 }

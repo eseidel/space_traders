@@ -36,4 +36,16 @@ class TransferCargoRequest {
       'shipSymbol': shipSymbol,
     };
   }
+
+  @override
+  int get hashCode => Object.hash(tradeSymbol, units, shipSymbol);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is TransferCargoRequest &&
+        tradeSymbol == other.tradeSymbol &&
+        units == other.units &&
+        shipSymbol == other.shipSymbol;
+  }
 }

@@ -22,4 +22,14 @@ class NavigateShipRequest {
   Map<String, dynamic> toJson() {
     return {'waypointSymbol': waypointSymbol};
   }
+
+  @override
+  int get hashCode => waypointSymbol.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is NavigateShipRequest &&
+        waypointSymbol == other.waypointSymbol;
+  }
 }

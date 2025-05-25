@@ -1,3 +1,4 @@
+import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/chart.dart';
 import 'package:openapi/model/waypoint_faction.dart';
 import 'package:openapi/model/waypoint_orbital.dart';
@@ -75,5 +76,33 @@ class ScannedWaypoint {
       'traits': traits.map((e) => e.toJson()).toList(),
       'chart': chart?.toJson(),
     };
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    symbol,
+    type,
+    systemSymbol,
+    x,
+    y,
+    orbitals,
+    faction,
+    traits,
+    chart,
+  );
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ScannedWaypoint &&
+        symbol == other.symbol &&
+        type == other.type &&
+        systemSymbol == other.systemSymbol &&
+        x == other.x &&
+        y == other.y &&
+        listsEqual(orbitals, other.orbitals) &&
+        faction == other.faction &&
+        listsEqual(traits, other.traits) &&
+        chart == other.chart;
   }
 }

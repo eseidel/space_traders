@@ -33,4 +33,15 @@ class TransferCargo200ResponseData {
   Map<String, dynamic> toJson() {
     return {'cargo': cargo.toJson(), 'targetCargo': targetCargo.toJson()};
   }
+
+  @override
+  int get hashCode => Object.hash(cargo, targetCargo);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is TransferCargo200ResponseData &&
+        cargo == other.cargo &&
+        targetCargo == other.targetCargo;
+  }
 }

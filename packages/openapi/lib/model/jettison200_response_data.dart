@@ -24,4 +24,13 @@ class Jettison200ResponseData {
   Map<String, dynamic> toJson() {
     return {'cargo': cargo.toJson()};
   }
+
+  @override
+  int get hashCode => cargo.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Jettison200ResponseData && cargo == other.cargo;
+  }
 }

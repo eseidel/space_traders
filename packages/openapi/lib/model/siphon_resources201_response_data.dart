@@ -1,3 +1,4 @@
+import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/cooldown.dart';
 import 'package:openapi/model/ship_cargo.dart';
 import 'package:openapi/model/ship_condition_event.dart';
@@ -49,5 +50,18 @@ class SiphonResources201ResponseData {
       'cargo': cargo.toJson(),
       'events': events.map((e) => e.toJson()).toList(),
     };
+  }
+
+  @override
+  int get hashCode => Object.hash(siphon, cooldown, cargo, events);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is SiphonResources201ResponseData &&
+        siphon == other.siphon &&
+        cooldown == other.cooldown &&
+        cargo == other.cargo &&
+        listsEqual(events, other.events);
   }
 }

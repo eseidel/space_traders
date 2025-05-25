@@ -1,3 +1,4 @@
+import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/cooldown.dart';
 import 'package:openapi/model/survey.dart';
 
@@ -37,5 +38,16 @@ class CreateSurvey201ResponseData {
       'cooldown': cooldown.toJson(),
       'surveys': surveys.map((e) => e.toJson()).toList(),
     };
+  }
+
+  @override
+  int get hashCode => Object.hash(cooldown, surveys);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is CreateSurvey201ResponseData &&
+        cooldown == other.cooldown &&
+        listsEqual(surveys, other.surveys);
   }
 }

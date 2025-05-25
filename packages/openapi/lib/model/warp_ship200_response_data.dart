@@ -1,3 +1,4 @@
+import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/ship_condition_event.dart';
 import 'package:openapi/model/ship_fuel.dart';
 import 'package:openapi/model/ship_nav.dart';
@@ -42,5 +43,17 @@ class WarpShip200ResponseData {
       'fuel': fuel.toJson(),
       'events': events.map((e) => e.toJson()).toList(),
     };
+  }
+
+  @override
+  int get hashCode => Object.hash(nav, fuel, events);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is WarpShip200ResponseData &&
+        nav == other.nav &&
+        fuel == other.fuel &&
+        listsEqual(events, other.events);
   }
 }

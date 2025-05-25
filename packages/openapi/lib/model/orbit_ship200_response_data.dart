@@ -24,4 +24,13 @@ class OrbitShip200ResponseData {
   Map<String, dynamic> toJson() {
     return {'nav': nav.toJson()};
   }
+
+  @override
+  int get hashCode => nav.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is OrbitShip200ResponseData && nav == other.nav;
+  }
 }

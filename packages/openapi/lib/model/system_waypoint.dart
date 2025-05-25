@@ -1,3 +1,4 @@
+import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/waypoint_orbital.dart';
 import 'package:openapi/model/waypoint_type.dart';
 
@@ -53,5 +54,20 @@ class SystemWaypoint {
       'orbitals': orbitals.map((e) => e.toJson()).toList(),
       'orbits': orbits,
     };
+  }
+
+  @override
+  int get hashCode => Object.hash(symbol, type, x, y, orbitals, orbits);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is SystemWaypoint &&
+        symbol == other.symbol &&
+        type == other.type &&
+        x == other.x &&
+        y == other.y &&
+        listsEqual(orbitals, other.orbitals) &&
+        orbits == other.orbits;
   }
 }

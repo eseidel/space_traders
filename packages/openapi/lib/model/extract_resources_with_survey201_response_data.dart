@@ -1,3 +1,4 @@
+import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/cooldown.dart';
 import 'package:openapi/model/extraction.dart';
 import 'package:openapi/model/ship_cargo.dart';
@@ -61,5 +62,20 @@ class ExtractResourcesWithSurvey201ResponseData {
       'modifiers': modifiers.map((e) => e.toJson()).toList(),
       'events': events.map((e) => e.toJson()).toList(),
     };
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(extraction, cooldown, cargo, modifiers, events);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ExtractResourcesWithSurvey201ResponseData &&
+        extraction == other.extraction &&
+        cooldown == other.cooldown &&
+        cargo == other.cargo &&
+        listsEqual(modifiers, other.modifiers) &&
+        listsEqual(events, other.events);
   }
 }

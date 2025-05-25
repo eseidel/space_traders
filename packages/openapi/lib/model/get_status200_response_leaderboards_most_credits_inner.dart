@@ -31,4 +31,15 @@ class GetStatus200ResponseLeaderboardsMostCreditsInner {
   Map<String, dynamic> toJson() {
     return {'agentSymbol': agentSymbol, 'credits': credits};
   }
+
+  @override
+  int get hashCode => Object.hash(agentSymbol, credits);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is GetStatus200ResponseLeaderboardsMostCreditsInner &&
+        agentSymbol == other.agentSymbol &&
+        credits == other.credits;
+  }
 }

@@ -1,3 +1,4 @@
+import 'package:openapi/api_helpers.dart';
 import 'package:openapi/model/agent.dart';
 import 'package:openapi/model/ship_cargo.dart';
 import 'package:openapi/model/ship_modification_transaction.dart';
@@ -51,5 +52,18 @@ class RemoveShipModule201ResponseData {
       'cargo': cargo.toJson(),
       'transaction': transaction.toJson(),
     };
+  }
+
+  @override
+  int get hashCode => Object.hash(agent, modules, cargo, transaction);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is RemoveShipModule201ResponseData &&
+        agent == other.agent &&
+        listsEqual(modules, other.modules) &&
+        cargo == other.cargo &&
+        transaction == other.transaction;
   }
 }

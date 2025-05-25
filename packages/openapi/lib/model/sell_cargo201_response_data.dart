@@ -40,4 +40,16 @@ class SellCargo201ResponseData {
       'agent': agent.toJson(),
     };
   }
+
+  @override
+  int get hashCode => Object.hash(cargo, transaction, agent);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is SellCargo201ResponseData &&
+        cargo == other.cargo &&
+        transaction == other.transaction &&
+        agent == other.agent;
+  }
 }

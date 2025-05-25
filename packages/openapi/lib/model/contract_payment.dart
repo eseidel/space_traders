@@ -24,4 +24,15 @@ class ContractPayment {
   Map<String, dynamic> toJson() {
     return {'onAccepted': onAccepted, 'onFulfilled': onFulfilled};
   }
+
+  @override
+  int get hashCode => Object.hash(onAccepted, onFulfilled);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ContractPayment &&
+        onAccepted == other.onAccepted &&
+        onFulfilled == other.onFulfilled;
+  }
 }

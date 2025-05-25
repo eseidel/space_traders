@@ -29,4 +29,14 @@ class GetSupplyChain200ResponseData {
   Map<String, dynamic> toJson() {
     return {'exportToImportMap': exportToImportMap.toJson()};
   }
+
+  @override
+  int get hashCode => exportToImportMap.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is GetSupplyChain200ResponseData &&
+        exportToImportMap == other.exportToImportMap;
+  }
 }
