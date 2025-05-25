@@ -10,7 +10,7 @@ class ConstructionMaterial {
   factory ConstructionMaterial.fromJson(Map<String, dynamic> json) {
     return ConstructionMaterial(
       tradeSymbol: TradeSymbol.fromJson(json['tradeSymbol'] as String),
-      required: json['required'] as int,
+      required_: json['required'] as int,
       fulfilled: json['fulfilled'] as int,
     );
   }

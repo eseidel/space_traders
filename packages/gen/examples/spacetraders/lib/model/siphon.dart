@@ -6,7 +6,7 @@ class Siphon {
   factory Siphon.fromJson(Map<String, dynamic> json) {
     return Siphon(
       shipSymbol: json['shipSymbol'] as String,
-      yield: SiphonYield.fromJson(json['yield'] as Map<String, dynamic>),
+      yield_: SiphonYield.fromJson(json['yield'] as Map<String, dynamic>),
     );
   }
 

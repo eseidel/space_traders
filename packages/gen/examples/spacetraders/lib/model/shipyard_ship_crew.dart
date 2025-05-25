@@ -3,7 +3,7 @@ class ShipyardShipCrew {
 
   factory ShipyardShipCrew.fromJson(Map<String, dynamic> json) {
     return ShipyardShipCrew(
-      required: json['required'] as int,
+      required_: json['required'] as int,
       capacity: json['capacity'] as int,
     );
   }

@@ -20,7 +20,7 @@ class {{ typeName }} {
     {{/castFromJsonArg}}
         return {{ typeName }}(
             {{#properties}}
-            {{ jsonName }}: {{{ fromJson }}},
+            {{ dartName }}: {{{ fromJson }}},
             {{/properties}}
             {{#hasAdditionalProperties}}
             {{additionalPropertiesName}}: json.map((key, value) => MapEntry(key, {{{ valueFromJson }}})),

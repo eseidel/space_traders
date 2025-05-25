@@ -13,7 +13,7 @@ class ShipCrew {
   factory ShipCrew.fromJson(Map<String, dynamic> json) {
     return ShipCrew(
       current: json['current'] as int,
-      required: json['required'] as int,
+      required_: json['required'] as int,
       capacity: json['capacity'] as int,
       rotation: ShipCrewRotation.fromJson(json['rotation'] as String),
       morale: json['morale'] as int,

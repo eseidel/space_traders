@@ -6,7 +6,7 @@ class Extraction {
   factory Extraction.fromJson(Map<String, dynamic> json) {
     return Extraction(
       shipSymbol: json['shipSymbol'] as String,
-      yield: ExtractionYield.fromJson(json['yield'] as Map<String, dynamic>),
+      yield_: ExtractionYield.fromJson(json['yield'] as Map<String, dynamic>),
     );
   }
 
