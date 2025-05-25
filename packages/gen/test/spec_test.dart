@@ -101,4 +101,16 @@ void main() {
       expect(refOrOne.hashCode, isNot(refOrThree.hashCode));
     });
   });
+
+  group('JsonPointer', () {
+    test('equality', () {
+      const pointerOne = JsonPointer(['foo', 'bar']);
+      const pointerTwo = JsonPointer(['foo', 'bar']);
+      const pointerThree = JsonPointer(['foo', 'baz']);
+      expect(pointerOne, pointerTwo);
+      expect(pointerOne.hashCode, pointerTwo.hashCode);
+      expect(pointerOne, isNot(pointerThree));
+      expect(pointerOne.hashCode, isNot(pointerThree.hashCode));
+    });
+  });
 }
