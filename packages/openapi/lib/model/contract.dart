@@ -7,10 +7,10 @@ class Contract {
     required this.factionSymbol,
     required this.type,
     required this.terms,
+    required this.accepted,
+    required this.fulfilled,
     required this.expiration,
-    required this.deadlineToAccept,
-    this.accepted = false,
-    this.fulfilled = false,
+    this.deadlineToAccept,
   });
 
   factory Contract.fromJson(dynamic jsonArg) {
@@ -43,7 +43,7 @@ class Contract {
   bool accepted;
   bool fulfilled;
   DateTime expiration;
-  DateTime deadlineToAccept;
+  DateTime? deadlineToAccept;
 
   Map<String, dynamic> toJson() {
     return {
@@ -54,7 +54,7 @@ class Contract {
       'accepted': accepted,
       'fulfilled': fulfilled,
       'expiration': expiration.toIso8601String(),
-      'deadlineToAccept': deadlineToAccept.toIso8601String(),
+      'deadlineToAccept': deadlineToAccept?.toIso8601String(),
     };
   }
 }

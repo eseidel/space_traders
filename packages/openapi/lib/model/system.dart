@@ -4,7 +4,6 @@ import 'package:openapi/model/system_waypoint.dart';
 
 class System {
   System({
-    required this.constellation,
     required this.symbol,
     required this.sectorSymbol,
     required this.type,
@@ -12,7 +11,8 @@ class System {
     required this.y,
     required this.waypoints,
     required this.factions,
-    required this.name,
+    this.constellation,
+    this.name,
   });
 
   factory System.fromJson(dynamic jsonArg) {
@@ -49,7 +49,7 @@ class System {
     return System.fromJson(json);
   }
 
-  String constellation;
+  String? constellation;
   String symbol;
   String sectorSymbol;
   SystemType type;
@@ -57,7 +57,7 @@ class System {
   int y;
   List<SystemWaypoint> waypoints;
   List<SystemFaction> factions;
-  String name;
+  String? name;
 
   Map<String, dynamic> toJson() {
     return {

@@ -2,8 +2,8 @@ class GetMyAccount200ResponseDataAccount {
   GetMyAccount200ResponseDataAccount({
     required this.id,
     required this.email,
-    required this.token,
     required this.createdAt,
+    this.token,
   });
 
   factory GetMyAccount200ResponseDataAccount.fromJson(dynamic jsonArg) {
@@ -29,7 +29,7 @@ class GetMyAccount200ResponseDataAccount {
 
   String id;
   String email;
-  String token;
+  String? token;
   DateTime createdAt;
 
   Map<String, dynamic> toJson() {

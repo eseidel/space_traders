@@ -9,9 +9,9 @@ class MarketTradeGood {
     required this.type,
     required this.tradeVolume,
     required this.supply,
-    required this.activity,
     required this.purchasePrice,
     required this.sellPrice,
+    this.activity,
   });
 
   factory MarketTradeGood.fromJson(dynamic jsonArg) {
@@ -40,7 +40,7 @@ class MarketTradeGood {
   MarketTradeGoodType type;
   int tradeVolume;
   SupplyLevel supply;
-  ActivityLevel activity;
+  ActivityLevel? activity;
   int purchasePrice;
   int sellPrice;
 
@@ -50,7 +50,7 @@ class MarketTradeGood {
       'type': type.toJson(),
       'tradeVolume': tradeVolume,
       'supply': supply.toJson(),
-      'activity': activity.toJson(),
+      'activity': activity?.toJson(),
       'purchasePrice': purchasePrice,
       'sellPrice': sellPrice,
     };

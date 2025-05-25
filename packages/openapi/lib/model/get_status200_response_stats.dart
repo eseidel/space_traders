@@ -1,10 +1,10 @@
 class GetStatus200ResponseStats {
   GetStatus200ResponseStats({
-    required this.accounts,
     required this.agents,
     required this.ships,
     required this.systems,
     required this.waypoints,
+    this.accounts,
   });
 
   factory GetStatus200ResponseStats.fromJson(dynamic jsonArg) {
@@ -27,7 +27,7 @@ class GetStatus200ResponseStats {
     return GetStatus200ResponseStats.fromJson(json);
   }
 
-  int accounts;
+  int? accounts;
   int agents;
   int ships;
   int systems;

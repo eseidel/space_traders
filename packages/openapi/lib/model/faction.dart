@@ -6,9 +6,9 @@ class Faction {
     required this.symbol,
     required this.name,
     required this.description,
-    required this.headquarters,
     required this.traits,
     required this.isRecruiting,
+    this.headquarters,
   });
 
   factory Faction.fromJson(dynamic jsonArg) {
@@ -40,7 +40,7 @@ class Faction {
   FactionSymbol symbol;
   String name;
   String description;
-  String headquarters;
+  String? headquarters;
   List<FactionTrait> traits;
   bool isRecruiting;
 

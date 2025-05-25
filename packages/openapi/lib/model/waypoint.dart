@@ -13,12 +13,12 @@ class Waypoint {
     required this.x,
     required this.y,
     required this.orbitals,
-    required this.orbits,
-    required this.faction,
     required this.traits,
-    required this.modifiers,
-    required this.chart,
     required this.isUnderConstruction,
+    this.orbits,
+    this.faction,
+    this.modifiers,
+    this.chart,
   });
 
   factory Waypoint.fromJson(dynamic jsonArg) {
@@ -71,11 +71,11 @@ class Waypoint {
   int x;
   int y;
   List<WaypointOrbital> orbitals;
-  String orbits;
-  WaypointFaction faction;
+  String? orbits;
+  WaypointFaction? faction;
   List<WaypointTrait> traits;
-  List<WaypointModifier> modifiers;
-  Chart chart;
+  List<WaypointModifier>? modifiers;
+  Chart? chart;
   bool isUnderConstruction;
 
   Map<String, dynamic> toJson() {
@@ -87,10 +87,10 @@ class Waypoint {
       'y': y,
       'orbitals': orbitals.map((e) => e.toJson()).toList(),
       'orbits': orbits,
-      'faction': faction.toJson(),
+      'faction': faction?.toJson(),
       'traits': traits.map((e) => e.toJson()).toList(),
-      'modifiers': modifiers.map((e) => e.toJson()).toList(),
-      'chart': chart.toJson(),
+      'modifiers': modifiers?.map((e) => e.toJson()).toList(),
+      'chart': chart?.toJson(),
       'isUnderConstruction': isUnderConstruction,
     };
   }

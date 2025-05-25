@@ -1,11 +1,7 @@
 import 'package:openapi/model/ship_fuel_consumed.dart';
 
 class ShipFuel {
-  ShipFuel({
-    required this.current,
-    required this.capacity,
-    required this.consumed,
-  });
+  ShipFuel({required this.current, required this.capacity, this.consumed});
 
   factory ShipFuel.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
@@ -29,13 +25,13 @@ class ShipFuel {
 
   int current;
   int capacity;
-  ShipFuelConsumed consumed;
+  ShipFuelConsumed? consumed;
 
   Map<String, dynamic> toJson() {
     return {
       'current': current,
       'capacity': capacity,
-      'consumed': consumed.toJson(),
+      'consumed': consumed?.toJson(),
     };
   }
 }
