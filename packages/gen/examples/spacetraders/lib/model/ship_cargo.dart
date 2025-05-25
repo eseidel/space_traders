@@ -40,4 +40,16 @@ class ShipCargo {
       'inventory': inventory.map((e) => e.toJson()).toList(),
     };
   }
+
+  @override
+  int get hashCode => Object.hash(capacity, units, inventory);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ShipCargo &&
+        capacity == other.capacity &&
+        units == other.units &&
+        listsEqual(inventory, other.inventory);
+  }
 }

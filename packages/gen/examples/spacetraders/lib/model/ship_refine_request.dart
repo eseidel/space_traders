@@ -23,4 +23,13 @@ class ShipRefineRequest {
   Map<String, dynamic> toJson() {
     return {'produce': produce.toJson()};
   }
+
+  @override
+  int get hashCode => produce.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ShipRefineRequest && produce == other.produce;
+  }
 }

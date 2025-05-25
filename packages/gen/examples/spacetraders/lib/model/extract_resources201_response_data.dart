@@ -61,4 +61,19 @@ class ExtractResources201ResponseData {
       'events': events.map((e) => e.toJson()).toList(),
     };
   }
+
+  @override
+  int get hashCode =>
+      Object.hash(extraction, cooldown, cargo, modifiers, events);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ExtractResources201ResponseData &&
+        extraction == other.extraction &&
+        cooldown == other.cooldown &&
+        cargo == other.cargo &&
+        listsEqual(modifiers, other.modifiers) &&
+        listsEqual(events, other.events);
+  }
 }

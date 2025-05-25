@@ -35,4 +35,16 @@ class ShipRegistration {
       'role': role.toJson(),
     };
   }
+
+  @override
+  int get hashCode => Object.hash(name, factionSymbol, role);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ShipRegistration &&
+        name == other.name &&
+        factionSymbol == other.factionSymbol &&
+        role == other.role;
+  }
 }

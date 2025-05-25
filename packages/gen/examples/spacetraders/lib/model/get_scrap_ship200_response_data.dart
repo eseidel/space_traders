@@ -27,4 +27,14 @@ class GetScrapShip200ResponseData {
   Map<String, dynamic> toJson() {
     return {'transaction': transaction.toJson()};
   }
+
+  @override
+  int get hashCode => transaction.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is GetScrapShip200ResponseData &&
+        transaction == other.transaction;
+  }
 }

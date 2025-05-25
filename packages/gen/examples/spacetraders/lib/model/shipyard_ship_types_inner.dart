@@ -23,4 +23,13 @@ class ShipyardShipTypesInner {
   Map<String, dynamic> toJson() {
     return {'type': type.toJson()};
   }
+
+  @override
+  int get hashCode => type.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ShipyardShipTypesInner && type == other.type;
+  }
 }

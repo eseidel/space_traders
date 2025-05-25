@@ -56,4 +56,30 @@ class Contract {
       'deadlineToAccept': deadlineToAccept?.toIso8601String(),
     };
   }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    factionSymbol,
+    type,
+    terms,
+    accepted,
+    fulfilled,
+    expiration,
+    deadlineToAccept,
+  );
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Contract &&
+        id == other.id &&
+        factionSymbol == other.factionSymbol &&
+        type == other.type &&
+        terms == other.terms &&
+        accepted == other.accepted &&
+        fulfilled == other.fulfilled &&
+        expiration == other.expiration &&
+        deadlineToAccept == other.deadlineToAccept;
+  }
 }

@@ -23,4 +23,15 @@ class JumpGate {
   Map<String, dynamic> toJson() {
     return {'symbol': symbol, 'connections': connections};
   }
+
+  @override
+  int get hashCode => Object.hash(symbol, connections);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is JumpGate &&
+        symbol == other.symbol &&
+        listsEqual(connections, other.connections);
+  }
 }

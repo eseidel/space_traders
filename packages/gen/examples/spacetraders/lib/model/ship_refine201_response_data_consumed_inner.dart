@@ -32,4 +32,15 @@ class ShipRefine201ResponseDataConsumedInner {
   Map<String, dynamic> toJson() {
     return {'tradeSymbol': tradeSymbol.toJson(), 'units': units};
   }
+
+  @override
+  int get hashCode => Object.hash(tradeSymbol, units);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ShipRefine201ResponseDataConsumedInner &&
+        tradeSymbol == other.tradeSymbol &&
+        units == other.units;
+  }
 }

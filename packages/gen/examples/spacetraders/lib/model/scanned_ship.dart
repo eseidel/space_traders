@@ -68,4 +68,21 @@ class ScannedShip {
       'mounts': mounts?.map((e) => e.toJson()).toList(),
     };
   }
+
+  @override
+  int get hashCode =>
+      Object.hash(symbol, registration, nav, frame, reactor, engine, mounts);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ScannedShip &&
+        symbol == other.symbol &&
+        registration == other.registration &&
+        nav == other.nav &&
+        frame == other.frame &&
+        reactor == other.reactor &&
+        engine == other.engine &&
+        listsEqual(mounts, other.mounts);
+  }
 }

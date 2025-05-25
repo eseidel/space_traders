@@ -34,4 +34,15 @@ class GetAgents200Response {
       'meta': meta.toJson(),
     };
   }
+
+  @override
+  int get hashCode => Object.hash(data, meta);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is GetAgents200Response &&
+        listsEqual(data, other.data) &&
+        meta == other.meta;
+  }
 }

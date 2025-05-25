@@ -21,4 +21,14 @@ class GetStatus200ResponseHealth {
   Map<String, dynamic> toJson() {
     return {'lastMarketUpdate': lastMarketUpdate};
   }
+
+  @override
+  int get hashCode => lastMarketUpdate.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is GetStatus200ResponseHealth &&
+        lastMarketUpdate == other.lastMarketUpdate;
+  }
 }

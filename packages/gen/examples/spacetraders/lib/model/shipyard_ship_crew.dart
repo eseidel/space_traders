@@ -3,7 +3,7 @@ class ShipyardShipCrew {
 
   factory ShipyardShipCrew.fromJson(Map<String, dynamic> json) {
     return ShipyardShipCrew(
-      required_: json['required'] as int,
+      required: json['required'] as int,
       capacity: json['capacity'] as int,
     );
   }
@@ -21,6 +21,17 @@ class ShipyardShipCrew {
   final int capacity;
 
   Map<String, dynamic> toJson() {
-    return {'required_': required_, 'capacity': capacity};
+    return {'required': required_, 'capacity': capacity};
+  }
+
+  @override
+  int get hashCode => Object.hash(required_, capacity);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ShipyardShipCrew &&
+        required_ == other.required_ &&
+        capacity == other.capacity;
   }
 }

@@ -41,4 +41,15 @@ class CreateShipSystemScan201ResponseData {
       'systems': systems.map((e) => e.toJson()).toList(),
     };
   }
+
+  @override
+  int get hashCode => Object.hash(cooldown, systems);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is CreateShipSystemScan201ResponseData &&
+        cooldown == other.cooldown &&
+        listsEqual(systems, other.systems);
+  }
 }

@@ -93,4 +93,38 @@ class Waypoint {
       'isUnderConstruction': isUnderConstruction,
     };
   }
+
+  @override
+  int get hashCode => Object.hash(
+    symbol,
+    type,
+    systemSymbol,
+    x,
+    y,
+    orbitals,
+    orbits,
+    faction,
+    traits,
+    modifiers,
+    chart,
+    isUnderConstruction,
+  );
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Waypoint &&
+        symbol == other.symbol &&
+        type == other.type &&
+        systemSymbol == other.systemSymbol &&
+        x == other.x &&
+        y == other.y &&
+        listsEqual(orbitals, other.orbitals) &&
+        orbits == other.orbits &&
+        faction == other.faction &&
+        listsEqual(traits, other.traits) &&
+        listsEqual(modifiers, other.modifiers) &&
+        chart == other.chart &&
+        isUnderConstruction == other.isUnderConstruction;
+  }
 }

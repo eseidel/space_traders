@@ -47,4 +47,19 @@ class ScannedSystem {
       'distance': distance,
     };
   }
+
+  @override
+  int get hashCode => Object.hash(symbol, sectorSymbol, type, x, y, distance);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ScannedSystem &&
+        symbol == other.symbol &&
+        sectorSymbol == other.sectorSymbol &&
+        type == other.type &&
+        x == other.x &&
+        y == other.y &&
+        distance == other.distance;
+  }
 }

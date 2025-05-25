@@ -53,4 +53,19 @@ class SystemWaypoint {
       'orbits': orbits,
     };
   }
+
+  @override
+  int get hashCode => Object.hash(symbol, type, x, y, orbitals, orbits);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is SystemWaypoint &&
+        symbol == other.symbol &&
+        type == other.type &&
+        x == other.x &&
+        y == other.y &&
+        listsEqual(orbitals, other.orbitals) &&
+        orbits == other.orbits;
+  }
 }

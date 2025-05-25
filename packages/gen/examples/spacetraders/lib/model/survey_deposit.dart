@@ -23,4 +23,13 @@ class SurveyDeposit {
   Map<String, dynamic> toJson() {
     return {'symbol': symbol.toJson()};
   }
+
+  @override
+  int get hashCode => symbol.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is SurveyDeposit && symbol == other.symbol;
+  }
 }

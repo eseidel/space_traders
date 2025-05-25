@@ -25,4 +25,15 @@ class GetStatus200ResponseLinksInner {
   Map<String, dynamic> toJson() {
     return {'name': name, 'url': url};
   }
+
+  @override
+  int get hashCode => Object.hash(name, url);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is GetStatus200ResponseLinksInner &&
+        name == other.name &&
+        url == other.url;
+  }
 }

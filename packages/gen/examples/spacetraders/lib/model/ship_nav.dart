@@ -45,4 +45,19 @@ class ShipNav {
       'flightMode': flightMode.toJson(),
     };
   }
+
+  @override
+  int get hashCode =>
+      Object.hash(systemSymbol, waypointSymbol, route, status, flightMode);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ShipNav &&
+        systemSymbol == other.systemSymbol &&
+        waypointSymbol == other.waypointSymbol &&
+        route == other.route &&
+        status == other.status &&
+        flightMode == other.flightMode;
+  }
 }

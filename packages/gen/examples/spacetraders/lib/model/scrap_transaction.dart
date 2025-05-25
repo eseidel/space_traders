@@ -37,4 +37,18 @@ class ScrapTransaction {
       'timestamp': timestamp.toIso8601String(),
     };
   }
+
+  @override
+  int get hashCode =>
+      Object.hash(waypointSymbol, shipSymbol, totalPrice, timestamp);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ScrapTransaction &&
+        waypointSymbol == other.waypointSymbol &&
+        shipSymbol == other.shipSymbol &&
+        totalPrice == other.totalPrice &&
+        timestamp == other.timestamp;
+  }
 }

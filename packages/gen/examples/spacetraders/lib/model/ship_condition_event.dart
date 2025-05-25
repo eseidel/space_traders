@@ -42,4 +42,17 @@ class ShipConditionEvent {
       'description': description,
     };
   }
+
+  @override
+  int get hashCode => Object.hash(symbol, component, name, description);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ShipConditionEvent &&
+        symbol == other.symbol &&
+        component == other.component &&
+        name == other.name &&
+        description == other.description;
+  }
 }

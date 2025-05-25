@@ -30,4 +30,14 @@ class GetErrorCodes200Response {
   Map<String, dynamic> toJson() {
     return {'errorCodes': errorCodes.map((e) => e.toJson()).toList()};
   }
+
+  @override
+  int get hashCode => errorCodes.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is GetErrorCodes200Response &&
+        listsEqual(errorCodes, other.errorCodes);
+  }
 }

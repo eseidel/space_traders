@@ -25,4 +25,16 @@ class ShipRequirements {
   Map<String, dynamic> toJson() {
     return {'power': power, 'crew': crew, 'slots': slots};
   }
+
+  @override
+  int get hashCode => Object.hash(power, crew, slots);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ShipRequirements &&
+        power == other.power &&
+        crew == other.crew &&
+        slots == other.slots;
+  }
 }

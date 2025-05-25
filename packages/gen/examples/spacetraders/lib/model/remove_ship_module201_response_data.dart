@@ -51,4 +51,17 @@ class RemoveShipModule201ResponseData {
       'transaction': transaction.toJson(),
     };
   }
+
+  @override
+  int get hashCode => Object.hash(agent, modules, cargo, transaction);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is RemoveShipModule201ResponseData &&
+        agent == other.agent &&
+        listsEqual(modules, other.modules) &&
+        cargo == other.cargo &&
+        transaction == other.transaction;
+  }
 }

@@ -49,4 +49,17 @@ class RemoveMount201ResponseData {
       'transaction': transaction.toJson(),
     };
   }
+
+  @override
+  int get hashCode => Object.hash(agent, mounts, cargo, transaction);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is RemoveMount201ResponseData &&
+        agent == other.agent &&
+        listsEqual(mounts, other.mounts) &&
+        cargo == other.cargo &&
+        transaction == other.transaction;
+  }
 }

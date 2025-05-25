@@ -33,4 +33,16 @@ class ShipFuel {
       'consumed': consumed?.toJson(),
     };
   }
+
+  @override
+  int get hashCode => Object.hash(current, capacity, consumed);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ShipFuel &&
+        current == other.current &&
+        capacity == other.capacity &&
+        consumed == other.consumed;
+  }
 }

@@ -89,4 +89,38 @@ class ShipyardShip {
       'crew': crew.toJson(),
     };
   }
+
+  @override
+  int get hashCode => Object.hash(
+    type,
+    name,
+    description,
+    activity,
+    supply,
+    purchasePrice,
+    frame,
+    reactor,
+    engine,
+    modules,
+    mounts,
+    crew,
+  );
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ShipyardShip &&
+        type == other.type &&
+        name == other.name &&
+        description == other.description &&
+        activity == other.activity &&
+        supply == other.supply &&
+        purchasePrice == other.purchasePrice &&
+        frame == other.frame &&
+        reactor == other.reactor &&
+        engine == other.engine &&
+        listsEqual(modules, other.modules) &&
+        listsEqual(mounts, other.mounts) &&
+        crew == other.crew;
+  }
 }

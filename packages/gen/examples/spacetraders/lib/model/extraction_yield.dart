@@ -25,4 +25,15 @@ class ExtractionYield {
   Map<String, dynamic> toJson() {
     return {'symbol': symbol.toJson(), 'units': units};
   }
+
+  @override
+  int get hashCode => Object.hash(symbol, units);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ExtractionYield &&
+        symbol == other.symbol &&
+        units == other.units;
+  }
 }

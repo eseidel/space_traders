@@ -49,4 +49,17 @@ class SiphonResources201ResponseData {
       'events': events.map((e) => e.toJson()).toList(),
     };
   }
+
+  @override
+  int get hashCode => Object.hash(siphon, cooldown, cargo, events);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is SiphonResources201ResponseData &&
+        siphon == other.siphon &&
+        cooldown == other.cooldown &&
+        cargo == other.cargo &&
+        listsEqual(events, other.events);
+  }
 }

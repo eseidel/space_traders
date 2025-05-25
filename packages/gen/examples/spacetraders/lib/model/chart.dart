@@ -33,4 +33,16 @@ class Chart {
       'submittedOn': submittedOn.toIso8601String(),
     };
   }
+
+  @override
+  int get hashCode => Object.hash(waypointSymbol, submittedBy, submittedOn);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Chart &&
+        waypointSymbol == other.waypointSymbol &&
+        submittedBy == other.submittedBy &&
+        submittedOn == other.submittedOn;
+  }
 }

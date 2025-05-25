@@ -45,4 +45,26 @@ class Agent {
       'shipCount': shipCount,
     };
   }
+
+  @override
+  int get hashCode => Object.hash(
+    accountId,
+    symbol,
+    headquarters,
+    credits,
+    startingFaction,
+    shipCount,
+  );
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Agent &&
+        accountId == other.accountId &&
+        symbol == other.symbol &&
+        headquarters == other.headquarters &&
+        credits == other.credits &&
+        startingFaction == other.startingFaction &&
+        shipCount == other.shipCount;
+  }
 }

@@ -23,4 +23,13 @@ class GetMyShip200Response {
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};
   }
+
+  @override
+  int get hashCode => data.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is GetMyShip200Response && data == other.data;
+  }
 }

@@ -43,4 +43,16 @@ class ContractTerms {
       'deliver': deliver?.map((e) => e.toJson()).toList(),
     };
   }
+
+  @override
+  int get hashCode => Object.hash(deadline, payment, deliver);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ContractTerms &&
+        deadline == other.deadline &&
+        payment == other.payment &&
+        listsEqual(deliver, other.deliver);
+  }
 }

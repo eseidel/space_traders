@@ -40,4 +40,16 @@ class Construction {
       'isComplete': isComplete,
     };
   }
+
+  @override
+  int get hashCode => Object.hash(symbol, materials, isComplete);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Construction &&
+        symbol == other.symbol &&
+        listsEqual(materials, other.materials) &&
+        isComplete == other.isComplete;
+  }
 }

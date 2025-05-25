@@ -43,4 +43,17 @@ class ShipNavRoute {
       'arrival': arrival.toIso8601String(),
     };
   }
+
+  @override
+  int get hashCode => Object.hash(destination, origin, departureTime, arrival);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ShipNavRoute &&
+        destination == other.destination &&
+        origin == other.origin &&
+        departureTime == other.departureTime &&
+        arrival == other.arrival;
+  }
 }

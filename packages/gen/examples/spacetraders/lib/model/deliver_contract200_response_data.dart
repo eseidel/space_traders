@@ -28,4 +28,15 @@ class DeliverContract200ResponseData {
   Map<String, dynamic> toJson() {
     return {'contract': contract.toJson(), 'cargo': cargo.toJson()};
   }
+
+  @override
+  int get hashCode => Object.hash(contract, cargo);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is DeliverContract200ResponseData &&
+        contract == other.contract &&
+        cargo == other.cargo;
+  }
 }

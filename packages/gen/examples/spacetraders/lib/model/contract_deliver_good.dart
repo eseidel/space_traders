@@ -37,4 +37,22 @@ class ContractDeliverGood {
       'unitsFulfilled': unitsFulfilled,
     };
   }
+
+  @override
+  int get hashCode => Object.hash(
+    tradeSymbol,
+    destinationSymbol,
+    unitsRequired,
+    unitsFulfilled,
+  );
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ContractDeliverGood &&
+        tradeSymbol == other.tradeSymbol &&
+        destinationSymbol == other.destinationSymbol &&
+        unitsRequired == other.unitsRequired &&
+        unitsFulfilled == other.unitsFulfilled;
+  }
 }

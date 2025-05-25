@@ -52,4 +52,15 @@ class GetStatus200ResponseLeaderboards {
           mostSubmittedCharts.map((e) => e.toJson()).toList(),
     };
   }
+
+  @override
+  int get hashCode => Object.hash(mostCredits, mostSubmittedCharts);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is GetStatus200ResponseLeaderboards &&
+        listsEqual(mostCredits, other.mostCredits) &&
+        listsEqual(mostSubmittedCharts, other.mostSubmittedCharts);
+  }
 }

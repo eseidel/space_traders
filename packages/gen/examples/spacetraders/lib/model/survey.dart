@@ -49,4 +49,19 @@ class Survey {
       'size': size.toJson(),
     };
   }
+
+  @override
+  int get hashCode =>
+      Object.hash(signature, symbol, deposits, expiration, size);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Survey &&
+        signature == other.signature &&
+        symbol == other.symbol &&
+        listsEqual(deposits, other.deposits) &&
+        expiration == other.expiration &&
+        size == other.size;
+  }
 }

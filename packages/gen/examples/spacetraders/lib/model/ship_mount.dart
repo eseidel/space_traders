@@ -52,4 +52,20 @@ class ShipMount {
       'requirements': requirements.toJson(),
     };
   }
+
+  @override
+  int get hashCode =>
+      Object.hash(symbol, name, description, strength, deposits, requirements);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ShipMount &&
+        symbol == other.symbol &&
+        name == other.name &&
+        description == other.description &&
+        strength == other.strength &&
+        listsEqual(deposits, other.deposits) &&
+        requirements == other.requirements;
+  }
 }

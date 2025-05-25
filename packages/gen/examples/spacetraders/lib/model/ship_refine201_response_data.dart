@@ -56,4 +56,17 @@ class ShipRefine201ResponseData {
       'consumed': consumed.map((e) => e.toJson()).toList(),
     };
   }
+
+  @override
+  int get hashCode => Object.hash(cargo, cooldown, produced, consumed);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ShipRefine201ResponseData &&
+        cargo == other.cargo &&
+        cooldown == other.cooldown &&
+        listsEqual(produced, other.produced) &&
+        listsEqual(consumed, other.consumed);
+  }
 }

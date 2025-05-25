@@ -44,4 +44,17 @@ class RefuelShip200ResponseData {
       'transaction': transaction.toJson(),
     };
   }
+
+  @override
+  int get hashCode => Object.hash(agent, fuel, cargo, transaction);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is RefuelShip200ResponseData &&
+        agent == other.agent &&
+        fuel == other.fuel &&
+        cargo == other.cargo &&
+        transaction == other.transaction;
+  }
 }

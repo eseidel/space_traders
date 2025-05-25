@@ -31,4 +31,15 @@ class GetStatus200ResponseLeaderboardsMostSubmittedChartsInner {
   Map<String, dynamic> toJson() {
     return {'agentSymbol': agentSymbol, 'chartCount': chartCount};
   }
+
+  @override
+  int get hashCode => Object.hash(agentSymbol, chartCount);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is GetStatus200ResponseLeaderboardsMostSubmittedChartsInner &&
+        agentSymbol == other.agentSymbol &&
+        chartCount == other.chartCount;
+  }
 }

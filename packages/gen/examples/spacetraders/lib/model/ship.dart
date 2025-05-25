@@ -93,4 +93,38 @@ class Ship {
       'cooldown': cooldown.toJson(),
     };
   }
+
+  @override
+  int get hashCode => Object.hash(
+    symbol,
+    registration,
+    nav,
+    crew,
+    frame,
+    reactor,
+    engine,
+    modules,
+    mounts,
+    cargo,
+    fuel,
+    cooldown,
+  );
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Ship &&
+        symbol == other.symbol &&
+        registration == other.registration &&
+        nav == other.nav &&
+        crew == other.crew &&
+        frame == other.frame &&
+        reactor == other.reactor &&
+        engine == other.engine &&
+        listsEqual(modules, other.modules) &&
+        listsEqual(mounts, other.mounts) &&
+        cargo == other.cargo &&
+        fuel == other.fuel &&
+        cooldown == other.cooldown;
+  }
 }

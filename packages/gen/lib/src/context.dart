@@ -206,6 +206,22 @@ extension _SchemaGeneration on Schema {
     return typeName.endsWith('?') ? typeName : '$typeName?';
   }
 
+  String equalsExpression(String name, _Context context) {
+    switch (type) {
+      case SchemaType.object:
+        return '$name == other.$name';
+      case SchemaType.array:
+        return 'listsEqual($name, other.$name)';
+      case SchemaType.string:
+      case SchemaType.integer:
+      case SchemaType.number:
+      case SchemaType.boolean:
+        return '$name == other.$name';
+      case SchemaType.unknown:
+        return 'identical($name, other.$name)';
+    }
+  }
+
   /// The toJson expression for this schema.
   String toJsonExpression(
     String name,
@@ -308,13 +324,15 @@ extension _SchemaGeneration on Schema {
     // isNullable means it's optional for the server, use nullable storage.
     final isNullable = !inRequiredList;
     return {
-      'name': dartName,
+      'dartName': dartName,
+      'jsonName': jsonName,
       'useRequired': useRequired,
       'isNullable': isNullable,
       'hasDefaultValue': hasDefaultValue,
       'defaultValue': defaultValueString,
       'type': schema.typeName(context),
       'nullableType': schema.nullableTypeName(context),
+      'equals': schema.equalsExpression(dartName, context),
       'toJson': schema.toJsonExpression(
         dartName,
         context,
@@ -348,10 +366,18 @@ extension _SchemaGeneration on Schema {
     // Force named properties to be rendered if hasAdditionalProperties is true.
     final hasProperties =
         renderProperties.isNotEmpty || hasAdditionalProperties;
+    const isNullable = false;
+    final propertiesCount =
+        renderProperties.length + (hasAdditionalProperties ? 1 : 0);
+    if (propertiesCount == 0) {
+      throw StateError('Object schema has no properties: $this');
+    }
     return {
       'typeName': className,
       'nullableTypeName': nullableTypeName(context),
       'hasProperties': hasProperties,
+      // Special case behavior hashCode with only one property.
+      'hasOneProperty': propertiesCount == 1,
       'properties': renderProperties,
       'hasAdditionalProperties': hasAdditionalProperties,
       'additionalPropertiesName': 'entries', // Matching OpenAPI.
@@ -359,7 +385,7 @@ extension _SchemaGeneration on Schema {
       'valueToJson': valueSchema?.toJsonExpression(
         'value',
         context,
-        isNullable: false,
+        isNullable: isNullable,
       ),
       'valueFromJson': valueSchema?.fromJsonExpression('value', context),
       'fromJsonJsonType': context.fromJsonJsonType,

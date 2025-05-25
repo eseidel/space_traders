@@ -37,4 +37,18 @@ class Cooldown {
       'expiration': expiration?.toIso8601String(),
     };
   }
+
+  @override
+  int get hashCode =>
+      Object.hash(shipSymbol, totalSeconds, remainingSeconds, expiration);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Cooldown &&
+        shipSymbol == other.shipSymbol &&
+        totalSeconds == other.totalSeconds &&
+        remainingSeconds == other.remainingSeconds &&
+        expiration == other.expiration;
+  }
 }
