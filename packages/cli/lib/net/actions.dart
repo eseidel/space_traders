@@ -176,7 +176,7 @@ Future<void> jettisonCargoAndLog(
     ship.symbol.symbol,
     JettisonRequest(symbol: item.tradeSymbol, units: item.units),
   );
-  ship.cargo = response!.data.cargo;
+  ship.cargo = response.data.cargo;
   await db.upsertShip(ship);
 }
 
@@ -313,11 +313,10 @@ bool _shouldRefuelAfterCheckingPrice(
 
 // Hack to prevent miners taking short trips from refueling constantly.
 bool _shouldRefuelBasedOnUsage(Ship ship) {
-  final recentFuelSpend = ship.fuel.consumed?.amount;
+  final recentFuelSpend = ship.fuel.consumed.amount;
   // This is currently 900 * 0.2 = 180 which is medium length trip.
   final twentyPercentTank = ship.fuel.capacity * 0.2;
-  final takingShortTrips =
-      recentFuelSpend != null && recentFuelSpend < twentyPercentTank;
+  final takingShortTrips = recentFuelSpend < twentyPercentTank;
   if (ship.isMiner && takingShortTrips) {
     // If we're a miner, we should only refuel if we're below 50% fuel.
     shipInfo(
@@ -427,7 +426,7 @@ Future<void> dockIfNeeded(Database db, Api api, Ship ship) async {
   if (ship.isOrbiting) {
     shipDetail(ship, '🛬 at ${ship.waypointSymbol}');
     final response = await api.fleet.dockShip(ship.symbol.symbol);
-    ship.nav = response!.data.nav;
+    ship.nav = response.data.nav;
     await db.upsertShip(ship);
   }
 }
@@ -438,7 +437,7 @@ Future<void> undockIfNeeded(Database db, Api api, Ship ship) async {
     // Extra space after emoji is needed for windows powershell.
     shipDetail(ship, '🛰️  at ${ship.waypointSymbol}');
     final response = await api.fleet.orbitShip(ship.symbol.symbol);
-    ship.nav = response!.data.nav;
+    ship.nav = response.data.nav;
     await db.upsertShip(ship);
   }
 }
@@ -476,11 +475,11 @@ void _checkFuelUsage(Ship ship, NavigateShip200ResponseData result) {
   final expectedFuel = ship.usesFuel
       ? fuelUsedByDistance(route.distance, ship.nav.flightMode)
       : 0;
-  final delta = (result.fuel.consumed!.amount - expectedFuel).abs();
+  final delta = (result.fuel.consumed.amount - expectedFuel).abs();
   if (delta > 1) {
     shipWarn(
       ship,
-      'Fuel usage ${result.fuel.consumed!.amount} '
+      'Fuel usage ${result.fuel.consumed.amount} '
       'does not match predicted $expectedFuel '
       'mode: ${ship.nav.flightMode} '
       'distance: ${route.distance}',
@@ -504,7 +503,7 @@ Future<DateTime> navigateToLocalWaypointAndLog(
     waypoint.symbol,
   );
   final flightTime = result.nav.route.duration;
-  final consumedFuel = result.fuel.consumed?.amount ?? 0;
+  final consumedFuel = result.fuel.consumed.amount;
   final fuelString = consumedFuel > 0 ? ' spent $consumedFuel fuel' : '';
   shipInfo(
     ship,
@@ -525,7 +524,7 @@ Future<DateTime> warpToWaypointAndLog(
 ) async {
   final result = await warpToWaypoint(db, api, ship, waypoint.symbol);
   final flightTime = result.nav.route.duration;
-  final consumedFuel = result.fuel.consumed?.amount ?? 0;
+  final consumedFuel = result.fuel.consumed.amount;
   final fuelString = consumedFuel > 0 ? ' spent $consumedFuel fuel' : '';
   shipErr(
     ship,
@@ -542,7 +541,7 @@ Future<DateTime> warpToWaypointAndLog(
 Future<void> chartWaypointAndLog(Api api, Database db, Ship ship) async {
   try {
     final response = await api.fleet.createChart(ship.symbol.symbol);
-    final data = response!.data;
+    final data = response.data;
     final waypoint = Waypoint.fromOpenApi(data.waypoint);
     await db.charting.addWaypoint(waypoint);
     await db.waypointTraits.addAll(waypoint.traits);
@@ -587,7 +586,7 @@ Future<JumpShip200ResponseData> useJumpGateAndLog(
     ship.symbol.symbol,
     JumpShipRequest(waypointSymbol: destination.waypoint),
   );
-  final data = response!.data;
+  final data = response.data;
   ship
     ..nav = data.nav
     ..cooldown = data.cooldown;
@@ -622,7 +621,7 @@ Future<Contract> negotiateContractAndLog(
 ) async {
   await dockIfNeeded(db, api, ship);
   final response = await api.fleet.negotiateContract(ship.symbol.symbol);
-  final contractData = response!.data;
+  final contractData = response.data;
   final contract = Contract.fromOpenApi(
     contractData.contract,
     DateTime.timestamp(),
@@ -640,7 +639,7 @@ Future<AcceptContract200ResponseData> acceptContractAndLog(
   Contract contract,
 ) async {
   final response = await api.contracts.acceptContract(contract.id);
-  final data = response!.data;
+  final data = response.data;
   final agent = Agent.fromOpenApi(data.agent);
   await db.upsertAgent(agent);
   await db.contracts.upsert(
@@ -668,14 +667,14 @@ Future<AcceptContract200ResponseData> acceptContractAndLog(
 }
 
 /// Complete [contract] and log.
-Future<AcceptContract200ResponseData> completeContractAndLog(
+Future<FulfillContract200ResponseData> completeContractAndLog(
   Api api,
   Database db,
   Ship ship,
   Contract contract,
 ) async {
   final response = await api.contracts.fulfillContract(contract.id);
-  final data = response!.data;
+  final data = response.data;
   final agent = Agent.fromOpenApi(data.agent);
   await db.upsertAgent(agent);
   await db.contracts.upsert(
@@ -710,7 +709,7 @@ Future<InstallMount201ResponseData> installMountAndLog(
     ship.symbol.symbol,
     InstallMountRequest(symbol: tradeSymbol.value),
   );
-  final data = response!.data;
+  final data = response.data;
   final agent = Agent.fromOpenApi(data.agent);
   await db.upsertAgent(agent);
   ship
@@ -737,7 +736,7 @@ Future<RemoveMount201ResponseData> removeMountAndLog(
     ship.symbol.symbol,
     RemoveMountRequest(symbol: tradeSymbol.value),
   );
-  final data = response!.data;
+  final data = response.data;
   final agent = Agent.fromOpenApi(data.agent);
   await db.upsertAgent(agent);
   ship
@@ -775,7 +774,7 @@ Future<TransferCargo200ResponseData> transferCargoAndLog(
   // MOUNT_MINING_LASER_II.","code":4219,"data":{"shipSymbol":"ESEIDEL-1",
   // "tradeSymbol":"MOUNT_MINING_LASER_II","cargoUnits":0,"unitsToRemove":1}}}
 
-  final data = response!.data;
+  final data = response.data;
   from.cargo = data.cargo;
   to.cargo = data.targetCargo;
   await db.upsertShip(from);
@@ -813,7 +812,7 @@ Future<CreateSurvey201ResponseData> surveyAndLog(
   DateTime Function() getNow = defaultGetNow,
 }) async {
   final outer = await api.fleet.createSurvey(ship.symbol.symbol);
-  final response = outer!.data;
+  final response = outer.data;
   ship.cooldown = response.cooldown;
   await db.upsertShip(ship);
   final count = response.surveys.length;

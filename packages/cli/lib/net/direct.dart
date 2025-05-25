@@ -22,7 +22,7 @@ Future<PurchaseShip201ResponseData> purchaseShip(
       shipType: shipType,
     ),
   );
-  final data = purchaseResponse!.data;
+  final data = purchaseResponse.data;
   // Add the new ship to our cache.
   await db.upsertShip(Ship.fromOpenApi(data.ship));
   await db.upsertAgent(Agent.fromOpenApi(data.agent));
@@ -37,7 +37,7 @@ Future<ScrapShip200ResponseData> scrapShip(
   ShipSymbol shipSymbol,
 ) async {
   final scrapResponse = await api.fleet.scrapShip(shipSymbol.symbol);
-  final data = scrapResponse!.data;
+  final data = scrapResponse.data;
   // Remove the ship from our cache.
   await db.deleteShip(shipSymbol);
   await db.upsertAgent(Agent.fromOpenApi(data.agent));
@@ -57,7 +57,7 @@ Future<void> setShipFlightMode(
     ship.symbol.symbol,
     patchShipNavRequest: request,
   );
-  final data = response!.data;
+  final data = response.data;
   ship
     ..nav = data.nav
     ..fuel = data.fuel;
@@ -74,7 +74,7 @@ Future<NavigateShip200ResponseData> navigateShip(
 ) async {
   final request = NavigateShipRequest(waypointSymbol: waypointSymbol.waypoint);
   final result = await api.fleet.navigateShip(ship.symbol.symbol, request);
-  final data = result!.data;
+  final data = result.data;
   ship
     ..nav = data.nav
     ..fuel = data.fuel;
@@ -83,15 +83,15 @@ Future<NavigateShip200ResponseData> navigateShip(
 }
 
 /// Navigate [ship] to [waypointSymbol]
-Future<NavigateShip200ResponseData> warpShip(
+Future<WarpShip200ResponseData> warpShip(
   Database db,
   Api api,
   Ship ship,
   WaypointSymbol waypointSymbol,
 ) async {
-  final request = NavigateShipRequest(waypointSymbol: waypointSymbol.waypoint);
+  final request = WarpShipRequest(waypointSymbol: waypointSymbol.waypoint);
   final result = await api.fleet.warpShip(ship.symbol.symbol, request);
-  final data = result!.data;
+  final data = result.data;
   ship
     ..nav = data.nav
     ..fuel = data.fuel;
@@ -107,7 +107,7 @@ Future<SiphonResources201ResponseData> siphonResources(
 ) async {
   final response = await api.fleet.siphonResources(ship.symbol.symbol);
   ship
-    ..cargo = response!.data.cargo
+    ..cargo = response.data.cargo
     ..cooldown = response.data.cooldown;
   await db.upsertShip(ship);
   return response.data;
@@ -122,7 +122,7 @@ Future<ExtractResources201ResponseData> extractResources(
 ) async {
   final response = await api.fleet.extractResources(ship.symbol.symbol);
   ship
-    ..cargo = response!.data.cargo
+    ..cargo = response.data.cargo
     ..cooldown = response.data.cooldown;
   await db.upsertShip(ship);
   return response.data;
@@ -130,7 +130,7 @@ Future<ExtractResources201ResponseData> extractResources(
 
 /// Extract resources from asteroid with [ship]
 /// Uses a survey.
-Future<ExtractResources201ResponseData> extractResourcesWithSurvey(
+Future<ExtractResourcesWithSurvey201ResponseData> extractResourcesWithSurvey(
   Database db,
   Api api,
   Ship ship,
@@ -141,7 +141,7 @@ Future<ExtractResources201ResponseData> extractResourcesWithSurvey(
     survey: survey,
   );
   ship
-    ..cargo = response!.data.cargo
+    ..cargo = response.data.cargo
     ..cooldown = response.data.cooldown;
   await db.upsertShip(ship);
   return response.data;
@@ -162,7 +162,7 @@ Future<DeliverContract200ResponseData> deliverContract(
     units: units,
   );
   final response = await api.contracts.deliverContract(contract.id, request);
-  final data = response!.data;
+  final data = response.data;
   await db.contracts.upsert(
     Contract.fromOpenApi(data.contract, DateTime.timestamp()),
   );
@@ -190,7 +190,7 @@ Future<SupplyConstruction201ResponseData> supplyConstruction(
     construction.waypointSymbol.waypoint,
     request,
   );
-  final data = response!.data;
+  final data = response.data;
   await db.construction.updateConstruction(
     construction.waypointSymbol,
     data.construction,
@@ -201,7 +201,7 @@ Future<SupplyConstruction201ResponseData> supplyConstruction(
 }
 
 /// Sell [units] of [tradeSymbol] to market.
-Future<PurchaseCargo201ResponseData> sellCargo(
+Future<SellCargo201ResponseData> sellCargo(
   Database db,
   Api api,
   Ship ship,
@@ -210,7 +210,7 @@ Future<PurchaseCargo201ResponseData> sellCargo(
 ) async {
   final request = SellCargoRequest(symbol: tradeSymbol, units: units);
   final response = await api.fleet.sellCargo(ship.symbol.symbol, request);
-  final data = response!.data;
+  final data = response.data;
   ship.cargo = data.cargo;
   await db.upsertShip(ship);
   await db.upsertAgent(Agent.fromOpenApi(data.agent));
@@ -229,7 +229,7 @@ Future<PurchaseCargo201ResponseData> purchaseCargo(
 ) async {
   final request = PurchaseCargoRequest(symbol: tradeSymbol, units: units);
   final response = await api.fleet.purchaseCargo(ship.symbol.symbol, request);
-  final data = response!.data;
+  final data = response.data;
   ship.cargo = data.cargo;
   await db.upsertShip(ship);
   await db.upsertAgent(Agent.fromOpenApi(data.agent));
@@ -260,12 +260,10 @@ Future<RefuelShip200ResponseData> refuelShip(
     ship.symbol.symbol,
     refuelShipRequest: request,
   );
-  final data = responseWrapper!.data;
+  final data = responseWrapper.data;
   await db.upsertAgent(Agent.fromOpenApi(data.agent));
   ship.fuel = data.fuel;
-  if (data.cargo != null) {
-    ship.cargo = data.cargo!;
-  }
+  ship.cargo = data.cargo;
   await db.upsertShip(ship);
   return data;
 }
