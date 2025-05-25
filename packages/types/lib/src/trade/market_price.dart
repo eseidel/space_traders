@@ -71,13 +71,13 @@ class MarketPrice extends PriceBase<TradeSymbol> {
   factory MarketPrice.fromJson(Map<String, dynamic> json) {
     return MarketPrice(
       waypointSymbol: WaypointSymbol.fromJson(json['waypointSymbol'] as String),
-      symbol: TradeSymbol.fromJson(json['symbol'] as String)!,
-      supply: SupplyLevel.fromJson(json['supply'] as String)!,
+      symbol: TradeSymbol.fromJson(json['symbol'] as String),
+      supply: SupplyLevel.fromJson(json['supply'] as String),
       purchasePrice: json['purchasePrice'] as int,
       sellPrice: json['sellPrice'] as int,
       tradeVolume: json['tradeVolume'] as int,
       timestamp: DateTime.parse(json['timestamp'] as String),
-      activity: ActivityLevel.fromJson(json['activity'] as String?),
+      activity: ActivityLevel.maybeFromJson(json['activity'] as String?),
     );
   }
 

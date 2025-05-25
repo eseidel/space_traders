@@ -5,11 +5,11 @@ import 'package:openapi/model/trade_good.dart';
 class Market {
   Market({
     required this.symbol,
-    required this.exports,
-    required this.imports,
-    required this.exchange,
-    this.transactions,
-    this.tradeGoods,
+    this.exports = const [],
+    this.imports = const [],
+    this.exchange = const [],
+    this.transactions = const [],
+    this.tradeGoods = const [],
   });
 
   factory Market.fromJson(dynamic jsonArg) {
@@ -62,8 +62,8 @@ class Market {
   List<TradeGood> exports;
   List<TradeGood> imports;
   List<TradeGood> exchange;
-  List<MarketTransaction>? transactions;
-  List<MarketTradeGood>? tradeGoods;
+  List<MarketTransaction> transactions;
+  List<MarketTradeGood> tradeGoods;
 
   Map<String, dynamic> toJson() {
     return {
@@ -71,8 +71,8 @@ class Market {
       'exports': exports.map((e) => e.toJson()).toList(),
       'imports': imports.map((e) => e.toJson()).toList(),
       'exchange': exchange.map((e) => e.toJson()).toList(),
-      'transactions': transactions?.map((e) => e.toJson()).toList(),
-      'tradeGoods': tradeGoods?.map((e) => e.toJson()).toList(),
+      'transactions': transactions.map((e) => e.toJson()).toList(),
+      'tradeGoods': tradeGoods.map((e) => e.toJson()).toList(),
     };
   }
 }

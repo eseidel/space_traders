@@ -2,7 +2,7 @@ import 'package:openapi/model/meta.dart';
 import 'package:openapi/model/system.dart';
 
 class GetSystems200Response {
-  GetSystems200Response({required this.data, required this.meta});
+  GetSystems200Response({required this.meta, this.data = const []});
 
   factory GetSystems200Response.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;

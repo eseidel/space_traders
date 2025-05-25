@@ -29,6 +29,7 @@ dart run space_gen
 * Generate tests. https://github.com/eseidel/space_gen/issues/1
 * Handle min/max in newtype types.
 * Wire up Authentication and sending of bearer header.
+* GetSupplyChain200ResponseDataExportToImportMap is unnecessary?
 
 ## Advantages over Open API Generator 7.0.0
 * Dart 3.0+ only (sound null safety)

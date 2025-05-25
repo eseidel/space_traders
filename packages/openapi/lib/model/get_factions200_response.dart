@@ -2,7 +2,7 @@ import 'package:openapi/model/faction.dart';
 import 'package:openapi/model/meta.dart';
 
 class GetFactions200Response {
-  GetFactions200Response({required this.data, required this.meta});
+  GetFactions200Response({required this.meta, this.data = const []});
 
   factory GetFactions200Response.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;

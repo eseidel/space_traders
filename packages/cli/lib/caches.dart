@@ -241,9 +241,9 @@ Future<TradeExportSnapshot> fetchExports(Database db, DataApi dataApi) async {
   // Build the old-style TradeExport list from the response.
   // The server's new API covers things other than TradeSymbols.
   final exports = <TradeExport>[];
-  for (final entry in response.data.exportToImportMap.entries) {
+  for (final entry in response.data.exportToImportMap.entries.entries) {
     final export = TradeSymbol.fromJson(entry.key);
-    final imports = entry.value.map((i) => TradeSymbol.fromJson(i));
+    final imports = entry.value.map(TradeSymbol.fromJson);
     exports.add(TradeExport(export: export, imports: imports.toList()));
   }
   for (final export in exports) {

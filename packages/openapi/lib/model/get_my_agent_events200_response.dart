@@ -1,7 +1,7 @@
 import 'package:openapi/model/agent_event.dart';
 
 class GetMyAgentEvents200Response {
-  GetMyAgentEvents200Response({required this.data});
+  GetMyAgentEvents200Response({this.data = const []});
 
   factory GetMyAgentEvents200Response.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;

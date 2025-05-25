@@ -2,7 +2,7 @@ import 'package:openapi/model/meta.dart';
 import 'package:openapi/model/ship.dart';
 
 class GetMyShips200Response {
-  GetMyShips200Response({required this.data, required this.meta});
+  GetMyShips200Response({required this.meta, this.data = const []});
 
   factory GetMyShips200Response.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;

@@ -58,7 +58,6 @@ extension ShipTypeToFrame on ShipyardShipSnapshot {
         shipSymbol: symbolString,
         remainingSeconds: 0,
         totalSeconds: 0,
-        expiration: arrival,
       ),
       nav: _makeShipNav(origin: waypoint, now: arrival),
       crew: ShipCrew(
@@ -71,15 +70,10 @@ extension ShipTypeToFrame on ShipyardShipSnapshot {
       frame: shipyardShip.frame,
       reactor: shipyardShip.reactor,
       engine: shipyardShip.engine,
-      cargo: ShipCargo(
-        capacity: shipyardShip.cargoCapacity,
-        units: 0,
-        inventory: [],
-      ),
+      cargo: ShipCargo(capacity: shipyardShip.cargoCapacity, units: 0),
       fuel: ShipFuel(
         current: shipyardShip.frame.fuelCapacity,
         capacity: shipyardShip.frame.fuelCapacity,
-        consumed: ShipFuelConsumed(amount: 0, timestamp: arrival),
       ),
       modules: shipyardShip.modules,
       mounts: shipyardShip.mounts,
@@ -162,5 +156,6 @@ ShipNav _makeShipNav({required SystemWaypoint origin, required DateTime now}) {
       departureTime: now,
     ),
     status: ShipNavStatus.DOCKED,
+    flightMode: ShipNavFlightMode.CRUISE,
   );
 }

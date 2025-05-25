@@ -10,22 +10,23 @@ extension ShipUpdateUtils on Ship {
   /// Updates the ship's cooldown and nav for the provided [now].
   void updateForServerTime(DateTime now) {
     final expiration = cooldown.expiration;
-    if (expiration.isBefore(now)) {
-      cooldown = Cooldown(
-        shipSymbol: cooldown.shipSymbol,
-        remainingSeconds: 0,
-        totalSeconds: 0,
-        expiration: expiration,
-      );
-    } else {
-      cooldown = Cooldown(
-        shipSymbol: cooldown.shipSymbol,
-        // The server seems to round rather than floor?
-        remainingSeconds: (expiration.difference(now).inMilliseconds / 1000)
-            .round(),
-        totalSeconds: cooldown.totalSeconds,
-        expiration: expiration,
-      );
+    if (expiration != null) {
+      if (expiration.isBefore(now)) {
+        cooldown = Cooldown(
+          shipSymbol: cooldown.shipSymbol,
+          remainingSeconds: 0,
+          totalSeconds: 0,
+        );
+      } else {
+        cooldown = Cooldown(
+          shipSymbol: cooldown.shipSymbol,
+          // The server seems to round rather than floor?
+          remainingSeconds: (expiration.difference(now).inMilliseconds / 1000)
+              .round(),
+          totalSeconds: cooldown.totalSeconds,
+          expiration: expiration,
+        );
+      }
     }
     if (isInTransit && nav.route.arrival.isBefore(now)) {
       nav.status = ShipNavStatus.IN_ORBIT;

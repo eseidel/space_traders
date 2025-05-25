@@ -313,10 +313,11 @@ bool _shouldRefuelAfterCheckingPrice(
 
 // Hack to prevent miners taking short trips from refueling constantly.
 bool _shouldRefuelBasedOnUsage(Ship ship) {
-  final recentFuelSpend = ship.fuel.consumed.amount;
+  final recentFuelSpend = ship.fuel.consumed?.amount;
   // This is currently 900 * 0.2 = 180 which is medium length trip.
   final twentyPercentTank = ship.fuel.capacity * 0.2;
-  final takingShortTrips = recentFuelSpend < twentyPercentTank;
+  final takingShortTrips =
+      recentFuelSpend != null && recentFuelSpend < twentyPercentTank;
   if (ship.isMiner && takingShortTrips) {
     // If we're a miner, we should only refuel if we're below 50% fuel.
     shipInfo(
@@ -475,11 +476,11 @@ void _checkFuelUsage(Ship ship, NavigateShip200ResponseData result) {
   final expectedFuel = ship.usesFuel
       ? fuelUsedByDistance(route.distance, ship.nav.flightMode)
       : 0;
-  final delta = (result.fuel.consumed.amount - expectedFuel).abs();
+  final delta = (result.fuel.consumed!.amount - expectedFuel).abs();
   if (delta > 1) {
     shipWarn(
       ship,
-      'Fuel usage ${result.fuel.consumed.amount} '
+      'Fuel usage ${result.fuel.consumed!.amount} '
       'does not match predicted $expectedFuel '
       'mode: ${ship.nav.flightMode} '
       'distance: ${route.distance}',
@@ -503,7 +504,7 @@ Future<DateTime> navigateToLocalWaypointAndLog(
     waypoint.symbol,
   );
   final flightTime = result.nav.route.duration;
-  final consumedFuel = result.fuel.consumed.amount;
+  final consumedFuel = result.fuel.consumed?.amount ?? 0;
   final fuelString = consumedFuel > 0 ? ' spent $consumedFuel fuel' : '';
   shipInfo(
     ship,
@@ -524,7 +525,7 @@ Future<DateTime> warpToWaypointAndLog(
 ) async {
   final result = await warpToWaypoint(db, api, ship, waypoint.symbol);
   final flightTime = result.nav.route.duration;
-  final consumedFuel = result.fuel.consumed.amount;
+  final consumedFuel = result.fuel.consumed?.amount ?? 0;
   final fuelString = consumedFuel > 0 ? ' spent $consumedFuel fuel' : '';
   shipErr(
     ship,

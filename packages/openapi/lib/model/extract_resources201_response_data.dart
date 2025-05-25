@@ -9,8 +9,8 @@ class ExtractResources201ResponseData {
     required this.extraction,
     required this.cooldown,
     required this.cargo,
-    required this.events,
-    this.modifiers,
+    this.modifiers = const [],
+    this.events = const [],
   });
 
   factory ExtractResources201ResponseData.fromJson(dynamic jsonArg) {
@@ -50,7 +50,7 @@ class ExtractResources201ResponseData {
   Extraction extraction;
   Cooldown cooldown;
   ShipCargo cargo;
-  List<WaypointModifier>? modifiers;
+  List<WaypointModifier> modifiers;
   List<ShipConditionEvent> events;
 
   Map<String, dynamic> toJson() {
@@ -58,7 +58,7 @@ class ExtractResources201ResponseData {
       'extraction': extraction.toJson(),
       'cooldown': cooldown.toJson(),
       'cargo': cargo.toJson(),
-      'modifiers': modifiers?.map((e) => e.toJson()).toList(),
+      'modifiers': modifiers.map((e) => e.toJson()).toList(),
       'events': events.map((e) => e.toJson()).toList(),
     };
   }

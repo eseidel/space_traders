@@ -4,7 +4,7 @@ import 'package:openapi/model/scanned_ship.dart';
 class CreateShipShipScan201ResponseData {
   CreateShipShipScan201ResponseData({
     required this.cooldown,
-    required this.ships,
+    this.ships = const [],
   });
 
   factory CreateShipShipScan201ResponseData.fromJson(dynamic jsonArg) {

@@ -6,9 +6,9 @@ import 'package:openapi/model/ship_module.dart';
 class InstallShipModule201ResponseData {
   InstallShipModule201ResponseData({
     required this.agent,
-    required this.modules,
     required this.cargo,
     required this.transaction,
+    this.modules = const [],
   });
 
   factory InstallShipModule201ResponseData.fromJson(dynamic jsonArg) {

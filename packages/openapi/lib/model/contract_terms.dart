@@ -2,7 +2,11 @@ import 'package:openapi/model/contract_deliver_good.dart';
 import 'package:openapi/model/contract_payment.dart';
 
 class ContractTerms {
-  ContractTerms({required this.deadline, required this.payment, this.deliver});
+  ContractTerms({
+    required this.deadline,
+    required this.payment,
+    this.deliver = const [],
+  });
 
   factory ContractTerms.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
@@ -31,13 +35,13 @@ class ContractTerms {
 
   DateTime deadline;
   ContractPayment payment;
-  List<ContractDeliverGood>? deliver;
+  List<ContractDeliverGood> deliver;
 
   Map<String, dynamic> toJson() {
     return {
       'deadline': deadline.toIso8601String(),
       'payment': payment.toJson(),
-      'deliver': deliver?.map((e) => e.toJson()).toList(),
+      'deliver': deliver.map((e) => e.toJson()).toList(),
     };
   }
 }

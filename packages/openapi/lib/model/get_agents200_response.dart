@@ -2,7 +2,7 @@ import 'package:openapi/model/meta.dart';
 import 'package:openapi/model/public_agent.dart';
 
 class GetAgents200Response {
-  GetAgents200Response({required this.data, required this.meta});
+  GetAgents200Response({required this.meta, this.data = const []});
 
   factory GetAgents200Response.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;

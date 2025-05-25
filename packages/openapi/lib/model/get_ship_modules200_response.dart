@@ -1,7 +1,7 @@
 import 'package:openapi/model/ship_module.dart';
 
 class GetShipModules200Response {
-  GetShipModules200Response({required this.data});
+  GetShipModules200Response({this.data = const []});
 
   factory GetShipModules200Response.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;

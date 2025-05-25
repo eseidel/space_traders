@@ -1033,13 +1033,11 @@ int _minimumFloatRequired(Contract contract) {
     contract.type == ContractType.PROCUREMENT,
     'Only procurement contracts are supported',
   );
-  final deliver = contract.terms.deliver;
-  assert(deliver != null, 'Contract terms should have deliver');
   assert(
-    deliver!.length == 1,
+    contract.terms.deliver.length == 1,
     'Only contracts with a single deliver good are supported',
   );
-  final good = deliver!.first;
+  final good = contract.terms.deliver.first;
   // MaxUnitPrice is the max we'd pay, which isn't the max they're likely to
   // cost.  We could instead use median price of the good in question.
   final maxUnitPrice = _maxContractUnitPurchasePrice(contract, good);

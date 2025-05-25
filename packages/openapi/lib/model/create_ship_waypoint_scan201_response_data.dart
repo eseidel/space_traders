@@ -4,7 +4,7 @@ import 'package:openapi/model/scanned_waypoint.dart';
 class CreateShipWaypointScan201ResponseData {
   CreateShipWaypointScan201ResponseData({
     required this.cooldown,
-    required this.waypoints,
+    this.waypoints = const [],
   });
 
   factory CreateShipWaypointScan201ResponseData.fromJson(dynamic jsonArg) {

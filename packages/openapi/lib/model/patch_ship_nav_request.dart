@@ -19,9 +19,9 @@ class PatchShipNavRequest {
     return PatchShipNavRequest.fromJson(json);
   }
 
-  ShipNavFlightMode? flightMode;
+  ShipNavFlightMode flightMode;
 
   Map<String, dynamic> toJson() {
-    return {'flightMode': flightMode?.toJson()};
+    return {'flightMode': flightMode.toJson()};
   }
 }

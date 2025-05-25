@@ -94,7 +94,7 @@ void main() {
     when(() => api.fleet).thenReturn(fleetApi);
     final shipNav = _MockShipNav();
     final fuel = ShipFuel(current: 100, capacity: 200);
-    final responseData = NavigateShip200ResponseData(nav: shipNav, fuel: fuel);
+    final responseData = PatchShipNav200ResponseData(nav: shipNav, fuel: fuel);
     final ship = _MockShip();
     final shipSymbol = ShipSymbol.fromString('S-1');
     when(() => ship.symbol).thenReturn(shipSymbol);
@@ -192,11 +192,7 @@ void main() {
     final systemsSnapshot = SystemsSnapshot([]);
 
     final patchResponse = PatchShipNav200Response(
-      data: PatchShipNav200ResponseData(
-        nav: shipNav,
-        fuel: shipFuel,
-        events: [],
-      ),
+      data: PatchShipNav200ResponseData(nav: shipNav, fuel: shipFuel),
     );
 
     when(
@@ -288,9 +284,9 @@ void main() {
       (_) => Future.value(
         TransferCargo200Response(
           data: TransferCargo200ResponseData(
-            cargo: ShipCargo(capacity: 100, units: 0, inventory: []),
+            cargo: ShipCargo(capacity: 100, units: 0),
             // Hack to give same cargo for both ships.
-            targetCargo: ShipCargo(capacity: 100, units: 0, inventory: []),
+            targetCargo: ShipCargo(capacity: 100, units: 0),
           ),
         ),
       ),
@@ -345,7 +341,6 @@ void main() {
       data: PatchShipNav200ResponseData(
         nav: shipNav,
         fuel: ShipFuel(current: 0, capacity: 0),
-        events: [],
       ),
     );
 
@@ -638,7 +633,7 @@ void main() {
         SellCargo201Response(
           data: SellCargo201ResponseData(
             agent: agent.toOpenApi(),
-            cargo: ShipCargo(capacity: 10, units: 0, inventory: []),
+            cargo: ShipCargo(capacity: 10, units: 0),
             transaction: MarketTransaction(
               waypointSymbol: 'S-A-W',
               shipSymbol: shipSymbol.symbol,
@@ -733,7 +728,7 @@ void main() {
       (invocation) => Future.value(
         Jettison200Response(
           data: Jettison200ResponseData(
-            cargo: ShipCargo(capacity: 10, units: 0, inventory: []),
+            cargo: ShipCargo(capacity: 10, units: 0),
           ),
         ),
       ),
@@ -1093,7 +1088,7 @@ void main() {
       );
     });
     final agent = Agent.test(credits: 10000000);
-    final cargo = ShipCargo(capacity: 100, units: 0, inventory: []);
+    final cargo = ShipCargo(capacity: 100, units: 0);
     final transaction = MarketTransaction(
       waypointSymbol: waypointSymbol.waypoint,
       shipSymbol: shipSymbol.symbol,
@@ -1182,16 +1177,13 @@ void main() {
     when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
     final logger = _MockLogger();
 
-    final request = NavigateShipRequest(
-      waypointSymbol: waypointSymbol.waypoint,
-    );
+    final request = WarpShipRequest(waypointSymbol: waypointSymbol.waypoint);
 
     when(() => fleetApi.warpShip(any(), request)).thenAnswer((_) async {
       return WarpShip200Response(
         data: WarpShip200ResponseData(
           fuel: ShipFuel(current: 0, capacity: 0),
           nav: _MockShipNav(),
-          events: [],
         ),
       );
     });

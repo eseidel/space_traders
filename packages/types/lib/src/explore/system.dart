@@ -32,7 +32,7 @@ class SystemWaypoint extends Equatable {
 
   /// Creates a new [SystemWaypoint] from JSON.
   factory SystemWaypoint.fromJson(Map<String, dynamic> json) {
-    final openapiWaypoint = openapi.SystemWaypoint.fromJson(json)!;
+    final openapiWaypoint = openapi.SystemWaypoint.fromJson(json);
     return SystemWaypoint.fromOpenApi(openapiWaypoint);
   }
 
@@ -186,7 +186,7 @@ class System extends Equatable {
 
   /// Create a new [System] from JSON.
   factory System.fromJson(Map<String, dynamic> json) {
-    final openapiSystem = openapi.System.fromJson(json)!;
+    final openapiSystem = openapi.System.fromJson(json);
     return System.fromOpenApi(openapiSystem);
   }
 
@@ -317,7 +317,7 @@ class Waypoint {
 
   /// Create a new [Waypoint] from JSON.
   factory Waypoint.fromJson(Map<String, dynamic> json) {
-    final openapiWaypoint = openapi.Waypoint.fromJson(json)!;
+    final openapiWaypoint = openapi.Waypoint.fromJson(json);
     return Waypoint.fromOpenApi(openapiWaypoint);
   }
 

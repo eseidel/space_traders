@@ -166,7 +166,7 @@ Future<void> cliMain(List<String> args) async {
   final centralCommand = CentralCommand();
 
   final status = await api.defaultApi.getStatus();
-  printStatus(status!);
+  printStatus(status);
 
   // Handle ctrl-c and print out request stats.
   // This should be made an argument rather than on by default.

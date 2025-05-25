@@ -13,7 +13,7 @@ class ScannedShip {
     required this.engine,
     this.frame,
     this.reactor,
-    this.mounts,
+    this.mounts = const [],
   });
 
   factory ScannedShip.fromJson(dynamic jsonArg) {
@@ -56,7 +56,7 @@ class ScannedShip {
   ScannedShipFrame? frame;
   ScannedShipReactor? reactor;
   ScannedShipEngine engine;
-  List<ScannedShipMountsInner>? mounts;
+  List<ScannedShipMountsInner> mounts;
 
   Map<String, dynamic> toJson() {
     return {
@@ -66,7 +66,7 @@ class ScannedShip {
       'frame': frame?.toJson(),
       'reactor': reactor?.toJson(),
       'engine': engine.toJson(),
-      'mounts': mounts?.map((e) => e.toJson()).toList(),
+      'mounts': mounts.map((e) => e.toJson()).toList(),
     };
   }
 }

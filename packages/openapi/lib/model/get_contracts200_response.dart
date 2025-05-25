@@ -2,7 +2,7 @@ import 'package:openapi/model/contract.dart';
 import 'package:openapi/model/meta.dart';
 
 class GetContracts200Response {
-  GetContracts200Response({required this.data, required this.meta});
+  GetContracts200Response({required this.meta, this.data = const []});
 
   factory GetContracts200Response.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;

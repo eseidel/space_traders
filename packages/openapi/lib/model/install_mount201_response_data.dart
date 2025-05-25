@@ -6,9 +6,9 @@ import 'package:openapi/model/ship_mount.dart';
 class InstallMount201ResponseData {
   InstallMount201ResponseData({
     required this.agent,
-    required this.mounts,
     required this.cargo,
     required this.transaction,
+    this.mounts = const [],
   });
 
   factory InstallMount201ResponseData.fromJson(dynamic jsonArg) {

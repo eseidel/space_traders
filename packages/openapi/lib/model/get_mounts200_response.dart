@@ -1,7 +1,7 @@
 import 'package:openapi/model/ship_mount.dart';
 
 class GetMounts200Response {
-  GetMounts200Response({required this.data});
+  GetMounts200Response({this.data = const []});
 
   factory GetMounts200Response.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;

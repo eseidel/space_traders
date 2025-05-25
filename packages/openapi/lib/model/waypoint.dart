@@ -12,12 +12,12 @@ class Waypoint {
     required this.systemSymbol,
     required this.x,
     required this.y,
-    required this.orbitals,
-    required this.traits,
     required this.isUnderConstruction,
+    this.orbitals = const [],
     this.orbits,
     this.faction,
-    this.modifiers,
+    this.traits = const [],
+    this.modifiers = const [],
     this.chart,
   });
 
@@ -74,7 +74,7 @@ class Waypoint {
   String? orbits;
   WaypointFaction? faction;
   List<WaypointTrait> traits;
-  List<WaypointModifier>? modifiers;
+  List<WaypointModifier> modifiers;
   Chart? chart;
   bool isUnderConstruction;
 
@@ -89,7 +89,7 @@ class Waypoint {
       'orbits': orbits,
       'faction': faction?.toJson(),
       'traits': traits.map((e) => e.toJson()).toList(),
-      'modifiers': modifiers?.map((e) => e.toJson()).toList(),
+      'modifiers': modifiers.map((e) => e.toJson()).toList(),
       'chart': chart?.toJson(),
       'isUnderConstruction': isUnderConstruction,
     };

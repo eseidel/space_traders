@@ -7,9 +7,9 @@ class Contract {
     required this.factionSymbol,
     required this.type,
     required this.terms,
-    required this.accepted,
-    required this.fulfilled,
     required this.expiration,
+    this.accepted = false,
+    this.fulfilled = false,
     this.deadlineToAccept,
   });
 

@@ -452,7 +452,7 @@ void main() {
     when(() => fleetApi.sellCargo(shipSymbol.symbol, any())).thenAnswer(
       (_) => Future.value(
         SellCargo201Response(
-          data: PurchaseCargo201ResponseData(
+          data: SellCargo201ResponseData(
             agent: agent.toOpenApi(),
             cargo: shipCargo,
             transaction: MarketTransaction(
@@ -472,7 +472,7 @@ void main() {
     when(() => fleetApi.orbitShip(shipSymbol.symbol)).thenAnswer(
       (_) => Future.value(
         OrbitShip200Response(
-          data: DockShip200ResponseData(
+          data: OrbitShip200ResponseData(
             nav: shipNav..status = ShipNavStatus.IN_ORBIT,
           ),
         ),
@@ -715,7 +715,7 @@ void main() {
 
     when(() => fleetApi.orbitShip(shipSymbol.symbol)).thenAnswer(
       (_) async =>
-          OrbitShip200Response(data: DockShip200ResponseData(nav: shipNav)),
+          OrbitShip200Response(data: OrbitShip200ResponseData(nav: shipNav)),
     );
     when(
       () => fleetApi.navigateShip(
@@ -943,7 +943,7 @@ void main() {
     when(() => fleetApi.orbitShip(shipSymbol.symbol)).thenAnswer(
       (_) => Future.value(
         OrbitShip200Response(
-          data: DockShip200ResponseData(
+          data: OrbitShip200ResponseData(
             nav: shipNav..status = ShipNavStatus.IN_ORBIT,
           ),
         ),

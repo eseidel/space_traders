@@ -306,7 +306,7 @@ extension _SchemaGeneration on Schema {
     // useRequired means "use the required constructor parameter"
     final useRequired = inRequiredList && !hasDefaultValue;
     // isNullable means it's optional for the server, use nullable storage.
-    final isNullable = !inRequiredList;
+    final isNullable = !inRequiredList && !hasDefaultValue;
     return {
       'name': dartName,
       'useRequired': useRequired,

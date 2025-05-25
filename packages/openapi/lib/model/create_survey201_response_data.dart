@@ -2,7 +2,10 @@ import 'package:openapi/model/cooldown.dart';
 import 'package:openapi/model/survey.dart';
 
 class CreateSurvey201ResponseData {
-  CreateSurvey201ResponseData({required this.cooldown, required this.surveys});
+  CreateSurvey201ResponseData({
+    required this.cooldown,
+    this.surveys = const [],
+  });
 
   factory CreateSurvey201ResponseData.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
