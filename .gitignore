@@ -33,3 +33,6 @@ config.yaml
 
 # Where postgres data is stored.
 /db_data
+
+# SQL dump of the database.
+spacetraders.sql
