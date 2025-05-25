@@ -42,7 +42,8 @@ enum SendIn {
 
 /// A parameter is a parameter to an endpoint.
 /// https://spec.openapis.org/oas/v3.0.0#parameter-object
-class Parameter {
+@immutable
+class Parameter extends Equatable {
   /// Create a new parameter.
   const Parameter({
     required this.name,
@@ -123,6 +124,9 @@ class Parameter {
 
   /// The type of the parameter.
   final SchemaRef type;
+
+  @override
+  List<Object?> get props => [name, description, isRequired, sendIn, type];
 }
 
 /// A type of schema.
@@ -194,7 +198,8 @@ class SchemaRef extends RefOr<Schema> {
 
 /// A schema is a json object that describes the shape of a json object.
 /// https://spec.openapis.org/oas/v3.0.0#schemaObject
-class Schema {
+@immutable
+class Schema extends Equatable {
   /// Create a new schema.
   Schema({
     required this.pointer,
@@ -328,6 +333,22 @@ class Schema {
   final bool useNewType;
 
   @override
+  List<Object?> get props => [
+    pointer,
+    snakeName,
+    type,
+    properties,
+    required,
+    description,
+    items,
+    enumValues,
+    format,
+    additionalProperties,
+    defaultValue,
+    useNewType,
+  ];
+
+  @override
   String toString() {
     return 'Schema(name: $snakeName, pointer: $pointer, type: $type, '
         'description: $description, useNewType: $useNewType)';
@@ -437,7 +458,8 @@ enum Method {
 /// Request body is sorta a schema, but it's a bit different.
 /// https://spec.openapis.org/oas/v3.0.0#requestBodyObject
 /// Notably "required" is a boolean, not a list of strings.
-class RequestBody {
+@immutable
+class RequestBody extends Equatable {
   const RequestBody({
     required this.pointer,
     required this.isRequired,
@@ -471,12 +493,16 @@ class RequestBody {
 
   /// The schema of the application/json content.
   final SchemaRef schema;
+
+  @override
+  List<Object?> get props => [pointer, isRequired, schema];
 }
 
 /// An endpoint is a path with a method.
 /// Spec splits this into a "path item" and a "operation" object.
 /// https://spec.openapis.org/oas/v3.0.0#path-item-object
-class Endpoint {
+@immutable
+class Endpoint extends Equatable {
   /// Create a new endpoint.
   const Endpoint({
     required this.path,
@@ -561,11 +587,23 @@ class Endpoint {
 
   /// The request body of this endpoint.
   final RefOr<RequestBody>? requestBody;
+
+  @override
+  List<Object?> get props => [
+    path,
+    method,
+    tag,
+    responses,
+    snakeName,
+    parameters,
+    requestBody,
+  ];
 }
 
 /// A response from an endpoint.
 /// https://spec.openapis.org/oas/v3.1.0#response-object
-class Response {
+@immutable
+class Response extends Equatable {
   /// Create a new response.
   const Response({required this.code, required this.content});
 
@@ -575,6 +613,9 @@ class Response {
   /// The content of this response.
   /// The official spec has a map here by mime type, but we only support json.
   final SchemaRef content;
+
+  @override
+  List<Object?> get props => [code, content];
 }
 
 List<Response> parseResponses(Json? json, ParseContext parentContext) {
@@ -611,7 +652,8 @@ List<Response> parseResponses(Json? json, ParseContext parentContext) {
   ];
 }
 
-class Components {
+@immutable
+class Components extends Equatable {
   const Components({required this.schemas, required this.requestBodies});
 
   final Map<String, Schema> schemas;
@@ -623,6 +665,9 @@ class Components {
   // final Map<String, Example> examples;
   // final Map<String, Link> links;
   // final Map<String, Callback> callbacks;
+
+  @override
+  List<Object?> get props => [schemas, requestBodies];
 }
 
 Components parseComponents(Json? json, ParseContext context) {
@@ -725,8 +770,10 @@ void _error(Json json, String message) {
 
 // Spec calls this the "OpenAPI Object"
 // https://spec.openapis.org/oas/v3.1.0#openapi-object
-class Spec {
-  Spec(this.serverUrl, this.endpoints, this.components);
+
+@immutable
+class Spec extends Equatable {
+  const Spec(this.serverUrl, this.endpoints, this.components);
 
   factory Spec.parse(Json json, ParseContext context) {
     final servers = _required<List<dynamic>>(json, 'servers');
@@ -767,6 +814,9 @@ class Spec {
   final Components components;
 
   List<String> get tags => endpoints.map((e) => e.tag).toSet().sorted();
+
+  @override
+  List<Object?> get props => [serverUrl, endpoints, components];
 }
 
 class RefRegistry {
@@ -818,9 +868,10 @@ class RefRegistry {
 /// Json pointer is a string that can be used to reference a value in a json
 /// object.
 /// https://spec.openapis.org/oas/v3.1.0#json-pointer
-class JsonPointer {
+@immutable
+class JsonPointer extends Equatable {
   /// Create a new JsonPointer from a list of parts.
-  JsonPointer(this.parts);
+  const JsonPointer(this.parts);
 
   /// The parts of the json pointer.
   final List<String> parts;
@@ -834,6 +885,9 @@ class JsonPointer {
 
   @override
   String toString() => location;
+
+  @override
+  List<Object?> get props => [parts];
 }
 
 /// Immutable context for parsing a spec.
