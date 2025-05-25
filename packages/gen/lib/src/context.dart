@@ -288,23 +288,37 @@ extension _SchemaGeneration on Schema {
     required String jsonName,
     required Schema schema,
     required _Context context,
-    required bool required,
+    required bool inRequiredList,
   }) {
     // TODO(eseidel): Remove this once we've migrated to the new generator.
     final dartName = avoidReservedWord(jsonName);
+
+    // Even if the server requires a property, we don't need the Dart
+    // constructor to require it if it has a default value.
+    var hasDefaultValue = schema.defaultValue != null;
+    var defaultValueString = schema.defaultValueString;
+    // OpenAPI defaults arrays to empty, so we match for now.
+    if (schema.type == SchemaType.array) {
+      hasDefaultValue = true;
+      defaultValueString = 'const []';
+    }
+
+    // useRequired means "use the required constructor parameter"
+    final useRequired = inRequiredList && !hasDefaultValue;
+    // isNullable means it's optional for the server, use nullable storage.
+    final isNullable = !inRequiredList;
     return {
       'name': dartName,
-      // Is this correct?
-      'isRequired': required,
-      // Required properties can't have a default value.
-      'hasDefaultValue': !required && schema.defaultValue != null,
-      'defaultValue': required ? null : schema.defaultValueString,
+      'useRequired': useRequired,
+      'isNullable': isNullable,
+      'hasDefaultValue': hasDefaultValue,
+      'defaultValue': defaultValueString,
       'type': schema.typeName(context),
       'nullableType': schema.nullableTypeName(context),
       'toJson': schema.toJsonExpression(
         dartName,
         context,
-        isNullable: !required,
+        isNullable: isNullable,
       ),
       'fromJson': schema.fromJsonExpression("json['$jsonName']", context),
     };
@@ -325,7 +339,7 @@ extension _SchemaGeneration on Schema {
         jsonName: jsonName,
         schema: schema,
         context: context,
-        required: required.contains(jsonName),
+        inRequiredList: required.contains(jsonName),
       );
     }).toList();
 
@@ -392,7 +406,7 @@ extension _SchemaGeneration on Schema {
   }
 
   /// Template context for an enum schema.
-  Map<String, dynamic> enumTemplateContext() {
+  Map<String, dynamic> enumTemplateContext(_Context context) {
     if (!isEnum) {
       throw StateError('Schema is not an enum: $this');
     }
@@ -408,6 +422,7 @@ extension _SchemaGeneration on Schema {
 
     return {
       'typeName': className,
+      'nullableTypeName': nullableTypeName(context),
       'enumValues': enumValues.map(enumValueToTemplateContext).toList(),
     };
   }
@@ -861,7 +876,7 @@ _RenderContext _renderSchema(_Context context, Schema schema) {
   final String template;
   switch (schema.renderType) {
     case SchemaRenderType.enumeration:
-      schemaContext = schema.enumTemplateContext();
+      schemaContext = schema.enumTemplateContext(context);
       template = 'schema_enum';
     case SchemaRenderType.object:
       schemaContext = schema.objectTemplateContext(context);
