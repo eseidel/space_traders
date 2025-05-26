@@ -623,5 +623,46 @@ void main() {
       await renderToDirectory(spec: spec, outDir: out, logger: logger);
       expect(out.childDirectory('lib/api'), hasFiles(['default_api.dart']));
     });
+
+    test('with datetime', () async {
+      final fs = MemoryFileSystem.test();
+      final spec = {
+        'servers': [
+          {'url': 'https://api.spacetraders.io/v2'},
+        ],
+        'paths': {
+          '/users': {
+            'get': {'operationId': 'get-user'},
+            'responses': {
+              '200': {
+                'description': 'Default Response',
+                'content': {
+                  'application/json': {
+                    'schema': {
+                      'type': 'object',
+                      'properties': {
+                        'foo': {'type': 'string', 'format': 'date-time'},
+                        'bar': {'type': 'string', 'format': 'date-time'},
+                      },
+                      // Bar is a nullable datetime, foo is non-nullable.
+                      'required': ['foo'],
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        'components': {
+          'schemas': {
+            'User': {'type': 'object'},
+          },
+        },
+      };
+      final out = fs.directory('spacetraders');
+      final logger = _MockLogger();
+      await renderToDirectory(spec: spec, outDir: out, logger: logger);
+      expect(out.childDirectory('lib/api'), hasFiles(['default_api.dart']));
+    });
   });
 }
