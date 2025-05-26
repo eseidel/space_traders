@@ -667,7 +667,7 @@ void main() {
       );
     });
 
-    test('with array of objects', () async {
+    test('with array', () async {
       final fs = MemoryFileSystem.test();
       final spec = {
         'servers': [
@@ -682,11 +682,23 @@ void main() {
                 'content': {
                   'application/json': {
                     'schema': {
-                      'type': 'array',
-                      'items': {
-                        'type': 'object',
-                        'properties': {
-                          'foo': {'type': 'string'},
+                      'type': 'object',
+                      'properties': {
+                        'foo': {
+                          'type': 'array',
+                          'items': {'type': 'string'},
+                        },
+                        'bar': {
+                          'type': 'array',
+                          'items': {'type': 'number'},
+                        },
+                        'baz': {
+                          'type': 'array',
+                          'items': {'type': 'integer'},
+                        },
+                        'qux': {
+                          'type': 'array',
+                          'items': {'type': 'boolean'},
                         },
                       },
                     },
