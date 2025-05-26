@@ -42,7 +42,7 @@ class ShipMount {
   final String name;
   final String description;
   final int? strength;
-  final List<ShipMountDepositsInner> deposits;
+  final List<ShipMountDepositsInner>? deposits;
   final ShipRequirements requirements;
 
   Map<String, dynamic> toJson() {

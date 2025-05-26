@@ -60,7 +60,7 @@ class ScannedShip {
   final ScannedShipFrame? frame;
   final ScannedShipReactor? reactor;
   final ScannedShipEngine engine;
-  final List<ScannedShipMountsInner> mounts;
+  final List<ScannedShipMountsInner>? mounts;
 
   Map<String, dynamic> toJson() {
     return {
@@ -70,7 +70,7 @@ class ScannedShip {
       'frame': frame?.toJson(),
       'reactor': reactor?.toJson(),
       'engine': engine.toJson(),
-      'mounts': mounts.map((e) => e.toJson()).toList(),
+      'mounts': mounts?.map((e) => e.toJson()).toList(),
     };
   }
 

@@ -37,13 +37,13 @@ class ContractTerms {
 
   final DateTime deadline;
   final ContractPayment payment;
-  final List<ContractDeliverGood> deliver;
+  final List<ContractDeliverGood>? deliver;
 
   Map<String, dynamic> toJson() {
     return {
       'deadline': deadline.toIso8601String(),
       'payment': payment.toJson(),
-      'deliver': deliver.map((e) => e.toJson()).toList(),
+      'deliver': deliver?.map((e) => e.toJson()).toList(),
     };
   }
 

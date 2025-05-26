@@ -76,7 +76,7 @@ class Waypoint {
   final String? orbits;
   final WaypointFaction? faction;
   final List<WaypointTrait> traits;
-  final List<WaypointModifier> modifiers;
+  final List<WaypointModifier>? modifiers;
   final Chart? chart;
   final bool isUnderConstruction;
 
@@ -91,7 +91,7 @@ class Waypoint {
       'orbits': orbits,
       'faction': faction?.toJson(),
       'traits': traits.map((e) => e.toJson()).toList(),
-      'modifiers': modifiers.map((e) => e.toJson()).toList(),
+      'modifiers': modifiers?.map((e) => e.toJson()).toList(),
       'chart': chart?.toJson(),
       'isUnderConstruction': isUnderConstruction,
     };
