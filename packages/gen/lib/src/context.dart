@@ -311,11 +311,8 @@ extension _SchemaGeneration on Schema {
       case SchemaType.boolean:
         return '$jsonValue as $jsonType';
       case SchemaType.number:
-        if (isNullable) {
-          return '($jsonValue as $jsonType)?.toDouble()';
-        } else {
-          return '($jsonValue as $jsonType).toDouble()';
-        }
+        final nullAware = isNullable ? '?' : '';
+        return '($jsonValue as $jsonType)$nullAware.toDouble()';
       case SchemaType.object:
         final jsonMethod = isNullable ? 'maybeFromJson' : 'fromJson';
         return '$className.$jsonMethod($jsonValue as $jsonType)';
