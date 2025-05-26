@@ -7,7 +7,7 @@ class GetErrorCodes200ResponseErrorCodesInner {
   factory GetErrorCodes200ResponseErrorCodesInner.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
     return GetErrorCodes200ResponseErrorCodesInner(
-      code: json['code'] as double,
+      code: (json['code'] as num).toDouble(),
       name: json['name'] as String,
     );
   }
