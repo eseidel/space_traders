@@ -632,20 +632,24 @@ void main() {
         ],
         'paths': {
           '/users': {
-            'get': {'operationId': 'get-user'},
-            'responses': {
-              '200': {
-                'description': 'Default Response',
-                'content': {
-                  'application/json': {
-                    'schema': {
-                      'type': 'object',
-                      'properties': {
-                        'foo': {'type': 'string', 'format': 'date-time'},
-                        'bar': {'type': 'string', 'format': 'date-time'},
+            'get': {
+              'operationId': 'get-user',
+              'summary': 'Get User',
+              'description': 'Fetch a user by name.',
+              'responses': {
+                '200': {
+                  'description': 'Default Response',
+                  'content': {
+                    'application/json': {
+                      'schema': {
+                        'type': 'object',
+                        'properties': {
+                          'foo': {'type': 'string', 'format': 'date-time'},
+                          'bar': {'type': 'string', 'format': 'date-time'},
+                        },
+                        // Bar is a nullable datetime, foo is non-nullable.
+                        'required': ['foo'],
                       },
-                      // Bar is a nullable datetime, foo is non-nullable.
-                      'required': ['foo'],
                     },
                   },
                 },
@@ -653,16 +657,14 @@ void main() {
             },
           },
         },
-        'components': {
-          'schemas': {
-            'User': {'type': 'object'},
-          },
-        },
       };
       final out = fs.directory('spacetraders');
       final logger = _MockLogger();
       await renderToDirectory(spec: spec, outDir: out, logger: logger);
-      expect(out.childDirectory('lib/api'), hasFiles(['default_api.dart']));
+      expect(
+        out.childDirectory('lib/model'),
+        hasFiles(['get_user200_response.dart']),
+      );
     });
   });
 }
