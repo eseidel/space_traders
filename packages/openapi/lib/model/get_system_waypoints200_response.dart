@@ -9,7 +9,7 @@ class GetSystemWaypoints200Response {
     final json = jsonArg as Map<String, dynamic>;
     return GetSystemWaypoints200Response(
       data:
-          (json['data'] as List<dynamic>)
+          (json['data'] as List)
               .map<Waypoint>(
                 (e) => Waypoint.fromJson(e as Map<String, dynamic>),
               )

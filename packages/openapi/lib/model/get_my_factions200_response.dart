@@ -9,7 +9,7 @@ class GetMyFactions200Response {
     final json = jsonArg as Map<String, dynamic>;
     return GetMyFactions200Response(
       data:
-          (json['data'] as List<dynamic>)
+          (json['data'] as List)
               .map<GetMyFactions200ResponseDataInner>(
                 (e) => GetMyFactions200ResponseDataInner.fromJson(
                   e as Map<String, dynamic>,

@@ -8,7 +8,7 @@ class GetMyAgentEvents200Response {
     final json = jsonArg as Map<String, dynamic>;
     return GetMyAgentEvents200Response(
       data:
-          (json['data'] as List<dynamic>)
+          (json['data'] as List)
               .map<AgentEvent>(
                 (e) => AgentEvent.fromJson(e as Map<String, dynamic>),
               )

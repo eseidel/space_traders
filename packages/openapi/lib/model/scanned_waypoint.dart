@@ -27,7 +27,7 @@ class ScannedWaypoint {
       x: json['x'] as int,
       y: json['y'] as int,
       orbitals:
-          (json['orbitals'] as List<dynamic>)
+          (json['orbitals'] as List)
               .map<WaypointOrbital>(
                 (e) => WaypointOrbital.fromJson(e as Map<String, dynamic>),
               )
@@ -36,7 +36,7 @@ class ScannedWaypoint {
         json['faction'] as Map<String, dynamic>?,
       ),
       traits:
-          (json['traits'] as List<dynamic>)
+          (json['traits'] as List)
               .map<WaypointTrait>(
                 (e) => WaypointTrait.fromJson(e as Map<String, dynamic>),
               )

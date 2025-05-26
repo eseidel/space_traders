@@ -17,7 +17,7 @@ class ContractTerms {
         json['payment'] as Map<String, dynamic>,
       ),
       deliver:
-          (json['deliver'] as List<dynamic>)
+          (json['deliver'] as List)
               .map<ContractDeliverGood>(
                 (e) => ContractDeliverGood.fromJson(e as Map<String, dynamic>),
               )

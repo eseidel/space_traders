@@ -9,7 +9,7 @@ class GetContracts200Response {
     final json = jsonArg as Map<String, dynamic>;
     return GetContracts200Response(
       data:
-          (json['data'] as List<dynamic>)
+          (json['data'] as List)
               .map<Contract>(
                 (e) => Contract.fromJson(e as Map<String, dynamic>),
               )

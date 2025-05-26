@@ -8,7 +8,7 @@ class GetShipModules200Response {
     final json = jsonArg as Map<String, dynamic>;
     return GetShipModules200Response(
       data:
-          (json['data'] as List<dynamic>)
+          (json['data'] as List)
               .map<ShipModule>(
                 (e) => ShipModule.fromJson(e as Map<String, dynamic>),
               )

@@ -7,7 +7,7 @@ class JumpGate {
     final json = jsonArg as Map<String, dynamic>;
     return JumpGate(
       symbol: json['symbol'] as String,
-      connections: (json['connections'] as List<dynamic>).cast<String>(),
+      connections: (json['connections'] as List).cast<String>(),
     );
   }
 

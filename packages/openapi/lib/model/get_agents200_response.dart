@@ -9,7 +9,7 @@ class GetAgents200Response {
     final json = jsonArg as Map<String, dynamic>;
     return GetAgents200Response(
       data:
-          (json['data'] as List<dynamic>)
+          (json['data'] as List)
               .map<PublicAgent>(
                 (e) => PublicAgent.fromJson(e as Map<String, dynamic>),
               )
