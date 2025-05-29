@@ -17,8 +17,8 @@ class ContractTerms {
         json['payment'] as Map<String, dynamic>,
       ),
       deliver:
-          (json['deliver'] as List)
-              .map<ContractDeliverGood>(
+          (json['deliver'] as List?)
+              ?.map<ContractDeliverGood>(
                 (e) => ContractDeliverGood.fromJson(e as Map<String, dynamic>),
               )
               .toList(),
@@ -36,13 +36,13 @@ class ContractTerms {
 
   DateTime deadline;
   ContractPayment payment;
-  List<ContractDeliverGood> deliver;
+  List<ContractDeliverGood>? deliver;
 
   Map<String, dynamic> toJson() {
     return {
       'deadline': deadline.toIso8601String(),
       'payment': payment.toJson(),
-      'deliver': deliver.map((e) => e.toJson()).toList(),
+      'deliver': deliver?.map((e) => e.toJson()).toList(),
     };
   }
 

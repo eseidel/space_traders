@@ -6,7 +6,9 @@ class PatchShipNavRequest {
   factory PatchShipNavRequest.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
     return PatchShipNavRequest(
-      flightMode: ShipNavFlightMode.fromJson(json['flightMode'] as String),
+      flightMode: ShipNavFlightMode.maybeFromJson(
+        json['flightMode'] as String?,
+      ),
     );
   }
 
@@ -19,10 +21,10 @@ class PatchShipNavRequest {
     return PatchShipNavRequest.fromJson(json);
   }
 
-  ShipNavFlightMode flightMode;
+  ShipNavFlightMode? flightMode;
 
   Map<String, dynamic> toJson() {
-    return {'flightMode': flightMode.toJson()};
+    return {'flightMode': flightMode?.toJson()};
   }
 
   @override
