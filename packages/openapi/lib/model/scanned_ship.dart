@@ -35,8 +35,8 @@ class ScannedShip {
         json['engine'] as Map<String, dynamic>,
       ),
       mounts:
-          (json['mounts'] as List?)
-              ?.map<ScannedShipMountsInner>(
+          (json['mounts'] as List? ?? const [])
+              .map<ScannedShipMountsInner>(
                 (e) =>
                     ScannedShipMountsInner.fromJson(e as Map<String, dynamic>),
               )
@@ -59,7 +59,7 @@ class ScannedShip {
   ScannedShipFrame? frame;
   ScannedShipReactor? reactor;
   ScannedShipEngine engine;
-  List<ScannedShipMountsInner>? mounts;
+  List<ScannedShipMountsInner> mounts;
 
   Map<String, dynamic> toJson() {
     return {
@@ -69,7 +69,7 @@ class ScannedShip {
       'frame': frame?.toJson(),
       'reactor': reactor?.toJson(),
       'engine': engine.toJson(),
-      'mounts': mounts?.map((e) => e.toJson()).toList(),
+      'mounts': mounts.map((e) => e.toJson()).toList(),
     };
   }
 

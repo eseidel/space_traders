@@ -21,8 +21,8 @@ class ShipMount {
       description: json['description'] as String,
       strength: json['strength'] as int?,
       deposits:
-          (json['deposits'] as List?)
-              ?.map<ShipMountDepositsInner>(
+          (json['deposits'] as List? ?? const [])
+              .map<ShipMountDepositsInner>(
                 (e) => ShipMountDepositsInner.fromJson(e as String),
               )
               .toList(),
@@ -45,7 +45,7 @@ class ShipMount {
   String name;
   String description;
   int? strength;
-  List<ShipMountDepositsInner>? deposits;
+  List<ShipMountDepositsInner> deposits;
   ShipRequirements requirements;
 
   Map<String, dynamic> toJson() {

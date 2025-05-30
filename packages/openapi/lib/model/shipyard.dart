@@ -24,14 +24,14 @@ class Shipyard {
               )
               .toList(),
       transactions:
-          (json['transactions'] as List?)
-              ?.map<ShipyardTransaction>(
+          (json['transactions'] as List? ?? const [])
+              .map<ShipyardTransaction>(
                 (e) => ShipyardTransaction.fromJson(e as Map<String, dynamic>),
               )
               .toList(),
       ships:
-          (json['ships'] as List?)
-              ?.map<ShipyardShip>(
+          (json['ships'] as List? ?? const [])
+              .map<ShipyardShip>(
                 (e) => ShipyardShip.fromJson(e as Map<String, dynamic>),
               )
               .toList(),
@@ -50,16 +50,16 @@ class Shipyard {
 
   String symbol;
   List<ShipyardShipTypesInner> shipTypes;
-  List<ShipyardTransaction>? transactions;
-  List<ShipyardShip>? ships;
+  List<ShipyardTransaction> transactions;
+  List<ShipyardShip> ships;
   int modificationsFee;
 
   Map<String, dynamic> toJson() {
     return {
       'symbol': symbol,
       'shipTypes': shipTypes.map((e) => e.toJson()).toList(),
-      'transactions': transactions?.map((e) => e.toJson()).toList(),
-      'ships': ships?.map((e) => e.toJson()).toList(),
+      'transactions': transactions.map((e) => e.toJson()).toList(),
+      'ships': ships.map((e) => e.toJson()).toList(),
       'modificationsFee': modificationsFee,
     };
   }

@@ -36,14 +36,14 @@ class Market {
               )
               .toList(),
       transactions:
-          (json['transactions'] as List?)
-              ?.map<MarketTransaction>(
+          (json['transactions'] as List? ?? const [])
+              .map<MarketTransaction>(
                 (e) => MarketTransaction.fromJson(e as Map<String, dynamic>),
               )
               .toList(),
       tradeGoods:
-          (json['tradeGoods'] as List?)
-              ?.map<MarketTradeGood>(
+          (json['tradeGoods'] as List? ?? const [])
+              .map<MarketTradeGood>(
                 (e) => MarketTradeGood.fromJson(e as Map<String, dynamic>),
               )
               .toList(),
@@ -63,8 +63,8 @@ class Market {
   List<TradeGood> exports;
   List<TradeGood> imports;
   List<TradeGood> exchange;
-  List<MarketTransaction>? transactions;
-  List<MarketTradeGood>? tradeGoods;
+  List<MarketTransaction> transactions;
+  List<MarketTradeGood> tradeGoods;
 
   Map<String, dynamic> toJson() {
     return {
@@ -72,8 +72,8 @@ class Market {
       'exports': exports.map((e) => e.toJson()).toList(),
       'imports': imports.map((e) => e.toJson()).toList(),
       'exchange': exchange.map((e) => e.toJson()).toList(),
-      'transactions': transactions?.map((e) => e.toJson()).toList(),
-      'tradeGoods': tradeGoods?.map((e) => e.toJson()).toList(),
+      'transactions': transactions.map((e) => e.toJson()).toList(),
+      'tradeGoods': tradeGoods.map((e) => e.toJson()).toList(),
     };
   }
 
