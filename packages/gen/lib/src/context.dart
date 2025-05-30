@@ -305,30 +305,29 @@ extension _SchemaGeneration on Schema {
       jsonIsNullable: jsonIsNullable,
       dartIsNullable: dartIsNullable,
     );
-    final asExpression = '($jsonValue as $jsonType) $orDefault';
 
     switch (type) {
       case SchemaType.string:
         if (isDateTime) {
           if (jsonIsNullable) {
-            return 'maybeParseDateTime($asExpression)';
+            return 'maybeParseDateTime($jsonValue as $jsonType) $orDefault';
           } else {
-            return 'DateTime.parse($asExpression)';
+            return 'DateTime.parse($jsonValue as $jsonType)';
           }
         } else if (isEnum) {
           final jsonMethod = jsonIsNullable ? 'maybeFromJson' : 'fromJson';
-          return '$className.$jsonMethod($asExpression)';
+          return '$className.$jsonMethod($jsonValue as $jsonType) $orDefault';
         }
-        return asExpression;
+        return '$jsonValue as $jsonType';
       case SchemaType.integer:
       case SchemaType.boolean:
-        return asExpression;
+        return '($jsonValue as $jsonType) $orDefault';
       case SchemaType.number:
         final nullAware = jsonIsNullable ? '?' : '';
-        return '($asExpression)$nullAware.toDouble()';
+        return '(($jsonValue as $jsonType)$nullAware.toDouble()) $orDefault';
       case SchemaType.object:
         final jsonMethod = jsonIsNullable ? 'maybeFromJson' : 'fromJson';
-        return '$className.$jsonMethod($asExpression)';
+        return '$className.$jsonMethod($jsonValue as $jsonType) $orDefault';
       case SchemaType.array:
         final itemsSchema = context._maybeResolve(items);
         if (itemsSchema == null) {
@@ -339,7 +338,7 @@ extension _SchemaGeneration on Schema {
         // List has special handling for nullability since we want to cast
         // through List<dynamic> first before casting to the item type.
         final castAsList = jsonIsNullable
-            ? '($jsonValue as List? $orDefault)?'
+            ? '($jsonValue as List?)?'
             : '($jsonValue as List)';
         final itemsFromJson = itemsSchema.fromJsonExpression(
           'e',
@@ -350,11 +349,12 @@ extension _SchemaGeneration on Schema {
         );
         // If it doesn't create a new type we can just cast the list.
         if (!itemsSchema.createsNewType) {
-          return '$castAsList.cast<$itemTypeName>()';
+          return '$castAsList.cast<$itemTypeName>() $orDefault';
         }
-        return '$castAsList.map<$itemTypeName>((e) => $itemsFromJson).toList()';
+        return '$castAsList.map<$itemTypeName>('
+            '(e) => $itemsFromJson).toList() $orDefault';
       case SchemaType.unknown:
-        return jsonValue;
+        return '$jsonValue $orDefault';
     }
   }
 

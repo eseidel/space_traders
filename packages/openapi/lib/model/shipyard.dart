@@ -24,17 +24,19 @@ class Shipyard {
               )
               .toList(),
       transactions:
-          (json['transactions'] as List? ?? const [])
-              .map<ShipyardTransaction>(
+          (json['transactions'] as List?)
+              ?.map<ShipyardTransaction>(
                 (e) => ShipyardTransaction.fromJson(e as Map<String, dynamic>),
               )
-              .toList(),
+              .toList() ??
+          const [],
       ships:
-          (json['ships'] as List? ?? const [])
-              .map<ShipyardShip>(
+          (json['ships'] as List?)
+              ?.map<ShipyardShip>(
                 (e) => ShipyardShip.fromJson(e as Map<String, dynamic>),
               )
-              .toList(),
+              .toList() ??
+          const [],
       modificationsFee: json['modificationsFee'] as int,
     );
   }

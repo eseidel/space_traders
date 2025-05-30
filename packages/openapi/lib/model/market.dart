@@ -36,17 +36,19 @@ class Market {
               )
               .toList(),
       transactions:
-          (json['transactions'] as List? ?? const [])
-              .map<MarketTransaction>(
+          (json['transactions'] as List?)
+              ?.map<MarketTransaction>(
                 (e) => MarketTransaction.fromJson(e as Map<String, dynamic>),
               )
-              .toList(),
+              .toList() ??
+          const [],
       tradeGoods:
-          (json['tradeGoods'] as List? ?? const [])
-              .map<MarketTradeGood>(
+          (json['tradeGoods'] as List?)
+              ?.map<MarketTradeGood>(
                 (e) => MarketTradeGood.fromJson(e as Map<String, dynamic>),
               )
-              .toList(),
+              .toList() ??
+          const [],
     );
   }
 

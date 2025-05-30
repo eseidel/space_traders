@@ -47,11 +47,12 @@ class Waypoint {
               )
               .toList(),
       modifiers:
-          (json['modifiers'] as List? ?? const [])
-              .map<WaypointModifier>(
+          (json['modifiers'] as List?)
+              ?.map<WaypointModifier>(
                 (e) => WaypointModifier.fromJson(e as Map<String, dynamic>),
               )
-              .toList(),
+              .toList() ??
+          const [],
       chart: Chart.maybeFromJson(json['chart'] as Map<String, dynamic>?),
       isUnderConstruction: json['isUnderConstruction'] as bool,
     );
