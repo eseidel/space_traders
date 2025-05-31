@@ -20,7 +20,11 @@ class CountingApiClient extends ApiClient {
   }) async {
     logger.detail(path);
     requestCounts.record(path);
-    final response = await super.invokeApi(method: method, path: path);
+    final response = await super.invokeApi(
+      method: method,
+      path: path,
+      parameters: parameters,
+    );
     // logger.info(response.body);
     return response;
   }

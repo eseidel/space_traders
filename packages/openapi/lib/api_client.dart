@@ -36,10 +36,13 @@ class ApiClient {
           final withParams = uri.replace(
             queryParameters: {...baseUri.queryParameters, ...parameters},
           );
+          print('GET $withParams');
           return client.get(withParams, headers: headers);
         case Method.post:
+          print('POST $uri');
           return client.post(uri, headers: headers, body: body);
         case Method.patch:
+          print('PATCH $uri');
           return client.patch(uri, headers: headers, body: body);
       }
     } on SocketException catch (error, trace) {

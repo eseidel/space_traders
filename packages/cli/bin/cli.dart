@@ -7,6 +7,7 @@ import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/logic/logic.dart';
 import 'package:cli/net/auth.dart';
+import 'package:cli/net/queries.dart';
 import 'package:cli/net/register.dart';
 import 'package:db/db.dart';
 import 'package:scoped_deps/scoped_deps.dart';
@@ -103,6 +104,24 @@ bool Function(Ship ship)? _shipFilterFromArgs(Agent agent, List<String> only) {
   return (Ship ship) => onlyShips.contains(ship.symbol);
 }
 
+/// Similar to waitFor in idle_queue.dart.
+Future<void> waitForSystem(Database db, GalaxyStats galaxy) async {
+  while (true) {
+    final systems = await db.systems.countSystemRecords();
+    final waypoints = await db.systems.countSystemWaypoints();
+    if (systems >= galaxy.systemCount && waypoints >= galaxy.waypointCount) {
+      logger.info('Systems and waypoints are cached.');
+      return;
+    }
+    logger.info(
+      'Waiting for systems to be cached... '
+      '$systems/${galaxy.systemCount} systems and '
+      '$waypoints/${galaxy.waypointCount} waypoints.',
+    );
+    await Future<void>.delayed(const Duration(minutes: 1));
+  }
+}
+
 Future<void> cliMain(List<String> args) async {
   final parser = ArgParser()
     ..addFlag('verbose', abbr: 'v', negatable: false, help: 'Verbose logging.')
@@ -149,6 +168,10 @@ Future<void> cliMain(List<String> args) async {
     logger.err('Selling all ships!');
     await db.config.setGamePhase(GamePhase.selloff);
   }
+
+  // First we ask the API how many systems there are.
+  final galaxy = await getGalaxyStats(api);
+  await waitForSystem(db, galaxy);
 
   config = await Config.fromDb(db);
 
