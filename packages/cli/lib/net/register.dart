@@ -13,7 +13,7 @@ Future<String> _tryRegister(
 }) async {
   final registerRequest = RegisterRequest(symbol: symbol, faction: faction);
   final registerResponse = await api.register(registerRequest);
-  return registerResponse!.data.token;
+  return registerResponse.data.token;
 }
 
 /// register registers a new user with the space traders api and

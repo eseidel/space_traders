@@ -150,7 +150,19 @@ Future<JobResult> extractAndLog(
   try {
     final ExtractResources201ResponseData response;
     if (maybeSurvey != null) {
-      response = await extractResourcesWithSurvey(db, api, ship, maybeSurvey);
+      // The types used to be the same, but now they're different, so we copy.
+      final survey = await extractResourcesWithSurvey(
+        db,
+        api,
+        ship,
+        maybeSurvey,
+      );
+      response = ExtractResources201ResponseData(
+        extraction: survey.extraction,
+        cooldown: survey.cooldown,
+        cargo: survey.cargo,
+        events: survey.events,
+      );
     } else {
       response = await extractResources(db, api, ship);
     }

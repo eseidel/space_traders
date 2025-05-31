@@ -157,7 +157,11 @@ void main() {
     ).thenAnswer((_) async => []);
     when(dataApi.getSupplyChain).thenAnswer(
       (_) async => GetSupplyChain200Response(
-        data: GetSupplyChain200ResponseData(exportToImportMap: {}),
+        data: GetSupplyChain200ResponseData(
+          exportToImportMap: GetSupplyChain200ResponseDataExportToImportMap(
+            entries: {},
+          ),
+        ),
       ),
     );
 

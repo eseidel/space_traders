@@ -28,7 +28,7 @@ Stream<T> fetchAllPages<T, A>(
 Stream<System> allSystems(Api api) {
   return fetchAllPages(api, (api, page) async {
     final response = await api.systems.getSystems(page: page, limit: pageLimit);
-    final systems = response!.data.map(System.fromOpenApi).toList();
+    final systems = response.data.map(System.fromOpenApi).toList();
     return (systems, response.meta);
   });
 }
@@ -39,7 +39,7 @@ Future<Waypoint> fetchWaypoint(Api api, WaypointSymbol waypointSymbol) async {
     waypointSymbol.systemString,
     waypointSymbol.toJson(),
   );
-  final openApiWaypoint = response!.data;
+  final openApiWaypoint = response.data;
   return Waypoint.fromOpenApi(openApiWaypoint);
 }
 
@@ -51,7 +51,7 @@ Stream<Waypoint> allWaypointsInSystem(Api api, SystemSymbol system) {
       page: page,
       limit: pageLimit,
     );
-    final waypoints = response!.data.map(Waypoint.fromOpenApi).toList();
+    final waypoints = response.data.map(Waypoint.fromOpenApi).toList();
     return (waypoints, response.meta);
   });
 }
@@ -60,7 +60,7 @@ Stream<Waypoint> allWaypointsInSystem(Api api, SystemSymbol system) {
 Stream<Ship> allMyShips(Api api) {
   return fetchAllPages(api, (api, page) async {
     final response = await api.fleet.getMyShips(page: page, limit: pageLimit);
-    final ships = response!.data.map(Ship.fromOpenApi).toList();
+    final ships = response.data.map(Ship.fromOpenApi).toList();
     return (ships, response.meta);
   });
 }
@@ -73,7 +73,7 @@ Stream<Contract> allMyContracts(Api api) {
       limit: pageLimit,
     );
     final now = DateTime.timestamp();
-    final contracts = response!.data
+    final contracts = response.data
         .map((c) => Contract.fromOpenApi(c, now))
         .toList();
     return (contracts, response.meta);
@@ -87,14 +87,14 @@ Stream<Faction> getAllFactions(Api api) {
       page: page,
       limit: pageLimit,
     );
-    return (response!.data, response.meta);
+    return (response.data, response.meta);
   });
 }
 
 /// Fetch user's [Agent] object.
 Future<Agent> getMyAgent(Api api) async {
   final response = await api.agents.getMyAgent();
-  return Agent.fromOpenApi(response!.data);
+  return Agent.fromOpenApi(response.data);
 }
 
 /// Fetch shipyard for a given waypoint, will throw if the waypoint does not
@@ -104,7 +104,7 @@ Future<Shipyard> getShipyard(Api api, WaypointSymbol waypointSymbol) async {
     waypointSymbol.systemString,
     waypointSymbol.waypoint,
   );
-  return response!.data;
+  return response.data;
 }
 
 /// Returns JumpGate object for passed in Waypoint.
@@ -113,7 +113,7 @@ Future<JumpGate> getJumpGate(Api api, WaypointSymbol waypointSymbol) async {
     waypointSymbol.systemString,
     waypointSymbol.waypoint,
   );
-  return JumpGate.fromOpenApi(response!.data);
+  return JumpGate.fromOpenApi(response.data);
 }
 
 /// Fetches Market for a given Waypoint.
@@ -122,14 +122,14 @@ Future<Market> getMarket(Api api, WaypointSymbol waypointSymbol) async {
     waypointSymbol.systemString,
     waypointSymbol.waypoint,
   );
-  return response!.data;
+  return response.data;
 }
 
 /// Fetches Scrap value for a given Ship.
 /// Ship must be docked at a shipyard.
 Future<ScrapTransaction?> getScrapValue(Api api, ShipSymbol symbol) async {
   final response = await api.fleet.getScrapShip(symbol.symbol);
-  return response?.data.transaction;
+  return response.data.transaction;
 }
 
 /// Fetches Construction for a given Waypoint.
@@ -141,14 +141,14 @@ Future<Construction> getConstruction(
     waypointSymbol.systemString,
     waypointSymbol.waypoint,
   );
-  return response!.data;
+  return response.data;
 }
 
 /// Fetches the galaxy stats.
 Future<GalaxyStats> getGalaxyStats(Api api) async {
   final response = await api.global.getStatus();
   return GalaxyStats(
-    systemCount: response!.stats.systems,
+    systemCount: response.stats.systems,
     waypointCount: response.stats.waypoints,
   );
 }

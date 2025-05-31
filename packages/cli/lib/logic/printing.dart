@@ -224,7 +224,6 @@ String describeShipNav(
       final remainingString = approximateDuration(remainingDuration);
       return 'Transit to $waypoint in $remainingString';
   }
-  return 'Unknown';
 }
 
 /// Log the counts.

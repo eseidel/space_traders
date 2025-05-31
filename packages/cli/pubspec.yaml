@@ -24,7 +24,7 @@ dependencies:
       # The original package is no longer maintained.
       url: https://github.com/eseidel/dart-json_diff.git
   mason_logger: ^0.3.3
-  meta: ^1.17.0
+  meta: ^1.16.0
   openapi:
     path: ../openapi
   path: ^1.8.3

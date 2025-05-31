@@ -32,7 +32,7 @@ ShipyardListing shipyardListingFromColumnMap(Map<String, dynamic> values) {
     waypointSymbol: WaypointSymbol.fromString(values['symbol'] as String),
     shipTypes: (values['types'] as List<dynamic>)
         .cast<String>()
-        .map((e) => ShipType.fromJson(e)!)
+        .map(ShipType.fromJson)
         .toSet(),
   );
 }

@@ -222,7 +222,6 @@ class Config {
       case SupplyLevel.SCARCE:
         return 200;
     }
-    throw ArgumentError('Unknown supplyLevel: $supplyLevel');
   }
 
   /// Max number of jumps we allow a charter to plan for at once.

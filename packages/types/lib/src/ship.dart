@@ -248,7 +248,7 @@ class Ship {
 
   /// Creates a new ship from a JSON map.
   Ship.fromJson(Map<String, dynamic> json)
-    : this.fromOpenApi(openapi.Ship.fromJson(json)!);
+    : this.fromOpenApi(openapi.Ship.fromJson(json));
 
   /// Creates a new ship from an OpenAPI ship.
   Ship.fromOpenApi(openapi.Ship ship)
@@ -294,7 +294,6 @@ class Ship {
           departureTime: DateTime(2021),
           destination: navRouteWaypoint,
         ),
-        flightMode: ShipNavFlightMode.CRUISE,
       ),
       crew: openapi.ShipCrew(
         current: 0,

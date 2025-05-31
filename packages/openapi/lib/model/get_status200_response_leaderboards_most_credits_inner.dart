@@ -1,138 +1,45 @@
-//
-// AUTO-GENERATED FILE, DO NOT MODIFY!
-//
-// @dart=2.18
-
-// ignore_for_file: unused_element, unused_import
-// ignore_for_file: always_put_required_named_parameters_first
-// ignore_for_file: constant_identifier_names
-// ignore_for_file: lines_longer_than_80_chars
-
-part of openapi;
-
 class GetStatus200ResponseLeaderboardsMostCreditsInner {
-  /// Returns a new [GetStatus200ResponseLeaderboardsMostCreditsInner] instance.
   GetStatus200ResponseLeaderboardsMostCreditsInner({
     required this.agentSymbol,
     required this.credits,
   });
 
-  /// Symbol of the agent.
-  String agentSymbol;
+  factory GetStatus200ResponseLeaderboardsMostCreditsInner.fromJson(
+    dynamic jsonArg,
+  ) {
+    final json = jsonArg as Map<String, dynamic>;
+    return GetStatus200ResponseLeaderboardsMostCreditsInner(
+      agentSymbol: json['agentSymbol'] as String,
+      credits: json['credits'] as int,
+    );
+  }
 
-  /// Amount of credits.
+  /// Convenience to create a nullable type from a nullable json object.
+  /// Useful when parsing optional fields.
+  static GetStatus200ResponseLeaderboardsMostCreditsInner? maybeFromJson(
+    Map<String, dynamic>? json,
+  ) {
+    if (json == null) {
+      return null;
+    }
+    return GetStatus200ResponseLeaderboardsMostCreditsInner.fromJson(json);
+  }
+
+  String agentSymbol;
   int credits;
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is GetStatus200ResponseLeaderboardsMostCreditsInner &&
-          other.agentSymbol == agentSymbol &&
-          other.credits == credits;
-
-  @override
-  int get hashCode =>
-      // ignore: unnecessary_parenthesis
-      (agentSymbol.hashCode) + (credits.hashCode);
-
-  @override
-  String toString() =>
-      'GetStatus200ResponseLeaderboardsMostCreditsInner[agentSymbol=$agentSymbol, credits=$credits]';
-
   Map<String, dynamic> toJson() {
-    final json = <String, dynamic>{};
-    json[r'agentSymbol'] = this.agentSymbol;
-    json[r'credits'] = this.credits;
-    return json;
+    return {'agentSymbol': agentSymbol, 'credits': credits};
   }
 
-  /// Returns a new [GetStatus200ResponseLeaderboardsMostCreditsInner] instance and imports its values from
-  /// [value] if it's a [Map], null otherwise.
-  // ignore: prefer_constructors_over_static_methods
-  static GetStatus200ResponseLeaderboardsMostCreditsInner? fromJson(
-      dynamic value) {
-    if (value is Map) {
-      final json = value.cast<String, dynamic>();
+  @override
+  int get hashCode => Object.hash(agentSymbol, credits);
 
-      // Ensure that the map contains the required keys.
-      // Note 1: the values aren't checked for validity beyond being non-null.
-      // Note 2: this code is stripped in release mode!
-      assert(() {
-        requiredKeys.forEach((key) {
-          assert(json.containsKey(key),
-              'Required key "GetStatus200ResponseLeaderboardsMostCreditsInner[$key]" is missing from JSON.');
-          assert(json[key] != null,
-              'Required key "GetStatus200ResponseLeaderboardsMostCreditsInner[$key]" has a null value in JSON.');
-        });
-        return true;
-      }());
-
-      return GetStatus200ResponseLeaderboardsMostCreditsInner(
-        agentSymbol: mapValueOfType<String>(json, r'agentSymbol')!,
-        credits: mapValueOfType<int>(json, r'credits')!,
-      );
-    }
-    return null;
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is GetStatus200ResponseLeaderboardsMostCreditsInner &&
+        agentSymbol == other.agentSymbol &&
+        credits == other.credits;
   }
-
-  static List<GetStatus200ResponseLeaderboardsMostCreditsInner> listFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
-    final result = <GetStatus200ResponseLeaderboardsMostCreditsInner>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value =
-            GetStatus200ResponseLeaderboardsMostCreditsInner.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-
-  static Map<String, GetStatus200ResponseLeaderboardsMostCreditsInner>
-      mapFromJson(dynamic json) {
-    final map = <String, GetStatus200ResponseLeaderboardsMostCreditsInner>{};
-    if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
-      for (final entry in json.entries) {
-        final value = GetStatus200ResponseLeaderboardsMostCreditsInner.fromJson(
-            entry.value);
-        if (value != null) {
-          map[entry.key] = value;
-        }
-      }
-    }
-    return map;
-  }
-
-  // maps a json object with a list of GetStatus200ResponseLeaderboardsMostCreditsInner-objects as value to a dart map
-  static Map<String, List<GetStatus200ResponseLeaderboardsMostCreditsInner>>
-      mapListFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
-    final map =
-        <String, List<GetStatus200ResponseLeaderboardsMostCreditsInner>>{};
-    if (json is Map && json.isNotEmpty) {
-      // ignore: parameter_assignments
-      json = json.cast<String, dynamic>();
-      for (final entry in json.entries) {
-        map[entry.key] =
-            GetStatus200ResponseLeaderboardsMostCreditsInner.listFromJson(
-          entry.value,
-          growable: growable,
-        );
-      }
-    }
-    return map;
-  }
-
-  /// The list of required keys that must be present in a JSON.
-  static const requiredKeys = <String>{
-    'agentSymbol',
-    'credits',
-  };
 }

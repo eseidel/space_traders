@@ -1,130 +1,48 @@
-//
-// AUTO-GENERATED FILE, DO NOT MODIFY!
-//
-// @dart=2.18
-
-// ignore_for_file: unused_element, unused_import
-// ignore_for_file: always_put_required_named_parameters_first
-// ignore_for_file: constant_identifier_names
-// ignore_for_file: lines_longer_than_80_chars
-
-part of openapi;
+import 'package:openapi/model/construction.dart';
+import 'package:openapi/model/ship_cargo.dart';
 
 class SupplyConstruction201ResponseData {
-  /// Returns a new [SupplyConstruction201ResponseData] instance.
   SupplyConstruction201ResponseData({
     required this.construction,
     required this.cargo,
   });
 
-  Construction construction;
+  factory SupplyConstruction201ResponseData.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
+    return SupplyConstruction201ResponseData(
+      construction: Construction.fromJson(
+        json['construction'] as Map<String, dynamic>,
+      ),
+      cargo: ShipCargo.fromJson(json['cargo'] as Map<String, dynamic>),
+    );
+  }
 
+  /// Convenience to create a nullable type from a nullable json object.
+  /// Useful when parsing optional fields.
+  static SupplyConstruction201ResponseData? maybeFromJson(
+    Map<String, dynamic>? json,
+  ) {
+    if (json == null) {
+      return null;
+    }
+    return SupplyConstruction201ResponseData.fromJson(json);
+  }
+
+  Construction construction;
   ShipCargo cargo;
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is SupplyConstruction201ResponseData &&
-          other.construction == construction &&
-          other.cargo == cargo;
-
-  @override
-  int get hashCode =>
-      // ignore: unnecessary_parenthesis
-      (construction.hashCode) + (cargo.hashCode);
-
-  @override
-  String toString() =>
-      'SupplyConstruction201ResponseData[construction=$construction, cargo=$cargo]';
-
   Map<String, dynamic> toJson() {
-    final json = <String, dynamic>{};
-    json[r'construction'] = this.construction;
-    json[r'cargo'] = this.cargo;
-    return json;
+    return {'construction': construction.toJson(), 'cargo': cargo.toJson()};
   }
 
-  /// Returns a new [SupplyConstruction201ResponseData] instance and imports its values from
-  /// [value] if it's a [Map], null otherwise.
-  // ignore: prefer_constructors_over_static_methods
-  static SupplyConstruction201ResponseData? fromJson(dynamic value) {
-    if (value is Map) {
-      final json = value.cast<String, dynamic>();
+  @override
+  int get hashCode => Object.hash(construction, cargo);
 
-      // Ensure that the map contains the required keys.
-      // Note 1: the values aren't checked for validity beyond being non-null.
-      // Note 2: this code is stripped in release mode!
-      assert(() {
-        requiredKeys.forEach((key) {
-          assert(json.containsKey(key),
-              'Required key "SupplyConstruction201ResponseData[$key]" is missing from JSON.');
-          assert(json[key] != null,
-              'Required key "SupplyConstruction201ResponseData[$key]" has a null value in JSON.');
-        });
-        return true;
-      }());
-
-      return SupplyConstruction201ResponseData(
-        construction: Construction.fromJson(json[r'construction'])!,
-        cargo: ShipCargo.fromJson(json[r'cargo'])!,
-      );
-    }
-    return null;
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is SupplyConstruction201ResponseData &&
+        construction == other.construction &&
+        cargo == other.cargo;
   }
-
-  static List<SupplyConstruction201ResponseData> listFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
-    final result = <SupplyConstruction201ResponseData>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = SupplyConstruction201ResponseData.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-
-  static Map<String, SupplyConstruction201ResponseData> mapFromJson(
-      dynamic json) {
-    final map = <String, SupplyConstruction201ResponseData>{};
-    if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
-      for (final entry in json.entries) {
-        final value = SupplyConstruction201ResponseData.fromJson(entry.value);
-        if (value != null) {
-          map[entry.key] = value;
-        }
-      }
-    }
-    return map;
-  }
-
-  // maps a json object with a list of SupplyConstruction201ResponseData-objects as value to a dart map
-  static Map<String, List<SupplyConstruction201ResponseData>> mapListFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
-    final map = <String, List<SupplyConstruction201ResponseData>>{};
-    if (json is Map && json.isNotEmpty) {
-      // ignore: parameter_assignments
-      json = json.cast<String, dynamic>();
-      for (final entry in json.entries) {
-        map[entry.key] = SupplyConstruction201ResponseData.listFromJson(
-          entry.value,
-          growable: growable,
-        );
-      }
-    }
-    return map;
-  }
-
-  /// The list of required keys that must be present in a JSON.
-  static const requiredKeys = <String>{
-    'construction',
-    'cargo',
-  };
 }

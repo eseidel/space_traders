@@ -108,15 +108,15 @@ MarketListing marketListingFromColumnMap(Map<String, dynamic> values) {
     waypointSymbol: WaypointSymbol.fromString(values['symbol'] as String),
     exports: (values['exports'] as List<dynamic>)
         .cast<String>()
-        .map((e) => TradeSymbol.fromJson(e)!)
+        .map(TradeSymbol.fromJson)
         .toSet(),
     imports: (values['imports'] as List<dynamic>)
         .cast<String>()
-        .map((e) => TradeSymbol.fromJson(e)!)
+        .map(TradeSymbol.fromJson)
         .toSet(),
     exchange: (values['exchange'] as List<dynamic>)
         .cast<String>()
-        .map((e) => TradeSymbol.fromJson(e)!)
+        .map(TradeSymbol.fromJson)
         .toSet(),
   );
 }

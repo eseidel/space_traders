@@ -11,9 +11,9 @@ class TradeExport {
   /// Create from JSON.
   factory TradeExport.fromJson(dynamic json) {
     final map = json as Map<String, dynamic>;
-    final export = TradeSymbol.fromJson(map['export'] as String)!;
+    final export = TradeSymbol.fromJson(map['export'] as String);
     final importsJson = map['imports'] as List<dynamic>;
-    final imports = importsJson.map((i) => TradeSymbol.fromJson(i as String)!);
+    final imports = importsJson.map((i) => TradeSymbol.fromJson(i as String));
     return TradeExport(export: export, imports: imports.toList());
   }
 

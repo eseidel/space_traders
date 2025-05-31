@@ -1,156 +1,64 @@
-//
-// AUTO-GENERATED FILE, DO NOT MODIFY!
-//
-// @dart=2.18
-
-// ignore_for_file: unused_element, unused_import
-// ignore_for_file: always_put_required_named_parameters_first
-// ignore_for_file: constant_identifier_names
-// ignore_for_file: lines_longer_than_80_chars
-
-part of openapi;
+import 'package:openapi/model/ship_nav_flight_mode.dart';
+import 'package:openapi/model/ship_nav_route.dart';
+import 'package:openapi/model/ship_nav_status.dart';
 
 class ShipNav {
-  /// Returns a new [ShipNav] instance.
   ShipNav({
     required this.systemSymbol,
     required this.waypointSymbol,
     required this.route,
     required this.status,
-    required this.flightMode,
+    this.flightMode = ShipNavFlightMode.CRUISE,
   });
 
-  /// The symbol of the system.
+  factory ShipNav.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
+    return ShipNav(
+      systemSymbol: json['systemSymbol'] as String,
+      waypointSymbol: json['waypointSymbol'] as String,
+      route: ShipNavRoute.fromJson(json['route'] as Map<String, dynamic>),
+      status: ShipNavStatus.fromJson(json['status'] as String),
+      flightMode: ShipNavFlightMode.fromJson(json['flightMode'] as String),
+    );
+  }
+
+  /// Convenience to create a nullable type from a nullable json object.
+  /// Useful when parsing optional fields.
+  static ShipNav? maybeFromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return null;
+    }
+    return ShipNav.fromJson(json);
+  }
+
   String systemSymbol;
-
-  /// The symbol of the waypoint.
   String waypointSymbol;
-
   ShipNavRoute route;
-
   ShipNavStatus status;
-
   ShipNavFlightMode flightMode;
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ShipNav &&
-          other.systemSymbol == systemSymbol &&
-          other.waypointSymbol == waypointSymbol &&
-          other.route == route &&
-          other.status == status &&
-          other.flightMode == flightMode;
+  Map<String, dynamic> toJson() {
+    return {
+      'systemSymbol': systemSymbol,
+      'waypointSymbol': waypointSymbol,
+      'route': route.toJson(),
+      'status': status.toJson(),
+      'flightMode': flightMode.toJson(),
+    };
+  }
 
   @override
   int get hashCode =>
-      // ignore: unnecessary_parenthesis
-      (systemSymbol.hashCode) +
-      (waypointSymbol.hashCode) +
-      (route.hashCode) +
-      (status.hashCode) +
-      (flightMode.hashCode);
+      Object.hash(systemSymbol, waypointSymbol, route, status, flightMode);
 
   @override
-  String toString() =>
-      'ShipNav[systemSymbol=$systemSymbol, waypointSymbol=$waypointSymbol, route=$route, status=$status, flightMode=$flightMode]';
-
-  Map<String, dynamic> toJson() {
-    final json = <String, dynamic>{};
-    json[r'systemSymbol'] = this.systemSymbol;
-    json[r'waypointSymbol'] = this.waypointSymbol;
-    json[r'route'] = this.route;
-    json[r'status'] = this.status;
-    json[r'flightMode'] = this.flightMode;
-    return json;
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ShipNav &&
+        systemSymbol == other.systemSymbol &&
+        waypointSymbol == other.waypointSymbol &&
+        route == other.route &&
+        status == other.status &&
+        flightMode == other.flightMode;
   }
-
-  /// Returns a new [ShipNav] instance and imports its values from
-  /// [value] if it's a [Map], null otherwise.
-  // ignore: prefer_constructors_over_static_methods
-  static ShipNav? fromJson(dynamic value) {
-    if (value is Map) {
-      final json = value.cast<String, dynamic>();
-
-      // Ensure that the map contains the required keys.
-      // Note 1: the values aren't checked for validity beyond being non-null.
-      // Note 2: this code is stripped in release mode!
-      assert(() {
-        requiredKeys.forEach((key) {
-          assert(json.containsKey(key),
-              'Required key "ShipNav[$key]" is missing from JSON.');
-          assert(json[key] != null,
-              'Required key "ShipNav[$key]" has a null value in JSON.');
-        });
-        return true;
-      }());
-
-      return ShipNav(
-        systemSymbol: mapValueOfType<String>(json, r'systemSymbol')!,
-        waypointSymbol: mapValueOfType<String>(json, r'waypointSymbol')!,
-        route: ShipNavRoute.fromJson(json[r'route'])!,
-        status: ShipNavStatus.fromJson(json[r'status'])!,
-        flightMode: ShipNavFlightMode.fromJson(json[r'flightMode'])!,
-      );
-    }
-    return null;
-  }
-
-  static List<ShipNav> listFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
-    final result = <ShipNav>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = ShipNav.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-
-  static Map<String, ShipNav> mapFromJson(dynamic json) {
-    final map = <String, ShipNav>{};
-    if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
-      for (final entry in json.entries) {
-        final value = ShipNav.fromJson(entry.value);
-        if (value != null) {
-          map[entry.key] = value;
-        }
-      }
-    }
-    return map;
-  }
-
-  // maps a json object with a list of ShipNav-objects as value to a dart map
-  static Map<String, List<ShipNav>> mapListFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
-    final map = <String, List<ShipNav>>{};
-    if (json is Map && json.isNotEmpty) {
-      // ignore: parameter_assignments
-      json = json.cast<String, dynamic>();
-      for (final entry in json.entries) {
-        map[entry.key] = ShipNav.listFromJson(
-          entry.value,
-          growable: growable,
-        );
-      }
-    }
-    return map;
-  }
-
-  /// The list of required keys that must be present in a JSON.
-  static const requiredKeys = <String>{
-    'systemSymbol',
-    'waypointSymbol',
-    'route',
-    'status',
-    'flightMode',
-  };
 }

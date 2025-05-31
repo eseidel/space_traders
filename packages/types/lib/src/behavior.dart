@@ -189,7 +189,7 @@ class BuyJob {
 
   /// Create a new buy job from JSON.
   factory BuyJob.fromJson(Map<String, dynamic> json) {
-    final tradeSymbol = TradeSymbol.fromJson(json['tradeSymbol'] as String)!;
+    final tradeSymbol = TradeSymbol.fromJson(json['tradeSymbol'] as String);
     final units = json['units'] as int;
     final buyLocation = WaypointSymbol.fromJson(json['buyLocation'] as String);
     return BuyJob(
@@ -230,7 +230,7 @@ class DeliverJob {
 
   /// Create a new deliver job from JSON.
   factory DeliverJob.fromJson(Map<String, dynamic> json) {
-    final tradeSymbol = TradeSymbol.fromJson(json['tradeSymbol'] as String)!;
+    final tradeSymbol = TradeSymbol.fromJson(json['tradeSymbol'] as String);
     final waypointSymbol = WaypointSymbol.fromJson(
       json['waypointSymbol'] as String,
     );
@@ -264,7 +264,7 @@ class PickupJob {
 
   /// Create a new pickup job from JSON.
   factory PickupJob.fromJson(Map<String, dynamic> json) {
-    final tradeSymbol = TradeSymbol.fromJson(json['tradeSymbol'] as String)!;
+    final tradeSymbol = TradeSymbol.fromJson(json['tradeSymbol'] as String);
     final waypointSymbol = WaypointSymbol.fromJson(
       json['waypointSymbol'] as String,
     );
@@ -300,9 +300,7 @@ class MountJob {
 
   /// Create a new mount job from JSON.
   factory MountJob.fromJson(Map<String, dynamic> json) {
-    final mountSymbol = ShipMountSymbol.fromJson(
-      json['mountSymbol'] as String,
-    )!;
+    final mountSymbol = ShipMountSymbol.fromJson(json['mountSymbol'] as String);
     final shipyardSymbol = WaypointSymbol.fromJson(
       json['shipyardSymbol'] as String,
     );
@@ -341,7 +339,7 @@ class ShipBuyJob {
 
   /// Create a new ship buy job from JSON.
   factory ShipBuyJob.fromJson(Map<String, dynamic> json) {
-    final shipType = ShipType.fromJson(json['shipType'] as String)!;
+    final shipType = ShipType.fromJson(json['shipType'] as String);
     final shipyardSymbol = WaypointSymbol.fromJson(
       json['shipyardSymbol'] as String,
     );
@@ -392,7 +390,7 @@ Map<TradeSymbol, WaypointSymbol> _marketForGoodFromJson(
   return Map.fromEntries(
     json.entries.map(
       (e) => MapEntry(
-        TradeSymbol.fromJson(e.key)!,
+        TradeSymbol.fromJson(e.key),
         WaypointSymbol.fromJson(e.value as String),
       ),
     ),

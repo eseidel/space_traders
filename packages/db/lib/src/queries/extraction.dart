@@ -40,7 +40,7 @@ ExtractionRecord extractionFromColumnMap(Map<String, dynamic> values) {
     waypointSymbol: WaypointSymbol.fromString(
       values['waypoint_symbol'] as String,
     ),
-    tradeSymbol: TradeSymbol.fromJson(values['trade_symbol'] as String)!,
+    tradeSymbol: TradeSymbol.fromJson(values['trade_symbol'] as String),
     quantity: values['quantity'] as int,
     power: values['power'] as int,
     surveySignature: values['survey_signature'] as String?,

@@ -69,7 +69,7 @@ Future<NavigateShip200ResponseData> navigateToLocalWaypoint(
 
 /// Navigate [ship] to [waypointSymbol] will retry in drift mode if
 /// there is insufficient fuel.
-Future<NavigateShip200ResponseData> warpToWaypoint(
+Future<WarpShip200ResponseData> warpToWaypoint(
   Database db,
   Api api,
   Ship ship,
@@ -83,7 +83,7 @@ Future<NavigateShip200ResponseData> warpToWaypoint(
 /// Sell all cargo matching the [where] predicate.
 /// If [where] is null, sell all cargo.
 /// returns a stream of the sell responses.
-Stream<PurchaseCargo201ResponseData> sellAllCargo(
+Stream<SellCargo201ResponseData> sellAllCargo(
   Database db,
   Api api,
   Market market,
@@ -176,7 +176,7 @@ Future<void> jettisonCargoAndLog(
     ship.symbol.symbol,
     JettisonRequest(symbol: item.tradeSymbol, units: item.units),
   );
-  ship.cargo = response!.data.cargo;
+  ship.cargo = response.data.cargo;
   await db.upsertShip(ship);
 }
 
@@ -427,7 +427,7 @@ Future<void> dockIfNeeded(Database db, Api api, Ship ship) async {
   if (ship.isOrbiting) {
     shipDetail(ship, '🛬 at ${ship.waypointSymbol}');
     final response = await api.fleet.dockShip(ship.symbol.symbol);
-    ship.nav = response!.data.nav;
+    ship.nav = response.data.nav;
     await db.upsertShip(ship);
   }
 }
@@ -438,7 +438,7 @@ Future<void> undockIfNeeded(Database db, Api api, Ship ship) async {
     // Extra space after emoji is needed for windows powershell.
     shipDetail(ship, '🛰️  at ${ship.waypointSymbol}');
     final response = await api.fleet.orbitShip(ship.symbol.symbol);
-    ship.nav = response!.data.nav;
+    ship.nav = response.data.nav;
     await db.upsertShip(ship);
   }
 }
@@ -542,7 +542,7 @@ Future<DateTime> warpToWaypointAndLog(
 Future<void> chartWaypointAndLog(Api api, Database db, Ship ship) async {
   try {
     final response = await api.fleet.createChart(ship.symbol.symbol);
-    final data = response!.data;
+    final data = response.data;
     final waypoint = Waypoint.fromOpenApi(data.waypoint);
     await db.charting.addWaypoint(waypoint);
     await db.waypointTraits.addAll(waypoint.traits);
@@ -587,7 +587,7 @@ Future<JumpShip200ResponseData> useJumpGateAndLog(
     ship.symbol.symbol,
     JumpShipRequest(waypointSymbol: destination.waypoint),
   );
-  final data = response!.data;
+  final data = response.data;
   ship
     ..nav = data.nav
     ..cooldown = data.cooldown;
@@ -622,7 +622,7 @@ Future<Contract> negotiateContractAndLog(
 ) async {
   await dockIfNeeded(db, api, ship);
   final response = await api.fleet.negotiateContract(ship.symbol.symbol);
-  final contractData = response!.data;
+  final contractData = response.data;
   final contract = Contract.fromOpenApi(
     contractData.contract,
     DateTime.timestamp(),
@@ -640,7 +640,7 @@ Future<AcceptContract200ResponseData> acceptContractAndLog(
   Contract contract,
 ) async {
   final response = await api.contracts.acceptContract(contract.id);
-  final data = response!.data;
+  final data = response.data;
   final agent = Agent.fromOpenApi(data.agent);
   await db.upsertAgent(agent);
   await db.contracts.upsert(
@@ -668,14 +668,14 @@ Future<AcceptContract200ResponseData> acceptContractAndLog(
 }
 
 /// Complete [contract] and log.
-Future<AcceptContract200ResponseData> completeContractAndLog(
+Future<FulfillContract200ResponseData> completeContractAndLog(
   Api api,
   Database db,
   Ship ship,
   Contract contract,
 ) async {
   final response = await api.contracts.fulfillContract(contract.id);
-  final data = response!.data;
+  final data = response.data;
   final agent = Agent.fromOpenApi(data.agent);
   await db.upsertAgent(agent);
   await db.contracts.upsert(
@@ -710,7 +710,7 @@ Future<InstallMount201ResponseData> installMountAndLog(
     ship.symbol.symbol,
     InstallMountRequest(symbol: tradeSymbol.value),
   );
-  final data = response!.data;
+  final data = response.data;
   final agent = Agent.fromOpenApi(data.agent);
   await db.upsertAgent(agent);
   ship
@@ -737,7 +737,7 @@ Future<RemoveMount201ResponseData> removeMountAndLog(
     ship.symbol.symbol,
     RemoveMountRequest(symbol: tradeSymbol.value),
   );
-  final data = response!.data;
+  final data = response.data;
   final agent = Agent.fromOpenApi(data.agent);
   await db.upsertAgent(agent);
   ship
@@ -775,7 +775,7 @@ Future<TransferCargo200ResponseData> transferCargoAndLog(
   // MOUNT_MINING_LASER_II.","code":4219,"data":{"shipSymbol":"ESEIDEL-1",
   // "tradeSymbol":"MOUNT_MINING_LASER_II","cargoUnits":0,"unitsToRemove":1}}}
 
-  final data = response!.data;
+  final data = response.data;
   from.cargo = data.cargo;
   to.cargo = data.targetCargo;
   await db.upsertShip(from);
@@ -813,7 +813,7 @@ Future<CreateSurvey201ResponseData> surveyAndLog(
   DateTime Function() getNow = defaultGetNow,
 }) async {
   final outer = await api.fleet.createSurvey(ship.symbol.symbol);
-  final response = outer!.data;
+  final response = outer.data;
   ship.cooldown = response.cooldown;
   await db.upsertShip(ship);
   final count = response.surveys.length;

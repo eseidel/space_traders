@@ -58,7 +58,7 @@ SystemWaypoint systemWaypointFromColumnMap(Map<String, dynamic> columnMap) {
   final symbol = WaypointSymbol.fromString(columnMap['symbol'] as String);
   return SystemWaypoint(
     symbol: symbol,
-    type: WaypointType.fromJson(columnMap['type'] as String)!,
+    type: WaypointType.fromJson(columnMap['type'] as String),
     position: WaypointPosition(
       columnMap['x'] as int,
       columnMap['y'] as int,

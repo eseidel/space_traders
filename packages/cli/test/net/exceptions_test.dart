@@ -109,7 +109,7 @@ void main() {
   });
 
   test('isMarketDoesNotSellFuelException', () {
-    final exception = ApiException(
+    const exception = ApiException(
       400,
       '{"error":{"message":"Market purchase failed. Trade good FUEL is '
       'not available at '
@@ -120,7 +120,7 @@ void main() {
   });
 
   test('isInsufficientFuelException', () {
-    final exception = ApiException(
+    const exception = ApiException(
       400,
       '{"error":{"message":"Navigate request failed. Ship ESEIDEL-2 '
       'requires 14 more fuel for '
@@ -131,7 +131,7 @@ void main() {
   });
 
   test('isMaintenanceWindowException', () {
-    final exception = ApiException(
+    const exception = ApiException(
       503,
       '{"error":{"message":"SpaceTraders is currently in maintenance mode '
       'and unavailable. This will hopefully only last a few minutes while we '
@@ -144,7 +144,7 @@ void main() {
   });
 
   test('isReservedHandleException', () {
-    final exception = ApiException(
+    const exception = ApiException(
       400,
       '{"error":{"message":'
       '"Cannot register agent. Call sign has been reserved between resets: '
@@ -156,7 +156,7 @@ void main() {
   });
 
   test('isWaypointAlreadyChartedException', () {
-    final exception = ApiException(
+    const exception = ApiException(
       400,
       '{"error":{"message":"Waypoint already charted: X1-ZY63-71980E", '
       '"code":4230,"data":{"waypointSymbol":"X1-ZY63-71980E"}}}',
@@ -165,7 +165,7 @@ void main() {
   });
 
   test('isInsufficientCreditsException', () {
-    final exception = ApiException(
+    const exception = ApiException(
       400,
       '{"error":{"message":"Market purchase failed. Agent does not have '
       'sufficient credits to purchase 10 unit(s) of '
@@ -177,7 +177,7 @@ void main() {
   });
 
   test('isShipNotInOrbitException', () {
-    final exception = ApiException(
+    const exception = ApiException(
       400,
       '{"error":{"message":"Ship action failed. Ship is not currently in '
       'orbit at X1-PA79-91721F.","code":4236,"data":{"waypointSymbol" '
@@ -187,7 +187,7 @@ void main() {
   });
 
   test('neededCreditsFromPurchaseShipException', () {
-    final exception = ApiException(
+    const exception = ApiException(
       400,
       '{"error":{"message":"Failed to purchase ship. Agent has insufficient '
       'funds.","code":4216, "data":{"creditsAvailable":116103, '

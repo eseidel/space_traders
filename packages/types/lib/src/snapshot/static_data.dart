@@ -68,7 +68,7 @@ class StaticSnapshot<Symbol extends Object, Record extends Object> {
 /// Traits for ShipMounts.
 class ShipMountTraits extends Traits<ShipMountSymbol, ShipMount> {
   @override
-  ShipMount fromJson(Map<String, dynamic> json) => ShipMount.fromJson(json)!;
+  ShipMount fromJson(Map<String, dynamic> json) => ShipMount.fromJson(json);
 
   @override
   Json toJson(ShipMount record) => record.toJson();
@@ -92,7 +92,7 @@ class ShipMountSnapshot extends StaticSnapshot<ShipMountSymbol, ShipMount> {
 class ShipModuleTraits extends Traits<ShipModuleSymbol, ShipModule> {
   @override
   ShipModule fromJson(Map<String, dynamic> json) {
-    return ShipModule.fromJson(json)!;
+    return ShipModule.fromJson(json);
   }
 
   @override
@@ -117,7 +117,7 @@ class ShipModuleSnapshot extends StaticSnapshot<ShipModuleSymbol, ShipModule> {
 class ShipyardShipTraits extends Traits<ShipType, ShipyardShip> {
   @override
   ShipyardShip fromJson(Map<String, dynamic> json) =>
-      ShipyardShip.fromJson(json)!;
+      ShipyardShip.fromJson(json);
 
   @override
   Json toJson(ShipyardShip record) => record.toJson();
@@ -152,7 +152,7 @@ class ShipEngineTraits extends Traits<ShipEngineSymbol, ShipEngine> {
   Json toJson(ShipEngine record) => record.toJson();
 
   @override
-  ShipEngine fromJson(Map<String, dynamic> json) => ShipEngine.fromJson(json)!;
+  ShipEngine fromJson(Map<String, dynamic> json) => ShipEngine.fromJson(json);
 
   @override
   ShipEngine copyAndNormalize(ShipEngine record) =>
@@ -176,8 +176,7 @@ class ShipEngineSnapshot extends StaticSnapshot<ShipEngineSymbol, ShipEngine> {
 /// Traits for ShipReactors.
 class ShipReactorTraits extends Traits<ShipReactorSymbol, ShipReactor> {
   @override
-  ShipReactor fromJson(Map<String, dynamic> json) =>
-      ShipReactor.fromJson(json)!;
+  ShipReactor fromJson(Map<String, dynamic> json) => ShipReactor.fromJson(json);
 
   @override
   Json toJson(ShipReactor record) => record.toJson();
@@ -206,7 +205,7 @@ class ShipReactorSnapshot
 class WaypointTraitTraits extends Traits<WaypointTraitSymbol, WaypointTrait> {
   @override
   WaypointTrait fromJson(Map<String, dynamic> json) =>
-      WaypointTrait.fromJson(json)!;
+      WaypointTrait.fromJson(json);
 
   @override
   Json toJson(WaypointTrait record) => record.toJson();
@@ -230,7 +229,7 @@ class WaypointTraitSnapshot
 /// A cache of trade good descriptions.
 class TradeGoodTraits extends Traits<TradeSymbol, TradeGood> {
   @override
-  TradeGood fromJson(Map<String, dynamic> json) => TradeGood.fromJson(json)!;
+  TradeGood fromJson(Map<String, dynamic> json) => TradeGood.fromJson(json);
   @override
   Json toJson(TradeGood record) => record.toJson();
 
@@ -275,7 +274,7 @@ class TradeExportSnapshot extends StaticSnapshot<TradeSymbol, TradeExport> {
 class EventTraits extends Traits<ShipConditionEventSymbol, ShipConditionEvent> {
   @override
   ShipConditionEvent fromJson(Map<String, dynamic> json) =>
-      ShipConditionEvent.fromJson(json)!;
+      ShipConditionEvent.fromJson(json);
   @override
   Json toJson(ShipConditionEvent record) => record.toJson();
 

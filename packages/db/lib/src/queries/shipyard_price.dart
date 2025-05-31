@@ -43,7 +43,7 @@ ShipyardPrice shipyardPriceFromColumnMap(Map<String, dynamic> values) {
     waypointSymbol: WaypointSymbol.fromString(
       values['waypoint_symbol'] as String,
     ),
-    shipType: ShipType.fromJson(values['ship_type'] as String)!,
+    shipType: ShipType.fromJson(values['ship_type'] as String),
     purchasePrice: values['purchase_price'] as int,
     timestamp: values['timestamp'] as DateTime,
   );

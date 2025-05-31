@@ -24,7 +24,7 @@ class JumpGate extends Equatable {
       // This can be removed on the next reset.
       'symbol': json['waypointSymbol'] ?? json['symbol'],
       'connections': json['connections'],
-    })!;
+    });
     return JumpGate.fromOpenApi(openapiJumpGate);
   }
 

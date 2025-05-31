@@ -110,8 +110,8 @@ class Transaction extends Equatable {
       ),
       shipSymbol: ShipSymbol.fromJson(json['shipSymbol'] as String),
       waypointSymbol: WaypointSymbol.fromJson(json['waypointSymbol'] as String),
-      tradeSymbol: TradeSymbol.fromJson(json['tradeSymbol'] as String?),
-      shipType: ShipType.fromJson(json['shipType'] as String?),
+      tradeSymbol: TradeSymbol.maybeFromJson(json['tradeSymbol'] as String?),
+      shipType: ShipType.maybeFromJson(json['shipType'] as String?),
       quantity: json['quantity'] as int,
       tradeType: MarketTransactionType.values.firstWhere(
         (e) => e.value == json['tradeType'] as String?,
@@ -134,7 +134,7 @@ class Transaction extends Equatable {
     AccountingType accounting,
   ) {
     // Using a local to force non-null.
-    final tradeSymbol = TradeSymbol.fromJson(transaction.tradeSymbol)!;
+    final tradeSymbol = TradeSymbol.fromJson(transaction.tradeSymbol);
     return Transaction(
       transactionType: TransactionType.market,
       shipSymbol: transaction.shipSymbolObject,
@@ -213,7 +213,7 @@ class Transaction extends Equatable {
     int agentCredits,
   ) {
     // Using a local to force non-null.
-    final tradeSymbol = TradeSymbol.fromJson(transaction.tradeSymbol)!;
+    final tradeSymbol = TradeSymbol.fromJson(transaction.tradeSymbol);
     assert(
       mountSymbolForTradeSymbol(tradeSymbol) != null,
       'Shipyard transaction with unknown mount symbol: $tradeSymbol',

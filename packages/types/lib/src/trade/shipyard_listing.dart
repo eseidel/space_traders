@@ -21,7 +21,7 @@ class ShipyardListing {
   factory ShipyardListing.fromJson(Map<String, dynamic> json) {
     final symbol = WaypointSymbol.fromJson(json['waypointSymbol'] as String);
     final shipTypes = (json['shipTypes'] as List<dynamic>)
-        .map((e) => ShipType.fromJson(e as String)!)
+        .map((e) => ShipType.fromJson(e as String))
         .toSet();
 
     return ShipyardListing(waypointSymbol: symbol, shipTypes: shipTypes);

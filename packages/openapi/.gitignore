@@ -1,19 +1,6 @@
-# See https://dart.dev/guides/libraries/private-files
-
+# https://dart.dev/guides/libraries/private-files
+# Created by `dart pub`
 .dart_tool/
 .packages
-build/
-
-# Except for application packages
+# Typically libraries do not check in pubspec.lock, only applications.
 pubspec.lock
-
-doc/api/
-
-# IntelliJ
-*.iml
-*.ipr
-*.iws
-.idea/
-
-# Mac
-.DS_Store

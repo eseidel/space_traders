@@ -658,7 +658,7 @@ void main() {
     ).thenAnswer(
       (_) => Future.value(
         SellCargo201Response(
-          data: PurchaseCargo201ResponseData(
+          data: SellCargo201ResponseData(
             agent: agent.toOpenApi(),
             cargo: ShipCargo(capacity: cargoCapacity, units: 0),
             transaction: transaction,

@@ -156,6 +156,5 @@ ShipNav _makeShipNav({required SystemWaypoint origin, required DateTime now}) {
       departureTime: now,
     ),
     status: ShipNavStatus.DOCKED,
-    flightMode: ShipNavFlightMode.CRUISE,
   );
 }

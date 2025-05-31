@@ -5,7 +5,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   final api = await defaultApi(db);
   // Ask the API how many systems and waypoints there are in total.
   final status = await api.defaultApi.getStatus();
-  final stats = status!.stats;
+  final stats = status.stats;
   logger
     ..info('Waypoints: ${stats.waypoints}')
     ..info('Systems: ${stats.systems}');

@@ -75,7 +75,7 @@ class SellOpp extends Equatable {
       waypointSymbol = WaypointSymbol.fromJson(
         json['waypointSymbol'] as String,
       ),
-      tradeSymbol = TradeSymbol.fromJson(json['tradeSymbol'] as String)!,
+      tradeSymbol = TradeSymbol.fromJson(json['tradeSymbol'] as String),
       price = json['price'] as int,
       contractId = json['contractId'] as String?,
       maxUnits = json['maxUnits'] as int?,

@@ -66,10 +66,12 @@ Transaction transactionFromColumnMap(Map<String, dynamic> values) {
     waypointSymbol: WaypointSymbol.fromJson(
       values['waypoint_symbol'] as String,
     ),
-    tradeSymbol: TradeSymbol.fromJson(values['trade_symbol'] as String?),
-    shipType: ShipType.fromJson(values['ship_type'] as String?),
+    tradeSymbol: TradeSymbol.maybeFromJson(values['trade_symbol'] as String?),
+    shipType: ShipType.maybeFromJson(values['ship_type'] as String?),
     quantity: values['quantity'] as int,
-    tradeType: MarketTransactionType.fromJson(values['trade_type'] as String?),
+    tradeType: MarketTransactionType.maybeFromJson(
+      values['trade_type'] as String?,
+    ),
     perUnitPrice: values['per_unit_price'] as int,
     timestamp: values['timestamp'] as DateTime,
     agentCredits: values['agent_credits'] as int,
