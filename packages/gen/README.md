@@ -30,7 +30,6 @@ dart run space_gen
 * GetSupplyChain200ResponseDataExportToImportMap is unnecessary?
 * Simplify hasAdditionalProperties.
 * Handle dynamic better (e.g. RefuelShipRequest.fromCargo)
-* Confirm it's using the network proxy still (I don't think it is).
 * Split Body from Query Parameters.
 * Fix query parameters:
 ```
