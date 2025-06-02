@@ -7,14 +7,13 @@ class GetErrorCodes200Response {
   factory GetErrorCodes200Response.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
     return GetErrorCodes200Response(
-      errorCodes:
-          (json['errorCodes'] as List)
-              .map<GetErrorCodes200ResponseErrorCodesInner>(
-                (e) => GetErrorCodes200ResponseErrorCodesInner.fromJson(
-                  e as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
+      errorCodes: (json['errorCodes'] as List)
+          .map<GetErrorCodes200ResponseErrorCodesInner>(
+            (e) => GetErrorCodes200ResponseErrorCodesInner.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList(),
     );
   }
 

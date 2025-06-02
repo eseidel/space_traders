@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart';
@@ -25,24 +24,27 @@ class ApiClient {
   Future<Response> invokeApi({
     required Method method,
     required String path,
-    Map<String, dynamic> parameters = const {},
+    Map<String, String> queryParameters = const {},
+    // Body is nullable to allow for post requests which have an optional body
+    // to not have to generate two separate calls depending on whether the
+    // body is present or not.
+    Map<String, dynamic>? body,
   }) async {
     final uri = resolvePath(path);
-    final body = method != Method.get ? jsonEncode(parameters) : null;
+    if (method == Method.get && body != null) {
+      throw ArgumentError('Body is not allowed for GET requests');
+    }
 
     try {
       switch (method) {
         case Method.get:
           final withParams = uri.replace(
-            queryParameters: {...baseUri.queryParameters, ...parameters},
+            queryParameters: {...baseUri.queryParameters, ...queryParameters},
           );
-          print('GET $withParams');
           return client.get(withParams, headers: headers);
         case Method.post:
-          print('POST $uri');
           return client.post(uri, headers: headers, body: body);
         case Method.patch:
-          print('PATCH $uri');
           return client.patch(uri, headers: headers, body: body);
       }
     } on SocketException catch (error, trace) {

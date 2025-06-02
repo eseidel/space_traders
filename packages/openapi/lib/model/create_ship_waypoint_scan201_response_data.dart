@@ -12,12 +12,11 @@ class CreateShipWaypointScan201ResponseData {
     final json = jsonArg as Map<String, dynamic>;
     return CreateShipWaypointScan201ResponseData(
       cooldown: Cooldown.fromJson(json['cooldown'] as Map<String, dynamic>),
-      waypoints:
-          (json['waypoints'] as List)
-              .map<ScannedWaypoint>(
-                (e) => ScannedWaypoint.fromJson(e as Map<String, dynamic>),
-              )
-              .toList(),
+      waypoints: (json['waypoints'] as List)
+          .map<ScannedWaypoint>(
+            (e) => ScannedWaypoint.fromJson(e as Map<String, dynamic>),
+          )
+          .toList(),
     );
   }
 

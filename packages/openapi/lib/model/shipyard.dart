@@ -16,13 +16,11 @@ class Shipyard {
     final json = jsonArg as Map<String, dynamic>;
     return Shipyard(
       symbol: json['symbol'] as String,
-      shipTypes:
-          (json['shipTypes'] as List)
-              .map<ShipyardShipTypesInner>(
-                (e) =>
-                    ShipyardShipTypesInner.fromJson(e as Map<String, dynamic>),
-              )
-              .toList(),
+      shipTypes: (json['shipTypes'] as List)
+          .map<ShipyardShipTypesInner>(
+            (e) => ShipyardShipTypesInner.fromJson(e as Map<String, dynamic>),
+          )
+          .toList(),
       transactions:
           (json['transactions'] as List?)
               ?.map<ShipyardTransaction>(

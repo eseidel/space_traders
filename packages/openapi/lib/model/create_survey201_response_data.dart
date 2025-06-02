@@ -12,10 +12,9 @@ class CreateSurvey201ResponseData {
     final json = jsonArg as Map<String, dynamic>;
     return CreateSurvey201ResponseData(
       cooldown: Cooldown.fromJson(json['cooldown'] as Map<String, dynamic>),
-      surveys:
-          (json['surveys'] as List)
-              .map<Survey>((e) => Survey.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      surveys: (json['surveys'] as List)
+          .map<Survey>((e) => Survey.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 

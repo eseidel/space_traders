@@ -7,12 +7,9 @@ class GetMounts200Response {
   factory GetMounts200Response.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
     return GetMounts200Response(
-      data:
-          (json['data'] as List)
-              .map<ShipMount>(
-                (e) => ShipMount.fromJson(e as Map<String, dynamic>),
-              )
-              .toList(),
+      data: (json['data'] as List)
+          .map<ShipMount>((e) => ShipMount.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 

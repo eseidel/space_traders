@@ -8,10 +8,9 @@ class GetSystems200Response {
   factory GetSystems200Response.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
     return GetSystems200Response(
-      data:
-          (json['data'] as List)
-              .map<System>((e) => System.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      data: (json['data'] as List)
+          .map<System>((e) => System.fromJson(e as Map<String, dynamic>))
+          .toList(),
       meta: Meta.fromJson(json['meta'] as Map<String, dynamic>),
     );
   }

@@ -15,12 +15,11 @@ class WarpShip200ResponseData {
     return WarpShip200ResponseData(
       nav: ShipNav.fromJson(json['nav'] as Map<String, dynamic>),
       fuel: ShipFuel.fromJson(json['fuel'] as Map<String, dynamic>),
-      events:
-          (json['events'] as List)
-              .map<ShipConditionEvent>(
-                (e) => ShipConditionEvent.fromJson(e as Map<String, dynamic>),
-              )
-              .toList(),
+      events: (json['events'] as List)
+          .map<ShipConditionEvent>(
+            (e) => ShipConditionEvent.fromJson(e as Map<String, dynamic>),
+          )
+          .toList(),
     );
   }
 

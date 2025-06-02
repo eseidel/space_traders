@@ -8,12 +8,9 @@ class GetContracts200Response {
   factory GetContracts200Response.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
     return GetContracts200Response(
-      data:
-          (json['data'] as List)
-              .map<Contract>(
-                (e) => Contract.fromJson(e as Map<String, dynamic>),
-              )
-              .toList(),
+      data: (json['data'] as List)
+          .map<Contract>((e) => Contract.fromJson(e as Map<String, dynamic>))
+          .toList(),
       meta: Meta.fromJson(json['meta'] as Map<String, dynamic>),
     );
   }

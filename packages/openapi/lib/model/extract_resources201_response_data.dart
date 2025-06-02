@@ -29,12 +29,11 @@ class ExtractResources201ResponseData {
               )
               .toList() ??
           const [],
-      events:
-          (json['events'] as List)
-              .map<ShipConditionEvent>(
-                (e) => ShipConditionEvent.fromJson(e as Map<String, dynamic>),
-              )
-              .toList(),
+      events: (json['events'] as List)
+          .map<ShipConditionEvent>(
+            (e) => ShipConditionEvent.fromJson(e as Map<String, dynamic>),
+          )
+          .toList(),
     );
   }
 

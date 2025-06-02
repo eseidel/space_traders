@@ -21,7 +21,7 @@ class ContractsApi {
     final response = await client.invokeApi(
       method: Method.get,
       path: '/my/contracts',
-      parameters: {'page': page, 'limit': limit},
+      queryParameters: {'page': ?page, 'limit': ?limit},
     );
 
     if (response.statusCode == 200) {
@@ -94,7 +94,7 @@ class ContractsApi {
         '{contractId}',
         contractId,
       ),
-      parameters: {'deliverContractRequest': deliverContractRequest.toJson()},
+      body: deliverContractRequest.toJson(),
     );
 
     if (response.statusCode == 200) {

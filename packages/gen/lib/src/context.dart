@@ -61,28 +61,39 @@ extension _EndpointGeneration on Endpoint {
   Uri uri(_Context context) => Uri.parse('${context.spec.serverUrl}$path');
 
   Map<String, dynamic> toTemplateContext(_Context context) {
-    final parameters = this.parameters
+    final serverParameters = parameters
         .map((param) => param.toTemplateContext(context))
         .toList();
-    final body = context._maybeResolve<RequestBody>(requestBody);
-    if (body != null) {
-      final templateContext = body.toTemplateContext(context);
-      parameters.add(templateContext);
-    }
+
+    final bodyObject = context._maybeResolve<RequestBody>(this.requestBody);
+    final requestBody = bodyObject?.toTemplateContext(context);
+    // Parameters as passed to the Dart function call, including the request
+    // body if it exists.
+    final dartParameters = [...serverParameters, ?requestBody];
 
     final firstResponse = context._maybeResolve(responses.firstOrNull?.content);
     final returnType = firstResponse?.typeName(context) ?? 'void';
 
-    final namedParameters = parameters.where((p) => p['required'] == false);
-    final positionalParameters = parameters.where((p) => p['required'] == true);
-
-    final pathParameters = parameters.where((p) => p['sendIn'] == 'path');
-    final queryParameters = parameters.where(
-      (p) => p['sendIn'] == 'query' || p['sendIn'] == 'body',
+    final namedParameters = dartParameters.where((p) => p['required'] == false);
+    final positionalParameters = dartParameters.where(
+      (p) => p['required'] == true,
     );
-    final hasQueryParameters = queryParameters.isNotEmpty;
 
-    // Cookie parameters are not supported for now.
+    // TODO(eseidel): This grouping should happen before converting to
+    // template context while we still have strong types.
+    final bySendIn = serverParameters.groupListsBy((p) => p['sendIn']);
+
+    final pathParameters = bySendIn['path'] ?? [];
+    final queryParameters = bySendIn['query'] ?? [];
+    final hasQueryParameters = queryParameters.isNotEmpty;
+    final cookieParameters = bySendIn['cookie'] ?? [];
+    if (cookieParameters.isNotEmpty) {
+      throw UnimplementedError('Cookie parameters are not yet supported.');
+    }
+    final headerParameters = bySendIn['header'] ?? [];
+    if (headerParameters.isNotEmpty) {
+      throw UnimplementedError('Header parameters are not yet supported.');
+    }
 
     return {
       'methodName': methodName,
@@ -97,6 +108,7 @@ extension _EndpointGeneration on Endpoint {
       'pathParameters': pathParameters,
       'hasQueryParameters': hasQueryParameters,
       'queryParameters': queryParameters,
+      'requestBody': requestBody,
       // TODO(eseidel): remove void support, it's unused.
       'returnIsVoid': returnType == 'void',
       'returnType': returnType,
@@ -572,6 +584,7 @@ extension _ParameterGeneration on Parameter {
       'required': isRequired,
       'hasDefaultValue': typeSchema.defaultValue != null,
       'defaultValue': typeSchema.defaultValueString(context),
+      'isNullable': isNullable,
       'type': typeSchema.typeName(context),
       'nullableType': typeSchema.nullableTypeName(context),
       'sendIn': sendIn.name,
@@ -608,7 +621,6 @@ extension _RequestBodyGeneration on RequestBody {
       'defaultValue': schema.defaultValueString(context),
       'type': typeName,
       'nullableType': schema.nullableTypeName(context),
-      'sendIn': 'body',
       'toJson': schema.toJsonExpression(
         paramName,
         context,

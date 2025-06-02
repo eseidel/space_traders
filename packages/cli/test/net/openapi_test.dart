@@ -42,13 +42,20 @@ void main() {
         200,
       ),
     );
-    final apiClient = ApiClient()..client = client;
+    final apiClient = ApiClient(client: client);
     final api = SystemsApi(apiClient);
-    final systems = await api.getSystems(limit: 1, page: 1);
+    final systems = await api.getSystems(limit: 1);
     verify(
       () => client.get(
         Uri.parse('https://api.spacetraders.io/v2/systems?page=1&limit=1'),
       ),
     ).called(1);
+    expect(systems.data.length, 1);
+    expect(systems.data[0].symbol, 'X1-QB10');
+    expect(systems.data[0].sectorSymbol, 'QB10');
+    expect(systems.data[0].type, SystemType.NEUTRON_STAR);
+    expect(systems.data[0].x, 0);
+    expect(systems.data[0].y, 0);
+    expect(systems.data[0].factions.length, 0);
   });
 }

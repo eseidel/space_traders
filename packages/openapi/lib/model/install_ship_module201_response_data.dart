@@ -16,12 +16,11 @@ class InstallShipModule201ResponseData {
     final json = jsonArg as Map<String, dynamic>;
     return InstallShipModule201ResponseData(
       agent: Agent.fromJson(json['agent'] as Map<String, dynamic>),
-      modules:
-          (json['modules'] as List)
-              .map<ShipModule>(
-                (e) => ShipModule.fromJson(e as Map<String, dynamic>),
-              )
-              .toList(),
+      modules: (json['modules'] as List)
+          .map<ShipModule>(
+            (e) => ShipModule.fromJson(e as Map<String, dynamic>),
+          )
+          .toList(),
       cargo: ShipCargo.fromJson(json['cargo'] as Map<String, dynamic>),
       transaction: ShipModificationTransaction.fromJson(
         json['transaction'] as Map<String, dynamic>,

@@ -29,16 +29,22 @@ class ApiClient {
   Future<Response> invokeApi({
     required Method method,
     required String path,
-    Map<String, dynamic> parameters = const {},
+    Map<String, String> queryParameters = const {},
+    // Body is nullable to allow for post requests which have an optional body
+    // to not have to generate two separate calls depending on whether the
+    // body is present or not.
+    Map<String, dynamic>? body,
   }) async {
     final uri = resolvePath(path);
-    final body = method != Method.get ? jsonEncode(parameters) : null;
+    if (method == Method.get && body != null) {
+      throw ArgumentError('Body is not allowed for GET requests');
+    }
 
     try {
       switch (method) {
         case Method.get:
           final withParams = uri.replace(
-            queryParameters: {...baseUri.queryParameters, ...parameters},
+            queryParameters: {...baseUri.queryParameters, ...queryParameters},
           );
           return client.get(withParams, headers: headers);
         case Method.post:

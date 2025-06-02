@@ -7,12 +7,11 @@ class GetMyAgentEvents200Response {
   factory GetMyAgentEvents200Response.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
     return GetMyAgentEvents200Response(
-      data:
-          (json['data'] as List)
-              .map<AgentEvent>(
-                (e) => AgentEvent.fromJson(e as Map<String, dynamic>),
-              )
-              .toList(),
+      data: (json['data'] as List)
+          .map<AgentEvent>(
+            (e) => AgentEvent.fromJson(e as Map<String, dynamic>),
+          )
+          .toList(),
     );
   }
 

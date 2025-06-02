@@ -16,14 +16,16 @@ class CountingApiClient extends ApiClient {
   Future<Response> invokeApi({
     required Method method,
     required String path,
-    Map<String, dynamic> parameters = const {},
+    Map<String, String> queryParameters = const {},
+    Map<String, dynamic>? body = const {},
   }) async {
     logger.detail(path);
     requestCounts.record(path);
     final response = await super.invokeApi(
       method: method,
       path: path,
-      parameters: parameters,
+      queryParameters: queryParameters,
+      body: body,
     );
     // logger.info(response.body);
     return response;

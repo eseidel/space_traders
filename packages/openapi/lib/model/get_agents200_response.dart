@@ -8,12 +8,11 @@ class GetAgents200Response {
   factory GetAgents200Response.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
     return GetAgents200Response(
-      data:
-          (json['data'] as List)
-              .map<PublicAgent>(
-                (e) => PublicAgent.fromJson(e as Map<String, dynamic>),
-              )
-              .toList(),
+      data: (json['data'] as List)
+          .map<PublicAgent>(
+            (e) => PublicAgent.fromJson(e as Map<String, dynamic>),
+          )
+          .toList(),
       meta: Meta.fromJson(json['meta'] as Map<String, dynamic>),
     );
   }

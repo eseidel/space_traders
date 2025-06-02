@@ -48,6 +48,10 @@ idle-1    | #9      allSystems.<anonymous closure> (package:cli/net/queries.dart
 idle-1    | #10     fetchAllPages (package:cli/net/queries.dart:17)
 ```
 
+Is the body sometimes passed in as an object, and sometimes created by
+the endpoint?  Or is it always created by the endpoint?
+
+
 ## Advantages over Open API Generator 7.0.0
 * Dart 3.0+ only (sound null safety)
 * Model code round trips through JSON correctly (TBD)

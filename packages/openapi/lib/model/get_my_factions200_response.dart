@@ -8,14 +8,13 @@ class GetMyFactions200Response {
   factory GetMyFactions200Response.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
     return GetMyFactions200Response(
-      data:
-          (json['data'] as List)
-              .map<GetMyFactions200ResponseDataInner>(
-                (e) => GetMyFactions200ResponseDataInner.fromJson(
-                  e as Map<String, dynamic>,
-                ),
-              )
-              .toList(),
+      data: (json['data'] as List)
+          .map<GetMyFactions200ResponseDataInner>(
+            (e) => GetMyFactions200ResponseDataInner.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList(),
       meta: Meta.fromJson(json['meta'] as Map<String, dynamic>),
     );
   }

@@ -12,12 +12,11 @@ class Construction {
     final json = jsonArg as Map<String, dynamic>;
     return Construction(
       symbol: json['symbol'] as String,
-      materials:
-          (json['materials'] as List)
-              .map<ConstructionMaterial>(
-                (e) => ConstructionMaterial.fromJson(e as Map<String, dynamic>),
-              )
-              .toList(),
+      materials: (json['materials'] as List)
+          .map<ConstructionMaterial>(
+            (e) => ConstructionMaterial.fromJson(e as Map<String, dynamic>),
+          )
+          .toList(),
       isComplete: json['isComplete'] as bool,
     );
   }
