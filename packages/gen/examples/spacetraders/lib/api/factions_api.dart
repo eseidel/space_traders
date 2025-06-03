@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:spacetraders/api_client.dart';
+import 'package:spacetraders/api_exception.dart';
 import 'package:spacetraders/model/get_faction200_response.dart';
 import 'package:spacetraders/model/get_factions200_response.dart';
 import 'package:spacetraders/model/get_my_factions200_response.dart';
@@ -18,16 +20,23 @@ class FactionsApi {
     final response = await client.invokeApi(
       method: Method.get,
       path: '/factions',
-      parameters: {'page': page, 'limit': limit},
+      queryParameters: {'page': page.toString(), 'limit': limit.toString()},
     );
 
-    if (response.statusCode == 200) {
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, response.body);
+    }
+
+    if (response.body.isNotEmpty) {
       return GetFactions200Response.fromJson(
         jsonDecode(response.body) as Map<String, dynamic>,
       );
-    } else {
-      throw Exception('Failed to load getFactions');
     }
+
+    throw ApiException(
+      response.statusCode,
+      'Unhandled response from $getFactions',
+    );
   }
 
   Future<GetFaction200Response> getFaction(String factionSymbol) async {
@@ -39,13 +48,20 @@ class FactionsApi {
       ),
     );
 
-    if (response.statusCode == 200) {
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, response.body);
+    }
+
+    if (response.body.isNotEmpty) {
       return GetFaction200Response.fromJson(
         jsonDecode(response.body) as Map<String, dynamic>,
       );
-    } else {
-      throw Exception('Failed to load getFaction');
     }
+
+    throw ApiException(
+      response.statusCode,
+      'Unhandled response from $getFaction',
+    );
   }
 
   Future<GetMyFactions200Response> getMyFactions({
@@ -55,15 +71,22 @@ class FactionsApi {
     final response = await client.invokeApi(
       method: Method.get,
       path: '/my/factions',
-      parameters: {'page': page, 'limit': limit},
+      queryParameters: {'page': page.toString(), 'limit': limit.toString()},
     );
 
-    if (response.statusCode == 200) {
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, response.body);
+    }
+
+    if (response.body.isNotEmpty) {
       return GetMyFactions200Response.fromJson(
         jsonDecode(response.body) as Map<String, dynamic>,
       );
-    } else {
-      throw Exception('Failed to load getMyFactions');
     }
+
+    throw ApiException(
+      response.statusCode,
+      'Unhandled response from $getMyFactions',
+    );
   }
 }
