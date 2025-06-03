@@ -124,7 +124,7 @@ class ContractsApi {
         '{contractId}',
         contractId,
       ),
-      body: deliverContractRequest.toJson(),
+      bodyJson: deliverContractRequest.toJson(),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {

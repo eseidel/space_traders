@@ -95,7 +95,7 @@ class FleetApi {
     final response = await client.invokeApi(
       method: Method.post,
       path: '/my/ships',
-      body: purchaseShipRequest.toJson(),
+      bodyJson: purchaseShipRequest.toJson(),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -275,7 +275,7 @@ class FleetApi {
         '{shipSymbol}',
         shipSymbol,
       ),
-      body: survey?.toJson(),
+      bodyJson: survey?.toJson(),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -304,7 +304,7 @@ class FleetApi {
         '{shipSymbol}',
         shipSymbol,
       ),
-      body: jettisonRequest.toJson(),
+      bodyJson: jettisonRequest.toJson(),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -333,7 +333,7 @@ class FleetApi {
         '{shipSymbol}',
         shipSymbol,
       ),
-      body: jumpShipRequest.toJson(),
+      bodyJson: jumpShipRequest.toJson(),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -493,7 +493,7 @@ class FleetApi {
         '{shipSymbol}',
         shipSymbol,
       ),
-      body: navigateShipRequest.toJson(),
+      bodyJson: navigateShipRequest.toJson(),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -522,7 +522,7 @@ class FleetApi {
         '{shipSymbol}',
         shipSymbol,
       ),
-      body: warpShipRequest.toJson(),
+      bodyJson: warpShipRequest.toJson(),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -576,7 +576,7 @@ class FleetApi {
         '{shipSymbol}',
         shipSymbol,
       ),
-      body: purchaseCargoRequest.toJson(),
+      bodyJson: purchaseCargoRequest.toJson(),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -605,7 +605,7 @@ class FleetApi {
         '{shipSymbol}',
         shipSymbol,
       ),
-      body: shipRefineRequest.toJson(),
+      bodyJson: shipRefineRequest.toJson(),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -634,7 +634,7 @@ class FleetApi {
         '{shipSymbol}',
         shipSymbol,
       ),
-      body: refuelShipRequest?.toJson(),
+      bodyJson: refuelShipRequest?.toJson(),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -713,7 +713,7 @@ class FleetApi {
         '{shipSymbol}',
         shipSymbol,
       ),
-      body: sellCargoRequest.toJson(),
+      bodyJson: sellCargoRequest.toJson(),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -792,7 +792,7 @@ class FleetApi {
         '{shipSymbol}',
         shipSymbol,
       ),
-      body: transferCargoRequest.toJson(),
+      bodyJson: transferCargoRequest.toJson(),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -871,7 +871,7 @@ class FleetApi {
         '{shipSymbol}',
         shipSymbol,
       ),
-      body: installShipModuleRequest.toJson(),
+      bodyJson: installShipModuleRequest.toJson(),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -900,7 +900,7 @@ class FleetApi {
         '{shipSymbol}',
         shipSymbol,
       ),
-      body: removeShipModuleRequest.toJson(),
+      bodyJson: removeShipModuleRequest.toJson(),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -954,7 +954,7 @@ class FleetApi {
         '{shipSymbol}',
         shipSymbol,
       ),
-      body: installMountRequest.toJson(),
+      bodyJson: installMountRequest.toJson(),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -983,7 +983,7 @@ class FleetApi {
         '{shipSymbol}',
         shipSymbol,
       ),
-      body: removeMountRequest.toJson(),
+      bodyJson: removeMountRequest.toJson(),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -1031,7 +1031,7 @@ class FleetApi {
     final response = await client.invokeApi(
       method: Method.patch,
       path: '/my/ships/{shipSymbol}/nav'.replaceAll('{shipSymbol}', shipSymbol),
-      body: patchShipNavRequest?.toJson(),
+      bodyJson: patchShipNavRequest?.toJson(),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {

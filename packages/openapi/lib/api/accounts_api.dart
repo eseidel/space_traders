@@ -39,7 +39,7 @@ class AccountsApi {
     final response = await client.invokeApi(
       method: Method.post,
       path: '/register',
-      body: registerRequest.toJson(),
+      bodyJson: registerRequest.toJson(),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {

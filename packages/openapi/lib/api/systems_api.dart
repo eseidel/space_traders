@@ -175,7 +175,7 @@ class SystemsApi {
           '/systems/{systemSymbol}/waypoints/{waypointSymbol}/construction/supply'
               .replaceAll('{systemSymbol}', systemSymbol)
               .replaceAll('{waypointSymbol}', waypointSymbol),
-      body: supplyConstructionRequest.toJson(),
+      bodyJson: supplyConstructionRequest.toJson(),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {

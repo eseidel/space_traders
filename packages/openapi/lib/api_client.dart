@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart';
@@ -26,20 +27,21 @@ class ApiClient {
     // Body is nullable to allow for post requests which have an optional body
     // to not have to generate two separate calls depending on whether the
     // body is present or not.
-    Map<String, dynamic>? body,
+    Map<String, dynamic>? bodyJson,
   }) async {
     final uri = resolvePath(path);
-    if (method == Method.get && body != null) {
+    if (method == Method.get && bodyJson != null) {
       throw ArgumentError('Body is not allowed for GET requests');
     }
 
     final maybeContentType = <String, String>{
       ...defaultHeaders,
-      if (body != null) 'Content-Type': 'application/json',
+      if (bodyJson != null) 'Content-Type': 'application/json',
     };
     // Just pass null to http if we have no headers to set.
     // This makes our calls match openapi (and thus our tests pass).
     final headers = maybeContentType.isEmpty ? null : maybeContentType;
+    final body = bodyJson != null ? jsonEncode(bodyJson) : null;
 
     try {
       switch (method) {

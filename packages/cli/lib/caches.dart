@@ -259,6 +259,8 @@ Future<TradeExportSnapshot> fetchExports(Database db, DataApi dataApi) async {
 /// Creates a new AgentCache from the API.
 Future<Agent> fetchAndCacheMyAgent(Database db, Api api) async {
   final agent = await getMyAgent(api);
+  // Just in case agent symbol is stale.
+  await db.config.setAgentSymbol(agent.symbol);
   await db.upsertAgent(agent);
   return agent;
 }
