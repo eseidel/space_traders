@@ -14,7 +14,7 @@ void main() {
   test('SystemsApi', () async {
     final client = MockClient();
     registerFallbackValue(Uri.parse('https://api.spacetraders.io/v2/systems'));
-    when(() => client.get(any())).thenAnswer(
+    when(() => client.get(any(), headers: any(named: 'headers'))).thenAnswer(
       (_) async => http.Response(
         jsonEncode(
           GetSystems200Response(
