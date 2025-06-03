@@ -382,6 +382,41 @@ SchemaRef parseSchemaOrRef({
     );
   }
 
+  if (json.containsKey('anyOf')) {
+    final anyOf = json['anyOf'] as List<dynamic>;
+    if (anyOf.length == 1) {
+      final schema = Schema.parse(anyOf.first as Json, context);
+      return SchemaRef.schema(schema);
+    }
+    if (anyOf.length == 2) {
+      final first = anyOf.first as Json;
+      final second = anyOf.last as Json;
+
+      // Two special case hacks to make space_traders work for now.
+      // One is if one is a type and the other is type=null, we just
+      // pretend the first is just marked nullable.
+      if (first.containsKey('type') && second.containsKey('type')) {
+        final firstType = first['type'] as String;
+        final secondType = second['type'] as String;
+        if (firstType == 'boolean' && secondType == 'null') {
+          return parseSchemaOrRef(json: first, context: context);
+        }
+      }
+
+      // The second hack is if one is an array of ref and the second is
+      // that ref, we just pretend it's just an array of that ref.
+      if (first.containsKey('items') && second.containsKey(r'$ref')) {
+        final items = first['items'] as Json;
+        final ref = second[r'$ref'] as String;
+        if (items[r'$ref'] == ref) {
+          return parseSchemaOrRef(json: first, context: context);
+        }
+      }
+    }
+
+    throw UnimplementedError('AnyOf with ${anyOf.length} items');
+  }
+
   return SchemaRef.schema(Schema.parse(json, context));
 }
 

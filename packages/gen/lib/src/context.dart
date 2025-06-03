@@ -61,28 +61,39 @@ extension _EndpointGeneration on Endpoint {
   Uri uri(_Context context) => Uri.parse('${context.spec.serverUrl}$path');
 
   Map<String, dynamic> toTemplateContext(_Context context) {
-    final parameters = this.parameters
+    final serverParameters = parameters
         .map((param) => param.toTemplateContext(context))
         .toList();
-    final body = context._maybeResolve<RequestBody>(requestBody);
-    if (body != null) {
-      final templateContext = body.toTemplateContext(context);
-      parameters.add(templateContext);
-    }
+
+    final bodyObject = context._maybeResolve<RequestBody>(this.requestBody);
+    final requestBody = bodyObject?.toTemplateContext(context);
+    // Parameters as passed to the Dart function call, including the request
+    // body if it exists.
+    final dartParameters = [...serverParameters, ?requestBody];
 
     final firstResponse = context._maybeResolve(responses.firstOrNull?.content);
     final returnType = firstResponse?.typeName(context) ?? 'void';
 
-    final namedParameters = parameters.where((p) => p['required'] == false);
-    final positionalParameters = parameters.where((p) => p['required'] == true);
-
-    final pathParameters = parameters.where((p) => p['sendIn'] == 'path');
-    final queryParameters = parameters.where(
-      (p) => p['sendIn'] == 'query' || p['sendIn'] == 'body',
+    final namedParameters = dartParameters.where((p) => p['required'] == false);
+    final positionalParameters = dartParameters.where(
+      (p) => p['required'] == true,
     );
-    final hasQueryParameters = queryParameters.isNotEmpty;
 
-    // Cookie parameters are not supported for now.
+    // TODO(eseidel): This grouping should happen before converting to
+    // template context while we still have strong types.
+    final bySendIn = serverParameters.groupListsBy((p) => p['sendIn']);
+
+    final pathParameters = bySendIn['path'] ?? [];
+    final queryParameters = bySendIn['query'] ?? [];
+    final hasQueryParameters = queryParameters.isNotEmpty;
+    final cookieParameters = bySendIn['cookie'] ?? [];
+    if (cookieParameters.isNotEmpty) {
+      throw UnimplementedError('Cookie parameters are not yet supported.');
+    }
+    final headerParameters = bySendIn['header'] ?? [];
+    if (headerParameters.isNotEmpty) {
+      throw UnimplementedError('Header parameters are not yet supported.');
+    }
 
     return {
       'methodName': methodName,
@@ -97,6 +108,7 @@ extension _EndpointGeneration on Endpoint {
       'pathParameters': pathParameters,
       'hasQueryParameters': hasQueryParameters,
       'queryParameters': queryParameters,
+      'requestBody': requestBody,
       // TODO(eseidel): remove void support, it's unused.
       'returnIsVoid': returnType == 'void',
       'returnType': returnType,
@@ -216,9 +228,9 @@ extension _SchemaGeneration on Schema {
   String toJsonExpression(
     String dartName,
     _Context context, {
-    required bool isNullable,
+    required bool dartIsNullable,
   }) {
-    final nameCall = isNullable ? '$dartName?' : dartName;
+    final nameCall = dartIsNullable ? '$dartName?' : dartName;
     switch (type) {
       case SchemaType.string:
         if (isDateTime) {
@@ -277,35 +289,57 @@ extension _SchemaGeneration on Schema {
     }
   }
 
+  String _orDefault({
+    required _Context context,
+    required bool jsonIsNullable,
+    required bool dartIsNullable,
+  }) {
+    if (jsonIsNullable && !dartIsNullable) {
+      final defaultValue = defaultValueString(context);
+      if (defaultValue == null) {
+        throw StateError('No default value for nullable property: $this');
+      }
+      return '?? $defaultValue';
+    }
+    return '';
+  }
+
   /// The fromJson expression for this schema.
   String fromJsonExpression(
     String jsonValue,
     _Context context, {
-    required bool isNullable,
+    required bool jsonIsNullable,
+    required bool dartIsNullable,
   }) {
-    final jsonType = jsonStorageType(isNullable: isNullable);
+    final jsonType = jsonStorageType(isNullable: jsonIsNullable);
+    final orDefault = _orDefault(
+      context: context,
+      jsonIsNullable: jsonIsNullable,
+      dartIsNullable: dartIsNullable,
+    );
+
     switch (type) {
       case SchemaType.string:
         if (isDateTime) {
-          if (isNullable) {
-            return 'maybeParseDateTime($jsonValue as $jsonType)';
+          if (jsonIsNullable) {
+            return 'maybeParseDateTime($jsonValue as $jsonType) $orDefault';
           } else {
             return 'DateTime.parse($jsonValue as $jsonType)';
           }
         } else if (isEnum) {
-          final jsonMethod = isNullable ? 'maybeFromJson' : 'fromJson';
-          return '$className.$jsonMethod($jsonValue as $jsonType)';
+          final jsonMethod = jsonIsNullable ? 'maybeFromJson' : 'fromJson';
+          return '$className.$jsonMethod($jsonValue as $jsonType) $orDefault';
         }
         return '$jsonValue as $jsonType';
       case SchemaType.integer:
       case SchemaType.boolean:
-        return '$jsonValue as $jsonType';
+        return '($jsonValue as $jsonType) $orDefault';
       case SchemaType.number:
-        final nullAware = isNullable ? '?' : '';
-        return '($jsonValue as $jsonType)$nullAware.toDouble()';
+        final nullAware = jsonIsNullable ? '?' : '';
+        return '(($jsonValue as $jsonType)$nullAware.toDouble()) $orDefault';
       case SchemaType.object:
-        final jsonMethod = isNullable ? 'maybeFromJson' : 'fromJson';
-        return '$className.$jsonMethod($jsonValue as $jsonType)';
+        final jsonMethod = jsonIsNullable ? 'maybeFromJson' : 'fromJson';
+        return '$className.$jsonMethod($jsonValue as $jsonType) $orDefault';
       case SchemaType.array:
         final itemsSchema = context._maybeResolve(items);
         if (itemsSchema == null) {
@@ -313,22 +347,26 @@ extension _SchemaGeneration on Schema {
         }
         final itemTypeName = itemsSchema.typeName(context);
 
-        final castAsList = isNullable
+        // List has special handling for nullability since we want to cast
+        // through List<dynamic> first before casting to the item type.
+        final castAsList = jsonIsNullable
             ? '($jsonValue as List?)?'
             : '($jsonValue as List)';
         final itemsFromJson = itemsSchema.fromJsonExpression(
           'e',
           context,
+          dartIsNullable: false,
           // Unless itemSchema itself has a nullable type this is always false.
-          isNullable: false,
+          jsonIsNullable: false,
         );
         // If it doesn't create a new type we can just cast the list.
         if (!itemsSchema.createsNewType) {
-          return '$castAsList.cast<$itemTypeName>()';
+          return '$castAsList.cast<$itemTypeName>() $orDefault';
         }
-        return '$castAsList.map<$itemTypeName>((e) => $itemsFromJson).toList()';
+        return '$castAsList.map<$itemTypeName>('
+            '(e) => $itemsFromJson).toList() $orDefault';
       case SchemaType.unknown:
-        return jsonValue;
+        return '$jsonValue $orDefault';
     }
   }
 
@@ -353,13 +391,14 @@ extension _SchemaGeneration on Schema {
       defaultValue != null || shouldApplyListDefaultToEmptyQuirk(context);
 
   // isNullable means it's optional for the server, use nullable storage.
-  bool propertyIsNullable({
-    required _Context context,
+  bool propertyDartIsNullable({
     required String jsonName,
+    required _Context context,
+    required bool propertyHasDefaultValue,
   }) {
     final inRequiredList = required.contains(jsonName);
     if (context.quirks.nonNullableDefaultValues) {
-      return !inRequiredList && !hasDefaultValue(context);
+      return !inRequiredList && !propertyHasDefaultValue;
     }
     return !inRequiredList;
   }
@@ -374,18 +413,23 @@ extension _SchemaGeneration on Schema {
     // Properties only need to avoid reserved words for openapi compat.
     // TODO(eseidel): Remove this once we've migrated to the new generator.
     final dartName = avoidReservedWord(jsonName);
-    final isNullable = propertyIsNullable(context: context, jsonName: jsonName);
+    final hasDefaultValue = property.hasDefaultValue(context);
+    final jsonIsNullable = !required.contains(jsonName);
+    final dartIsNullable = propertyDartIsNullable(
+      jsonName: jsonName,
+      context: context,
+      propertyHasDefaultValue: hasDefaultValue,
+    );
 
     // Means that the constructor parameter is required which is only true if
     // both the json property is required and it does not have a default.
-    final useRequired =
-        required.contains(jsonName) && !property.hasDefaultValue(context);
+    final useRequired = required.contains(jsonName) && !hasDefaultValue;
     return {
       'dartName': dartName,
       'jsonName': jsonName,
       'useRequired': useRequired,
-      'isNullable': isNullable,
-      'hasDefaultValue': property.hasDefaultValue(context),
+      'dartIsNullable': dartIsNullable,
+      'hasDefaultValue': hasDefaultValue,
       'defaultValue': property.defaultValueString(context),
       'type': property.typeName(context),
       'nullableType': property.nullableTypeName(context),
@@ -393,12 +437,13 @@ extension _SchemaGeneration on Schema {
       'toJson': property.toJsonExpression(
         dartName,
         context,
-        isNullable: isNullable,
+        dartIsNullable: dartIsNullable,
       ),
       'fromJson': property.fromJsonExpression(
         "json['$jsonName']",
         context,
-        isNullable: isNullable,
+        dartIsNullable: dartIsNullable,
+        jsonIsNullable: jsonIsNullable,
       ),
     };
   }
@@ -445,12 +490,13 @@ extension _SchemaGeneration on Schema {
       'valueToJson': valueSchema?.toJsonExpression(
         'value',
         context,
-        isNullable: isNullable,
+        dartIsNullable: isNullable,
       ),
       'valueFromJson': valueSchema?.fromJsonExpression(
         'value',
         context,
-        isNullable: isNullable,
+        jsonIsNullable: isNullable,
+        dartIsNullable: isNullable,
       ),
       'fromJsonJsonType': context.fromJsonJsonType,
       'castFromJsonArg': context.quirks.dynamicJson,
@@ -538,18 +584,20 @@ extension _ParameterGeneration on Parameter {
       'required': isRequired,
       'hasDefaultValue': typeSchema.defaultValue != null,
       'defaultValue': typeSchema.defaultValueString(context),
+      'isNullable': isNullable,
       'type': typeSchema.typeName(context),
       'nullableType': typeSchema.nullableTypeName(context),
       'sendIn': sendIn.name,
       'toJson': typeSchema.toJsonExpression(
         name,
         context,
-        isNullable: isNullable,
+        dartIsNullable: isNullable,
       ),
       'fromJson': typeSchema.fromJsonExpression(
         "json['$name']",
         context,
-        isNullable: isNullable,
+        jsonIsNullable: isNullable,
+        dartIsNullable: isNullable,
       ),
     };
   }
@@ -573,16 +621,16 @@ extension _RequestBodyGeneration on RequestBody {
       'defaultValue': schema.defaultValueString(context),
       'type': typeName,
       'nullableType': schema.nullableTypeName(context),
-      'sendIn': 'body',
       'toJson': schema.toJsonExpression(
         paramName,
         context,
-        isNullable: isNullable,
+        dartIsNullable: isNullable,
       ),
       'fromJson': schema.fromJsonExpression(
         'json',
         context,
-        isNullable: isNullable,
+        jsonIsNullable: isNullable,
+        dartIsNullable: isNullable,
       ),
     };
   }
@@ -835,7 +883,8 @@ class _Context {
     final renderedModels = rendered.map(refRegistry.get<Schema>);
     _renderPublicApi(renderedModels);
     // Consider running pub upgrade here to ensure packages are up to date.
-    _runDart(['pub', 'get']);
+    // Might need to make offline configurable?
+    _runDart(['pub', 'get', '--offline']);
     // Run format first to add missing commas.
     _runDart(['format', '.']);
     // Then run fix to clean up various other things.
@@ -1032,7 +1081,11 @@ void _renderApi(_RenderContext renderContext, _Context context, Api api) {
       .toList();
   renderContext.collectApi(api);
 
-  final imports = renderContext.sortedPackageImports(context);
+  final imports = {
+    ...renderContext.sortedPackageImports(context),
+    'dart:io', // For HttpStatus
+    'package:${context.packageName}/api_exception.dart',
+  };
 
   // The OpenAPI generator only includes the APIs in the api/ directory
   // all other classes and enums go in the model/ directory even ones

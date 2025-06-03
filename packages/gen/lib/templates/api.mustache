@@ -28,15 +28,22 @@ class {{ className }} {
             .replaceAll('{{{ bracketedName }}}', {{{ toJson }}})
             {{/pathParameters}},
             {{#hasQueryParameters}}
-            parameters: {
+            queryParameters: {
                 {{#queryParameters}}
-                '{{{ name }}}': {{{ toJson }}},
+                '{{{ name }}}': {{#isNullable}}?{{/isNullable}}{{{ toJson }}}.toString(),
                 {{/queryParameters}}
             },
             {{/hasQueryParameters}}
+            {{#requestBody}}
+            bodyJson: {{{ toJson }}},
+            {{/requestBody}}
         );
 
-        if (response.statusCode == 200) {
+        if (response.statusCode >= HttpStatus.badRequest) {
+            throw ApiException(response.statusCode, response.body.toString());
+        }
+
+        if (response.body.isNotEmpty) {
             {{#returnIsVoid}}
             return;
             {{/returnIsVoid}}
@@ -45,9 +52,9 @@ class {{ className }} {
                 jsonDecode(response.body) as Map<String, dynamic>,
             );
             {{/returnIsVoid}}
-        } else {
-            throw Exception('Failed to load {{methodName}}');
         }
+
+        throw ApiException(response.statusCode, 'Unhandled response from ${{{methodName}}}');
     }
     {{/endpoints}}
 }
