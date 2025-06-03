@@ -30,23 +30,7 @@ dart run space_gen
 * GetSupplyChain200ResponseDataExportToImportMap is unnecessary?
 * Simplify hasAdditionalProperties.
 * Handle dynamic better (e.g. RefuelShipRequest.fromCargo)
-* Split Body from Query Parameters.
-* Fix query parameters:
-```
-idle-1    | Unhandled exception:
-idle-1    | type 'int' is not a subtype of type 'Iterable<dynamic>'
-idle-1    | #0      _Uri._makeQueryFromParametersDefault.<anonymous closure> (dart:core/uri.dart:2521)
-idle-1    | #1      _LinkedHashMapMixin.forEach (dart:_compact_hash:764)
-idle-1    | #2      _Uri._makeQueryFromParametersDefault (dart:core/uri.dart:2517)
-idle-1    | #3      _Uri._makeQueryFromParameters (dart:core-patch/uri_patch.dart:88)
-idle-1    | #4      _Uri._makeQuery (dart:core/uri.dart:2490)
-idle-1    | #5      _SimpleUri.replace (dart:core/uri.dart:4483)
-idle-1    | #6      ApiClient.invokeApi (package:openapi/api_client.dart:36)
-idle-1    | #7      CountingApiClient.invokeApi (package:cli/net/counts.dart:23)
-idle-1    | #8      SystemsApi.getSystems (package:openapi/api/systems_api.dart:26)
-idle-1    | #9      allSystems.<anonymous closure> (package:cli/net/queries.dart:30)
-idle-1    | #10     fetchAllPages (package:cli/net/queries.dart:17)
-```
+* Fix toString hack for queryParameters.
 
 Is the body sometimes passed in as an object, and sometimes created by
 the endpoint?  Or is it always created by the endpoint?

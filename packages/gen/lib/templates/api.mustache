@@ -30,7 +30,7 @@ class {{ className }} {
             {{#hasQueryParameters}}
             queryParameters: {
                 {{#queryParameters}}
-                '{{{ name }}}': {{#isNullable}}?{{/isNullable}}{{{ toJson }}},
+                '{{{ name }}}': {{#isNullable}}?{{/isNullable}}{{{ toJson }}}.toString(),
                 {{/queryParameters}}
             },
             {{/hasQueryParameters}}

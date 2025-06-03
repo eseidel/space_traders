@@ -26,7 +26,7 @@ class SystemsApi {
     final response = await client.invokeApi(
       method: Method.get,
       path: '/systems',
-      queryParameters: {'page': ?page, 'limit': ?limit},
+      queryParameters: {'page': page.toString(), 'limit': limit.toString()},
     );
 
     if (response.statusCode == 200) {
@@ -70,10 +70,10 @@ class SystemsApi {
         systemSymbol,
       ),
       queryParameters: {
-        'page': ?page,
-        'limit': ?limit,
+        'page': page.toString(),
+        'limit': limit.toString(),
         'type': ?type?.toJson(),
-        'traits': ?traits,
+        'traits': traits.toString(),
       },
     );
 

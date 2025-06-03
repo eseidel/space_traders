@@ -883,7 +883,8 @@ class _Context {
     final renderedModels = rendered.map(refRegistry.get<Schema>);
     _renderPublicApi(renderedModels);
     // Consider running pub upgrade here to ensure packages are up to date.
-    _runDart(['pub', 'get']);
+    // Might need to make offline configurable?
+    _runDart(['pub', 'get', '--offline']);
     // Run format first to add missing commas.
     _runDart(['format', '.']);
     // Then run fix to clean up various other things.
