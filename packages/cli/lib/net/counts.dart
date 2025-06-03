@@ -17,7 +17,7 @@ class CountingApiClient extends ApiClient {
     required Method method,
     required String path,
     Map<String, String> queryParameters = const {},
-    Map<String, dynamic>? body = const {},
+    Map<String, dynamic>? body,
   }) async {
     logger.detail(path);
     requestCounts.record(path);

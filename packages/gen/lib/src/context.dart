@@ -1081,7 +1081,11 @@ void _renderApi(_RenderContext renderContext, _Context context, Api api) {
       .toList();
   renderContext.collectApi(api);
 
-  final imports = renderContext.sortedPackageImports(context);
+  final imports = {
+    ...renderContext.sortedPackageImports(context),
+    'dart:io', // For HttpStatus
+    'package:${context.packageName}/api_exception.dart',
+  };
 
   // The OpenAPI generator only includes the APIs in the api/ directory
   // all other classes and enums go in the model/ directory even ones
