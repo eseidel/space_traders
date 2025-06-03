@@ -14,6 +14,7 @@ import 'package:openapi/model/get_systems200_response.dart';
 import 'package:openapi/model/get_waypoint200_response.dart';
 import 'package:openapi/model/supply_construction201_response.dart';
 import 'package:openapi/model/supply_construction_request.dart';
+import 'package:openapi/model/waypoint_trait_symbol.dart';
 import 'package:openapi/model/waypoint_type.dart';
 
 class SystemsApi {
@@ -77,7 +78,7 @@ class SystemsApi {
     int? page = 1,
     int? limit = 10,
     WaypointType? type,
-    dynamic traits,
+    List<WaypointTraitSymbol>? traits,
   }) async {
     final response = await client.invokeApi(
       method: Method.get,

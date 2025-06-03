@@ -1,11 +1,11 @@
 class RefuelShipRequest {
-  RefuelShipRequest({this.units, this.fromCargo = false});
+  RefuelShipRequest({this.units, this.fromCargo});
 
   factory RefuelShipRequest.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
     return RefuelShipRequest(
       units: json['units'] as int?,
-      fromCargo: json['fromCargo'] ?? false,
+      fromCargo: json['fromCargo'] as bool?,
     );
   }
 
@@ -19,7 +19,7 @@ class RefuelShipRequest {
   }
 
   int? units;
-  dynamic fromCargo;
+  bool? fromCargo;
 
   Map<String, dynamic> toJson() {
     return {'units': units, 'fromCargo': fromCargo};
@@ -33,6 +33,6 @@ class RefuelShipRequest {
     if (identical(this, other)) return true;
     return other is RefuelShipRequest &&
         units == other.units &&
-        identical(fromCargo, other.fromCargo);
+        fromCargo == other.fromCargo;
   }
 }
