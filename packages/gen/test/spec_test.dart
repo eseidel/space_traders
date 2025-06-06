@@ -10,6 +10,22 @@ void main() {
       );
     }
 
+    Map<String, Schema> parseTestSchemas(Map<String, dynamic> schemasJson) {
+      final specJson = {
+        'servers': [
+          {'url': 'https://api.spacetraders.io/v2'},
+        ],
+        'paths': {
+          '/users': {
+            'get': {'summary': 'Get user'},
+          },
+        },
+        'components': {'schemas': schemasJson},
+      };
+      final spec = parseTestSpec(specJson);
+      return spec.components.schemas;
+    }
+
     test('parse', () {
       final specJson = {
         'servers': [
@@ -27,26 +43,14 @@ void main() {
     });
 
     test('parse with invalid enum', () {
-      final specJson = {
-        'servers': [
-          {'url': 'https://api.spacetraders.io/v2'},
-        ],
-        'paths': {
-          '/users': {
-            'get': {'summary': 'Get user'},
-          },
-        },
-        'components': {
-          'schemas': {
-            'NumberEnum': {
-              // This is valid according to the spec, but we don't support it.
-              'type': 'number',
-              'enum': [1, 2, 3],
-            },
-          },
+      final json = {
+        'NumberEnum': {
+          // This is valid according to the spec, but we don't support it.
+          'type': 'number',
+          'enum': [1, 2, 3],
         },
       };
-      expect(() => parseTestSpec(specJson), throwsA(isA<UnimplementedError>()));
+      expect(() => parseTestSchemas(json), throwsA(isA<UnimplementedError>()));
     });
 
     test('equals', () {
@@ -98,59 +102,59 @@ void main() {
     });
 
     test('anyOf nullable hack', () {
-      final specJson = {
-        'servers': [
-          {'url': 'https://api.spacetraders.io/v2'},
-        ],
-        'paths': {
-          '/users': {
-            'get': {'summary': 'Get user'},
-          },
-        },
-        'components': {
-          'schemas': {
-            'User': {
-              'anyOf': [
-                {'type': 'boolean'},
-                {'type': 'null'},
-              ],
-            },
-          },
+      final json = {
+        'User': {
+          'anyOf': [
+            {'type': 'boolean'},
+            {'type': 'null'},
+          ],
         },
       };
-      final spec = parseTestSpec(specJson);
-      expect(spec.components.schemas['User']!.type, SchemaType.boolean);
+      final schemas = parseTestSchemas(json);
+      expect(schemas['User']!.type, SchemaType.boolean);
     });
 
     test('anyOf array hack', () {
-      final specJson = {
-        'servers': [
-          {'url': 'https://api.spacetraders.io/v2'},
-        ],
-        'paths': {
-          '/users': {
-            'get': {'summary': 'Get user'},
-          },
-        },
-        'components': {
-          'schemas': {
-            'User': {
-              'anyOf': [
-                {
-                  'type': 'array',
-                  'items': {r'$ref': '#/components/schemas/Value'},
-                },
-                {r'$ref': '#/components/schemas/Value'},
-              ],
+      final json = {
+        'User': {
+          'anyOf': [
+            {
+              'type': 'array',
+              'items': {r'$ref': '#/components/schemas/Value'},
             },
-            'Value': {'type': 'boolean'},
-          },
+            {r'$ref': '#/components/schemas/Value'},
+          ],
+        },
+        'Value': {'type': 'boolean'},
+      };
+      final schemas = parseTestSchemas(json);
+      final schema = schemas['User']!;
+      expect(schema.type, SchemaType.array);
+      expect(schema.items!.ref, '#/components/schemas/Value');
+    });
+
+    test('anyOf with one value', () {
+      final json = {
+        'User': {
+          'anyOf': [
+            {'type': 'boolean'},
+          ],
         },
       };
-      final spec = parseTestSpec(specJson);
-      final schema = spec.components.schemas['User'];
-      expect(schema!.type, SchemaType.array);
-      expect(schema.items!.ref, '#/components/schemas/Value');
+      final schemas = parseTestSchemas(json);
+      expect(schemas['User']!.type, SchemaType.boolean);
+    });
+
+    test('anyOf not generally supported', () {
+      final json = {
+        'User': {
+          'anyOf': [
+            {'type': 'boolean'},
+            {'type': 'string'},
+          ],
+        },
+      };
+      expect(() => parseTestSchemas(json), throwsA(isA<UnimplementedError>()));
     });
   });
 
