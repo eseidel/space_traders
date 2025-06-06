@@ -8,7 +8,7 @@ class ShipTypeConverter implements JsonConverter<ShipType, String> {
   const ShipTypeConverter();
 
   @override
-  ShipType fromJson(String json) => ShipType.fromJson(json)!;
+  ShipType fromJson(String json) => ShipType.fromJson(json);
 
   @override
   String toJson(ShipType object) => object.toJson();
@@ -21,7 +21,7 @@ class TradeSymbolConverter implements JsonConverter<TradeSymbol, String> {
   const TradeSymbolConverter();
 
   @override
-  TradeSymbol fromJson(String json) => TradeSymbol.fromJson(json)!;
+  TradeSymbol fromJson(String json) => TradeSymbol.fromJson(json);
 
   @override
   String toJson(TradeSymbol object) => object.toJson();

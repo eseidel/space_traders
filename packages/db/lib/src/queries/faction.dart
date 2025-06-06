@@ -22,5 +22,5 @@ Map<String, dynamic> factionToColumnMap(Faction faction) {
 
 /// Convert a result row to a faction.
 Faction factionFromColumnMap(Map<String, dynamic> values) {
-  return Faction.fromJson(values['json'] as Map<String, dynamic>)!;
+  return Faction.fromJson(values['json'] as Map<String, dynamic>);
 }

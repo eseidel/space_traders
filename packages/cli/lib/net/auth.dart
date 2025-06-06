@@ -2,7 +2,6 @@ import 'package:cli/api.dart';
 import 'package:cli/net/counts.dart';
 import 'package:cli/net/queue.dart';
 import 'package:db/db.dart';
-import 'package:types/types.dart';
 
 export 'package:cli/net/queue.dart'
     show networkPriorityDefault, networkPriorityLow;
@@ -23,19 +22,13 @@ CountingApiClient getApiClient(
   Database db, {
   int Function() getPriority = defaultGetPriority,
   String? overrideBaseUrl,
-  Authentication? auth,
+  Map<String, String>? defaultHeaders,
 }) {
-  final CountingApiClient apiClient;
-  if (overrideBaseUrl != null) {
-    apiClient = CountingApiClient(
-      authentication: auth,
-      basePath: overrideBaseUrl,
-    );
-  } else {
-    apiClient = CountingApiClient(authentication: auth);
-  }
-  apiClient.client = getQueuedClient(db, getPriority: getPriority);
-  return apiClient;
+  return CountingApiClient(
+    baseUri: overrideBaseUrl != null ? Uri.parse(overrideBaseUrl) : null,
+    defaultHeaders: defaultHeaders ?? {},
+    client: getQueuedClient(db, getPriority: getPriority),
+  );
 }
 
 /// apiFromAuthToken creates an Api with the given auth token.
@@ -44,8 +37,12 @@ Api apiFromAuthToken(
   Database db, {
   int Function() getPriority = defaultGetPriority,
 }) {
-  final auth = HttpBearerAuth()..accessToken = token;
-  final apiClient = getApiClient(db, getPriority: getPriority, auth: auth);
+  final defaultHeaders = <String, String>{'Authorization': 'Bearer $token'};
+  final apiClient = getApiClient(
+    db,
+    getPriority: getPriority,
+    defaultHeaders: defaultHeaders,
+  );
   return Api(apiClient);
 }
 

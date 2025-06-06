@@ -1,117 +1,55 @@
-//
-// AUTO-GENERATED FILE, DO NOT MODIFY!
-//
-// @dart=2.18
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
-// ignore_for_file: unused_element, unused_import
-// ignore_for_file: always_put_required_named_parameters_first
-// ignore_for_file: constant_identifier_names
-// ignore_for_file: lines_longer_than_80_chars
-
-part of openapi;
+import 'package:openapi/api_client.dart';
+import 'package:openapi/api_exception.dart';
+import 'package:openapi/model/get_error_codes200_response.dart';
+import 'package:openapi/model/get_status200_response.dart';
 
 class GlobalApi {
-  GlobalApi([ApiClient? apiClient]) : apiClient = apiClient ?? defaultApiClient;
+  GlobalApi(ApiClient? client) : client = client ?? ApiClient();
 
-  final ApiClient apiClient;
+  final ApiClient client;
 
-  /// Error code list
-  ///
-  /// Return a list of all possible error codes thrown by the game server.
-  ///
-  /// Note: This method returns the HTTP [Response].
-  Future<Response> getErrorCodesWithHttpInfo() async {
-    // ignore: prefer_const_declarations
-    final path = r'/error-codes';
+  Future<GetStatus200Response> getStatus() async {
+    final response = await client.invokeApi(method: Method.get, path: '/');
 
-    // ignore: prefer_final_locals
-    Object? postBody;
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, response.body);
+    }
 
-    final queryParams = <QueryParam>[];
-    final headerParams = <String, String>{};
-    final formParams = <String, String>{};
+    if (response.body.isNotEmpty) {
+      return GetStatus200Response.fromJson(
+        jsonDecode(response.body) as Map<String, dynamic>,
+      );
+    }
 
-    const contentTypes = <String>[];
-
-    return apiClient.invokeAPI(
-      path,
-      'GET',
-      queryParams,
-      postBody,
-      headerParams,
-      formParams,
-      contentTypes.isEmpty ? null : contentTypes.first,
+    throw ApiException(
+      response.statusCode,
+      'Unhandled response from $getStatus',
     );
   }
 
-  /// Error code list
-  ///
-  /// Return a list of all possible error codes thrown by the game server.
-  Future<GetErrorCodes200Response?> getErrorCodes() async {
-    final response = await getErrorCodesWithHttpInfo();
-    if (response.statusCode >= HttpStatus.badRequest) {
-      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
-    }
-    // When a remote server returns no body with a status of 204, we shall not decode it.
-    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
-    // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty &&
-        response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(
-        await _decodeBodyBytes(response),
-        'GetErrorCodes200Response',
-      ) as GetErrorCodes200Response;
-    }
-    return null;
-  }
-
-  /// Server status
-  ///
-  /// Return the status of the game server. This also includes a few global elements, such as announcements, server reset dates and leaderboards.
-  ///
-  /// Note: This method returns the HTTP [Response].
-  Future<Response> getStatusWithHttpInfo() async {
-    // ignore: prefer_const_declarations
-    final path = r'/';
-
-    // ignore: prefer_final_locals
-    Object? postBody;
-
-    final queryParams = <QueryParam>[];
-    final headerParams = <String, String>{};
-    final formParams = <String, String>{};
-
-    const contentTypes = <String>[];
-
-    return apiClient.invokeAPI(
-      path,
-      'GET',
-      queryParams,
-      postBody,
-      headerParams,
-      formParams,
-      contentTypes.isEmpty ? null : contentTypes.first,
+  Future<GetErrorCodes200Response> getErrorCodes() async {
+    final response = await client.invokeApi(
+      method: Method.get,
+      path: '/error-codes',
     );
-  }
 
-  /// Server status
-  ///
-  /// Return the status of the game server. This also includes a few global elements, such as announcements, server reset dates and leaderboards.
-  Future<GetStatus200Response?> getStatus() async {
-    final response = await getStatusWithHttpInfo();
     if (response.statusCode >= HttpStatus.badRequest) {
-      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+      throw ApiException(response.statusCode, response.body);
     }
-    // When a remote server returns no body with a status of 204, we shall not decode it.
-    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
-    // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty &&
-        response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(
-        await _decodeBodyBytes(response),
-        'GetStatus200Response',
-      ) as GetStatus200Response;
+
+    if (response.body.isNotEmpty) {
+      return GetErrorCodes200Response.fromJson(
+        jsonDecode(response.body) as Map<String, dynamic>,
+      );
     }
-    return null;
+
+    throw ApiException(
+      response.statusCode,
+      'Unhandled response from $getErrorCodes',
+    );
   }
 }

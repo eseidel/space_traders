@@ -1,137 +1,66 @@
-//
-// AUTO-GENERATED FILE, DO NOT MODIFY!
-//
-// @dart=2.18
-
-// ignore_for_file: unused_element, unused_import
-// ignore_for_file: always_put_required_named_parameters_first
-// ignore_for_file: constant_identifier_names
-// ignore_for_file: lines_longer_than_80_chars
-
-part of openapi;
+import 'package:openapi/model/get_status200_response_leaderboards_most_credits_inner.dart';
+import 'package:openapi/model/get_status200_response_leaderboards_most_submitted_charts_inner.dart';
+import 'package:openapi/model_helpers.dart';
 
 class GetStatus200ResponseLeaderboards {
-  /// Returns a new [GetStatus200ResponseLeaderboards] instance.
   GetStatus200ResponseLeaderboards({
     this.mostCredits = const [],
     this.mostSubmittedCharts = const [],
   });
 
-  /// Top agents with the most credits.
+  factory GetStatus200ResponseLeaderboards.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
+    return GetStatus200ResponseLeaderboards(
+      mostCredits: (json['mostCredits'] as List)
+          .map<GetStatus200ResponseLeaderboardsMostCreditsInner>(
+            (e) => GetStatus200ResponseLeaderboardsMostCreditsInner.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList(),
+      mostSubmittedCharts: (json['mostSubmittedCharts'] as List)
+          .map<GetStatus200ResponseLeaderboardsMostSubmittedChartsInner>(
+            (e) =>
+                GetStatus200ResponseLeaderboardsMostSubmittedChartsInner.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+          )
+          .toList(),
+    );
+  }
+
+  /// Convenience to create a nullable type from a nullable json object.
+  /// Useful when parsing optional fields.
+  static GetStatus200ResponseLeaderboards? maybeFromJson(
+    Map<String, dynamic>? json,
+  ) {
+    if (json == null) {
+      return null;
+    }
+    return GetStatus200ResponseLeaderboards.fromJson(json);
+  }
+
   List<GetStatus200ResponseLeaderboardsMostCreditsInner> mostCredits;
-
-  /// Top agents with the most charted submitted.
   List<GetStatus200ResponseLeaderboardsMostSubmittedChartsInner>
-      mostSubmittedCharts;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is GetStatus200ResponseLeaderboards &&
-          _deepEquality.equals(other.mostCredits, mostCredits) &&
-          _deepEquality.equals(other.mostSubmittedCharts, mostSubmittedCharts);
-
-  @override
-  int get hashCode =>
-      // ignore: unnecessary_parenthesis
-      (mostCredits.hashCode) + (mostSubmittedCharts.hashCode);
-
-  @override
-  String toString() =>
-      'GetStatus200ResponseLeaderboards[mostCredits=$mostCredits, mostSubmittedCharts=$mostSubmittedCharts]';
+  mostSubmittedCharts;
 
   Map<String, dynamic> toJson() {
-    final json = <String, dynamic>{};
-    json[r'mostCredits'] = this.mostCredits;
-    json[r'mostSubmittedCharts'] = this.mostSubmittedCharts;
-    return json;
+    return {
+      'mostCredits': mostCredits.map((e) => e.toJson()).toList(),
+      'mostSubmittedCharts': mostSubmittedCharts
+          .map((e) => e.toJson())
+          .toList(),
+    };
   }
 
-  /// Returns a new [GetStatus200ResponseLeaderboards] instance and imports its values from
-  /// [value] if it's a [Map], null otherwise.
-  // ignore: prefer_constructors_over_static_methods
-  static GetStatus200ResponseLeaderboards? fromJson(dynamic value) {
-    if (value is Map) {
-      final json = value.cast<String, dynamic>();
+  @override
+  int get hashCode => Object.hash(mostCredits, mostSubmittedCharts);
 
-      // Ensure that the map contains the required keys.
-      // Note 1: the values aren't checked for validity beyond being non-null.
-      // Note 2: this code is stripped in release mode!
-      assert(() {
-        requiredKeys.forEach((key) {
-          assert(json.containsKey(key),
-              'Required key "GetStatus200ResponseLeaderboards[$key]" is missing from JSON.');
-          assert(json[key] != null,
-              'Required key "GetStatus200ResponseLeaderboards[$key]" has a null value in JSON.');
-        });
-        return true;
-      }());
-
-      return GetStatus200ResponseLeaderboards(
-        mostCredits:
-            GetStatus200ResponseLeaderboardsMostCreditsInner.listFromJson(
-                json[r'mostCredits']),
-        mostSubmittedCharts:
-            GetStatus200ResponseLeaderboardsMostSubmittedChartsInner
-                .listFromJson(json[r'mostSubmittedCharts']),
-      );
-    }
-    return null;
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is GetStatus200ResponseLeaderboards &&
+        listsEqual(mostCredits, other.mostCredits) &&
+        listsEqual(mostSubmittedCharts, other.mostSubmittedCharts);
   }
-
-  static List<GetStatus200ResponseLeaderboards> listFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
-    final result = <GetStatus200ResponseLeaderboards>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = GetStatus200ResponseLeaderboards.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-
-  static Map<String, GetStatus200ResponseLeaderboards> mapFromJson(
-      dynamic json) {
-    final map = <String, GetStatus200ResponseLeaderboards>{};
-    if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
-      for (final entry in json.entries) {
-        final value = GetStatus200ResponseLeaderboards.fromJson(entry.value);
-        if (value != null) {
-          map[entry.key] = value;
-        }
-      }
-    }
-    return map;
-  }
-
-  // maps a json object with a list of GetStatus200ResponseLeaderboards-objects as value to a dart map
-  static Map<String, List<GetStatus200ResponseLeaderboards>> mapListFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
-    final map = <String, List<GetStatus200ResponseLeaderboards>>{};
-    if (json is Map && json.isNotEmpty) {
-      // ignore: parameter_assignments
-      json = json.cast<String, dynamic>();
-      for (final entry in json.entries) {
-        map[entry.key] = GetStatus200ResponseLeaderboards.listFromJson(
-          entry.value,
-          growable: growable,
-        );
-      }
-    }
-    return map;
-  }
-
-  /// The list of required keys that must be present in a JSON.
-  static const requiredKeys = <String>{
-    'mostCredits',
-    'mostSubmittedCharts',
-  };
 }

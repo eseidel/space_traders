@@ -7,31 +7,25 @@ import 'package:types/types.dart';
 /// ApiClient that counts the number of requests made.
 class CountingApiClient extends ApiClient {
   /// Construct a rate limited api client.
-  CountingApiClient({super.authentication, super.basePath});
+  CountingApiClient({super.baseUri, super.client, super.defaultHeaders});
 
   /// RequestCounts tracks the number of requests made to each path.
   final RequestCounts requestCounts = RequestCounts();
 
   @override
-  Future<Response> invokeAPI(
-    String path,
-    String method,
-    List<QueryParam> queryParams,
-    Object? body,
-    Map<String, String> headerParams,
-    Map<String, String> formParams,
-    String? contentType,
-  ) async {
+  Future<Response> invokeApi({
+    required Method method,
+    required String path,
+    Map<String, String> queryParameters = const {},
+    Map<String, dynamic>? bodyJson,
+  }) async {
     logger.detail(path);
     requestCounts.record(path);
-    final response = await super.invokeAPI(
-      path,
-      method,
-      queryParams,
-      body,
-      headerParams,
-      formParams,
-      contentType,
+    final response = await super.invokeApi(
+      method: method,
+      path: path,
+      queryParameters: queryParameters,
+      bodyJson: bodyJson,
     );
     // logger.info(response.body);
     return response;

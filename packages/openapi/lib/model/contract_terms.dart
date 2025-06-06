@@ -1,137 +1,61 @@
-//
-// AUTO-GENERATED FILE, DO NOT MODIFY!
-//
-// @dart=2.18
-
-// ignore_for_file: unused_element, unused_import
-// ignore_for_file: always_put_required_named_parameters_first
-// ignore_for_file: constant_identifier_names
-// ignore_for_file: lines_longer_than_80_chars
-
-part of openapi;
+import 'package:openapi/model/contract_deliver_good.dart';
+import 'package:openapi/model/contract_payment.dart';
+import 'package:openapi/model_helpers.dart';
 
 class ContractTerms {
-  /// Returns a new [ContractTerms] instance.
   ContractTerms({
     required this.deadline,
     required this.payment,
     this.deliver = const [],
   });
 
-  /// The deadline for the contract.
+  factory ContractTerms.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
+    return ContractTerms(
+      deadline: DateTime.parse(json['deadline'] as String),
+      payment: ContractPayment.fromJson(
+        json['payment'] as Map<String, dynamic>,
+      ),
+      deliver:
+          (json['deliver'] as List?)
+              ?.map<ContractDeliverGood>(
+                (e) => ContractDeliverGood.fromJson(e as Map<String, dynamic>),
+              )
+              .toList() ??
+          const [],
+    );
+  }
+
+  /// Convenience to create a nullable type from a nullable json object.
+  /// Useful when parsing optional fields.
+  static ContractTerms? maybeFromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return null;
+    }
+    return ContractTerms.fromJson(json);
+  }
+
   DateTime deadline;
-
   ContractPayment payment;
-
-  /// The cargo that needs to be delivered to fulfill the contract.
   List<ContractDeliverGood> deliver;
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ContractTerms &&
-          other.deadline == deadline &&
-          other.payment == payment &&
-          _deepEquality.equals(other.deliver, deliver);
-
-  @override
-  int get hashCode =>
-      // ignore: unnecessary_parenthesis
-      (deadline.hashCode) + (payment.hashCode) + (deliver.hashCode);
-
-  @override
-  String toString() =>
-      'ContractTerms[deadline=$deadline, payment=$payment, deliver=$deliver]';
-
   Map<String, dynamic> toJson() {
-    final json = <String, dynamic>{};
-    json[r'deadline'] = this.deadline.toUtc().toIso8601String();
-    json[r'payment'] = this.payment;
-    json[r'deliver'] = this.deliver;
-    return json;
+    return {
+      'deadline': deadline.toIso8601String(),
+      'payment': payment.toJson(),
+      'deliver': deliver.map((e) => e.toJson()).toList(),
+    };
   }
 
-  /// Returns a new [ContractTerms] instance and imports its values from
-  /// [value] if it's a [Map], null otherwise.
-  // ignore: prefer_constructors_over_static_methods
-  static ContractTerms? fromJson(dynamic value) {
-    if (value is Map) {
-      final json = value.cast<String, dynamic>();
+  @override
+  int get hashCode => Object.hash(deadline, payment, deliver);
 
-      // Ensure that the map contains the required keys.
-      // Note 1: the values aren't checked for validity beyond being non-null.
-      // Note 2: this code is stripped in release mode!
-      assert(() {
-        requiredKeys.forEach((key) {
-          assert(json.containsKey(key),
-              'Required key "ContractTerms[$key]" is missing from JSON.');
-          assert(json[key] != null,
-              'Required key "ContractTerms[$key]" has a null value in JSON.');
-        });
-        return true;
-      }());
-
-      return ContractTerms(
-        deadline: mapDateTime(json, r'deadline', r'')!,
-        payment: ContractPayment.fromJson(json[r'payment'])!,
-        deliver: ContractDeliverGood.listFromJson(json[r'deliver']),
-      );
-    }
-    return null;
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ContractTerms &&
+        deadline == other.deadline &&
+        payment == other.payment &&
+        listsEqual(deliver, other.deliver);
   }
-
-  static List<ContractTerms> listFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
-    final result = <ContractTerms>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = ContractTerms.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-
-  static Map<String, ContractTerms> mapFromJson(dynamic json) {
-    final map = <String, ContractTerms>{};
-    if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
-      for (final entry in json.entries) {
-        final value = ContractTerms.fromJson(entry.value);
-        if (value != null) {
-          map[entry.key] = value;
-        }
-      }
-    }
-    return map;
-  }
-
-  // maps a json object with a list of ContractTerms-objects as value to a dart map
-  static Map<String, List<ContractTerms>> mapListFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
-    final map = <String, List<ContractTerms>>{};
-    if (json is Map && json.isNotEmpty) {
-      // ignore: parameter_assignments
-      json = json.cast<String, dynamic>();
-      for (final entry in json.entries) {
-        map[entry.key] = ContractTerms.listFromJson(
-          entry.value,
-          growable: growable,
-        );
-      }
-    }
-    return map;
-  }
-
-  /// The list of required keys that must be present in a JSON.
-  static const requiredKeys = <String>{
-    'deadline',
-    'payment',
-  };
 }

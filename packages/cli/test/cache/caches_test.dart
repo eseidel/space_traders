@@ -8,6 +8,8 @@ class _MockApi extends Mock implements Api {}
 
 class _MockBehaviorStore extends Mock implements BehaviorStore {}
 
+class _MockConfigStore extends Mock implements ConfigStore {}
+
 class _MockConstructionStore extends Mock implements ConstructionStore {}
 
 class _MockContractsApi extends Mock implements ContractsApi {}
@@ -157,7 +159,11 @@ void main() {
     ).thenAnswer((_) async => []);
     when(dataApi.getSupplyChain).thenAnswer(
       (_) async => GetSupplyChain200Response(
-        data: GetSupplyChain200ResponseData(exportToImportMap: {}),
+        data: GetSupplyChain200ResponseData(
+          exportToImportMap: GetSupplyChain200ResponseDataExportToImportMap(
+            entries: {},
+          ),
+        ),
       ),
     );
 
@@ -264,6 +270,8 @@ void main() {
 
   test('fetchAndCacheMyAgent', () async {
     final db = _MockDatabase();
+    final configStore = _MockConfigStore();
+    when(() => db.config).thenReturn(configStore);
     final api = _MockApi();
     final agentsApi = _MockAgentsApi();
     when(() => api.agents).thenReturn(agentsApi);
@@ -272,12 +280,14 @@ void main() {
     when(agentsApi.getMyAgent).thenAnswer((_) async => response);
     registerFallbackValue(agent);
     when(() => db.upsertAgent(any())).thenAnswer((_) async => {});
+    when(() => configStore.setAgentSymbol(any())).thenAnswer((_) async => {});
     await runWithLogger(
       _MockLogger(),
       () async => fetchAndCacheMyAgent(db, api),
     );
     verify(agentsApi.getMyAgent).called(1);
     verify(() => db.upsertAgent(agent)).called(1);
+    verify(() => configStore.setAgentSymbol(agent.symbol)).called(1);
   });
 
   test('getOrFetchJumpGate', () async {

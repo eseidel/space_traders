@@ -1,266 +1,108 @@
-//
-// AUTO-GENERATED FILE, DO NOT MODIFY!
-//
-// @dart=2.18
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
-// ignore_for_file: unused_element, unused_import
-// ignore_for_file: always_put_required_named_parameters_first
-// ignore_for_file: constant_identifier_names
-// ignore_for_file: lines_longer_than_80_chars
-
-part of openapi;
+import 'package:openapi/api_client.dart';
+import 'package:openapi/api_exception.dart';
+import 'package:openapi/model/get_agent200_response.dart';
+import 'package:openapi/model/get_agents200_response.dart';
+import 'package:openapi/model/get_my_agent200_response.dart';
+import 'package:openapi/model/get_my_agent_events200_response.dart';
 
 class AgentsApi {
-  AgentsApi([ApiClient? apiClient]) : apiClient = apiClient ?? defaultApiClient;
+  AgentsApi(ApiClient? client) : client = client ?? ApiClient();
 
-  final ApiClient apiClient;
+  final ApiClient client;
 
-  /// Get public details for a specific agent.
-  ///
-  /// Get public details for a specific agent.
-  ///
-  /// Note: This method returns the HTTP [Response].
-  ///
-  /// Parameters:
-  ///
-  /// * [String] agentSymbol (required):
-  ///   The agent symbol
-  Future<Response> getAgentWithHttpInfo(
-    String agentSymbol,
-  ) async {
-    // ignore: prefer_const_declarations
-    final path =
-        r'/agents/{agentSymbol}'.replaceAll('{agentSymbol}', agentSymbol);
-
-    // ignore: prefer_final_locals
-    Object? postBody;
-
-    final queryParams = <QueryParam>[];
-    final headerParams = <String, String>{};
-    final formParams = <String, String>{};
-
-    const contentTypes = <String>[];
-
-    return apiClient.invokeAPI(
-      path,
-      'GET',
-      queryParams,
-      postBody,
-      headerParams,
-      formParams,
-      contentTypes.isEmpty ? null : contentTypes.first,
-    );
-  }
-
-  /// Get public details for a specific agent.
-  ///
-  /// Get public details for a specific agent.
-  ///
-  /// Parameters:
-  ///
-  /// * [String] agentSymbol (required):
-  ///   The agent symbol
-  Future<GetAgent200Response?> getAgent(
-    String agentSymbol,
-  ) async {
-    final response = await getAgentWithHttpInfo(
-      agentSymbol,
-    );
-    if (response.statusCode >= HttpStatus.badRequest) {
-      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
-    }
-    // When a remote server returns no body with a status of 204, we shall not decode it.
-    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
-    // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty &&
-        response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(
-        await _decodeBodyBytes(response),
-        'GetAgent200Response',
-      ) as GetAgent200Response;
-    }
-    return null;
-  }
-
-  /// List all public agent details.
-  ///
-  /// List all public agent details.
-  ///
-  /// Note: This method returns the HTTP [Response].
-  ///
-  /// Parameters:
-  ///
-  /// * [int] page:
-  ///   What entry offset to request
-  ///
-  /// * [int] limit:
-  ///   How many entries to return per page
-  Future<Response> getAgentsWithHttpInfo({
-    int? page,
-    int? limit,
+  Future<GetAgents200Response> getAgents({
+    int? page = 1,
+    int? limit = 10,
   }) async {
-    // ignore: prefer_const_declarations
-    final path = r'/agents';
-
-    // ignore: prefer_final_locals
-    Object? postBody;
-
-    final queryParams = <QueryParam>[];
-    final headerParams = <String, String>{};
-    final formParams = <String, String>{};
-
-    if (page != null) {
-      queryParams.addAll(_queryParams('', 'page', page));
-    }
-    if (limit != null) {
-      queryParams.addAll(_queryParams('', 'limit', limit));
-    }
-
-    const contentTypes = <String>[];
-
-    return apiClient.invokeAPI(
-      path,
-      'GET',
-      queryParams,
-      postBody,
-      headerParams,
-      formParams,
-      contentTypes.isEmpty ? null : contentTypes.first,
+    final response = await client.invokeApi(
+      method: Method.get,
+      path: '/agents',
+      queryParameters: {'page': page.toString(), 'limit': limit.toString()},
     );
-  }
 
-  /// List all public agent details.
-  ///
-  /// List all public agent details.
-  ///
-  /// Parameters:
-  ///
-  /// * [int] page:
-  ///   What entry offset to request
-  ///
-  /// * [int] limit:
-  ///   How many entries to return per page
-  Future<GetAgents200Response?> getAgents({
-    int? page,
-    int? limit,
-  }) async {
-    final response = await getAgentsWithHttpInfo(
-      page: page,
-      limit: limit,
-    );
     if (response.statusCode >= HttpStatus.badRequest) {
-      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+      throw ApiException(response.statusCode, response.body);
     }
-    // When a remote server returns no body with a status of 204, we shall not decode it.
-    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
-    // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty &&
-        response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(
-        await _decodeBodyBytes(response),
-        'GetAgents200Response',
-      ) as GetAgents200Response;
+
+    if (response.body.isNotEmpty) {
+      return GetAgents200Response.fromJson(
+        jsonDecode(response.body) as Map<String, dynamic>,
+      );
     }
-    return null;
-  }
 
-  /// Get Agent
-  ///
-  /// Fetch your agent's details.
-  ///
-  /// Note: This method returns the HTTP [Response].
-  Future<Response> getMyAgentWithHttpInfo() async {
-    // ignore: prefer_const_declarations
-    final path = r'/my/agent';
-
-    // ignore: prefer_final_locals
-    Object? postBody;
-
-    final queryParams = <QueryParam>[];
-    final headerParams = <String, String>{};
-    final formParams = <String, String>{};
-
-    const contentTypes = <String>[];
-
-    return apiClient.invokeAPI(
-      path,
-      'GET',
-      queryParams,
-      postBody,
-      headerParams,
-      formParams,
-      contentTypes.isEmpty ? null : contentTypes.first,
+    throw ApiException(
+      response.statusCode,
+      'Unhandled response from $getAgents',
     );
   }
 
-  /// Get Agent
-  ///
-  /// Fetch your agent's details.
-  Future<GetMyAgent200Response?> getMyAgent() async {
-    final response = await getMyAgentWithHttpInfo();
+  Future<GetAgent200Response> getAgent(String agentSymbol) async {
+    final response = await client.invokeApi(
+      method: Method.get,
+      path: '/agents/{agentSymbol}'.replaceAll('{agentSymbol}', agentSymbol),
+    );
+
     if (response.statusCode >= HttpStatus.badRequest) {
-      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+      throw ApiException(response.statusCode, response.body);
     }
-    // When a remote server returns no body with a status of 204, we shall not decode it.
-    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
-    // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty &&
-        response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(
-        await _decodeBodyBytes(response),
-        'GetMyAgent200Response',
-      ) as GetMyAgent200Response;
+
+    if (response.body.isNotEmpty) {
+      return GetAgent200Response.fromJson(
+        jsonDecode(response.body) as Map<String, dynamic>,
+      );
     }
-    return null;
-  }
 
-  /// Get Agent Events
-  ///
-  /// Get recent events for your agent.
-  ///
-  /// Note: This method returns the HTTP [Response].
-  Future<Response> getMyAgentEventsWithHttpInfo() async {
-    // ignore: prefer_const_declarations
-    final path = r'/my/agent/events';
-
-    // ignore: prefer_final_locals
-    Object? postBody;
-
-    final queryParams = <QueryParam>[];
-    final headerParams = <String, String>{};
-    final formParams = <String, String>{};
-
-    const contentTypes = <String>[];
-
-    return apiClient.invokeAPI(
-      path,
-      'GET',
-      queryParams,
-      postBody,
-      headerParams,
-      formParams,
-      contentTypes.isEmpty ? null : contentTypes.first,
+    throw ApiException(
+      response.statusCode,
+      'Unhandled response from $getAgent',
     );
   }
 
-  /// Get Agent Events
-  ///
-  /// Get recent events for your agent.
-  Future<GetMyAgentEvents200Response?> getMyAgentEvents() async {
-    final response = await getMyAgentEventsWithHttpInfo();
+  Future<GetMyAgent200Response> getMyAgent() async {
+    final response = await client.invokeApi(
+      method: Method.get,
+      path: '/my/agent',
+    );
+
     if (response.statusCode >= HttpStatus.badRequest) {
-      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+      throw ApiException(response.statusCode, response.body);
     }
-    // When a remote server returns no body with a status of 204, we shall not decode it.
-    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
-    // FormatException when trying to decode an empty string.
-    if (response.body.isNotEmpty &&
-        response.statusCode != HttpStatus.noContent) {
-      return await apiClient.deserializeAsync(
-        await _decodeBodyBytes(response),
-        'GetMyAgentEvents200Response',
-      ) as GetMyAgentEvents200Response;
+
+    if (response.body.isNotEmpty) {
+      return GetMyAgent200Response.fromJson(
+        jsonDecode(response.body) as Map<String, dynamic>,
+      );
     }
-    return null;
+
+    throw ApiException(
+      response.statusCode,
+      'Unhandled response from $getMyAgent',
+    );
+  }
+
+  Future<GetMyAgentEvents200Response> getMyAgentEvents() async {
+    final response = await client.invokeApi(
+      method: Method.get,
+      path: '/my/agent/events',
+    );
+
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, response.body);
+    }
+
+    if (response.body.isNotEmpty) {
+      return GetMyAgentEvents200Response.fromJson(
+        jsonDecode(response.body) as Map<String, dynamic>,
+      );
+    }
+
+    throw ApiException(
+      response.statusCode,
+      'Unhandled response from $getMyAgentEvents',
+    );
   }
 }

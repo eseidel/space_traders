@@ -36,7 +36,7 @@ Query systemRecordBySymbolQuery(SystemSymbol symbol) => Query(
 SystemRecord systemRecordFromColumnMap(Map<String, dynamic> columnMap) {
   return SystemRecord(
     symbol: SystemSymbol.fromString(columnMap['symbol'] as String),
-    type: SystemType.fromJson(columnMap['type'] as String)!,
+    type: SystemType.fromJson(columnMap['type'] as String),
     position: SystemPosition(columnMap['x'] as int, columnMap['y'] as int),
     waypointSymbols: (columnMap['waypoint_symbols'] as List)
         .cast<String>()

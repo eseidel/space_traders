@@ -5,7 +5,9 @@ import 'package:types/types.dart';
 ConstructionRecord constructionFromColumnMap(Map<String, dynamic> values) {
   // ignoring is_complete from the db, computing from construction instead.
   return ConstructionRecord(
-    construction: Construction.fromJson(values['construction']),
+    construction: Construction.maybeFromJson(
+      values['construction'] as Map<String, dynamic>?,
+    ),
     timestamp: values['timestamp'] as DateTime,
     waypointSymbol: WaypointSymbol.fromJson(
       values['waypoint_symbol'] as String,

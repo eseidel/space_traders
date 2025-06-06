@@ -88,10 +88,10 @@ MarketPrice marketPriceFromColumnMap(Map<String, dynamic> values) {
     waypointSymbol: WaypointSymbol.fromJson(
       values['waypoint_symbol'] as String,
     ),
-    symbol: TradeSymbol.fromJson(values['trade_symbol'] as String)!,
+    symbol: TradeSymbol.fromJson(values['trade_symbol'] as String),
     purchasePrice: values['purchase_price'] as int,
     sellPrice: values['sell_price'] as int,
-    supply: SupplyLevel.fromJson(values['supply'] as String)!,
+    supply: SupplyLevel.fromJson(values['supply'] as String),
     timestamp: values['timestamp'] as DateTime,
     tradeVolume: values['trade_volume'] as int,
   );

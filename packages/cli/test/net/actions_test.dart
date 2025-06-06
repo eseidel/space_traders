@@ -94,7 +94,7 @@ void main() {
     when(() => api.fleet).thenReturn(fleetApi);
     final shipNav = _MockShipNav();
     final fuel = ShipFuel(current: 100, capacity: 200);
-    final responseData = NavigateShip200ResponseData(nav: shipNav, fuel: fuel);
+    final responseData = PatchShipNav200ResponseData(nav: shipNav, fuel: fuel);
     final ship = _MockShip();
     final shipSymbol = ShipSymbol.fromString('S-1');
     when(() => ship.symbol).thenReturn(shipSymbol);
@@ -121,7 +121,7 @@ void main() {
     when(() => fleetApi.orbitShip(any())).thenAnswer(
       (invocation) => Future.value(
         OrbitShip200Response(
-          data: DockShip200ResponseData(nav: _MockShipNav()),
+          data: OrbitShip200ResponseData(nav: _MockShipNav()),
         ),
       ),
     );
@@ -192,7 +192,7 @@ void main() {
     final systemsSnapshot = SystemsSnapshot([]);
 
     final patchResponse = PatchShipNav200Response(
-      data: NavigateShip200ResponseData(nav: shipNav, fuel: shipFuel),
+      data: PatchShipNav200ResponseData(nav: shipNav, fuel: shipFuel),
     );
 
     when(
@@ -338,7 +338,7 @@ void main() {
     final logger = _MockLogger();
 
     final patchResponse = PatchShipNav200Response(
-      data: NavigateShip200ResponseData(
+      data: PatchShipNav200ResponseData(
         nav: shipNav,
         fuel: ShipFuel(current: 0, capacity: 0),
       ),
@@ -460,9 +460,7 @@ void main() {
     verify(
       () => fleetApi.patchShipNav(
         shipSymbol.symbol,
-        patchShipNavRequest: PatchShipNavRequest(
-          flightMode: ShipNavFlightMode.CRUISE,
-        ),
+        patchShipNavRequest: PatchShipNavRequest(),
       ),
     ).called(1);
 
@@ -633,7 +631,7 @@ void main() {
     when(() => fleetApi.sellCargo(any(), any())).thenAnswer(
       (invocation) => Future.value(
         SellCargo201Response(
-          data: PurchaseCargo201ResponseData(
+          data: SellCargo201ResponseData(
             agent: agent.toOpenApi(),
             cargo: ShipCargo(capacity: 10, units: 0),
             transaction: MarketTransaction(
@@ -815,7 +813,7 @@ void main() {
 
     // Waypoint already charted exceptions are caught and logged.
     when(() => fleetApi.createChart(shipSymbol.symbol)).thenAnswer(
-      (invocation) => throw ApiException(
+      (invocation) => throw const ApiException(
         400,
         '{"error":{"message":"Waypoint already charted: X1-ZY63-71980E" '
         ',"code":4230,"data":{"waypointSymbol":"X1-ZY63-71980E"}}}',
@@ -829,9 +827,9 @@ void main() {
     ).called(1);
 
     // Any other exception is thrown.
-    when(
-      () => fleetApi.createChart(shipSymbol.symbol),
-    ).thenAnswer((invocation) => throw ApiException(401, 'other exception'));
+    when(() => fleetApi.createChart(shipSymbol.symbol)).thenAnswer(
+      (invocation) => throw const ApiException(401, 'other exception'),
+    );
     expect(
       () => runWithLogger(logger, () async {
         await chartWaypointAndLog(api, db, ship);
@@ -928,7 +926,7 @@ void main() {
     when(() => contractsApi.fulfillContract(any())).thenAnswer(
       (invocation) => Future.value(
         FulfillContract200Response(
-          data: AcceptContract200ResponseData(
+          data: FulfillContract200ResponseData(
             contract: contract.toOpenApi(),
             agent: Agent.test(credits: 1000).toOpenApi(),
           ),
@@ -1010,7 +1008,7 @@ void main() {
     when(() => fleetApi.orbitShip(shipSymbol.symbol)).thenAnswer(
       (invocation) => Future.value(
         OrbitShip200Response(
-          data: DockShip200ResponseData(nav: _MockShipNav()),
+          data: OrbitShip200ResponseData(nav: _MockShipNav()),
         ),
       ),
     );
@@ -1179,13 +1177,11 @@ void main() {
     when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
     final logger = _MockLogger();
 
-    final request = NavigateShipRequest(
-      waypointSymbol: waypointSymbol.waypoint,
-    );
+    final request = WarpShipRequest(waypointSymbol: waypointSymbol.waypoint);
 
     when(() => fleetApi.warpShip(any(), request)).thenAnswer((_) async {
-      return NavigateShip200Response(
-        data: NavigateShip200ResponseData(
+      return WarpShip200Response(
+        data: WarpShip200ResponseData(
           fuel: ShipFuel(current: 0, capacity: 0),
           nav: _MockShipNav(),
         ),

@@ -39,14 +39,14 @@ class ChartedValues {
 
   /// Creates a new charted values from JSON data.
   factory ChartedValues.fromJson(Map<String, dynamic> json) {
-    final faction = WaypointFaction.fromJson(
+    final faction = WaypointFaction.maybeFromJson(
       json['faction'] as Map<String, dynamic>?,
     );
     final traitSymbols = (json['traitSymbols'] as List<dynamic>)
         .cast<String>()
-        .map((e) => WaypointTraitSymbol.fromJson(e)!)
+        .map(WaypointTraitSymbol.fromJson)
         .toSet();
-    final chart = Chart.fromJson(json['chart'] as Map<String, dynamic>)!;
+    final chart = Chart.fromJson(json['chart'] as Map<String, dynamic>);
     return ChartedValues(
       faction: faction,
       traitSymbols: traitSymbols,
@@ -69,19 +69,9 @@ class ChartedValues {
 
   /// Converts this charted values to JSON data.
   Map<String, dynamic> toJson() {
-    // Work around that OpenAPI's toJson method doesn't handle nested objects.
-    Map<String, dynamic>? factionToJson(WaypointFaction? faction) {
-      if (faction == null) {
-        return null;
-      }
-      final json = faction.toJson();
-      json['symbol'] = faction.symbol.toJson();
-      return json;
-    }
-
     final sortedTradeSymbols = traitSymbols.sortedBy((s) => s.value);
     return <String, dynamic>{
-      'faction': factionToJson(faction),
+      'faction': faction?.toJson(),
       'traitSymbols': sortedTradeSymbols.map((e) => e.toJson()).toList(),
       'chart': chart.toJson(),
     };

@@ -58,8 +58,6 @@ int fuelUsedByDistance(double distance, ShipNavFlightMode flightMode) {
     case ShipNavFlightMode.BURN:
       return 2 * intDistance;
   }
-  // This is only needed because ShipNavFlightMode is not an enum.
-  throw UnimplementedError('Unknown flight mode: $flightMode');
 }
 
 /// Returns the fuel cost to the given waypoint.

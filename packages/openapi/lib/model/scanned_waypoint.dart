@@ -1,17 +1,11 @@
-//
-// AUTO-GENERATED FILE, DO NOT MODIFY!
-//
-// @dart=2.18
-
-// ignore_for_file: unused_element, unused_import
-// ignore_for_file: always_put_required_named_parameters_first
-// ignore_for_file: constant_identifier_names
-// ignore_for_file: lines_longer_than_80_chars
-
-part of openapi;
+import 'package:openapi/model/chart.dart';
+import 'package:openapi/model/waypoint_faction.dart';
+import 'package:openapi/model/waypoint_orbital.dart';
+import 'package:openapi/model/waypoint_trait.dart';
+import 'package:openapi/model/waypoint_type.dart';
+import 'package:openapi/model_helpers.dart';
 
 class ScannedWaypoint {
-  /// Returns a new [ScannedWaypoint] instance.
   ScannedWaypoint({
     required this.symbol,
     required this.type,
@@ -24,187 +18,89 @@ class ScannedWaypoint {
     this.chart,
   });
 
-  /// The symbol of the waypoint.
+  factory ScannedWaypoint.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
+    return ScannedWaypoint(
+      symbol: json['symbol'] as String,
+      type: WaypointType.fromJson(json['type'] as String),
+      systemSymbol: json['systemSymbol'] as String,
+      x: json['x'] as int,
+      y: json['y'] as int,
+      orbitals: (json['orbitals'] as List)
+          .map<WaypointOrbital>(
+            (e) => WaypointOrbital.fromJson(e as Map<String, dynamic>),
+          )
+          .toList(),
+      faction: WaypointFaction.maybeFromJson(
+        json['faction'] as Map<String, dynamic>?,
+      ),
+      traits: (json['traits'] as List)
+          .map<WaypointTrait>(
+            (e) => WaypointTrait.fromJson(e as Map<String, dynamic>),
+          )
+          .toList(),
+      chart: Chart.maybeFromJson(json['chart'] as Map<String, dynamic>?),
+    );
+  }
+
+  /// Convenience to create a nullable type from a nullable json object.
+  /// Useful when parsing optional fields.
+  static ScannedWaypoint? maybeFromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return null;
+    }
+    return ScannedWaypoint.fromJson(json);
+  }
+
   String symbol;
-
   WaypointType type;
-
-  /// The symbol of the system.
   String systemSymbol;
-
-  /// Position in the universe in the x axis.
   int x;
-
-  /// Position in the universe in the y axis.
   int y;
-
-  /// List of waypoints that orbit this waypoint.
   List<WaypointOrbital> orbitals;
-
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
   WaypointFaction? faction;
-
-  /// The traits of the waypoint.
   List<WaypointTrait> traits;
-
-  ///
-  /// Please note: This property should have been non-nullable! Since the specification file
-  /// does not include a default value (using the "default:" property), however, the generated
-  /// source code must fall back to having a nullable type.
-  /// Consider adding a "default:" property in the specification file to hide this note.
-  ///
   Chart? chart;
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is ScannedWaypoint &&
-          other.symbol == symbol &&
-          other.type == type &&
-          other.systemSymbol == systemSymbol &&
-          other.x == x &&
-          other.y == y &&
-          _deepEquality.equals(other.orbitals, orbitals) &&
-          other.faction == faction &&
-          _deepEquality.equals(other.traits, traits) &&
-          other.chart == chart;
-
-  @override
-  int get hashCode =>
-      // ignore: unnecessary_parenthesis
-      (symbol.hashCode) +
-      (type.hashCode) +
-      (systemSymbol.hashCode) +
-      (x.hashCode) +
-      (y.hashCode) +
-      (orbitals.hashCode) +
-      (faction == null ? 0 : faction!.hashCode) +
-      (traits.hashCode) +
-      (chart == null ? 0 : chart!.hashCode);
-
-  @override
-  String toString() =>
-      'ScannedWaypoint[symbol=$symbol, type=$type, systemSymbol=$systemSymbol, x=$x, y=$y, orbitals=$orbitals, faction=$faction, traits=$traits, chart=$chart]';
-
   Map<String, dynamic> toJson() {
-    final json = <String, dynamic>{};
-    json[r'symbol'] = this.symbol;
-    json[r'type'] = this.type;
-    json[r'systemSymbol'] = this.systemSymbol;
-    json[r'x'] = this.x;
-    json[r'y'] = this.y;
-    json[r'orbitals'] = this.orbitals;
-    if (this.faction != null) {
-      json[r'faction'] = this.faction;
-    } else {
-      json[r'faction'] = null;
-    }
-    json[r'traits'] = this.traits;
-    if (this.chart != null) {
-      json[r'chart'] = this.chart;
-    } else {
-      json[r'chart'] = null;
-    }
-    return json;
+    return {
+      'symbol': symbol,
+      'type': type.toJson(),
+      'systemSymbol': systemSymbol,
+      'x': x,
+      'y': y,
+      'orbitals': orbitals.map((e) => e.toJson()).toList(),
+      'faction': faction?.toJson(),
+      'traits': traits.map((e) => e.toJson()).toList(),
+      'chart': chart?.toJson(),
+    };
   }
 
-  /// Returns a new [ScannedWaypoint] instance and imports its values from
-  /// [value] if it's a [Map], null otherwise.
-  // ignore: prefer_constructors_over_static_methods
-  static ScannedWaypoint? fromJson(dynamic value) {
-    if (value is Map) {
-      final json = value.cast<String, dynamic>();
+  @override
+  int get hashCode => Object.hash(
+    symbol,
+    type,
+    systemSymbol,
+    x,
+    y,
+    orbitals,
+    faction,
+    traits,
+    chart,
+  );
 
-      // Ensure that the map contains the required keys.
-      // Note 1: the values aren't checked for validity beyond being non-null.
-      // Note 2: this code is stripped in release mode!
-      assert(() {
-        requiredKeys.forEach((key) {
-          assert(json.containsKey(key),
-              'Required key "ScannedWaypoint[$key]" is missing from JSON.');
-          assert(json[key] != null,
-              'Required key "ScannedWaypoint[$key]" has a null value in JSON.');
-        });
-        return true;
-      }());
-
-      return ScannedWaypoint(
-        symbol: mapValueOfType<String>(json, r'symbol')!,
-        type: WaypointType.fromJson(json[r'type'])!,
-        systemSymbol: mapValueOfType<String>(json, r'systemSymbol')!,
-        x: mapValueOfType<int>(json, r'x')!,
-        y: mapValueOfType<int>(json, r'y')!,
-        orbitals: WaypointOrbital.listFromJson(json[r'orbitals']),
-        faction: WaypointFaction.fromJson(json[r'faction']),
-        traits: WaypointTrait.listFromJson(json[r'traits']),
-        chart: Chart.fromJson(json[r'chart']),
-      );
-    }
-    return null;
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ScannedWaypoint &&
+        symbol == other.symbol &&
+        type == other.type &&
+        systemSymbol == other.systemSymbol &&
+        x == other.x &&
+        y == other.y &&
+        listsEqual(orbitals, other.orbitals) &&
+        faction == other.faction &&
+        listsEqual(traits, other.traits) &&
+        chart == other.chart;
   }
-
-  static List<ScannedWaypoint> listFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
-    final result = <ScannedWaypoint>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = ScannedWaypoint.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-
-  static Map<String, ScannedWaypoint> mapFromJson(dynamic json) {
-    final map = <String, ScannedWaypoint>{};
-    if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
-      for (final entry in json.entries) {
-        final value = ScannedWaypoint.fromJson(entry.value);
-        if (value != null) {
-          map[entry.key] = value;
-        }
-      }
-    }
-    return map;
-  }
-
-  // maps a json object with a list of ScannedWaypoint-objects as value to a dart map
-  static Map<String, List<ScannedWaypoint>> mapListFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
-    final map = <String, List<ScannedWaypoint>>{};
-    if (json is Map && json.isNotEmpty) {
-      // ignore: parameter_assignments
-      json = json.cast<String, dynamic>();
-      for (final entry in json.entries) {
-        map[entry.key] = ScannedWaypoint.listFromJson(
-          entry.value,
-          growable: growable,
-        );
-      }
-    }
-    return map;
-  }
-
-  /// The list of required keys that must be present in a JSON.
-  static const requiredKeys = <String>{
-    'symbol',
-    'type',
-    'systemSymbol',
-    'x',
-    'y',
-    'orbitals',
-    'traits',
-  };
 }

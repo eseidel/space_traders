@@ -1,121 +1,32 @@
-//
-// AUTO-GENERATED FILE, DO NOT MODIFY!
-//
-// @dart=2.18
-
-// ignore_for_file: unused_element, unused_import
-// ignore_for_file: always_put_required_named_parameters_first
-// ignore_for_file: constant_identifier_names
-// ignore_for_file: lines_longer_than_80_chars
-
-part of openapi;
-
 class RemoveShipModuleRequest {
-  /// Returns a new [RemoveShipModuleRequest] instance.
-  RemoveShipModuleRequest({
-    required this.symbol,
-  });
+  RemoveShipModuleRequest({required this.symbol});
 
-  /// The symbol of the module to remove.
+  factory RemoveShipModuleRequest.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
+    return RemoveShipModuleRequest(symbol: json['symbol'] as String);
+  }
+
+  /// Convenience to create a nullable type from a nullable json object.
+  /// Useful when parsing optional fields.
+  static RemoveShipModuleRequest? maybeFromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return null;
+    }
+    return RemoveShipModuleRequest.fromJson(json);
+  }
+
   String symbol;
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is RemoveShipModuleRequest && other.symbol == symbol;
-
-  @override
-  int get hashCode =>
-      // ignore: unnecessary_parenthesis
-      (symbol.hashCode);
-
-  @override
-  String toString() => 'RemoveShipModuleRequest[symbol=$symbol]';
-
   Map<String, dynamic> toJson() {
-    final json = <String, dynamic>{};
-    json[r'symbol'] = this.symbol;
-    return json;
+    return {'symbol': symbol};
   }
 
-  /// Returns a new [RemoveShipModuleRequest] instance and imports its values from
-  /// [value] if it's a [Map], null otherwise.
-  // ignore: prefer_constructors_over_static_methods
-  static RemoveShipModuleRequest? fromJson(dynamic value) {
-    if (value is Map) {
-      final json = value.cast<String, dynamic>();
+  @override
+  int get hashCode => symbol.hashCode;
 
-      // Ensure that the map contains the required keys.
-      // Note 1: the values aren't checked for validity beyond being non-null.
-      // Note 2: this code is stripped in release mode!
-      assert(() {
-        requiredKeys.forEach((key) {
-          assert(json.containsKey(key),
-              'Required key "RemoveShipModuleRequest[$key]" is missing from JSON.');
-          assert(json[key] != null,
-              'Required key "RemoveShipModuleRequest[$key]" has a null value in JSON.');
-        });
-        return true;
-      }());
-
-      return RemoveShipModuleRequest(
-        symbol: mapValueOfType<String>(json, r'symbol')!,
-      );
-    }
-    return null;
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is RemoveShipModuleRequest && symbol == other.symbol;
   }
-
-  static List<RemoveShipModuleRequest> listFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
-    final result = <RemoveShipModuleRequest>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = RemoveShipModuleRequest.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-
-  static Map<String, RemoveShipModuleRequest> mapFromJson(dynamic json) {
-    final map = <String, RemoveShipModuleRequest>{};
-    if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
-      for (final entry in json.entries) {
-        final value = RemoveShipModuleRequest.fromJson(entry.value);
-        if (value != null) {
-          map[entry.key] = value;
-        }
-      }
-    }
-    return map;
-  }
-
-  // maps a json object with a list of RemoveShipModuleRequest-objects as value to a dart map
-  static Map<String, List<RemoveShipModuleRequest>> mapListFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
-    final map = <String, List<RemoveShipModuleRequest>>{};
-    if (json is Map && json.isNotEmpty) {
-      // ignore: parameter_assignments
-      json = json.cast<String, dynamic>();
-      for (final entry in json.entries) {
-        map[entry.key] = RemoveShipModuleRequest.listFromJson(
-          entry.value,
-          growable: growable,
-        );
-      }
-    }
-    return map;
-  }
-
-  /// The list of required keys that must be present in a JSON.
-  static const requiredKeys = <String>{
-    'symbol',
-  };
 }

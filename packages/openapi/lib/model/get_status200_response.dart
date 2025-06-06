@@ -1,17 +1,12 @@
-//
-// AUTO-GENERATED FILE, DO NOT MODIFY!
-//
-// @dart=2.18
-
-// ignore_for_file: unused_element, unused_import
-// ignore_for_file: always_put_required_named_parameters_first
-// ignore_for_file: constant_identifier_names
-// ignore_for_file: lines_longer_than_80_chars
-
-part of openapi;
+import 'package:openapi/model/get_status200_response_announcements_inner.dart';
+import 'package:openapi/model/get_status200_response_health.dart';
+import 'package:openapi/model/get_status200_response_leaderboards.dart';
+import 'package:openapi/model/get_status200_response_links_inner.dart';
+import 'package:openapi/model/get_status200_response_server_resets.dart';
+import 'package:openapi/model/get_status200_response_stats.dart';
+import 'package:openapi/model_helpers.dart';
 
 class GetStatus200Response {
-  /// Returns a new [GetStatus200Response] instance.
   GetStatus200Response({
     required this.status,
     required this.version,
@@ -25,176 +20,104 @@ class GetStatus200Response {
     this.links = const [],
   });
 
-  /// The current status of the game server.
+  factory GetStatus200Response.fromJson(dynamic jsonArg) {
+    final json = jsonArg as Map<String, dynamic>;
+    return GetStatus200Response(
+      status: json['status'] as String,
+      version: json['version'] as String,
+      resetDate: json['resetDate'] as String,
+      description: json['description'] as String,
+      stats: GetStatus200ResponseStats.fromJson(
+        json['stats'] as Map<String, dynamic>,
+      ),
+      health: GetStatus200ResponseHealth.fromJson(
+        json['health'] as Map<String, dynamic>,
+      ),
+      leaderboards: GetStatus200ResponseLeaderboards.fromJson(
+        json['leaderboards'] as Map<String, dynamic>,
+      ),
+      serverResets: GetStatus200ResponseServerResets.fromJson(
+        json['serverResets'] as Map<String, dynamic>,
+      ),
+      announcements: (json['announcements'] as List)
+          .map<GetStatus200ResponseAnnouncementsInner>(
+            (e) => GetStatus200ResponseAnnouncementsInner.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList(),
+      links: (json['links'] as List)
+          .map<GetStatus200ResponseLinksInner>(
+            (e) => GetStatus200ResponseLinksInner.fromJson(
+              e as Map<String, dynamic>,
+            ),
+          )
+          .toList(),
+    );
+  }
+
+  /// Convenience to create a nullable type from a nullable json object.
+  /// Useful when parsing optional fields.
+  static GetStatus200Response? maybeFromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return null;
+    }
+    return GetStatus200Response.fromJson(json);
+  }
+
   String status;
-
-  /// The current version of the API.
   String version;
-
-  /// The date when the game server was last reset.
   String resetDate;
-
   String description;
-
   GetStatus200ResponseStats stats;
-
   GetStatus200ResponseHealth health;
-
   GetStatus200ResponseLeaderboards leaderboards;
-
   GetStatus200ResponseServerResets serverResets;
-
   List<GetStatus200ResponseAnnouncementsInner> announcements;
-
   List<GetStatus200ResponseLinksInner> links;
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is GetStatus200Response &&
-          other.status == status &&
-          other.version == version &&
-          other.resetDate == resetDate &&
-          other.description == description &&
-          other.stats == stats &&
-          other.health == health &&
-          other.leaderboards == leaderboards &&
-          other.serverResets == serverResets &&
-          _deepEquality.equals(other.announcements, announcements) &&
-          _deepEquality.equals(other.links, links);
-
-  @override
-  int get hashCode =>
-      // ignore: unnecessary_parenthesis
-      (status.hashCode) +
-      (version.hashCode) +
-      (resetDate.hashCode) +
-      (description.hashCode) +
-      (stats.hashCode) +
-      (health.hashCode) +
-      (leaderboards.hashCode) +
-      (serverResets.hashCode) +
-      (announcements.hashCode) +
-      (links.hashCode);
-
-  @override
-  String toString() =>
-      'GetStatus200Response[status=$status, version=$version, resetDate=$resetDate, description=$description, stats=$stats, health=$health, leaderboards=$leaderboards, serverResets=$serverResets, announcements=$announcements, links=$links]';
-
   Map<String, dynamic> toJson() {
-    final json = <String, dynamic>{};
-    json[r'status'] = this.status;
-    json[r'version'] = this.version;
-    json[r'resetDate'] = this.resetDate;
-    json[r'description'] = this.description;
-    json[r'stats'] = this.stats;
-    json[r'health'] = this.health;
-    json[r'leaderboards'] = this.leaderboards;
-    json[r'serverResets'] = this.serverResets;
-    json[r'announcements'] = this.announcements;
-    json[r'links'] = this.links;
-    return json;
+    return {
+      'status': status,
+      'version': version,
+      'resetDate': resetDate,
+      'description': description,
+      'stats': stats.toJson(),
+      'health': health.toJson(),
+      'leaderboards': leaderboards.toJson(),
+      'serverResets': serverResets.toJson(),
+      'announcements': announcements.map((e) => e.toJson()).toList(),
+      'links': links.map((e) => e.toJson()).toList(),
+    };
   }
 
-  /// Returns a new [GetStatus200Response] instance and imports its values from
-  /// [value] if it's a [Map], null otherwise.
-  // ignore: prefer_constructors_over_static_methods
-  static GetStatus200Response? fromJson(dynamic value) {
-    if (value is Map) {
-      final json = value.cast<String, dynamic>();
+  @override
+  int get hashCode => Object.hash(
+    status,
+    version,
+    resetDate,
+    description,
+    stats,
+    health,
+    leaderboards,
+    serverResets,
+    announcements,
+    links,
+  );
 
-      // Ensure that the map contains the required keys.
-      // Note 1: the values aren't checked for validity beyond being non-null.
-      // Note 2: this code is stripped in release mode!
-      assert(() {
-        requiredKeys.forEach((key) {
-          assert(json.containsKey(key),
-              'Required key "GetStatus200Response[$key]" is missing from JSON.');
-          assert(json[key] != null,
-              'Required key "GetStatus200Response[$key]" has a null value in JSON.');
-        });
-        return true;
-      }());
-
-      return GetStatus200Response(
-        status: mapValueOfType<String>(json, r'status')!,
-        version: mapValueOfType<String>(json, r'version')!,
-        resetDate: mapValueOfType<String>(json, r'resetDate')!,
-        description: mapValueOfType<String>(json, r'description')!,
-        stats: GetStatus200ResponseStats.fromJson(json[r'stats'])!,
-        health: GetStatus200ResponseHealth.fromJson(json[r'health'])!,
-        leaderboards:
-            GetStatus200ResponseLeaderboards.fromJson(json[r'leaderboards'])!,
-        serverResets:
-            GetStatus200ResponseServerResets.fromJson(json[r'serverResets'])!,
-        announcements: GetStatus200ResponseAnnouncementsInner.listFromJson(
-            json[r'announcements']),
-        links: GetStatus200ResponseLinksInner.listFromJson(json[r'links']),
-      );
-    }
-    return null;
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is GetStatus200Response &&
+        status == other.status &&
+        version == other.version &&
+        resetDate == other.resetDate &&
+        description == other.description &&
+        stats == other.stats &&
+        health == other.health &&
+        leaderboards == other.leaderboards &&
+        serverResets == other.serverResets &&
+        listsEqual(announcements, other.announcements) &&
+        listsEqual(links, other.links);
   }
-
-  static List<GetStatus200Response> listFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
-    final result = <GetStatus200Response>[];
-    if (json is List && json.isNotEmpty) {
-      for (final row in json) {
-        final value = GetStatus200Response.fromJson(row);
-        if (value != null) {
-          result.add(value);
-        }
-      }
-    }
-    return result.toList(growable: growable);
-  }
-
-  static Map<String, GetStatus200Response> mapFromJson(dynamic json) {
-    final map = <String, GetStatus200Response>{};
-    if (json is Map && json.isNotEmpty) {
-      json = json.cast<String, dynamic>(); // ignore: parameter_assignments
-      for (final entry in json.entries) {
-        final value = GetStatus200Response.fromJson(entry.value);
-        if (value != null) {
-          map[entry.key] = value;
-        }
-      }
-    }
-    return map;
-  }
-
-  // maps a json object with a list of GetStatus200Response-objects as value to a dart map
-  static Map<String, List<GetStatus200Response>> mapListFromJson(
-    dynamic json, {
-    bool growable = false,
-  }) {
-    final map = <String, List<GetStatus200Response>>{};
-    if (json is Map && json.isNotEmpty) {
-      // ignore: parameter_assignments
-      json = json.cast<String, dynamic>();
-      for (final entry in json.entries) {
-        map[entry.key] = GetStatus200Response.listFromJson(
-          entry.value,
-          growable: growable,
-        );
-      }
-    }
-    return map;
-  }
-
-  /// The list of required keys that must be present in a JSON.
-  static const requiredKeys = <String>{
-    'status',
-    'version',
-    'resetDate',
-    'description',
-    'stats',
-    'health',
-    'leaderboards',
-    'serverResets',
-    'announcements',
-    'links',
-  };
 }

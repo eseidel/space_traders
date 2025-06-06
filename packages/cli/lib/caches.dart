@@ -207,7 +207,7 @@ class TopOfLoopUpdater {
 Future<List<Faction>> allFactions(FactionsApi factionsApi) async {
   return fetchAllPages(factionsApi, (factionsApi, page) async {
     final response = await factionsApi.getFactions(page: page);
-    return (response!.data, response.meta);
+    return (response.data, response.meta);
   }).toList();
 }
 
@@ -241,12 +241,9 @@ Future<TradeExportSnapshot> fetchExports(Database db, DataApi dataApi) async {
   // Build the old-style TradeExport list from the response.
   // The server's new API covers things other than TradeSymbols.
   final exports = <TradeExport>[];
-  for (final entry in response!.data.exportToImportMap.entries) {
+  for (final entry in response.data.exportToImportMap.entries.entries) {
     final export = TradeSymbol.fromJson(entry.key);
-    if (export == null) {
-      continue;
-    }
-    final imports = entry.value.map((i) => TradeSymbol.fromJson(i)!);
+    final imports = entry.value.map(TradeSymbol.fromJson);
     exports.add(TradeExport(export: export, imports: imports.toList()));
   }
   for (final export in exports) {
@@ -262,6 +259,8 @@ Future<TradeExportSnapshot> fetchExports(Database db, DataApi dataApi) async {
 /// Creates a new AgentCache from the API.
 Future<Agent> fetchAndCacheMyAgent(Database db, Api api) async {
   final agent = await getMyAgent(api);
+  // Just in case agent symbol is stale.
+  await db.config.setAgentSymbol(agent.symbol);
   await db.upsertAgent(agent);
   return agent;
 }

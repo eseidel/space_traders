@@ -3,6 +3,7 @@ import 'package:cli/cli.dart';
 import 'package:cli/logic/idle_queue.dart';
 import 'package:cli/logic/systems_fetcher.dart';
 import 'package:cli/net/auth.dart';
+import 'package:cli/net/queries.dart';
 
 Future<T> waitFor<T>(Database db, Future<T?> Function() get) async {
   var value = await get();
@@ -16,7 +17,7 @@ Future<T> waitFor<T>(Database db, Future<T?> Function() get) async {
 
 Future<void> command(Database db, ArgResults argResults) async {
   final api = await waitForApi(db, getPriority: () => networkPriorityLow);
-  final agent = await waitFor(db, () => db.getMyAgent());
+  final agent = await getMyAgent(api);
 
   /// Make sure we've cached all systems and waypoints before bothering to
   /// start the idle queue.

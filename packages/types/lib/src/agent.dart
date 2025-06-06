@@ -31,7 +31,7 @@ class Agent extends Equatable {
       symbol: agent.symbol,
       headquarters: WaypointSymbol.fromString(agent.headquarters),
       credits: agent.credits,
-      startingFaction: FactionSymbol.fromJson(agent.startingFaction)!,
+      startingFaction: FactionSymbol.fromJson(agent.startingFaction),
       shipCount: agent.shipCount,
       accountId: agent.accountId,
     );
