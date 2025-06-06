@@ -90,7 +90,6 @@ class SystemsApi {
         'page': page.toString(),
         'limit': limit.toString(),
         'type': ?type?.toJson(),
-        'traits': traits.toString(),
       },
     );
 
