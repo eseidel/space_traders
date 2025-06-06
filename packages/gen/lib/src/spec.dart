@@ -733,13 +733,18 @@ Components parseComponents(Json? json, ParseContext context) {
       final name = entry.key;
       final snakeName = snakeFromCamel(name);
       final value = entry.value as Json;
-      schemas[name] = Schema.parse(
-        value,
-        context
+      final ref = parseSchemaOrRef(
+        json: value,
+        context: context
             .addSnakeName(snakeName, isTopLevelComponent: true)
             .key('schemas')
             .key(name),
       );
+      final schema = ref.schema;
+      if (schema == null) {
+        throw UnimplementedError('reference found, schema expected: $name');
+      }
+      schemas[name] = schema;
     }
   }
 

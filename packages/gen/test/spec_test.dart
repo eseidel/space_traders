@@ -3,6 +3,13 @@ import 'package:test/test.dart';
 
 void main() {
   group('Spec', () {
+    Spec parseTestSpec(Map<String, dynamic> json) {
+      return parseSpec(
+        json,
+        ParseContext.initial(Uri.parse('file:///foo.json')),
+      );
+    }
+
     test('parse', () {
       final specJson = {
         'servers': [
@@ -14,10 +21,7 @@ void main() {
           },
         },
       };
-      final spec = parseSpec(
-        specJson,
-        ParseContext.initial(Uri.parse('file:///foo.json')),
-      );
+      final spec = parseTestSpec(specJson);
       expect(spec.serverUrl, Uri.parse('https://api.spacetraders.io/v2'));
       expect(spec.endpoints.first.path, '/users');
     });
@@ -42,13 +46,7 @@ void main() {
           },
         },
       };
-      expect(
-        () => parseSpec(
-          specJson,
-          ParseContext.initial(Uri.parse('file:///foo.json')),
-        ),
-        throwsA(isA<UnimplementedError>()),
-      );
+      expect(() => parseTestSpec(specJson), throwsA(isA<UnimplementedError>()));
     });
 
     test('equals', () {
@@ -90,22 +88,69 @@ void main() {
           },
         },
       };
-      final specOne = parseSpec(
-        jsonOne,
-        ParseContext.initial(Uri.parse('file:///foo.json')),
-      );
-      final specTwo = parseSpec(
-        jsonOne,
-        ParseContext.initial(Uri.parse('file:///foo.json')),
-      );
-      final specThree = parseSpec(
-        jsonTwo,
-        ParseContext.initial(Uri.parse('file:///foo.json')),
-      );
+      final specOne = parseTestSpec(jsonOne);
+      final specTwo = parseTestSpec(jsonOne);
+      final specThree = parseTestSpec(jsonTwo);
       expect(specOne, specTwo);
       expect(specOne, isNot(specThree));
       expect(specOne.hashCode, specTwo.hashCode);
       expect(specOne.hashCode, isNot(specThree.hashCode));
+    });
+
+    test('anyOf nullable hack', () {
+      final specJson = {
+        'servers': [
+          {'url': 'https://api.spacetraders.io/v2'},
+        ],
+        'paths': {
+          '/users': {
+            'get': {'summary': 'Get user'},
+          },
+        },
+        'components': {
+          'schemas': {
+            'User': {
+              'anyOf': [
+                {'type': 'boolean'},
+                {'type': 'null'},
+              ],
+            },
+          },
+        },
+      };
+      final spec = parseTestSpec(specJson);
+      expect(spec.components.schemas['User']!.type, SchemaType.boolean);
+    });
+
+    test('anyOf array hack', () {
+      final specJson = {
+        'servers': [
+          {'url': 'https://api.spacetraders.io/v2'},
+        ],
+        'paths': {
+          '/users': {
+            'get': {'summary': 'Get user'},
+          },
+        },
+        'components': {
+          'schemas': {
+            'User': {
+              'anyOf': [
+                {
+                  'type': 'array',
+                  'items': {r'$ref': '#/components/schemas/Value'},
+                },
+                {r'$ref': '#/components/schemas/Value'},
+              ],
+            },
+            'Value': {'type': 'boolean'},
+          },
+        },
+      };
+      final spec = parseTestSpec(specJson);
+      final schema = spec.components.schemas['User'];
+      expect(schema!.type, SchemaType.array);
+      expect(schema.items!.ref, '#/components/schemas/Value');
     });
   });
 
