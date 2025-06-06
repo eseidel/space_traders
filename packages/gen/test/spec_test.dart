@@ -156,6 +156,30 @@ void main() {
       };
       expect(() => parseTestSchemas(json), throwsA(isA<UnimplementedError>()));
     });
+
+    test('components schemas as ref not supported', () {
+      // Refs are generally fine.
+      final json = {
+        'User': {
+          'type': 'object',
+          'properties': {
+            'value': {r'$ref': '#/components/schemas/Value'},
+          },
+        },
+        'Value': {'type': 'boolean'},
+      };
+      final schemas = parseTestSchemas(json);
+      final schema = schemas['User']!;
+      expect(schema.type, SchemaType.object);
+      expect(schema.properties['value']!.ref, '#/components/schemas/Value');
+
+      // Just not as a direct alias/redirect
+      final json2 = {
+        'User': {r'$ref': '#/components/schemas/Value'},
+        'Value': {'type': 'boolean'},
+      };
+      expect(() => parseTestSchemas(json2), throwsUnimplementedError);
+    });
   });
 
   group('RefOr', () {

@@ -385,8 +385,10 @@ SchemaRef parseSchemaOrRef({
   if (json.containsKey('anyOf')) {
     final anyOf = json['anyOf'] as List<dynamic>;
     if (anyOf.length == 1) {
-      final schema = Schema.parse(anyOf.first as Json, context);
-      return SchemaRef.schema(schema);
+      return parseSchemaOrRef(
+        json: anyOf.first as Map<String, dynamic>,
+        context: context,
+      );
     }
     if (anyOf.length == 2) {
       final first = anyOf.first as Json;
@@ -733,16 +735,16 @@ Components parseComponents(Json? json, ParseContext context) {
       final name = entry.key;
       final snakeName = snakeFromCamel(name);
       final value = entry.value as Json;
-      final ref = parseSchemaOrRef(
-        json: value,
-        context: context
-            .addSnakeName(snakeName, isTopLevelComponent: true)
-            .key('schemas')
-            .key(name),
-      );
+      final childContext = context
+          .addSnakeName(snakeName, isTopLevelComponent: true)
+          .key('schemas')
+          .key(name);
+      final ref = parseSchemaOrRef(json: value, context: childContext);
       final schema = ref.schema;
       if (schema == null) {
-        throw UnimplementedError('reference found, schema expected: $name');
+        throw UnimplementedError(
+          'reference found, schema expected: ${childContext.pointer}',
+        );
       }
       schemas[name] = schema;
     }
