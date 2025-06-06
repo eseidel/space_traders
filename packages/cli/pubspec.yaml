@@ -32,12 +32,12 @@ dependencies:
     git:
       url: https://github.com/shorebirdtech/shorebird.git
       path: packages/scoped_deps
-  stats: ^2.0.0
+  stats: ^3.0.0
   types:
     path: ../types
   yaml: ^3.1.2
 
 dev_dependencies:
   mocktail: ^1.0.3
-  test: ^1.26.0
-  very_good_analysis: ^7.0.0
+  test: ^1.26.2
+  very_good_analysis: ^8.0.0

@@ -485,10 +485,10 @@ packages:
     dependency: "direct main"
     description:
       name: stats
-      sha256: a64d41328dc1332a02ce4acc8830e240e10ac14b19c9bb256466737b792f22aa
+      sha256: f08a0b8dcf95cc68960e85eaa21c80e8837fb816c719a99a0edd36c44831d403
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.0"
+    version: "3.0.0"
   stream_channel:
     dependency: transitive
     description:
@@ -525,10 +525,10 @@ packages:
     dependency: "direct dev"
     description:
       name: test
-      sha256: "0561f3a2cfd33d10232360f16dfcab9351cfb7ad9b23e6cd6e8c7fb0d62c7ac3"
+      sha256: "65e29d831719be0591f7b3b1a32a3cda258ec98c58c7b25f7b84241bc31215bb"
       url: "https://pub.dev"
     source: hosted
-    version: "1.26.1"
+    version: "1.26.2"
   test_api:
     dependency: transitive
     description:
@@ -541,10 +541,10 @@ packages:
     dependency: transitive
     description:
       name: test_core
-      sha256: "8619a9a45be044b71fe2cd6b77b54fd60f1c67904c38d48706e2852a2bda1c60"
+      sha256: "80bf5a02b60af04b09e14f6fe68b921aad119493e26e490deaca5993fef1b05a"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.10"
+    version: "0.6.11"
   typed_data:
     dependency: transitive
     description:
@@ -572,10 +572,10 @@ packages:
     dependency: "direct dev"
     description:
       name: very_good_analysis
-      sha256: "62d2b86d183fb81b2edc22913d9f155d26eb5cf3855173adb1f59fac85035c63"
+      sha256: c529563be4cbba1137386f2720fb7ed69e942012a28b13398d8a5e3e6ef551a7
       url: "https://pub.dev"
     source: hosted
-    version: "7.0.0"
+    version: "8.0.0"
   vm_service:
     dependency: transitive
     description:
