@@ -169,6 +169,8 @@ Future<void> cliMain(List<String> args) async {
     await db.config.setGamePhase(GamePhase.selloff);
   }
 
+  logger.info('Playing as $agentSymbol');
+
   // First we ask the API how many systems there are.
   final galaxy = await getGalaxyStats(api);
   await waitForSystem(db, galaxy);
