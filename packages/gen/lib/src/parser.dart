@@ -490,10 +490,11 @@ OpenApi parseOpenApi(Json json, ParseContext context) {
   final endpoints = <Endpoint>[];
   for (final pathEntry in paths.entries) {
     final path = pathEntry.key;
-    _expect(path.isNotEmpty, context, json, 'Path cannot be empty');
+    final pathContext = context.key('paths').key(path);
+    _expect(path.isNotEmpty, pathContext, json, 'Path cannot be empty');
     _expect(
       path.startsWith('/'),
-      context,
+      pathContext,
       json,
       'Path must start with /: $path',
     );
@@ -505,7 +506,7 @@ OpenApi parseOpenApi(Json json, ParseContext context) {
       }
       endpoints.add(
         parseEndpoint(
-          parentContext: context.key('paths').key(path).key(method.key),
+          parentContext: pathContext.key(method.key),
           path: path,
           json: methodValue,
           method: method,

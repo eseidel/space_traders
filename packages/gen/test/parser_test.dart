@@ -316,6 +316,27 @@ void main() {
         ),
       );
     });
+
+    test('empty paths', () {
+      final json = {
+        'openapi': '3.1.0',
+        'info': {'title': 'Space Traders API', 'version': '1.0.0'},
+        'servers': [
+          {'url': 'https://api.spacetraders.io/v2'},
+        ],
+        'paths': {'': <String, dynamic>{}},
+      };
+      expect(
+        () => parseTestSpec(json),
+        throwsA(
+          isA<FormatException>().having(
+            (e) => e.message,
+            'message',
+            equals('Path cannot be empty in /paths/'),
+          ),
+        ),
+      );
+    });
   });
 
   group('JsonPointer', () {
