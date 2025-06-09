@@ -3,9 +3,9 @@ import 'package:space_gen/src/spec.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('Spec', () {
-    Spec parseTestSpec(Map<String, dynamic> json) {
-      return parseSpec(
+  group('OpenApi', () {
+    OpenApi parseTestSpec(Map<String, dynamic> json) {
+      return parseOpenApi(
         json,
         ParseContext.initial(Uri.parse('file:///foo.json')),
       );
@@ -13,6 +13,8 @@ void main() {
 
     Map<String, Schema> parseTestSchemas(Map<String, dynamic> schemasJson) {
       final specJson = {
+        'openapi': '3.1.0',
+        'info': {'title': 'Space Traders API', 'version': '1.0.0'},
         'servers': [
           {'url': 'https://api.spacetraders.io/v2'},
         ],
@@ -29,6 +31,8 @@ void main() {
 
     test('parse', () {
       final specJson = {
+        'openapi': '3.1.0',
+        'info': {'title': 'Space Traders API', 'version': '1.0.0'},
         'servers': [
           {'url': 'https://api.spacetraders.io/v2'},
         ],
@@ -56,6 +60,8 @@ void main() {
 
     test('equals', () {
       final jsonOne = {
+        'openapi': '3.1.0',
+        'info': {'title': 'Space Traders API', 'version': '1.0.0'},
         'servers': [
           {'url': 'https://api.spacetraders.io/v2'},
         ],
@@ -84,6 +90,8 @@ void main() {
         },
       };
       final jsonTwo = {
+        'openapi': '3.1.0',
+        'info': {'title': 'Space Traders API', 'version': '1.0.0'},
         'servers': [
           {'url': 'https://api.spacetraders.io/v2'},
         ],
