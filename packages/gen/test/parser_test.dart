@@ -292,6 +292,9 @@ void main() {
       final json = {
         'openapi': '3.1.0',
         'info': {'title': 'Space Traders API', 'version': '1.0.0'},
+        'servers': [
+          {'url': 'https://api.spacetraders.io/v2'},
+        ],
         'paths': {
           '/users': {
             // This should throw a FormatException for having an optional
@@ -306,7 +309,9 @@ void main() {
           isA<FormatException>().having(
             (e) => e.message,
             'message',
-            contains('responses'),
+            equals(
+              'Key responses is not of type Map<String, dynamic>: true (in /paths//users/get)',
+            ),
           ),
         ),
       );
