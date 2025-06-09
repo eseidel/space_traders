@@ -287,6 +287,30 @@ void main() {
       // schema used to generate it and can be an arbitrary string.
       expect(spec.info.version, '1.0.0.a.b.c');
     });
+
+    test('wrong type for responses', () {
+      final json = {
+        'openapi': '3.1.0',
+        'info': {'title': 'Space Traders API', 'version': '1.0.0'},
+        'paths': {
+          '/users': {
+            // This should throw a FormatException for having an optional
+            // key of the wrong type.
+            'get': {'responses': true},
+          },
+        },
+      };
+      expect(
+        () => parseTestSpec(json),
+        throwsA(
+          isA<FormatException>().having(
+            (e) => e.message,
+            'message',
+            contains('responses'),
+          ),
+        ),
+      );
+    });
   });
 
   group('JsonPointer', () {
