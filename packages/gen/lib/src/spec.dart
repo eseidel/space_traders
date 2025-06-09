@@ -405,5 +405,5 @@ class OpenApi extends Equatable {
   Set<String> get tags => endpoints.map((e) => e.tag).toSet();
 
   @override
-  List<Object?> get props => [serverUrl, endpoints, components];
+  List<Object?> get props => [serverUrl, info, endpoints, components];
 }

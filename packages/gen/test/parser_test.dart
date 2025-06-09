@@ -189,6 +189,74 @@ void main() {
       };
       expect(() => parseTestSchemas(json2), throwsUnimplementedError);
     });
+
+    test('parameter with schema and content', () {
+      final json = {
+        'openapi': '3.1.0',
+        'info': {'title': 'Space Traders API', 'version': '1.0.0'},
+        'servers': [
+          {'url': 'https://api.spacetraders.io/v2'},
+        ],
+        'paths': {
+          '/users': {
+            'get': {
+              'parameters': [
+                {
+                  'name': 'foo',
+                  'in': 'query',
+                  // Both schema and content are not allowed at the same time.
+                  'schema': {'type': 'boolean'},
+                  'content': {
+                    'application/json': {
+                      'schema': {'type': 'boolean'},
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        },
+      };
+      expect(
+        () => parseTestSpec(json),
+        throwsA(
+          isA<FormatException>().having(
+            (e) => e.message,
+            'message',
+            contains('schema and content'),
+          ),
+        ),
+      );
+    });
+
+    test('parameter with no schema or content', () {
+      final json = {
+        'openapi': '3.1.0',
+        'info': {'title': 'Space Traders API', 'version': '1.0.0'},
+        'servers': [
+          {'url': 'https://api.spacetraders.io/v2'},
+        ],
+        'paths': {
+          '/users': {
+            'get': {
+              'parameters': [
+                {'name': 'foo', 'in': 'query'},
+              ],
+            },
+          },
+        },
+      };
+      expect(
+        () => parseTestSpec(json),
+        throwsA(
+          isA<FormatException>().having(
+            (e) => e.message,
+            'message',
+            contains('schema or content'),
+          ),
+        ),
+      );
+    });
   });
 
   group('JsonPointer', () {
