@@ -10,8 +10,7 @@ void main() {
   group('OpenApi', () {
     OpenApi parseTestSpec(Map<String, dynamic> json) {
       return parseOpenApi(
-        json,
-        ParseContext.initial(Uri.parse('file:///foo.json')),
+        MapContext.initial(Uri.parse('file:///foo.json'), json),
       );
     }
 

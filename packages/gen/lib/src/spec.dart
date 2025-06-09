@@ -356,6 +356,8 @@ class Response extends Equatable {
 class Components extends Equatable {
   const Components({required this.schemas, required this.requestBodies});
 
+  const Components.empty() : schemas = const {}, requestBodies = const {};
+
   final Map<String, Schema> schemas;
   // final Map<String, Parameter> parameters;
   // final Map<String, SecurityScheme> securitySchemes;

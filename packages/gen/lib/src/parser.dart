@@ -5,29 +5,53 @@ import 'package:space_gen/src/logger.dart';
 import 'package:space_gen/src/spec.dart';
 import 'package:space_gen/src/string.dart';
 
-T _required<T>(ParseContext context, Json json, String key) {
+T _required<T>(MapContext json, String key) {
   final value = json[key];
   if (value == null) {
     throw FormatException(
-      'Required key not found: $key in ${context.pointer}: $json',
+      'Required key not found: $key in ${json.pointer}: $json',
     );
   }
   return value as T;
 }
 
-void _expect(bool condition, ParseContext context, Json json, String message) {
+MapContext _requiredMap(MapContext json, String key) {
+  final value = json[key];
+  // Check the value is not null to avoid the childAsMap throwing StateError.
+  if (value == null) {
+    throw FormatException(
+      'Required key not found: $key in ${json.pointer}: $json',
+    );
+  }
+  return json.childAsMap(key);
+}
+
+void _expect(bool condition, ParseContext json, String message) {
   if (!condition) {
-    throw FormatException('$message in ${context.pointer}');
+    throw FormatException('$message in ${json.pointer}');
   }
 }
 
-T? _optional<T>(ParseContext context, Json json, String key) {
-  final value = json[key];
+T? _optional<T>(MapContext parent, String key) {
+  final value = parent[key];
   if (value is T?) {
     return value;
   }
   throw FormatException(
-    'Key $key is not of type $T: $value (in ${context.pointer})',
+    'Key $key is not of type $T: $value (in ${parent.pointer})',
+  );
+}
+
+MapContext? _optionalMap(MapContext parent, String key) {
+  final value = parent[key];
+  if (value == null) {
+    return null;
+  }
+  if (value is Map<String, dynamic>) {
+    return parent.childAsMap(key);
+  }
+  throw FormatException(
+    'Key $key is not of type Map<String, dynamic>: $value (in ${parent.pointer})',
   );
 }
 
@@ -38,50 +62,50 @@ T? _optional<T>(ParseContext context, Json json, String key) {
 //   }
 // }
 
-void _ignored(ParseContext context, Json json, String key) {
-  final value = json[key];
+void _ignored(MapContext parent, String key) {
+  final value = parent[key];
   if (value != null) {
-    logger.detail('Ignoring key: $key in ${context.pointer}');
+    logger.detail('Ignoring key: $key in ${parent.pointer}');
   }
 }
 
-void _warn(ParseContext context, Json json, String message) {
+void _warn(MapContext context, String message) {
   logger.warn('$message in ${context.pointer}');
 }
 
-void _error(ParseContext context, Json json, String message) {
+void _error(MapContext context, String message) {
   throw FormatException('$message in ${context.pointer}');
 }
 
 /// Parse a parameter from a json object.
-Parameter parseParameter({required Json json, required ParseContext context}) {
-  final schema = _optional<Json>(context, json, 'schema');
+Parameter parseParameter({required MapContext json}) {
+  final schema = _optionalMap(json, 'schema');
   final hasSchema = schema != null;
-  final hasContent = _optional<Json>(context, json, 'content') != null;
+  final hasContent = _optional<Json>(json, 'content') != null;
 
   // Common fields.
-  final name = _required<String>(context, json, 'name');
-  final description = _optional<String>(context, json, 'description');
-  final required = _optional<bool>(context, json, 'required') ?? false;
-  final sendIn = SendIn.fromJson(_required<String>(context, json, 'in'));
-  _ignored(context, json, 'deprecated');
-  _ignored(context, json, 'allowEmptyValue');
+  final name = _required<String>(json, 'name');
+  final description = _optional<String>(json, 'description');
+  final required = _optional<bool>(json, 'required') ?? false;
+  final sendIn = SendIn.fromJson(_required<String>(json, 'in'));
+  _ignored(json, 'deprecated');
+  _ignored(json, 'allowEmptyValue');
 
   final SchemaRef type;
   if (hasSchema) {
     if (hasContent) {
-      _error(context, json, 'Parameter cannot have both schema and content');
+      _error(json, 'Parameter cannot have both schema and content');
     }
     // Schema fields.
-    type = parseSchemaOrRef(json: schema, context: context.key('schema'));
-    _ignored(context, json, 'style');
-    _ignored(context, json, 'explode');
-    _ignored(context, json, 'allowReserved');
-    _ignored(context, json, 'example');
-    _ignored(context, json, 'examples');
+    type = parseSchemaOrRef(schema);
+    _ignored(json, 'style');
+    _ignored(json, 'explode');
+    _ignored(json, 'allowReserved');
+    _ignored(json, 'example');
+    _ignored(json, 'examples');
   } else {
     if (!hasSchema && !hasContent) {
-      _error(context, json, 'Parameter must have either schema or content');
+      _error(json, 'Parameter must have either schema or content');
     }
     // Content fields.
     // Use an explicit throw so Dart can see `type` is always set.
@@ -110,32 +134,36 @@ Parameter parseParameter({required Json json, required ParseContext context}) {
 }
 
 /// Parse a schema from a json object.
-Schema parseSchema(Json json, ParseContext context) {
+Schema parseSchema(MapContext json) {
   final type = SchemaType.fromJson(json['type'] as String? ?? 'unknown');
-  final properties = parseProperties(
-    json: json['properties'] as Json?,
-    context: context.key('properties'),
-  );
-  final items = json['items'] as Json?;
+  final propertiesJson = _optionalMap(json, 'properties');
+  final properties = <String, SchemaRef>{};
+  if (propertiesJson != null) {
+    for (final name in propertiesJson.json.keys) {
+      final snakeName = snakeFromCamel(name);
+      final childContext = propertiesJson
+          .childAsMap(name)
+          .addSnakeName(snakeName);
+      properties[name] = parseSchemaOrRef(childContext);
+    }
+  }
+  final items = _optionalMap(json, 'items');
   SchemaRef? itemSchema;
   if (items != null) {
     const innerName = 'inner'; // Matching OpenAPI.
-    itemSchema = parseSchemaOrRef(
-      json: items,
-      context: context.addSnakeName(innerName).key('items'),
-    );
+    itemSchema = parseSchemaOrRef(items.addSnakeName(innerName));
   }
 
-  _ignored(context, json, 'nullable');
-  _ignored(context, json, 'readOnly');
-  _ignored(context, json, 'writeOnly');
-  _ignored(context, json, 'discriminator');
-  _ignored(context, json, 'xml');
-  _ignored(context, json, 'example');
-  _ignored(context, json, 'examples');
-  _ignored(context, json, 'externalDocs');
+  _ignored(json, 'nullable');
+  _ignored(json, 'readOnly');
+  _ignored(json, 'writeOnly');
+  _ignored(json, 'discriminator');
+  _ignored(json, 'xml');
+  _ignored(json, 'example');
+  _ignored(json, 'examples');
+  _ignored(json, 'externalDocs');
 
-  final defaultValue = _optional<dynamic>(context, json, 'default');
+  final defaultValue = _optional<dynamic>(json, 'default');
 
   final required = json['required'] as List<dynamic>? ?? [];
   final description = json['description'] as String? ?? '';
@@ -148,22 +176,16 @@ Schema parseSchema(Json json, ParseContext context) {
     }
   }
   final format = json['format'] as String?;
-  final additionalPropertiesJson = json['additionalProperties'];
-  SchemaRef? additionalProperties;
-  if (additionalPropertiesJson is Json) {
-    additionalProperties = parseSchemaOrRef(
-      json: additionalPropertiesJson,
-      context: context.key('additionalProperties'),
-    );
-  } else if (additionalPropertiesJson is bool) {
-    throw UnimplementedError('additionalProperties is bool');
-  } else if (additionalPropertiesJson != null) {
-    throw UnimplementedError('additionalProperties is not a map or bool');
+  // This isn't quite correct, since it doesn't support boolean values.
+  final additionalProperties = _optionalMap(json, 'additionalProperties');
+  SchemaRef? additionalPropertiesSchema;
+  if (additionalProperties != null) {
+    additionalPropertiesSchema = parseSchemaOrRef(additionalProperties);
   }
 
   final schema = Schema(
-    pointer: context.pointer.toString(),
-    snakeName: context.snakeName,
+    pointer: json.pointer.toString(),
+    snakeName: json.snakeName,
     type: type,
     properties: properties,
     required: required.cast<String>(),
@@ -171,21 +193,18 @@ Schema parseSchema(Json json, ParseContext context) {
     items: itemSchema,
     enumValues: enumValues.cast<String>(),
     format: format,
-    additionalProperties: additionalProperties,
+    additionalProperties: additionalPropertiesSchema,
     defaultValue: defaultValue,
-    useNewType: context.isTopLevelComponent,
+    useNewType: json.isTopLevelComponent,
   );
-  context.addObject(schema);
+  json.addObject(schema);
   return schema;
 }
 
 /// Parse a schema or a reference to a schema.
 /// https://spec.openapis.org/oas/v3.0.0#schemaObject
 /// https://spec.openapis.org/oas/v3.0.0#relative-references-in-urls
-SchemaRef parseSchemaOrRef({
-  required Json json,
-  required ParseContext context,
-}) {
+SchemaRef parseSchemaOrRef(MapContext json) {
   if (json.containsKey(r'$ref')) {
     return SchemaRef.ref(json[r'$ref'] as String);
   }
@@ -196,27 +215,21 @@ SchemaRef parseSchemaOrRef({
   }
 
   if (json.containsKey('allOf')) {
-    final allOf = json['allOf'] as List<dynamic>;
+    final allOf = json.childAsList('allOf');
     if (allOf.length != 1) {
       throw UnimplementedError('AllOf with ${allOf.length} items');
     }
-    return parseSchemaOrRef(
-      json: allOf.first as Json,
-      context: context.key('allOf'),
-    );
+    return parseSchemaOrRef(allOf.indexAsMap(0));
   }
 
   if (json.containsKey('anyOf')) {
-    final anyOf = json['anyOf'] as List<dynamic>;
+    final anyOf = json.childAsList('anyOf');
     if (anyOf.length == 1) {
-      return parseSchemaOrRef(
-        json: anyOf.first as Map<String, dynamic>,
-        context: context,
-      );
+      return parseSchemaOrRef(anyOf.indexAsMap(0));
     }
     if (anyOf.length == 2) {
-      final first = anyOf.first as Json;
-      final second = anyOf.last as Json;
+      final first = anyOf.indexAsMap(0);
+      final second = anyOf.indexAsMap(1);
 
       // Two special case hacks to make space_traders work for now.
       // One is if one is a type and the other is type=null, we just
@@ -225,7 +238,7 @@ SchemaRef parseSchemaOrRef({
         final firstType = first['type'] as String;
         final secondType = second['type'] as String;
         if (firstType == 'boolean' && secondType == 'null') {
-          return parseSchemaOrRef(json: first, context: context);
+          return parseSchemaOrRef(first);
         }
       }
 
@@ -235,7 +248,7 @@ SchemaRef parseSchemaOrRef({
         final items = first['items'] as Json;
         final ref = second[r'$ref'] as String;
         if (items[r'$ref'] == ref) {
-          return parseSchemaOrRef(json: first, context: context);
+          return parseSchemaOrRef(first);
         }
       }
     }
@@ -243,108 +256,70 @@ SchemaRef parseSchemaOrRef({
     throw UnimplementedError('AnyOf with ${anyOf.length} items');
   }
 
-  return SchemaRef.schema(parseSchema(json, context));
+  return SchemaRef.schema(parseSchema(json));
 }
 
 /// Parse a schema or a reference to a schema.
 /// https://spec.openapis.org/oas/v3.0.0#schemaObject
 /// https://spec.openapis.org/oas/v3.0.0#relative-references-in-urls
-RefOr<RequestBody> parseRequestBodyOrRef({
-  required Json json,
-  required ParseContext context,
-}) {
+RefOr<RequestBody> parseRequestBodyOrRef(MapContext json) {
   if (json.containsKey(r'$ref')) {
     return RefOr<RequestBody>.ref(json[r'$ref'] as String);
   }
-  final body = parseRequestBody(json, context);
+  final body = parseRequestBody(json);
   return RefOr<RequestBody>.object(body);
 }
 
-/// Parse the properties of a schema.
-/// https://spec.openapis.org/oas/v3.0.0#schemaObject
-Map<String, SchemaRef> parseProperties({
-  required Json? json,
-  required ParseContext context,
-}) {
-  if (json == null) {
-    return {};
-  }
-  final properties = <String, SchemaRef>{};
-  if (json.isEmpty) {
-    return properties;
-  }
-  for (final entry in json.entries) {
-    final name = entry.key;
-    final snakeName = snakeFromCamel(name);
-    final value = entry.value as Json;
-    properties[name] = parseSchemaOrRef(
-      json: value,
-      context: context.addSnakeName(snakeName).key(name),
-    );
-  }
-  return properties;
-}
+RequestBody parseRequestBody(MapContext json) {
+  final content = _requiredMap(json, 'content');
+  final applicationJson = _requiredMap(content, 'application/json');
+  final schema = parseSchemaOrRef(applicationJson.childAsMap('schema'));
+  _ignored(json, 'description');
 
-RequestBody parseRequestBody(Json requestBodyJson, ParseContext context) {
-  final content = _required<Json>(context, requestBodyJson, 'content');
-  final applicationJson = _required<Json>(context, content, 'application/json');
-  final schema = parseSchemaOrRef(
-    json: _required<Json>(context, applicationJson, 'schema'),
-    context: context.addSnakeName('request').key('requestBody'),
-  );
-  _ignored(context, requestBodyJson, 'description');
-
-  final isRequired = requestBodyJson['required'] as bool? ?? false;
+  final isRequired = json['required'] as bool? ?? false;
   final body = RequestBody(
-    pointer: context.pointer.toString(),
+    pointer: json.pointer.toString(),
     isRequired: isRequired,
     schema: schema,
   );
-  context.addObject(body);
+  json.addObject(body);
   return body;
 }
 
 /// Parse an endpoint from a json object.
 Endpoint parseEndpoint({
-  required Json json,
+  required MapContext json,
   required String path,
   required Method method,
-  required ParseContext parentContext,
 }) {
   final snakeName =
       (json['operationId'] as String? ?? Uri.parse(path).pathSegments.last)
           .replaceAll('-', '_');
 
-  final context = parentContext.addSnakeName(snakeName);
-
-  final responses = parseResponses(
-    _optional<Json>(context, json, 'responses'),
-    context.key('responses'),
-  );
-  final tags = _optional<List<dynamic>>(context, json, 'tags');
+  final context = json.addSnakeName(snakeName);
+  final responsesJson = _optionalMap(json, 'responses');
+  final responses = responsesJson == null
+      ? <Response>[]
+      : parseResponses(responsesJson);
+  final tags = _optional<List<dynamic>>(json, 'tags');
   final tag = tags?.firstOrNull as String? ?? 'Default';
-  final parametersJson =
-      _optional<List<dynamic>>(context, json, 'parameters') ?? [];
-  final parameters = parametersJson
-      .cast<Json>()
-      .indexed
-      .map(
-        (indexed) => parseParameter(
-          json: indexed.$2,
-          context: context
-              .addSnakeName('parameter${indexed.$1}')
-              .key('parameters')
-              .index(indexed.$1),
-        ),
-      )
-      .toList();
-  final requestBodyJson = json['requestBody'] as Json?;
+  final parametersJson = _optionalMap(json, 'parameters');
+  final parameters = parametersJson == null
+      ? <Parameter>[]
+      : parametersJson.json.entries.indexed
+            .map(
+              (indexed) => parseParameter(
+                json: context
+                    .addSnakeName('parameter${indexed.$1}')
+                    .childAsList('parameters')
+                    .indexAsMap(indexed.$1),
+              ),
+            )
+            .toList();
+  final requestBodyJson = _optionalMap(json, 'requestBody');
   RefOr<RequestBody>? requestBody;
   if (requestBodyJson != null) {
-    requestBody = parseRequestBodyOrRef(
-      json: requestBodyJson,
-      context: context.key('requestBody'),
-    );
+    requestBody = parseRequestBodyOrRef(requestBodyJson);
   }
   return Endpoint(
     path: path,
@@ -357,46 +332,30 @@ Endpoint parseEndpoint({
   );
 }
 
-List<Response> parseResponses(Json? json, ParseContext parentContext) {
-  if (json == null) {
-    return [];
-  }
-  // Hack to make get cooldown compile.
+List<Response> parseResponses(MapContext json) {
   final responseCodes = json.keys.toList()..remove('204');
   if (responseCodes.length != 1) {
     throw UnimplementedError(
-      'Multiple responses not supported: ${parentContext.pointer}',
+      'Multiple responses not supported: ${json.pointer}',
     );
   }
 
   final responseCode = responseCodes.first;
-  final responseTypes = json[responseCode] as Json;
-  final content = responseTypes['content'] as Json?;
+  final responseTypes = json
+      .childAsMap(responseCode)
+      .addSnakeName(responseCode);
+  final content = _optionalMap(responseTypes, 'content');
   if (content == null) {
     return [];
   }
-  final jsonResponse = content['application/json'] as Json;
+  final jsonResponse = _requiredMap(content, 'application/json');
+  final schema = jsonResponse.childAsMap('schema').addSnakeName('response');
   return [
-    Response(
-      code: int.parse(responseCode),
-      content: parseSchemaOrRef(
-        json: jsonResponse['schema'] as Json,
-        context: parentContext
-            .addSnakeName(responseCode)
-            .addSnakeName('response')
-            .key(responseCode)
-            .key('content')
-            .key('application/json')
-            .key('schema'),
-      ),
-    ),
+    Response(code: int.parse(responseCode), content: parseSchemaOrRef(schema)),
   ];
 }
 
-Components parseComponents(Json? json, ParseContext context) {
-  if (json == null) {
-    return const Components(schemas: {}, requestBodies: {});
-  }
+Components parseComponents(MapContext json) {
   final keys = json.keys.toList();
   final supportedKeys = ['schemas', 'securitySchemes', 'requestBodies'];
 
@@ -417,15 +376,13 @@ Components parseComponents(Json? json, ParseContext context) {
   final schemasJson = json['schemas'] as Json?;
   final schemas = <String, Schema>{};
   if (schemasJson != null) {
-    for (final entry in schemasJson.entries) {
-      final name = entry.key;
+    for (final name in schemasJson.keys) {
       final snakeName = snakeFromCamel(name);
-      final value = entry.value as Json;
-      final childContext = context
+      final childContext = json
           .addSnakeName(snakeName, isTopLevelComponent: true)
-          .key('schemas')
-          .key(name);
-      final ref = parseSchemaOrRef(json: value, context: childContext);
+          .childAsMap('schemas')
+          .childAsMap(name);
+      final ref = parseSchemaOrRef(childContext);
       final schema = ref.schema;
       if (schema == null) {
         throw UnimplementedError(
@@ -439,85 +396,64 @@ Components parseComponents(Json? json, ParseContext context) {
   final requestBodiesJson = json['requestBodies'] as Json?;
   final requestBodies = <String, RequestBody>{};
   if (requestBodiesJson != null) {
-    for (final entry in requestBodiesJson.entries) {
-      final name = entry.key;
+    for (final name in requestBodiesJson.keys) {
       final snakeName = snakeFromCamel(name);
-      final value = entry.value as Json;
-      requestBodies[name] = parseRequestBody(
-        value,
-        context
-            .addSnakeName(snakeName, isTopLevelComponent: true)
-            .key('requestBodies')
-            .key(name),
-      );
+      final childContext = json
+          .addSnakeName(snakeName, isTopLevelComponent: true)
+          .childAsMap('requestBodies')
+          .childAsMap(name);
+      requestBodies[name] = parseRequestBody(childContext);
     }
   }
 
   return Components(schemas: schemas, requestBodies: requestBodies);
 }
 
-Info parseInfo(Json json, ParseContext context) {
-  final title = _required<String>(context, json, 'title');
-  final version = _required<String>(context, json, 'version');
-  _ignored(context, json, 'summary');
-  _ignored(context, json, 'description');
-  _ignored(context, json, 'termsOfService');
-  _ignored(context, json, 'contact');
-  _ignored(context, json, 'license');
+Info parseInfo(MapContext json) {
+  final title = _required<String>(json, 'title');
+  final version = _required<String>(json, 'version');
+  _ignored(json, 'summary');
+  _ignored(json, 'description');
+  _ignored(json, 'termsOfService');
+  _ignored(json, 'contact');
+  _ignored(json, 'license');
   return Info(title, version);
 }
 
-OpenApi parseOpenApi(Json json, ParseContext context) {
+OpenApi parseOpenApi(MapContext json) {
   final minimumVersion = Version.parse('3.1.0');
-  final versionString = _required<String>(context, json, 'openapi');
+  final versionString = _required<String>(json, 'openapi');
   final version = Version.parse(versionString);
   if (version < minimumVersion) {
-    _warn(
-      context,
-      json,
-      '$version may not be supported, only tested with 3.1.0',
-    );
+    _warn(json, '$version may not be supported, only tested with 3.1.0');
   }
 
-  final infoJson = _required<Json>(context, json, 'info');
-  final info = parseInfo(infoJson, context.key('info'));
+  final info = parseInfo(_requiredMap(json, 'info'));
 
-  final servers = _required<List<dynamic>>(context, json, 'servers');
-  final firstServer = servers.first as Json;
-  final serverUrl = _required<String>(context, firstServer, 'url');
+  final servers = _requiredMap(json, 'servers');
+  final firstServer = servers.childAsList('servers').indexAsMap(0);
+  final serverUrl = _required<String>(firstServer, 'url');
 
-  final paths = _required<Json>(context, json, 'paths');
+  final paths = _requiredMap(json, 'paths');
   final endpoints = <Endpoint>[];
-  for (final pathEntry in paths.entries) {
-    final path = pathEntry.key;
-    final pathContext = context.key('paths').key(path);
-    _expect(path.isNotEmpty, pathContext, json, 'Path cannot be empty');
-    _expect(
-      path.startsWith('/'),
-      pathContext,
-      json,
-      'Path must start with /: $path',
-    );
-    final pathValue = pathEntry.value as Json;
+  for (final path in paths.keys) {
+    final pathContext = paths.childAsMap(path);
+    _expect(path.isNotEmpty, pathContext, 'Path cannot be empty');
+    _expect(path.startsWith('/'), pathContext, 'Path must start with /: $path');
     for (final method in Method.values) {
-      final methodValue = pathValue[method.key] as Json?;
+      final methodValue = _optionalMap(pathContext, method.key);
       if (methodValue == null) {
         continue;
       }
       endpoints.add(
-        parseEndpoint(
-          parentContext: pathContext.key(method.key),
-          path: path,
-          json: methodValue,
-          method: method,
-        ),
+        parseEndpoint(json: methodValue, path: path, method: method),
       );
     }
   }
-  final components = parseComponents(
-    json['components'] as Json?,
-    context.key('components'),
-  );
+  final componentsJson = _optionalMap(json, 'components');
+  final components = componentsJson == null
+      ? const Components(schemas: {}, requestBodies: {})
+      : parseComponents(componentsJson);
   return OpenApi(
     serverUrl: Uri.parse(serverUrl),
     version: version,
@@ -598,9 +534,164 @@ class JsonPointer extends Equatable {
   List<Object?> get props => [parts];
 }
 
+class MapContext extends ParseContext {
+  MapContext({
+    required super.baseUrl,
+    required super.pointerParts,
+    required super.snakeNameStack,
+    required super.refRegistry,
+    required super.isTopLevelComponent,
+    required this.json,
+  });
+
+  MapContext.initial(Uri baseUrl, Json json)
+    : this(
+        baseUrl: baseUrl,
+        pointerParts: [],
+        snakeNameStack: [],
+        refRegistry: RefRegistry(),
+        isTopLevelComponent: true,
+        json: json,
+      );
+
+  MapContext childAsMap(String key) {
+    final value = json[key];
+    if (value == null) {
+      throw StateError('Key not found: $key in $pointer');
+    }
+    if (value is! Map<String, dynamic>) {
+      throw FormatException(
+        'Key $key is not of type Map<String, dynamic>: $value (in $pointer)',
+      );
+    }
+    return MapContext(
+      baseUrl: baseUrl,
+      pointerParts: pointerParts,
+      snakeNameStack: snakeNameStack,
+      refRegistry: refRegistry,
+      isTopLevelComponent: isTopLevelComponent,
+      json: value,
+    );
+  }
+
+  ListContext childAsList(String key) {
+    final value = json[key];
+    if (value == null) {
+      throw StateError('Key not found: $key in $pointer');
+    }
+    if (value is! List) {
+      throw FormatException(
+        'Key $key is not of type List: $value (in $pointer)',
+      );
+    }
+    return ListContext(
+      baseUrl: baseUrl,
+      pointerParts: pointerParts,
+      snakeNameStack: snakeNameStack,
+      refRegistry: refRegistry,
+      isTopLevelComponent: isTopLevelComponent,
+      json: value,
+    );
+  }
+
+  MapContext addSnakeName(
+    String snakeName, {
+    bool isTopLevelComponent = false,
+  }) => MapContext(
+    baseUrl: baseUrl,
+    pointerParts: pointerParts,
+    snakeNameStack: [...snakeNameStack, snakeName],
+    refRegistry: refRegistry,
+    isTopLevelComponent: isTopLevelComponent,
+    json: json,
+  );
+
+  dynamic operator [](String key) => json[key];
+
+  bool containsKey(String key) {
+    final json = this.json;
+    return json.containsKey(key);
+  }
+
+  Iterable<String> get keys => json.keys;
+
+  bool isEmpty() => json.isEmpty;
+
+  final Json json;
+}
+
+class ListContext extends ParseContext {
+  ListContext({
+    required super.baseUrl,
+    required super.pointerParts,
+    required super.snakeNameStack,
+    required super.refRegistry,
+    required super.isTopLevelComponent,
+    required this.json,
+  });
+
+  ListContext indexAsList(int index) {
+    final value = json[index];
+    if (value == null) {
+      throw FormatException('Index not found: $index in $pointer');
+    }
+    if (value is! List<dynamic>) {
+      throw FormatException(
+        'Index $index is not of type List<dynamic>: $value (in $pointer)',
+      );
+    }
+    return ListContext(
+      baseUrl: baseUrl,
+      pointerParts: pointerParts,
+      snakeNameStack: snakeNameStack,
+      refRegistry: refRegistry,
+      isTopLevelComponent: isTopLevelComponent,
+      json: value,
+    );
+  }
+
+  MapContext indexAsMap(int index) {
+    final value = json[index];
+    if (value == null) {
+      throw FormatException('Index not found: $index in $pointer');
+    }
+    if (value is! Map<String, dynamic>) {
+      throw FormatException(
+        'Index $index is not of type Map<String, dynamic>: $value (in $pointer)',
+      );
+    }
+    return MapContext(
+      baseUrl: baseUrl,
+      pointerParts: pointerParts,
+      snakeNameStack: snakeNameStack,
+      refRegistry: refRegistry,
+      isTopLevelComponent: isTopLevelComponent,
+      json: value,
+    );
+  }
+
+  dynamic operator [](int index) => json[index];
+
+  int get length => json.length;
+
+  ListContext addSnakeName(
+    String snakeName, {
+    bool isTopLevelComponent = false,
+  }) => ListContext(
+    baseUrl: baseUrl,
+    pointerParts: pointerParts,
+    snakeNameStack: [...snakeNameStack, snakeName],
+    refRegistry: refRegistry,
+    isTopLevelComponent: isTopLevelComponent,
+    json: json,
+  );
+
+  final List<dynamic> json;
+}
+
 /// Immutable context for parsing a spec.
 /// SchemaRegistry is internally mutable, so this is not truly immutable.
-class ParseContext {
+abstract class ParseContext {
   ParseContext({
     required this.baseUrl,
     required this.pointerParts,
@@ -616,11 +707,6 @@ class ParseContext {
       );
     }
   }
-  ParseContext.initial(this.baseUrl)
-    : pointerParts = [],
-      snakeNameStack = [],
-      refRegistry = RefRegistry(),
-      isTopLevelComponent = false;
 
   /// The base url of the spec being parsed.
   final Uri baseUrl;
@@ -648,42 +734,38 @@ class ParseContext {
     return buf.toString();
   }
 
+  ParseContext fromJson(dynamic json) {
+    if (json is Map<String, dynamic>) {
+      return MapContext(
+        baseUrl: baseUrl,
+        pointerParts: pointerParts,
+        snakeNameStack: snakeNameStack,
+        refRegistry: refRegistry,
+        isTopLevelComponent: isTopLevelComponent,
+        json: json,
+      );
+    }
+    if (json is List) {
+      return ListContext(
+        baseUrl: baseUrl,
+        pointerParts: pointerParts,
+        snakeNameStack: snakeNameStack,
+        refRegistry: refRegistry,
+        isTopLevelComponent: isTopLevelComponent,
+        json: json,
+      );
+    }
+    throw UnimplementedError(
+      'fromJson not implemented for ${json.runtimeType}',
+    );
+  }
+
   // Registry of all the schemas we've parsed so far.
   // RefRegistry is internally mutable.
   final RefRegistry refRegistry;
 
-  ParseContext _addPart(String part) =>
-      copyWith(pointerParts: [...pointerParts, part]);
-
-  ParseContext key(String key) => _addPart(key);
-  ParseContext index(int index) => _addPart(index.toString());
-
   void addObject(dynamic object) {
     final uri = baseUrl.replace(fragment: pointer.toString());
     refRegistry.register(uri, object);
-  }
-
-  /// Add a snake name to the current context.
-  /// Also resets the top-level component flag by default.
-  ParseContext addSnakeName(
-    String snakeName, {
-    bool isTopLevelComponent = false,
-  }) => copyWith(
-    snakeNameStack: [...snakeNameStack, snakeName],
-    isTopLevelComponent: isTopLevelComponent,
-  );
-
-  ParseContext copyWith({
-    List<String>? pointerParts,
-    List<String>? snakeNameStack,
-    bool? isTopLevelComponent,
-  }) {
-    return ParseContext(
-      baseUrl: baseUrl,
-      pointerParts: pointerParts ?? this.pointerParts,
-      snakeNameStack: snakeNameStack ?? this.snakeNameStack,
-      refRegistry: refRegistry,
-      isTopLevelComponent: isTopLevelComponent ?? this.isTopLevelComponent,
-    );
   }
 }
