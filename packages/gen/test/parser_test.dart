@@ -1,6 +1,10 @@
+import 'package:mocktail/mocktail.dart';
+import 'package:space_gen/src/logger.dart';
 import 'package:space_gen/src/parser.dart';
 import 'package:space_gen/src/spec.dart';
 import 'package:test/test.dart';
+
+class _MockLogger extends Mock implements Logger {}
 
 void main() {
   group('OpenApi', () {
@@ -256,6 +260,32 @@ void main() {
           ),
         ),
       );
+    });
+    test('warn on version below 3.1.0', () {
+      final json = {
+        'openapi': '3.0.0',
+        'info': {'title': 'Space Traders API', 'version': '1.0.0.a.b.c'},
+        'servers': [
+          {'url': 'https://api.spacetraders.io/v2'},
+        ],
+        'paths': {
+          '/users': {
+            'get': {'summary': 'Get user'},
+          },
+        },
+      };
+
+      final logger = _MockLogger();
+      final spec = runWithLogger(logger, () => parseTestSpec(json));
+      verify(
+        () => logger.warn(
+          '3.0.0 may not be supported, only tested with 3.1.0 in /',
+        ),
+      ).called(1);
+      expect(spec.version, Version.parse('3.0.0'));
+      // Info.version is the version of the spec, not the version of the OpenAPI
+      // schema used to generate it and can be an arbitrary string.
+      expect(spec.info.version, '1.0.0.a.b.c');
     });
   });
 

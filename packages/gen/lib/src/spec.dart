@@ -1,5 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
+import 'package:version/version.dart';
+
+export 'package:version/version.dart';
 
 /// A typedef representing a json object.
 typedef Json = Map<String, dynamic>;
@@ -384,6 +387,7 @@ class Info extends Equatable {
 class OpenApi extends Equatable {
   const OpenApi({
     required this.serverUrl,
+    required this.version,
     required this.info,
     required this.endpoints,
     required this.components,
@@ -391,6 +395,9 @@ class OpenApi extends Equatable {
 
   /// The server url of the spec.
   final Uri serverUrl;
+
+  /// The version of the spec.
+  final Version version;
 
   /// The info of the spec.
   final Info info;

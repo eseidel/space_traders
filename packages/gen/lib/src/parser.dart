@@ -4,7 +4,6 @@ import 'package:meta/meta.dart';
 import 'package:space_gen/src/logger.dart';
 import 'package:space_gen/src/spec.dart';
 import 'package:space_gen/src/string.dart';
-import 'package:version/version.dart';
 
 T _required<T>(ParseContext context, Json json, String key) {
   final value = json[key];
@@ -470,8 +469,9 @@ Info parseInfo(Json json, ParseContext context) {
 
 OpenApi parseOpenApi(Json json, ParseContext context) {
   final minimumVersion = Version.parse('3.1.0');
-  final version = _required<String>(context, json, 'openapi');
-  if (Version.parse(version) < minimumVersion) {
+  final versionString = _required<String>(context, json, 'openapi');
+  final version = Version.parse(versionString);
+  if (version < minimumVersion) {
     _warn(
       context,
       json,
@@ -519,6 +519,7 @@ OpenApi parseOpenApi(Json json, ParseContext context) {
   );
   return OpenApi(
     serverUrl: Uri.parse(serverUrl),
+    version: version,
     info: info,
     endpoints: endpoints,
     components: components,
