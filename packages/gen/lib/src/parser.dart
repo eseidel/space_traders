@@ -100,10 +100,7 @@ Parameter parseParameter(MapContext json) {
   _ignored(json, 'allowEmptyValue');
 
   final SchemaRef type;
-  if (hasSchema) {
-    if (hasContent) {
-      _error(json, 'Parameter cannot have both schema and content');
-    }
+  if (hasSchema && !hasContent) {
     // Schema fields.
     type = parseSchemaOrRef(schema);
     _ignored(json, 'style');
@@ -111,12 +108,13 @@ Parameter parseParameter(MapContext json) {
     _ignored(json, 'allowReserved');
     _ignored(json, 'example');
     _ignored(json, 'examples');
+  } else if (!hasSchema && hasContent) {
+    // Content values (Map<String, MediaType>) are not supported.
+    _unimplemented(json, "'content'");
+  } else if (hasSchema && hasContent) {
+    _error(json, 'Parameter cannot have both schema and content');
   } else {
-    if (!hasSchema && !hasContent) {
-      _error(json, 'Parameter must have either schema or content');
-    }
-    // Content fields.
-    _unimplemented(json, 'Content parameters');
+    _error(json, 'Parameter must have either schema or content, not both');
   }
 
   if (sendIn == SendIn.cookie) {

@@ -260,6 +260,50 @@ void main() {
         ),
       );
     });
+
+    test('content is not supported', () {
+      final json = {
+        'openapi': '3.1.0',
+        'info': {'title': 'Space Traders API', 'version': '1.0.0'},
+        'servers': [
+          {'url': 'https://api.spacetraders.io/v2'},
+        ],
+        'paths': {
+          '/users': {
+            'get': {
+              'summary': 'Get user',
+              'parameters': [
+                {
+                  'name': 'foo',
+                  'in': 'query',
+                  'content': {
+                    'application/json': {
+                      'schema': {'type': 'boolean'},
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        },
+      };
+      expect(
+        () => parseTestSpec(json),
+        throwsA(
+          isA<UnimplementedError>().having(
+            (e) => e.message,
+            'message',
+            equals(
+              "'content' not supported in "
+              'MapContext(/paths//users/get/parameters/0, {name: foo, '
+              'in: query, content: {application/json: '
+              '{schema: {type: boolean}}}})',
+            ),
+          ),
+        ),
+      );
+    });
+
     test('warn on version below 3.0.0', () {
       final json = {
         'openapi': '2.9.9',
