@@ -374,7 +374,7 @@ Components parseComponents(MapContext? json) {
     }
   }
 
-  final securitySchemesJson = json['securitySchemes'] as Json?;
+  final securitySchemesJson = _optionalMap(json, 'securitySchemes');
   if (securitySchemesJson != null) {
     logger.warn('Ignoring securitySchemes.');
   }
@@ -396,15 +396,14 @@ Components parseComponents(MapContext? json) {
     }
   }
 
-  final requestBodiesJson = json['requestBodies'] as Json?;
+  final requestBodiesJson = _optionalMap(json, 'requestBodies');
   final requestBodies = <String, RequestBody>{};
   if (requestBodiesJson != null) {
     for (final name in requestBodiesJson.keys) {
       final snakeName = snakeFromCamel(name);
-      final childContext = json
-          .addSnakeName(snakeName, isTopLevelComponent: true)
-          .childAsMap('requestBodies')
-          .childAsMap(name);
+      final childContext = requestBodiesJson
+          .childAsMap(name)
+          .addSnakeName(snakeName, isTopLevelComponent: true);
       requestBodies[name] = parseRequestBody(childContext);
     }
   }
@@ -556,7 +555,7 @@ class MapContext extends ParseContext {
          pointerParts: [...parent.pointerParts, key],
          snakeNameStack: parent.snakeNameStack,
          refRegistry: parent.refRegistry,
-         isTopLevelComponent: parent.isTopLevelComponent,
+         isTopLevelComponent: false,
          json: json,
        );
 
@@ -566,7 +565,7 @@ class MapContext extends ParseContext {
         pointerParts: [],
         snakeNameStack: [],
         refRegistry: RefRegistry(),
-        isTopLevelComponent: true,
+        isTopLevelComponent: false,
         json: json,
       );
 
@@ -634,7 +633,7 @@ class ListContext extends ParseContext {
          pointerParts: [...parent.pointerParts, key],
          snakeNameStack: parent.snakeNameStack,
          refRegistry: parent.refRegistry,
-         isTopLevelComponent: parent.isTopLevelComponent,
+         isTopLevelComponent: false,
          json: json,
        );
 
