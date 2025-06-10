@@ -195,6 +195,43 @@ void main() {
       );
     });
 
+    test('allOf with one item', () {
+      final json = {
+        'User': {
+          'allOf': [
+            {'type': 'boolean'},
+          ],
+        },
+      };
+      final schemas = parseTestSchemas(json);
+      expect(schemas['User']!.type, SchemaType.boolean);
+    });
+
+    test('allOf with multiple items', () {
+      final json = {
+        'User': {
+          'allOf': [
+            {'type': 'boolean'},
+            {'type': 'string'},
+          ],
+        },
+      };
+      expect(
+        () => parseTestSchemas(json),
+        throwsA(
+          isA<UnimplementedError>().having(
+            (e) => e.message,
+            'message',
+            equals(
+              'allOf with 2 items not supported in '
+              'MapContext(/components/schemas/User, '
+              '{allOf: [{type: boolean}, {type: string}]})',
+            ),
+          ),
+        ),
+      );
+    });
+
     test('oneOf not supported', () {
       final json = {
         'User': {
