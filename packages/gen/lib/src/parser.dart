@@ -448,11 +448,14 @@ Info parseInfo(MapContext json) {
 }
 
 OpenApi parseOpenApi(MapContext json) {
-  final minimumVersion = Version.parse('3.1.0');
+  final minimumVersion = Version.parse('3.0.0');
   final versionString = _required<String>(json, 'openapi');
   final version = Version.parse(versionString);
   if (version < minimumVersion) {
-    _warn(json, '$version may not be supported, only tested with 3.1.0');
+    _warn(
+      json,
+      '$version < $minimumVersion, the lowest known supported version.',
+    );
   }
 
   final info = parseInfo(_requiredMap(json, 'info'));
