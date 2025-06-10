@@ -661,6 +661,34 @@ void main() {
         ),
       );
     });
+
+    test('MapContext.childAsList throws on missing child', () {
+      final context = MapContext.initial(Uri.parse('file:///foo.json'), {
+        'foo': ['bar'],
+      });
+      expect(context.pointer, const JsonPointer([]));
+      expect(context.childAsList('foo'), isA<ListContext>());
+      expect(
+        () => context.childAsMap('foo'),
+        throwsA(
+          isA<FormatException>().having(
+            (e) => e.message,
+            'message',
+            equals("'foo' is not of type Map<String, dynamic>: [bar] in /"),
+          ),
+        ),
+      );
+      expect(
+        () => context.childAsMap('bar'),
+        throwsA(
+          isA<StateError>().having(
+            (e) => e.message,
+            'message',
+            equals('Key not found: bar in /'),
+          ),
+        ),
+      );
+    });
   });
 
   group('JsonPointer', () {
