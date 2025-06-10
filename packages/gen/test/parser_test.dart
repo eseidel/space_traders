@@ -355,6 +355,22 @@ void main() {
         ),
       );
     });
+    test('servers is required', () {
+      final json = {
+        'openapi': '3.1.0',
+        'info': {'title': 'Space Traders API', 'version': '1.0.0'},
+      };
+      expect(
+        () => parseTestSpec(json),
+        throwsA(
+          isA<FormatException>().having(
+            (e) => e.message,
+            'message',
+            equals('Key servers is required in /'),
+          ),
+        ),
+      );
+    });
   });
 
   group('JsonPointer', () {
