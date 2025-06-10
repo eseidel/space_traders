@@ -609,6 +609,28 @@ void main() {
         ),
       );
     });
+
+    test('responses without content are ignored', () {
+      final json = {
+        'openapi': '3.1.0',
+        'info': {'title': 'Space Traders API', 'version': '1.0.0'},
+        'servers': [
+          {'url': 'https://api.spacetraders.io/v2'},
+        ],
+        'paths': {
+          '/users': {
+            'get': {
+              'responses': {
+                '200': {'description': 'OK'},
+              },
+            },
+          },
+        },
+      };
+      final spec = parseTestSpec(json);
+      // This is not correct, but documents our current behavior.
+      expect(spec.endpoints.first.responses, isEmpty);
+    });
   });
 
   group('JsonPointer', () {
