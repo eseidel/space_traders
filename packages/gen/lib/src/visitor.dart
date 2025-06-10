@@ -48,7 +48,7 @@ class SpecWalker {
     for (final parameter in endpoint.parameters) {
       _parameter(parameter);
     }
-    for (final response in endpoint.responses) {
+    for (final response in endpoint.responses.values) {
       _maybeRef(response.content);
     }
     _maybeRef(endpoint.requestBody);
