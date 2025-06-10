@@ -316,8 +316,10 @@ Endpoint parseEndpoint({
         Uri.parse(path).pathSegments.last,
   );
   final context = endpointJson.addSnakeName(snakeName);
-  final responses = parseResponses(_optionalMap(context, 'responses'));
-  if (responses.values.where(Response.hasContent).length > 1) {
+  // Operation does not mention 'responses' as being required, but
+  // the Responses object says at least one response is required.
+  final responses = parseResponses(_requiredMap(context, 'responses'));
+  if (responses.contentfulResponses.length > 1) {
     _unimplemented(context, 'Multiple responses with content');
   }
   if (responses.isEmpty) {
@@ -357,10 +359,7 @@ Response _parseResponse(MapContext responseJson) {
   return Response(description: description, content: parseSchemaOrRef(schema));
 }
 
-Map<int, Response> parseResponses(MapContext? responsesJson) {
-  if (responsesJson == null) {
-    return {};
-  }
+Responses parseResponses(MapContext responsesJson) {
   final responseCodes = responsesJson.keys.toList();
 
   // We don't yet support default responses.
@@ -378,7 +377,7 @@ Map<int, Response> parseResponses(MapContext? responsesJson) {
     }
     responses[responseCodeInt] = _parseResponse(responseJson);
   }
-  return responses;
+  return Responses(responses: responses);
 }
 
 Map<String, T> _parseComponent<T>(

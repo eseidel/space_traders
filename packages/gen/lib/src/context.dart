@@ -69,7 +69,7 @@ extension _EndpointGeneration on Endpoint {
     if (responses.isEmpty) {
       return null;
     }
-    return responses.values.firstWhereOrNull(Response.hasContent)?.content;
+    return responses.contentfulResponses.firstOrNull?.content;
   }
 
   Map<String, dynamic> toTemplateContext(_Context context) {
@@ -1009,7 +1009,7 @@ class _RenderContext {
   void collectApi(Api api) {
     for (final endpoint in api.endpoints) {
       visitRef(endpoint.responseTypeRef);
-      for (final response in endpoint.responses.values) {
+      for (final response in endpoint.responses.contentfulResponses) {
         visitRef(response.content);
       }
       for (final param in endpoint.parameters) {
