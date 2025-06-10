@@ -689,6 +689,42 @@ void main() {
         ),
       );
     });
+
+    test('ListContext.indexAsMap throws on missing child', () {
+      final context = ListContext(
+        baseUrl: Uri.parse('file:///foo.json'),
+        pointerParts: const ['root'],
+        snakeNameStack: const [],
+        refRegistry: RefRegistry(),
+        isTopLevelComponent: false,
+        json: [
+          {'foo': 'bar'},
+          'baz',
+        ],
+      );
+      expect(context.pointer, const JsonPointer(['root']));
+      expect(context.indexAsMap(0), isA<MapContext>());
+      expect(
+        () => context.indexAsMap(1),
+        throwsA(
+          isA<FormatException>().having(
+            (e) => e.message,
+            'message',
+            equals('Index 1 is not of type Map<String, dynamic>: baz in /root'),
+          ),
+        ),
+      );
+      expect(
+        () => context.indexAsMap(2),
+        throwsA(
+          isA<RangeError>().having(
+            (e) => e.message,
+            'message',
+            equals('Invalid value'),
+          ),
+        ),
+      );
+    });
   });
 
   group('JsonPointer', () {
