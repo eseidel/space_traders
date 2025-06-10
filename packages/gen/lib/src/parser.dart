@@ -70,10 +70,13 @@ Never _unimplemented(ParseContext json, String message) {
   throw UnimplementedError('$message not supported in $json');
 }
 
-void _ignored(MapContext parent, String key) {
+void _ignored<T>(MapContext parent, String key) {
   final value = parent[key];
   if (value != null) {
     logger.detail('Ignoring key: $key in ${parent.pointer}');
+  }
+  if (value != null) {
+    _expectType<T>(parent, key, value);
   }
 }
 
@@ -96,18 +99,18 @@ Parameter parseParameter(MapContext json) {
   final description = _optional<String>(json, 'description');
   final required = _optional<bool>(json, 'required') ?? false;
   final sendIn = SendIn.fromJson(_required<String>(json, 'in'));
-  _ignored(json, 'deprecated');
-  _ignored(json, 'allowEmptyValue');
+  _ignored<bool>(json, 'deprecated');
+  _ignored<bool>(json, 'allowEmptyValue');
 
   final SchemaRef type;
   if (hasSchema && !hasContent) {
     // Schema fields.
     type = parseSchemaOrRef(schema);
-    _ignored(json, 'style');
-    _ignored(json, 'explode');
-    _ignored(json, 'allowReserved');
-    _ignored(json, 'example');
-    _ignored(json, 'examples');
+    _ignored<String>(json, 'style');
+    _ignored<bool>(json, 'explode');
+    _ignored<bool>(json, 'allowReserved');
+    _ignored<dynamic>(json, 'example');
+    _ignored<dynamic>(json, 'examples');
   } else if (!hasSchema && hasContent) {
     // Content values (Map<String, MediaType>) are not supported.
     _unimplemented(json, "'content'");
@@ -161,14 +164,14 @@ Schema parseSchema(MapContext json) {
     itemSchema = parseSchemaOrRef(items.addSnakeName(innerName));
   }
 
-  _ignored(json, 'nullable');
-  _ignored(json, 'readOnly');
-  _ignored(json, 'writeOnly');
-  _ignored(json, 'discriminator');
-  _ignored(json, 'xml');
-  _ignored(json, 'example');
-  _ignored(json, 'examples');
-  _ignored(json, 'externalDocs');
+  _ignored<bool>(json, 'nullable');
+  _ignored<bool>(json, 'readOnly');
+  _ignored<bool>(json, 'writeOnly');
+  _ignored<dynamic>(json, 'discriminator');
+  _ignored<dynamic>(json, 'xml');
+  _ignored<dynamic>(json, 'example');
+  _ignored<dynamic>(json, 'examples');
+  _ignored<dynamic>(json, 'externalDocs');
 
   final defaultValue = _optional<dynamic>(json, 'default');
 
@@ -279,7 +282,7 @@ RequestBody parseRequestBody(MapContext json) {
   final content = _requiredMap(json, 'content');
   final applicationJson = _requiredMap(content, 'application/json');
   final schema = parseSchemaOrRef(applicationJson.childAsMap('schema'));
-  _ignored(json, 'description');
+  _ignored<String>(json, 'description');
 
   final isRequired = json['required'] as bool? ?? false;
   final body = RequestBody(
@@ -358,6 +361,27 @@ List<Response> parseResponses(MapContext responsesJson) {
   ];
 }
 
+Map<String, T> _parseComponent<T>(
+  MapContext json,
+  String key,
+  T Function(MapContext) parse,
+) {
+  final valuesJson = _optionalMap(json, key);
+  final values = <String, T>{};
+  if (valuesJson != null) {
+    for (final name in valuesJson.keys) {
+      final snakeName = snakeFromCamel(name);
+      final childContext = valuesJson
+          .childAsMap(name)
+          .addSnakeName(snakeName, isTopLevelComponent: true);
+      values[name] = parse(childContext);
+    }
+  }
+  return values;
+}
+
+/// Parse the components section of a spec.
+/// https://spec.openapis.org/oas/v3.1.0#componentsObject
 Components parseComponents(MapContext? json) {
   if (json == null) {
     return const Components();
@@ -379,34 +403,19 @@ Components parseComponents(MapContext? json) {
     logger.warn('Ignoring securitySchemes.');
   }
 
-  final schemasJson = _optionalMap(json, 'schemas');
-  final schemas = <String, Schema>{};
-  if (schemasJson != null) {
-    for (final name in schemasJson.keys) {
-      final snakeName = snakeFromCamel(name);
-      final childContext = schemasJson
-          .childAsMap(name)
-          .addSnakeName(snakeName, isTopLevelComponent: true);
-      final ref = parseSchemaOrRef(childContext);
-      final schema = ref.schema;
-      if (schema == null) {
-        _unimplemented(childContext, r'$ref');
-      }
-      schemas[name] = schema;
+  final schemas = _parseComponent<Schema>(json, 'schemas', (childContext) {
+    final ref = parseSchemaOrRef(childContext);
+    final schema = ref.schema;
+    if (schema == null) {
+      _unimplemented(childContext, r'$ref');
     }
-  }
-
-  final requestBodiesJson = _optionalMap(json, 'requestBodies');
-  final requestBodies = <String, RequestBody>{};
-  if (requestBodiesJson != null) {
-    for (final name in requestBodiesJson.keys) {
-      final snakeName = snakeFromCamel(name);
-      final childContext = requestBodiesJson
-          .childAsMap(name)
-          .addSnakeName(snakeName, isTopLevelComponent: true);
-      requestBodies[name] = parseRequestBody(childContext);
-    }
-  }
+    return schema;
+  });
+  final requestBodies = _parseComponent<RequestBody>(
+    json,
+    'requestBodies',
+    parseRequestBody,
+  );
 
   return Components(schemas: schemas, requestBodies: requestBodies);
 }
@@ -414,11 +423,11 @@ Components parseComponents(MapContext? json) {
 Info parseInfo(MapContext json) {
   final title = _required<String>(json, 'title');
   final version = _required<String>(json, 'version');
-  _ignored(json, 'summary');
-  _ignored(json, 'description');
-  _ignored(json, 'termsOfService');
-  _ignored(json, 'contact');
-  _ignored(json, 'license');
+  _ignored<String>(json, 'summary');
+  _ignored<String>(json, 'description');
+  _ignored<String>(json, 'termsOfService');
+  _ignored<dynamic>(json, 'contact');
+  _ignored<dynamic>(json, 'license');
   return Info(title, version);
 }
 
