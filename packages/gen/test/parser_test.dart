@@ -571,7 +571,8 @@ void main() {
             (e) => e.message,
             'message',
             equals(
-              'Path parameters must be strings in /paths//users/get/parameters/0',
+              'Path parameters must be strings or integers in '
+              '/paths//users/get/parameters/0',
             ),
           ),
         ),

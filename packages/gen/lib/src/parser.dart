@@ -131,8 +131,9 @@ Parameter parseParameter(MapContext json) {
     _unimplemented(json, 'in=cookie');
   }
   if (sendIn == SendIn.path) {
-    if (type.schema?.type != SchemaType.string) {
-      _error(json, 'Path parameters must be strings');
+    final schemaType = type.schema?.type;
+    if (schemaType != SchemaType.string && schemaType != SchemaType.integer) {
+      _error(json, 'Path parameters must be strings or integers');
     }
     if (required != true) {
       _error(json, 'Path parameters must be required');
