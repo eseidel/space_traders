@@ -16,7 +16,10 @@ jobs:
   build:
     name: 🏗️ Build & Test
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        package: ['cli', 'client', 'db', 'gen', 'protocol', 'server', 'types']
+        
     steps:
       - uses: actions/checkout@v4
 
@@ -27,22 +30,28 @@ jobs:
 
       - name: Install dependencies
         run: dart pub get
-        working-directory: packages/cli
+        working-directory: packages/${{ matrix.package }}
 
       - name: Verify formatting
         run: dart format --output=none --set-exit-if-changed .
-        working-directory: packages/cli
+        working-directory: packages/${{ matrix.package }}
 
       # Consider passing '--fatal-infos' for slightly stricter analysis.
       - name: Analyze project source
         run: dart analyze
-        working-directory: packages/cli
+        working-directory: packages/${{ matrix.package }}
 
       - name: Run tests with coverage
-        run: ./coverage.sh
+        run: dart test --coverage=coverage
+        working-directory: packages/${{ matrix.package }}
+
+      - name: Convert coverage to lcov
+        run: dart run coverage:format_coverage --lcov --in=coverage --out=coverage.lcov --packages=.dart_tool/package_config.json
+        working-directory: packages/${{ matrix.package }}
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
         with:
-          fail_ci_if_error: true # optional (default = false)
-          token: ${{ secrets.CODECOV_TOKEN }} # required
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: packages/${{ matrix.package }}/coverage.lcov
