@@ -158,7 +158,9 @@ Parameter parseParameter(MapContext json) {
 
 /// Parse a schema from a json object.
 Schema parseSchema(MapContext json) {
-  final type = SchemaType.fromJson(json['type'] as String? ?? 'unknown');
+  final type = SchemaType.fromJson(
+    _optional<String>(json, 'type') ?? 'unknown',
+  );
   final propertiesJson = _optionalMap(json, 'properties');
   final properties = <String, SchemaRef>{};
   if (propertiesJson != null) {
@@ -189,7 +191,7 @@ Schema parseSchema(MapContext json) {
   final defaultValue = _optional<dynamic>(json, 'default');
 
   final required = json['required'] as List<dynamic>? ?? [];
-  final description = json['description'] as String? ?? '';
+  final description = _optional<String>(json, 'description');
   final enumValues = json['enum'] as List<dynamic>? ?? [];
   if (enumValues.isNotEmpty) {
     if (type != SchemaType.string) {
@@ -198,7 +200,7 @@ Schema parseSchema(MapContext json) {
       );
     }
   }
-  final format = json['format'] as String?;
+  final format = _optional<String>(json, 'format');
   // This isn't quite correct, since it doesn't support boolean values.
   final additionalProperties = _optionalMap(json, 'additionalProperties');
   SchemaRef? additionalPropertiesSchema;
@@ -212,7 +214,7 @@ Schema parseSchema(MapContext json) {
     type: type,
     properties: properties,
     required: required.cast<String>(),
-    description: description,
+    description: description ?? '',
     items: itemSchema,
     enumValues: enumValues.cast<String>(),
     format: format,
@@ -637,8 +639,6 @@ class MapContext extends ParseContext {
 
   Iterable<String> get keys => json.keys;
 
-  bool isEmpty() => json.isEmpty;
-
   final Json json;
 }
 
@@ -665,23 +665,6 @@ class ListContext extends ParseContext {
          json: json,
        );
 
-  ListContext indexAsList(int index) {
-    final value = json[index];
-    if (value == null) {
-      throw FormatException('Index not found: $index in $pointer');
-    }
-    if (value is! List<dynamic>) {
-      throw FormatException(
-        'Index $index is not of type List<dynamic>: $value (in $pointer)',
-      );
-    }
-    return ListContext.fromParent(
-      parent: this,
-      json: value,
-      key: index.toString(),
-    );
-  }
-
   MapContext indexAsMap(int index) {
     final value = json[index];
     if (value == null) {
@@ -699,23 +682,9 @@ class ListContext extends ParseContext {
     );
   }
 
-  dynamic operator [](int index) => json[index];
-
   int get length => json.length;
 
   Iterable<(int, dynamic)> get indexed => json.indexed;
-
-  ListContext addSnakeName(
-    String snakeName, {
-    bool isTopLevelComponent = false,
-  }) => ListContext(
-    baseUrl: baseUrl,
-    pointerParts: pointerParts,
-    snakeNameStack: [...snakeNameStack, snakeName],
-    refRegistry: refRegistry,
-    isTopLevelComponent: isTopLevelComponent,
-    json: json,
-  );
 
   final List<dynamic> json;
 }
