@@ -701,6 +701,38 @@ void main() {
       expect(spec.endpoints.first.responses[200]!.content, isNotNull);
       expect(spec.endpoints.first.responses[204]!.content, isNotNull);
     });
+
+    test('only integers and default are supported as response codes', () {
+      final json = {
+        'openapi': '3.1.0',
+        'info': {'title': 'Space Traders API', 'version': '1.0.0'},
+        'servers': [
+          {'url': 'https://api.spacetraders.io/v2'},
+        ],
+        'paths': {
+          '/users': {
+            'get': {
+              'responses': {
+                '200': {'description': 'OK'},
+                'barf': {'description': 'Barf'},
+              },
+            },
+          },
+        },
+      };
+      expect(
+        () => parseTestSpec(json),
+        throwsA(
+          isA<FormatException>().having(
+            (e) => e.message,
+            'message',
+            equals(
+              'Invalid response code: barf in /paths//users/get/responses',
+            ),
+          ),
+        ),
+      );
+    });
   });
 
   group('ParseContext', () {
