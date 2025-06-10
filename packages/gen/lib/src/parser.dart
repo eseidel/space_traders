@@ -289,7 +289,7 @@ RefOr<RequestBody> parseRequestBodyOrRef(MapContext json) {
   if (json.containsKey(r'$ref')) {
     return RefOr<RequestBody>.ref(json[r'$ref'] as String);
   }
-  final body = parseRequestBody(json);
+  final body = parseRequestBody(json.addSnakeName('request'));
   return RefOr<RequestBody>.object(body);
 }
 
@@ -311,22 +311,22 @@ RequestBody parseRequestBody(MapContext json) {
 
 /// Parse an endpoint from a json object.
 Endpoint parseEndpoint({
-  required MapContext json,
+  required MapContext endpointJson,
   required String path,
   required Method method,
 }) {
-  final snakeName =
-      (json['operationId'] as String? ?? Uri.parse(path).pathSegments.last)
-          .replaceAll('-', '_');
+  final operationId = _optional<String>(endpointJson, 'operationId');
+  final snakeName = (operationId ?? Uri.parse(path).pathSegments.last)
+      .replaceAll('-', '_');
 
-  final context = json.addSnakeName(snakeName);
-  final responsesJson = _optionalMap(json, 'responses');
+  final context = endpointJson.addSnakeName(snakeName);
+  final responsesJson = _optionalMap(context, 'responses');
   final responses = responsesJson == null
       ? <Response>[]
       : parseResponses(responsesJson);
-  final tags = _optional<List<dynamic>>(json, 'tags');
+  final tags = _optional<List<dynamic>>(context, 'tags');
   final tag = tags?.firstOrNull as String? ?? 'Default';
-  final parametersJson = _optionalList(json, 'parameters');
+  final parametersJson = _optionalList(context, 'parameters');
   final parameters = parametersJson == null
       ? <Parameter>[]
       : parametersJson.indexed
@@ -339,7 +339,7 @@ Endpoint parseEndpoint({
               ),
             )
             .toList();
-  final requestBodyJson = _optionalMap(json, 'requestBody');
+  final requestBodyJson = _optionalMap(context, 'requestBody');
   RefOr<RequestBody>? requestBody;
   if (requestBodyJson != null) {
     requestBody = parseRequestBodyOrRef(requestBodyJson);
@@ -355,19 +355,19 @@ Endpoint parseEndpoint({
   );
 }
 
-List<Response> parseResponses(MapContext json) {
-  final responseCodes = json.keys.toList()..remove('204');
+List<Response> parseResponses(MapContext responsesJson) {
+  final responseCodes = responsesJson.keys.toList()..remove('204');
   if (responseCodes.length != 1) {
     throw UnimplementedError(
-      'Multiple responses not supported: ${json.pointer}',
+      'Multiple responses not supported: ${responsesJson.pointer}',
     );
   }
 
   final responseCode = responseCodes.first;
-  final responseTypes = json
+  final forCode = responsesJson
       .childAsMap(responseCode)
       .addSnakeName(responseCode);
-  final content = _optionalMap(responseTypes, 'content');
+  final content = _optionalMap(forCode, 'content');
   if (content == null) {
     return [];
   }
@@ -468,7 +468,7 @@ OpenApi parseOpenApi(MapContext json) {
         continue;
       }
       endpoints.add(
-        parseEndpoint(json: methodValue, path: path, method: method),
+        parseEndpoint(endpointJson: methodValue, path: path, method: method),
       );
     }
   }
