@@ -733,6 +733,33 @@ void main() {
         ),
       );
     });
+    test('default response is not supported', () {
+      final json = {
+        'openapi': '3.1.0',
+        'info': {'title': 'Space Traders API', 'version': '1.0.0'},
+        'servers': [
+          {'url': 'https://api.spacetraders.io/v2'},
+        ],
+        'paths': {
+          '/users': {
+            'get': {
+              'responses': {
+                'default': {'description': 'Default'},
+                '201': {'description': 'Created'},
+              },
+            },
+          },
+        },
+      };
+      final logger = _MockLogger();
+      final spec = runWithLogger(logger, () => parseTestSpec(json));
+      verify(
+        () => logger.detail(
+          'Ignoring key: default in /paths//users/get/responses',
+        ),
+      ).called(1);
+      expect(spec.endpoints.first.responses[200], isNull);
+    });
   });
 
   group('ParseContext', () {
