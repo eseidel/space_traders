@@ -380,7 +380,10 @@ List<Response> parseResponses(MapContext responsesJson) {
   ];
 }
 
-Components parseComponents(MapContext json) {
+Components parseComponents(MapContext? json) {
+  if (json == null) {
+    return const Components();
+  }
   final keys = json.keys.toList();
   final supportedKeys = ['schemas', 'securitySchemes', 'requestBodies'];
 
@@ -474,10 +477,7 @@ OpenApi parseOpenApi(MapContext json) {
       );
     }
   }
-  final componentsJson = _optionalMap(json, 'components');
-  final components = componentsJson == null
-      ? const Components(schemas: {}, requestBodies: {})
-      : parseComponents(componentsJson);
+  final components = parseComponents(_optionalMap(json, 'components'));
   return OpenApi(
     serverUrl: Uri.parse(serverUrl),
     version: version,
