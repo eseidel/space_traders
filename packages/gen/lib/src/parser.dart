@@ -57,12 +57,25 @@ MapContext? _optionalMap(MapContext parent, String key) {
   if (value == null) {
     return null;
   }
-  if (value is Map<String, dynamic>) {
-    return parent.childAsMap(key);
+  if (value is! Map<String, dynamic>) {
+    throw FormatException(
+      'Key $key is not of type Map<String, dynamic>: $value (in ${parent.pointer})',
+    );
   }
-  throw FormatException(
-    'Key $key is not of type Map<String, dynamic>: $value (in ${parent.pointer})',
-  );
+  return parent.childAsMap(key);
+}
+
+ListContext? _optionalList(MapContext parent, String key) {
+  final value = parent[key];
+  if (value == null) {
+    return null;
+  }
+  if (value is! List<dynamic>) {
+    throw FormatException(
+      'Key $key is not of type List<dynamic>: $value (in ${parent.pointer})',
+    );
+  }
+  return parent.childAsList(key);
 }
 
 // void _unimplemented(Json json, String key) {
@@ -313,10 +326,10 @@ Endpoint parseEndpoint({
       : parseResponses(responsesJson);
   final tags = _optional<List<dynamic>>(json, 'tags');
   final tag = tags?.firstOrNull as String? ?? 'Default';
-  final parametersJson = _optionalMap(json, 'parameters');
+  final parametersJson = _optionalList(json, 'parameters');
   final parameters = parametersJson == null
       ? <Parameter>[]
-      : parametersJson.json.entries.indexed
+      : parametersJson.indexed
             .map(
               (indexed) => parseParameter(
                 context
@@ -553,6 +566,19 @@ class MapContext extends ParseContext {
     required this.json,
   });
 
+  MapContext.fromParent({
+    required ParseContext parent,
+    required Map<String, dynamic> json,
+    required String key,
+  }) : this(
+         baseUrl: parent.baseUrl,
+         pointerParts: [...parent.pointerParts, key],
+         snakeNameStack: parent.snakeNameStack,
+         refRegistry: parent.refRegistry,
+         isTopLevelComponent: parent.isTopLevelComponent,
+         json: json,
+       );
+
   MapContext.initial(Uri baseUrl, Json json)
     : this(
         baseUrl: baseUrl,
@@ -574,14 +600,7 @@ class MapContext extends ParseContext {
         'rather ${value.runtimeType}: $value (in $pointer)',
       );
     }
-    return MapContext(
-      baseUrl: baseUrl,
-      pointerParts: pointerParts,
-      snakeNameStack: snakeNameStack,
-      refRegistry: refRegistry,
-      isTopLevelComponent: isTopLevelComponent,
-      json: value,
-    );
+    return MapContext.fromParent(parent: this, json: value, key: key);
   }
 
   ListContext childAsList(String key) {
@@ -594,14 +613,7 @@ class MapContext extends ParseContext {
         'Key $key is not of type List: $value (in $pointer)',
       );
     }
-    return ListContext(
-      baseUrl: baseUrl,
-      pointerParts: pointerParts,
-      snakeNameStack: snakeNameStack,
-      refRegistry: refRegistry,
-      isTopLevelComponent: isTopLevelComponent,
-      json: value,
-    );
+    return ListContext.fromParent(parent: this, json: value, key: key);
   }
 
   MapContext addSnakeName(
@@ -640,6 +652,19 @@ class ListContext extends ParseContext {
     required this.json,
   });
 
+  ListContext.fromParent({
+    required ParseContext parent,
+    required List<dynamic> json,
+    required String key,
+  }) : this(
+         baseUrl: parent.baseUrl,
+         pointerParts: [...parent.pointerParts, key],
+         snakeNameStack: parent.snakeNameStack,
+         refRegistry: parent.refRegistry,
+         isTopLevelComponent: parent.isTopLevelComponent,
+         json: json,
+       );
+
   ListContext indexAsList(int index) {
     final value = json[index];
     if (value == null) {
@@ -650,13 +675,10 @@ class ListContext extends ParseContext {
         'Index $index is not of type List<dynamic>: $value (in $pointer)',
       );
     }
-    return ListContext(
-      baseUrl: baseUrl,
-      pointerParts: pointerParts,
-      snakeNameStack: snakeNameStack,
-      refRegistry: refRegistry,
-      isTopLevelComponent: isTopLevelComponent,
+    return ListContext.fromParent(
+      parent: this,
       json: value,
+      key: index.toString(),
     );
   }
 
@@ -670,19 +692,18 @@ class ListContext extends ParseContext {
         'Index $index is not of type Map<String, dynamic>: $value (in $pointer)',
       );
     }
-    return MapContext(
-      baseUrl: baseUrl,
-      pointerParts: pointerParts,
-      snakeNameStack: snakeNameStack,
-      refRegistry: refRegistry,
-      isTopLevelComponent: isTopLevelComponent,
+    return MapContext.fromParent(
+      parent: this,
       json: value,
+      key: index.toString(),
     );
   }
 
   dynamic operator [](int index) => json[index];
 
   int get length => json.length;
+
+  Iterable<(int, dynamic)> get indexed => json.indexed;
 
   ListContext addSnakeName(
     String snakeName, {
@@ -742,32 +763,6 @@ abstract class ParseContext {
       buf.write(e);
     }
     return buf.toString();
-  }
-
-  ParseContext fromJson(dynamic json) {
-    if (json is Map<String, dynamic>) {
-      return MapContext(
-        baseUrl: baseUrl,
-        pointerParts: pointerParts,
-        snakeNameStack: snakeNameStack,
-        refRegistry: refRegistry,
-        isTopLevelComponent: isTopLevelComponent,
-        json: json,
-      );
-    }
-    if (json is List) {
-      return ListContext(
-        baseUrl: baseUrl,
-        pointerParts: pointerParts,
-        snakeNameStack: snakeNameStack,
-        refRegistry: refRegistry,
-        isTopLevelComponent: isTopLevelComponent,
-        json: json,
-      );
-    }
-    throw UnimplementedError(
-      'fromJson not implemented for ${json.runtimeType}',
-    );
   }
 
   // Registry of all the schemas we've parsed so far.
