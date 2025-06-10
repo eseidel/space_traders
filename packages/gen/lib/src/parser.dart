@@ -216,13 +216,13 @@ SchemaRef parseSchemaOrRef(MapContext json) {
 
   if (json.containsKey('oneOf')) {
     // TODO(eseidel): Support oneOf
-    _unimplemented(json, 'OneOf');
+    _unimplemented(json, 'oneOf');
   }
 
   if (json.containsKey('allOf')) {
     final allOf = json.childAsList('allOf');
     if (allOf.length != 1) {
-      _unimplemented(json, 'AllOf with ${allOf.length} items');
+      _unimplemented(json, 'allOf with ${allOf.length} items');
     }
     return parseSchemaOrRef(allOf.indexAsMap(0));
   }
@@ -258,7 +258,7 @@ SchemaRef parseSchemaOrRef(MapContext json) {
       }
     }
 
-    _unimplemented(json, 'AnyOf with ${anyOf.length} items');
+    _unimplemented(json, 'anyOf with ${anyOf.length} items');
   }
 
   return SchemaRef.schema(parseSchema(json));

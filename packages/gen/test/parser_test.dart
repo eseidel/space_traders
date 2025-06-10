@@ -58,7 +58,20 @@ void main() {
           'enum': [1, 2, 3],
         },
       };
-      expect(() => parseTestSchemas(json), throwsA(isA<UnimplementedError>()));
+      expect(
+        () => parseTestSchemas(json),
+        throwsA(
+          isA<UnimplementedError>().having(
+            (e) => e.message,
+            'message',
+            equals(
+              'enumValues for type=SchemaType.number not supported in '
+              'MapContext(/components/schemas/NumberEnum, '
+              '{type: number, enum: [1, 2, 3]})',
+            ),
+          ),
+        ),
+      );
     });
 
     test('equals', () {
@@ -166,7 +179,44 @@ void main() {
           ],
         },
       };
-      expect(() => parseTestSchemas(json), throwsA(isA<UnimplementedError>()));
+      expect(
+        () => parseTestSchemas(json),
+        throwsA(
+          isA<UnimplementedError>().having(
+            (e) => e.message,
+            'message',
+            equals(
+              'anyOf with 2 items not supported in '
+              'MapContext(/components/schemas/User, '
+              '{anyOf: [{type: boolean}, {type: string}]})',
+            ),
+          ),
+        ),
+      );
+    });
+
+    test('oneOf not supported', () {
+      final json = {
+        'User': {
+          'oneOf': [
+            {'type': 'boolean'},
+          ],
+        },
+      };
+      expect(
+        () => parseTestSchemas(json),
+        throwsA(
+          isA<UnimplementedError>().having(
+            (e) => e.message,
+            'message',
+            equals(
+              'oneOf not supported in '
+              'MapContext(/components/schemas/User, '
+              '{oneOf: [{type: boolean}]})',
+            ),
+          ),
+        ),
+      );
     });
 
     test('components schemas as ref not supported', () {
