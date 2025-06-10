@@ -309,7 +309,7 @@ void main() {
             (e) => e.message,
             'message',
             equals(
-              'Key responses is not of type Map<String, dynamic>: true (in /paths//users/get)',
+              "'responses' is not of type Map<String, dynamic>: true in /paths//users/get",
             ),
           ),
         ),
@@ -332,6 +332,25 @@ void main() {
             (e) => e.message,
             'message',
             equals('Path cannot be empty in /paths/'),
+          ),
+        ),
+      );
+    });
+
+    test('info is required', () {
+      final json = {
+        'openapi': '3.1.0',
+        'servers': [
+          {'url': 'https://api.spacetraders.io/v2'},
+        ],
+      };
+      expect(
+        () => parseTestSpec(json),
+        throwsA(
+          isA<FormatException>().having(
+            (e) => e.message,
+            'message',
+            equals('Key info is required in /'),
           ),
         ),
       );

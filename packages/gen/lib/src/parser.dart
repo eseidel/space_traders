@@ -8,9 +8,7 @@ import 'package:space_gen/src/string.dart';
 T _required<T>(MapContext json, String key) {
   final value = json[key];
   if (value == null) {
-    throw FormatException(
-      'Required key not found: $key in ${json.pointer}: $json',
-    );
+    _error(json, 'Key $key is required');
   }
   return value as T;
 }
@@ -19,9 +17,7 @@ MapContext _requiredMap(MapContext json, String key) {
   final value = json[key];
   // Check the value is not null to avoid the childAsMap throwing StateError.
   if (value == null) {
-    throw FormatException(
-      'Required key not found: $key in ${json.pointer}: $json',
-    );
+    _error(json, 'Key $key is required');
   }
   return json.childAsMap(key);
 }
@@ -29,27 +25,27 @@ MapContext _requiredMap(MapContext json, String key) {
 ListContext _requiredList(MapContext json, String key) {
   final value = json[key];
   if (value == null) {
-    throw FormatException(
-      'Required key not found: $key in ${json.pointer}: $json',
-    );
+    _error(json, 'Key $key is required');
   }
   return json.childAsList(key);
 }
 
 void _expect(bool condition, ParseContext json, String message) {
   if (!condition) {
-    throw FormatException('$message in ${json.pointer}');
+    _error(json, message);
   }
+}
+
+T _expectType<T>(ParseContext context, String key, dynamic value) {
+  if (value is! T) {
+    _error(context, "'$key' is not of type $T: $value");
+  }
+  return value;
 }
 
 T? _optional<T>(MapContext parent, String key) {
   final value = parent[key];
-  if (value is T?) {
-    return value;
-  }
-  throw FormatException(
-    'Key $key is not of type $T: $value (in ${parent.pointer})',
-  );
+  return _expectType<T?>(parent, key, value);
 }
 
 MapContext? _optionalMap(MapContext parent, String key) {
@@ -57,11 +53,7 @@ MapContext? _optionalMap(MapContext parent, String key) {
   if (value == null) {
     return null;
   }
-  if (value is! Map<String, dynamic>) {
-    throw FormatException(
-      'Key $key is not of type Map<String, dynamic>: $value (in ${parent.pointer})',
-    );
-  }
+  _expectType<Map<String, dynamic>>(parent, key, value);
   return parent.childAsMap(key);
 }
 
@@ -70,20 +62,13 @@ ListContext? _optionalList(MapContext parent, String key) {
   if (value == null) {
     return null;
   }
-  if (value is! List<dynamic>) {
-    throw FormatException(
-      'Key $key is not of type List<dynamic>: $value (in ${parent.pointer})',
-    );
-  }
+  _expectType<List<dynamic>>(parent, key, value);
   return parent.childAsList(key);
 }
 
-// void _unimplemented(Json json, String key) {
-//   final value = json[key];
-//   if (value != null) {
-//     throw UnimplementedError('Unsupported key: $key in $json');
-//   }
-// }
+Never _unimplemented(ParseContext json, String message) {
+  throw UnimplementedError('$message not supported in $json');
+}
 
 void _ignored(MapContext parent, String key) {
   final value = parent[key];
@@ -92,11 +77,11 @@ void _ignored(MapContext parent, String key) {
   }
 }
 
-void _warn(MapContext context, String message) {
+void _warn(ParseContext context, String message) {
   logger.warn('$message in ${context.pointer}');
 }
 
-void _error(MapContext context, String message) {
+Never _error(ParseContext context, String message) {
   throw FormatException('$message in ${context.pointer}');
 }
 
@@ -131,19 +116,18 @@ Parameter parseParameter(MapContext json) {
       _error(json, 'Parameter must have either schema or content');
     }
     // Content fields.
-    // Use an explicit throw so Dart can see `type` is always set.
-    throw const FormatException('Content parameters not supported');
+    _unimplemented(json, 'Content parameters');
   }
 
   if (sendIn == SendIn.cookie) {
-    throw UnimplementedError('Cookie parameters not supported');
+    _unimplemented(json, 'in=cookie');
   }
   if (sendIn == SendIn.path) {
     if (type.schema?.type != SchemaType.string) {
-      throw UnimplementedError('Path parameters must be strings');
+      _error(json, 'Path parameters must be strings');
     }
     if (required != true) {
-      throw UnimplementedError('Path parameters must be required');
+      _error(json, 'Path parameters must be required');
     }
   }
 
@@ -195,9 +179,7 @@ Schema parseSchema(MapContext json) {
   final enumValues = json['enum'] as List<dynamic>? ?? [];
   if (enumValues.isNotEmpty) {
     if (type != SchemaType.string) {
-      throw UnimplementedError(
-        'Enum values are currently only supported for string types',
-      );
+      _unimplemented(json, 'enumValues for type=$type');
     }
   }
   final format = _optional<String>(json, 'format');
@@ -236,13 +218,13 @@ SchemaRef parseSchemaOrRef(MapContext json) {
 
   if (json.containsKey('oneOf')) {
     // TODO(eseidel): Support oneOf
-    throw UnimplementedError('OneOf not supported');
+    _unimplemented(json, 'OneOf');
   }
 
   if (json.containsKey('allOf')) {
     final allOf = json.childAsList('allOf');
     if (allOf.length != 1) {
-      throw UnimplementedError('AllOf with ${allOf.length} items');
+      _unimplemented(json, 'AllOf with ${allOf.length} items');
     }
     return parseSchemaOrRef(allOf.indexAsMap(0));
   }
@@ -278,7 +260,7 @@ SchemaRef parseSchemaOrRef(MapContext json) {
       }
     }
 
-    throw UnimplementedError('AnyOf with ${anyOf.length} items');
+    _unimplemented(json, 'AnyOf with ${anyOf.length} items');
   }
 
   return SchemaRef.schema(parseSchema(json));
@@ -360,9 +342,7 @@ Endpoint parseEndpoint({
 List<Response> parseResponses(MapContext responsesJson) {
   final responseCodes = responsesJson.keys.toList()..remove('204');
   if (responseCodes.length != 1) {
-    throw UnimplementedError(
-      'Multiple responses not supported: ${responsesJson.pointer}',
-    );
+    _unimplemented(responsesJson, 'Multiple responses');
   }
 
   final responseCode = responseCodes.first;
@@ -391,7 +371,7 @@ Components parseComponents(MapContext? json) {
     if (!supportedKeys.contains(key)) {
       final value = json[key] as Json;
       if (value.isNotEmpty) {
-        throw UnimplementedError('Components key not supported: $key');
+        _unimplemented(json, key);
       }
     }
   }
@@ -412,9 +392,7 @@ Components parseComponents(MapContext? json) {
       final ref = parseSchemaOrRef(childContext);
       final schema = ref.schema;
       if (schema == null) {
-        throw UnimplementedError(
-          'reference found, schema expected: ${childContext.pointer}',
-        );
+        _unimplemented(childContext, r'$ref');
       }
       schemas[name] = schema;
     }
@@ -599,13 +577,8 @@ class MapContext extends ParseContext {
     if (value == null) {
       throw StateError('Key not found: $key in $pointer');
     }
-    if (value is! Map<String, dynamic>) {
-      throw FormatException(
-        'Key $key is not of type Map<String, dynamic> '
-        'rather ${value.runtimeType}: $value (in $pointer)',
-      );
-    }
-    return MapContext.fromParent(parent: this, json: value, key: key);
+    final child = _expectType<Map<String, dynamic>>(this, key, value);
+    return MapContext.fromParent(parent: this, json: child, key: key);
   }
 
   ListContext childAsList(String key) {
@@ -613,12 +586,8 @@ class MapContext extends ParseContext {
     if (value == null) {
       throw StateError('Key not found: $key in $pointer');
     }
-    if (value is! List) {
-      throw FormatException(
-        'Key $key is not of type List: $value (in $pointer)',
-      );
-    }
-    return ListContext.fromParent(parent: this, json: value, key: key);
+    final child = _expectType<List<dynamic>>(this, key, value);
+    return ListContext.fromParent(parent: this, json: child, key: key);
   }
 
   MapContext addSnakeName(
@@ -641,6 +610,9 @@ class MapContext extends ParseContext {
   }
 
   Iterable<String> get keys => json.keys;
+
+  @override
+  String toString() => 'MapContext($pointer, $json)';
 
   final Json json;
 }
@@ -671,12 +643,10 @@ class ListContext extends ParseContext {
   MapContext indexAsMap(int index) {
     final value = json[index];
     if (value == null) {
-      throw FormatException('Index not found: $index in $pointer');
+      _error(this, 'Index $index not found');
     }
     if (value is! Map<String, dynamic>) {
-      throw FormatException(
-        'Index $index is not of type Map<String, dynamic>: $value (in $pointer)',
-      );
+      _error(this, 'Index $index is not of type Map<String, dynamic>: $value');
     }
     return MapContext.fromParent(
       parent: this,
