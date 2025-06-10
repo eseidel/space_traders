@@ -575,6 +575,40 @@ void main() {
         ),
       );
     });
+
+    test('multiple responses not supported', () {
+      final json = {
+        'openapi': '3.1.0',
+        'info': {'title': 'Space Traders API', 'version': '1.0.0'},
+        'servers': [
+          {'url': 'https://api.spacetraders.io/v2'},
+        ],
+        'paths': {
+          '/users': {
+            'get': {
+              'responses': {
+                '200': {'description': 'OK'},
+                '201': {'description': 'Created'},
+              },
+            },
+          },
+        },
+      };
+      expect(
+        () => parseTestSpec(json),
+        throwsA(
+          isA<UnimplementedError>().having(
+            (e) => e.message,
+            'message',
+            equals(
+              'Multiple responses not supported in '
+              'MapContext(/paths//users/get/responses, '
+              '{200: {description: OK}, 201: {description: Created}})',
+            ),
+          ),
+        ),
+      );
+    });
   });
 
   group('JsonPointer', () {
