@@ -26,6 +26,16 @@ MapContext _requiredMap(MapContext json, String key) {
   return json.childAsMap(key);
 }
 
+ListContext _requiredList(MapContext json, String key) {
+  final value = json[key];
+  if (value == null) {
+    throw FormatException(
+      'Required key not found: $key in ${json.pointer}: $json',
+    );
+  }
+  return json.childAsList(key);
+}
+
 void _expect(bool condition, ParseContext json, String message) {
   if (!condition) {
     throw FormatException('$message in ${json.pointer}');
@@ -78,7 +88,7 @@ void _error(MapContext context, String message) {
 }
 
 /// Parse a parameter from a json object.
-Parameter parseParameter({required MapContext json}) {
+Parameter parseParameter(MapContext json) {
   final schema = _optionalMap(json, 'schema');
   final hasSchema = schema != null;
   final hasContent = _optional<Json>(json, 'content') != null;
@@ -309,10 +319,10 @@ Endpoint parseEndpoint({
       : parametersJson.json.entries.indexed
             .map(
               (indexed) => parseParameter(
-                json: context
-                    .addSnakeName('parameter${indexed.$1}')
+                context
                     .childAsList('parameters')
-                    .indexAsMap(indexed.$1),
+                    .indexAsMap(indexed.$1)
+                    .addSnakeName('parameter${indexed.$1}'),
               ),
             )
             .toList();
@@ -373,15 +383,14 @@ Components parseComponents(MapContext json) {
     logger.warn('Ignoring securitySchemes.');
   }
 
-  final schemasJson = json['schemas'] as Json?;
+  final schemasJson = _optionalMap(json, 'schemas');
   final schemas = <String, Schema>{};
   if (schemasJson != null) {
     for (final name in schemasJson.keys) {
       final snakeName = snakeFromCamel(name);
-      final childContext = json
-          .addSnakeName(snakeName, isTopLevelComponent: true)
-          .childAsMap('schemas')
-          .childAsMap(name);
+      final childContext = schemasJson
+          .childAsMap(name)
+          .addSnakeName(snakeName, isTopLevelComponent: true);
       final ref = parseSchemaOrRef(childContext);
       final schema = ref.schema;
       if (schema == null) {
@@ -430,8 +439,8 @@ OpenApi parseOpenApi(MapContext json) {
 
   final info = parseInfo(_requiredMap(json, 'info'));
 
-  final servers = _requiredMap(json, 'servers');
-  final firstServer = servers.childAsList('servers').indexAsMap(0);
+  final servers = _requiredList(json, 'servers');
+  final firstServer = servers.indexAsMap(0);
   final serverUrl = _required<String>(firstServer, 'url');
 
   final paths = _requiredMap(json, 'paths');
@@ -561,7 +570,8 @@ class MapContext extends ParseContext {
     }
     if (value is! Map<String, dynamic>) {
       throw FormatException(
-        'Key $key is not of type Map<String, dynamic>: $value (in $pointer)',
+        'Key $key is not of type Map<String, dynamic> '
+        'rather ${value.runtimeType}: $value (in $pointer)',
       );
     }
     return MapContext(
