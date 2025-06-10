@@ -65,12 +65,8 @@ extension _EndpointGeneration on Endpoint {
   /// The type of the response.
   /// If there are multiple responses, we return the first one with a content
   /// type.
-  SchemaRef? get responseTypeRef {
-    if (responses.isEmpty) {
-      return null;
-    }
-    return responses.contentfulResponses.firstOrNull?.content;
-  }
+  SchemaRef? get responseTypeRef =>
+      responses.contentfulResponses.firstOrNull?.content;
 
   Map<String, dynamic> toTemplateContext(_Context context) {
     final serverParameters = parameters

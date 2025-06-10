@@ -350,9 +350,6 @@ class Responses extends Equatable {
   List<Response> get contentfulResponses =>
       responses.values.where(Response.hasContent).toList();
 
-  /// Whether this endpoint has any content-ful responses.
-  bool get hasContentfulResponses => contentfulResponses.isNotEmpty;
-
   /// Whether this endpoint has any responses.
   bool get isEmpty => responses.isEmpty;
 
