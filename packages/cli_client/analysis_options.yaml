@@ -1,9 +1,8 @@
 # This file configures the static analysis results for your project (errors,
 # warnings, and lints).
 
-include: package:very_good_analysis/analysis_options.yaml
+include: ../../analysis_options.yaml
 linter:
   rules:
-    # This lint is wrong.  It changes behavior to pass the future
-    # out, making exceptions happen in the outer scope.
-    unnecessary_await_in_return: false
+    # An experimental rule that very_good_analysis shouldn't have on.
+    specify_nonobvious_property_types: false

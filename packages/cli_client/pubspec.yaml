@@ -5,7 +5,7 @@ publish_to: none
 
 environment:
   sdk: ^3.8.0
-# resolution: workspace
+resolution: workspace
 
 dependencies:
   args: ^2.7.0
@@ -27,4 +27,4 @@ dependencies:
 dev_dependencies:
   mocktail: ^1.0.3
   test: ^1.24.0
-  very_good_analysis: ^7.0.0
+  very_good_analysis: ^8.0.0

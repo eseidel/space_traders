@@ -1,16 +1,20 @@
 # Workaround for https://github.com/dart-lang/sdk/issues/56047
-name: _
-environment: 
-  sdk: ^3.7.0
+name: space_traders
+environment:
+  sdk: ^3.8.0
+
 dev_dependencies:
-  very_good_analysis: ^7.0.0
-# workspace:
-#   - packages/cli
-#   - packages/cli_client
-#   - packages/client
-#   - packages/db
-#   - packages/openapi
-#   - packages/protocol
-#   - packages/server
-#   - packages/types
-#   - packages/ui
+  very_good_analysis: ^8.0.0
+
+workspace:
+  - packages/cli
+  - packages/cli_client
+  - packages/client
+  - packages/db
+  - packages/gen
+  - packages/openapi
+  - packages/protocol
+  - packages/server
+  - packages/types
+# Can't include ui due to https://github.com/dart-lang/sdk/issues/60888
+  # - packages/ui
