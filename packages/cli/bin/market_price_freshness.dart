@@ -14,7 +14,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   String d(num seconds) =>
       approximateDuration(Duration(seconds: seconds.toInt()));
   logger.info(
-    'freshness: {average: ${d(s.average)}, '
+    'freshness: {average: ${d(s.mean)}, '
     'median: ${d(s.median)}, '
     'min: ${d(s.min)}, '
     'max: ${d(s.max)}, '

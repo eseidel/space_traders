@@ -1,7 +1,7 @@
 # This file configures the static analysis results for your project (errors,
 # warnings, and lints).
 
-include: package:very_good_analysis/analysis_options.yaml
+include: ../../analysis_options.yaml
 
 analyzer:
   exclude:
