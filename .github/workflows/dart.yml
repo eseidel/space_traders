@@ -30,9 +30,8 @@ jobs:
 
       # Install dependencies for all packages since some import each other.
       - name: Install dependencies
-        run: |
-          dart pub global activate very_good_cli
-          dart pub global run very_good_cli:very_good packages get -r
+        run: dart pub get
+        working-directory: packages/${{ matrix.package }}
 
       - name: Verify formatting
         run: dart format --output=none --set-exit-if-changed .
