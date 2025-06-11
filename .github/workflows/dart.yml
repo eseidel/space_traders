@@ -1,4 +1,9 @@
+# cspell:words subosito
 name: Dart
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 on:
   push:
@@ -13,10 +18,13 @@ jobs:
     with:
       config: cspell.config.yaml
 
-  build:
+  build_dart_packages:
     name: 🏗️ Build & Test
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        package: ['cli', 'cli_client', 'client', 'db', 'gen', 'protocol', 'server', 'types']
+        
     steps:
       - uses: actions/checkout@v4
 
@@ -25,24 +33,79 @@ jobs:
       # https://github.com/dart-lang/setup-dart/blob/main/README.md
       - uses: dart-lang/setup-dart@v1
 
+      # Install dependencies for all packages since some import each other.
       - name: Install dependencies
         run: dart pub get
-        working-directory: packages/cli
+        working-directory: packages/${{ matrix.package }}
 
       - name: Verify formatting
         run: dart format --output=none --set-exit-if-changed .
-        working-directory: packages/cli
+        working-directory: packages/${{ matrix.package }}
 
       # Consider passing '--fatal-infos' for slightly stricter analysis.
       - name: Analyze project source
         run: dart analyze
-        working-directory: packages/cli
+        working-directory: packages/${{ matrix.package }}
 
       - name: Run tests with coverage
-        run: ./coverage.sh
+        run: dart test --coverage=coverage
+        working-directory: packages/${{ matrix.package }}
+
+      - name: Convert coverage to lcov
+      # Intentionally excluding openapi generated code from coverage for now.
+        run: >
+          dart run coverage:format_coverage
+          --lcov
+          --in=coverage
+          --out=coverage.lcov
+          --packages=.dart_tool/package_config.json
+          --report-on=../cli/lib/
+          --report-on=../cli_client/lib/
+          --report-on=../client/lib/
+          --report-on=../db/lib/
+          --report-on=../gen/lib/
+          --report-on=../protocol/lib/
+          --report-on=../server/lib/
+          --report-on=../types/lib/
+        working-directory: packages/${{ matrix.package }}
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
         with:
-          fail_ci_if_error: true # optional (default = false)
-          token: ${{ secrets.CODECOV_TOKEN }} # required
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: packages/${{ matrix.package }}/coverage.lcov
+  
+  # build_flutter_packages:
+  #   name: 🏗️ Build & Test
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     matrix:
+  #       package: ['ui']
+        
+  #   steps:
+  #     - uses: actions/checkout@v4
+
+  #     - uses: subosito/flutter-action@v2
+
+  #     - name: Install dependencies
+  #       run: flutter pub get
+  #       working-directory: packages/${{ matrix.package }}
+
+  #     - name: Verify formatting
+  #       run: dart format --output=none --set-exit-if-changed .
+  #       working-directory: packages/${{ matrix.package }}
+
+  #     - name: Analyze project source
+  #       run: dart analyze
+  #       working-directory: packages/${{ matrix.package }}
+
+  #     - name: Run tests with coverage
+  #       run: flutter test --coverage
+  #       working-directory: packages/${{ matrix.package }}
+
+  #     - name: Upload coverage reports to Codecov
+  #       uses: codecov/codecov-action@v5
+  #       with:
+  #         fail_ci_if_error: true
+  #         token: ${{ secrets.CODECOV_TOKEN }}
