@@ -1,5 +1,4 @@
 # cspell:words subosito
-name: Dart
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
