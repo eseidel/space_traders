@@ -52,7 +52,21 @@ jobs:
         working-directory: packages/${{ matrix.package }}
 
       - name: Convert coverage to lcov
-        run: dart run coverage:format_coverage --lcov --in=coverage --out=coverage.lcov --packages=.dart_tool/package_config.json
+      # Intentionally excluding openapi generated code from coverage for now.
+        run: >
+          dart run coverage:format_coverage
+          --lcov
+          --in=coverage
+          --out=coverage.lcov
+          --packages=.dart_tool/package_config.json
+          --report-on=../cli/lib/
+          --report-on=../cli_client/lib/
+          --report-on=../client/lib/
+          --report-on=../db/lib/
+          --report-on=../gen/lib/
+          --report-on=../protocol/lib/
+          --report-on=../server/lib/
+          --report-on=../types/lib/
         working-directory: packages/${{ matrix.package }}
 
       - name: Upload coverage reports to Codecov
