@@ -745,7 +745,7 @@ void main() {
       );
     });
 
-    test('in=cookie and in=header not supported', () async {
+    test('in=cookie not supported', () async {
       Map<String, dynamic> withIn(String sendIn) {
         return {
           'openapi': '3.1.0',
@@ -778,10 +778,7 @@ void main() {
         renderToDirectory(spec: withIn('cookie')),
         throwsA(isA<UnimplementedError>()),
       );
-      await expectLater(
-        renderToDirectory(spec: withIn('header')),
-        throwsA(isA<UnimplementedError>()),
-      );
+      await expectLater(renderToDirectory(spec: withIn('header')), completes);
     });
 
     test('responses without content are ignored', () async {
