@@ -313,6 +313,7 @@ class Endpoint extends Equatable {
     required this.path,
     required this.method,
     required this.tag,
+    required this.summary,
     required this.responses,
     required this.parameters,
     required this.snakeName,
@@ -327,6 +328,9 @@ class Endpoint extends Equatable {
 
   /// A tag for grouping endpoints.
   final String tag;
+
+  /// The summary of this endpoint.
+  final String? summary;
 
   /// The responses of this endpoint.
   final Responses responses;
@@ -346,6 +350,7 @@ class Endpoint extends Equatable {
     path,
     method,
     tag,
+    summary,
     responses,
     snakeName,
     parameters,

@@ -315,6 +315,9 @@ Map<String, MediaType> _parseContent(MapContext contentJson) {
     );
     mediaTypes[mimeType] = MediaType(schema: schema);
   }
+  if (mediaTypes.isEmpty) {
+    _error(contentJson, 'Empty content');
+  }
   return mediaTypes;
 }
 
@@ -345,7 +348,7 @@ Endpoint parseEndpoint({
         Uri.parse(path).pathSegments.last,
   );
   final context = endpointJson.addSnakeName(snakeName);
-  _ignored<String>(context, 'summary');
+  final summary = _optional<String>(context, 'summary');
   // Operation does not mention 'responses' as being required, but
   // the Responses object says at least one response is required.
   final responses = parseResponses(_requiredMap(context, 'responses'));
@@ -365,11 +368,13 @@ Endpoint parseEndpoint({
   final requestBody = parseRequestBodyOrRef(
     _optionalMap(context, 'requestBody'),
   );
+
   _warnUnused(context);
   return Endpoint(
     path: path,
     method: method,
     tag: tag,
+    summary: summary,
     responses: responses,
     snakeName: snakeName,
     parameters: parameters,
@@ -669,6 +674,8 @@ class MapContext extends ParseContext {
     json: json,
     usedKeys: usedKeys,
   );
+
+  bool get isEmpty => json.isEmpty;
 
   dynamic operator [](String key) {
     _markUsed(key);

@@ -846,6 +846,37 @@ void main() {
         ),
       );
     });
+
+    test('request body with empty content is not supported', () {
+      final json = {
+        'openapi': '3.1.0',
+        'info': {'title': 'Space Traders API', 'version': '1.0.0'},
+        'servers': [
+          {'url': 'https://api.spacetraders.io/v2'},
+        ],
+        'paths': {
+          '/users': {
+            'post': {
+              'summary': 'Post user',
+              'responses': {
+                '200': {'description': 'OK'},
+              },
+              'requestBody': {'content': <String, dynamic>{}},
+            },
+          },
+        },
+      };
+      expect(
+        () => parseTestSpec(json),
+        throwsA(
+          isA<FormatException>().having(
+            (e) => e.message,
+            'message',
+            equals('Empty content in /paths//users/post/requestBody/content'),
+          ),
+        ),
+      );
+    });
   });
 
   group('ParseContext', () {
