@@ -87,11 +87,7 @@ jobs:
         working-directory: packages/${{ matrix.package }}
 
       - name: Run tests with coverage
-        run: flutter test --coverage=coverage
-        working-directory: packages/${{ matrix.package }}
-
-      - name: Convert coverage to lcov
-        run: dart run coverage:format_coverage --lcov --in=coverage --out=coverage.lcov --packages=.dart_tool/package_config.json
+        run: flutter test --coverage
         working-directory: packages/${{ matrix.package }}
 
       - name: Upload coverage reports to Codecov
@@ -99,4 +95,3 @@ jobs:
         with:
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: packages/${{ matrix.package }}/coverage.lcov
