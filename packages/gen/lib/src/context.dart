@@ -10,6 +10,10 @@ import 'package:space_gen/src/parser.dart';
 import 'package:space_gen/src/spec.dart';
 import 'package:space_gen/src/string.dart';
 
+void _unimplemented(String message, String pointer) {
+  throw UnimplementedError('$message at $pointer');
+}
+
 class Paths {
   static String apiFilePath(Api api) {
     // openapi generator does not use /src/ in the path.
@@ -96,12 +100,10 @@ extension _EndpointGeneration on Endpoint {
     final hasQueryParameters = queryParameters.isNotEmpty;
     final cookieParameters = bySendIn['cookie'] ?? [];
     if (cookieParameters.isNotEmpty) {
-      throw UnimplementedError('Cookie parameters are not yet supported.');
+      _unimplemented('Cookie parameters are not yet supported.', path);
     }
     final headerParameters = bySendIn['header'] ?? [];
-    if (headerParameters.isNotEmpty) {
-      throw UnimplementedError('Header parameters are not yet supported.');
-    }
+    final hasHeaderParameters = headerParameters.isNotEmpty;
 
     return {
       'methodName': methodName,
@@ -116,6 +118,8 @@ extension _EndpointGeneration on Endpoint {
       'pathParameters': pathParameters,
       'hasQueryParameters': hasQueryParameters,
       'queryParameters': queryParameters,
+      'hasHeaderParameters': hasHeaderParameters,
+      'headerParameters': headerParameters,
       'requestBody': requestBody,
       // TODO(eseidel): remove void support, it's unused.
       'returnIsVoid': returnType == 'void',
@@ -613,9 +617,17 @@ extension _ParameterGeneration on Parameter {
 
 extension _RequestBodyGeneration on RequestBody {
   Map<String, dynamic> toTemplateContext(_Context context) {
-    final schema = context._maybeResolve<Schema>(
-      content['application/json']?.schema,
-    );
+    var mediaTypeRef = content['application/json']?.schema;
+    // If there is no application/json media type, use the first one.
+    // This is a hack to make petstore work enough for now.
+    if (mediaTypeRef == null) {
+      final firstKey = content.keys.first;
+      logger
+        ..warn('No application/json media type found for $pointer')
+        ..detail('Using first media type: $firstKey');
+      mediaTypeRef = content[firstKey]?.schema;
+    }
+    final schema = context._maybeResolve<Schema>(mediaTypeRef);
     if (schema == null) {
       throw StateError('Schema is null: $this');
     }
