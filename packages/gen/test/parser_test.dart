@@ -7,7 +7,7 @@ import 'package:test/test.dart';
 class _MockLogger extends Mock implements Logger {}
 
 void main() {
-  group('OpenApi', () {
+  group('parser', () {
     OpenApi parseTestSpec(Map<String, dynamic> json) {
       return parseOpenApi(
         MapContext.initial(Uri.parse('file:///foo.json'), json),
@@ -86,7 +86,7 @@ void main() {
       );
     });
 
-    test('equals', () {
+    test('OpenApi equals', () {
       final jsonOne = {
         'openapi': '3.1.0',
         'info': {'title': 'Space Traders API', 'version': '1.0.0'},
@@ -320,6 +320,45 @@ void main() {
               r'$ref not supported in '
               'MapContext(/components/schemas/User, '
               r'{$ref: #/components/schemas/Value})',
+            ),
+          ),
+        ),
+      );
+    });
+
+    test('components not supported keys', () {
+      final json = {
+        'openapi': '3.1.0',
+        'info': {'title': 'Space Traders API', 'version': '1.0.0'},
+        'servers': [
+          {'url': 'https://api.spacetraders.io/v2'},
+        ],
+        'paths': {
+          '/users': {
+            'get': {
+              'summary': 'Get user',
+              'responses': {
+                '200': {'description': 'OK'},
+              },
+            },
+          },
+        },
+        'components': {
+          'headers': {
+            'X-Foo': {'type': 'string', 'description': 'Foo'},
+          },
+        },
+      };
+      final logger = _MockLogger();
+      expect(
+        () => runWithLogger(logger, () => parseTestSpec(json)),
+        throwsA(
+          isA<UnimplementedError>().having(
+            (e) => e.message,
+            'message',
+            equals(
+              'headers not supported in MapContext(/components, '
+              '{headers: {X-Foo: {type: string, description: Foo}}})',
             ),
           ),
         ),
