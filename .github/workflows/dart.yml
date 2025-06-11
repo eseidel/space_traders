@@ -29,7 +29,9 @@ jobs:
       - uses: dart-lang/setup-dart@v1
 
       - name: Install dependencies
-        run: dart pub get
+        run: |
+          dart pub global activate very_good_cli
+          dart pub global run very_good_cli packages get -r
         working-directory: packages/${{ matrix.package }}
 
       - name: Verify formatting
