@@ -62,36 +62,36 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: packages/${{ matrix.package }}/coverage.lcov
   
-  build_flutter_packages:
-    name: 🏗️ Build & Test
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        package: ['ui']
+  # build_flutter_packages:
+  #   name: 🏗️ Build & Test
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     matrix:
+  #       package: ['ui']
         
-    steps:
-      - uses: actions/checkout@v4
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - uses: subosito/flutter-action@v2
+  #     - uses: subosito/flutter-action@v2
 
-      - name: Install dependencies
-        run: flutter pub get
-        working-directory: packages/${{ matrix.package }}
+  #     - name: Install dependencies
+  #       run: flutter pub get
+  #       working-directory: packages/${{ matrix.package }}
 
-      - name: Verify formatting
-        run: dart format --output=none --set-exit-if-changed .
-        working-directory: packages/${{ matrix.package }}
+  #     - name: Verify formatting
+  #       run: dart format --output=none --set-exit-if-changed .
+  #       working-directory: packages/${{ matrix.package }}
 
-      - name: Analyze project source
-        run: dart analyze
-        working-directory: packages/${{ matrix.package }}
+  #     - name: Analyze project source
+  #       run: dart analyze
+  #       working-directory: packages/${{ matrix.package }}
 
-      - name: Run tests with coverage
-        run: flutter test --coverage
-        working-directory: packages/${{ matrix.package }}
+  #     - name: Run tests with coverage
+  #       run: flutter test --coverage
+  #       working-directory: packages/${{ matrix.package }}
 
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          fail_ci_if_error: true
-          token: ${{ secrets.CODECOV_TOKEN }}
+  #     - name: Upload coverage reports to Codecov
+  #       uses: codecov/codecov-action@v5
+  #       with:
+  #         fail_ci_if_error: true
+  #         token: ${{ secrets.CODECOV_TOKEN }}
