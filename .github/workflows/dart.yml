@@ -13,12 +13,12 @@ jobs:
     with:
       config: cspell.config.yaml
 
-  build:
+  build_dart_packages:
     name: 🏗️ Build & Test
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        package: ['cli', 'client', 'db', 'gen', 'protocol', 'server', 'types']
+        package: ['cli', 'cli_client', 'client', 'db', 'gen', 'protocol', 'server', 'types']
         
     steps:
       - uses: actions/checkout@v4
@@ -44,6 +44,43 @@ jobs:
 
       - name: Run tests with coverage
         run: dart test --coverage=coverage
+        working-directory: packages/${{ matrix.package }}
+
+      - name: Convert coverage to lcov
+        run: dart run coverage:format_coverage --lcov --in=coverage --out=coverage.lcov --packages=.dart_tool/package_config.json
+        working-directory: packages/${{ matrix.package }}
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: packages/${{ matrix.package }}/coverage.lcov
+  
+  build_flutter_packages:
+    name: 🏗️ Build & Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: ['ui']
+        
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: flutter pub get
+        working-directory: packages/${{ matrix.package }}
+
+      - name: Verify formatting
+        run: dart format --output=none --set-exit-if-changed .
+        working-directory: packages/${{ matrix.package }}
+
+      - name: Analyze project source
+        run: dart analyze
+        working-directory: packages/${{ matrix.package }}
+
+      - name: Run tests with coverage
+        run: flutter test --coverage=coverage
         working-directory: packages/${{ matrix.package }}
 
       - name: Convert coverage to lcov
