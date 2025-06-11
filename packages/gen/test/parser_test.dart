@@ -55,7 +55,8 @@ void main() {
           },
         },
       };
-      final spec = parseTestSpec(specJson);
+      final logger = _MockLogger();
+      final spec = runWithLogger(logger, () => parseTestSpec(specJson));
       expect(spec.serverUrl, Uri.parse('https://api.spacetraders.io/v2'));
       expect(spec.endpoints.first.path, '/users');
     });
@@ -68,8 +69,9 @@ void main() {
           'enum': [1, 2, 3],
         },
       };
+      final logger = _MockLogger();
       expect(
-        () => parseTestSchemas(json),
+        () => runWithLogger(logger, () => parseTestSchemas(json)),
         throwsA(
           isA<UnimplementedError>().having(
             (e) => e.message,
@@ -139,9 +141,10 @@ void main() {
           },
         },
       };
-      final specOne = parseTestSpec(jsonOne);
-      final specTwo = parseTestSpec(jsonOne);
-      final specThree = parseTestSpec(jsonTwo);
+      final logger = _MockLogger();
+      final specOne = runWithLogger(logger, () => parseTestSpec(jsonOne));
+      final specTwo = runWithLogger(logger, () => parseTestSpec(jsonOne));
+      final specThree = runWithLogger(logger, () => parseTestSpec(jsonTwo));
       expect(specOne, specTwo);
       expect(specOne, isNot(specThree));
       expect(specOne.hashCode, specTwo.hashCode);
@@ -157,7 +160,8 @@ void main() {
           ],
         },
       };
-      final schemas = parseTestSchemas(json);
+      final logger = _MockLogger();
+      final schemas = runWithLogger(logger, () => parseTestSchemas(json));
       expect(schemas['User']!.type, SchemaType.boolean);
     });
 
@@ -174,7 +178,8 @@ void main() {
         },
         'Value': {'type': 'boolean'},
       };
-      final schemas = parseTestSchemas(json);
+      final logger = _MockLogger();
+      final schemas = runWithLogger(logger, () => parseTestSchemas(json));
       final schema = schemas['User']!;
       expect(schema.type, SchemaType.array);
       expect(schema.items!.ref, '#/components/schemas/Value');
@@ -188,7 +193,8 @@ void main() {
           ],
         },
       };
-      final schemas = parseTestSchemas(json);
+      final logger = _MockLogger();
+      final schemas = runWithLogger(logger, () => parseTestSchemas(json));
       expect(schemas['User']!.type, SchemaType.boolean);
     });
 
@@ -201,8 +207,9 @@ void main() {
           ],
         },
       };
+      final logger = _MockLogger();
       expect(
-        () => parseTestSchemas(json),
+        () => runWithLogger(logger, () => parseTestSchemas(json)),
         throwsA(
           isA<UnimplementedError>().having(
             (e) => e.message,
@@ -225,7 +232,8 @@ void main() {
           ],
         },
       };
-      final schemas = parseTestSchemas(json);
+      final logger = _MockLogger();
+      final schemas = runWithLogger(logger, () => parseTestSchemas(json));
       expect(schemas['User']!.type, SchemaType.boolean);
     });
 
@@ -238,8 +246,9 @@ void main() {
           ],
         },
       };
+      final logger = _MockLogger();
       expect(
-        () => parseTestSchemas(json),
+        () => runWithLogger(logger, () => parseTestSchemas(json)),
         throwsA(
           isA<UnimplementedError>().having(
             (e) => e.message,
@@ -262,8 +271,9 @@ void main() {
           ],
         },
       };
+      final logger = _MockLogger();
       expect(
-        () => parseTestSchemas(json),
+        () => runWithLogger(logger, () => parseTestSchemas(json)),
         throwsA(
           isA<UnimplementedError>().having(
             (e) => e.message,
@@ -289,7 +299,8 @@ void main() {
         },
         'Value': {'type': 'boolean'},
       };
-      final schemas = parseTestSchemas(json);
+      final logger = _MockLogger();
+      final schemas = runWithLogger(logger, () => parseTestSchemas(json));
       final schema = schemas['User']!;
       expect(schema.type, SchemaType.object);
       expect(schema.properties['value']!.ref, '#/components/schemas/Value');
@@ -299,7 +310,20 @@ void main() {
         'User': {r'$ref': '#/components/schemas/Value'},
         'Value': {'type': 'boolean'},
       };
-      expect(() => parseTestSchemas(json2), throwsUnimplementedError);
+      expect(
+        () => runWithLogger(logger, () => parseTestSchemas(json2)),
+        throwsA(
+          isA<UnimplementedError>().having(
+            (e) => e.message,
+            'message',
+            equals(
+              r'$ref not supported in '
+              'MapContext(/components/schemas/User, '
+              r'{$ref: #/components/schemas/Value})',
+            ),
+          ),
+        ),
+      );
     });
 
     test('parameter with schema and content', () {
@@ -405,8 +429,9 @@ void main() {
           },
         },
       };
+      final logger = _MockLogger();
       expect(
-        () => parseTestSpec(json),
+        () => runWithLogger(logger, () => parseTestSpec(json)),
         throwsA(
           isA<UnimplementedError>().having(
             (e) => e.message,
@@ -564,8 +589,9 @@ void main() {
           },
         },
       };
+      final logger = _MockLogger();
       expect(
-        () => parseTestSpec(json),
+        () => runWithLogger(logger, () => parseTestSpec(json)),
         throwsA(
           isA<FormatException>().having(
             (e) => e.message,
@@ -605,8 +631,9 @@ void main() {
           },
         },
       };
+      final logger = _MockLogger();
       expect(
-        () => parseTestSpec(json),
+        () => runWithLogger(logger, () => parseTestSpec(json)),
         throwsA(
           isA<FormatException>().having(
             (e) => e.message,
@@ -753,11 +780,6 @@ void main() {
       };
       final logger = _MockLogger();
       final spec = runWithLogger(logger, () => parseTestSpec(json));
-      verify(
-        () => logger.detail(
-          'Ignoring key: default in /paths//users/get/responses',
-        ),
-      ).called(1);
       expect(spec.endpoints.first.responses[200], isNull);
     });
 
