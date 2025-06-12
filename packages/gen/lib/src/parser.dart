@@ -304,22 +304,8 @@ RefOr<RequestBody>? parseRequestBodyOrRef(MapContext? json) {
   return RefOr<RequestBody>.object(body);
 }
 
-Map<String, MediaType> _parseContent(MapContext contentJson) {
-  final mediaTypes = <String, MediaType>{};
-  for (final mimeType in contentJson.keys) {
-    final schema = parseSchema(
-      contentJson.childAsMap(mimeType).childAsMap('schema'),
-    );
-    mediaTypes[mimeType] = MediaType(schema: schema);
-  }
-  if (mediaTypes.isEmpty) {
-    _error(contentJson, 'Empty content');
-  }
-  return mediaTypes;
-}
-
 RequestBody parseRequestBody(MapContext json) {
-  final content = _parseContent(_requiredMap(json, 'content'));
+  final content = _parseMediaTypes(_requiredMap(json, 'content'));
   final description = _optional<String>(json, 'description');
 
   final isRequired = json['required'] as bool? ?? false;
