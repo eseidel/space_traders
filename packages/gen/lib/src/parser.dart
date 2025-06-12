@@ -337,29 +337,16 @@ RequestBody parseRequestBody(MapContext json) {
   return body;
 }
 
-/// Parse an endpoint from a json object.
-Endpoint parseEndpoint({
-  required MapContext endpointJson,
-  required String path,
-  required Method method,
-}) {
+Operation _parseOperation(MapContext operationJson, String path) {
   final snakeName = snakeFromKebab(
-    _optional<String>(endpointJson, 'operationId') ??
+    _optional<String>(operationJson, 'operationId') ??
         Uri.parse(path).pathSegments.last,
   );
-  final context = endpointJson.addSnakeName(snakeName);
+  final context = operationJson.addSnakeName(snakeName);
+
   final summary = _optional<String>(context, 'summary');
-  // Operation does not mention 'responses' as being required, but
-  // the Responses object says at least one response is required.
-  final responses = parseResponses(_requiredMap(context, 'responses'));
-  if (responses.contentfulResponses.length > 1) {
-    _unimplemented(context, 'Multiple responses with content');
-  }
-  if (responses.isEmpty) {
-    _error(context, 'Responses are required');
-  }
-  final tags = _optional<List<dynamic>>(context, 'tags');
-  final tag = tags?.firstOrNull as String? ?? 'Default';
+  final description = _optional<String>(context, 'description');
+  final tags = _optional<List<dynamic>>(context, 'tags')?.cast<String>() ?? [];
   final parameters = _mapOptionalList(
     context,
     'parameters',
@@ -368,17 +355,72 @@ Endpoint parseEndpoint({
   final requestBody = parseRequestBodyOrRef(
     _optionalMap(context, 'requestBody'),
   );
+  final deprecated = _optional<bool>(context, 'deprecated') ?? false;
+  final responses = parseResponses(_requiredMap(context, 'responses'));
 
-  _warnUnused(context);
-  return Endpoint(
-    path: path,
-    method: method,
-    tag: tag,
-    summary: summary,
-    responses: responses,
+  // Operation does not mention 'responses' as being required, but
+  // the Responses object says at least one response is required.
+  if (responses.contentfulResponses.length > 1) {
+    _unimplemented(context, 'Multiple responses with content');
+  }
+  if (responses.isEmpty) {
+    _error(context, 'Responses are required');
+  }
+  return Operation(
+    tags: tags,
     snakeName: snakeName,
+    summary: summary ?? '',
+    description: description ?? '',
     parameters: parameters,
     requestBody: requestBody,
+    responses: responses,
+    deprecated: deprecated,
+  );
+}
+
+Map<Method, Operation> _parseOperations(MapContext context, String path) {
+  final operations = <Method, Operation>{};
+  for (final method in Method.values) {
+    final methodValue = _optionalMap(context, method.key);
+    if (methodValue == null) {
+      continue;
+    }
+    final operation = _parseOperation(methodValue, path);
+    operations[method] = operation;
+  }
+  return operations;
+}
+
+/// Parse a path item from a json object.
+/// https://spec.openapis.org/oas/v3.1.0#path-item-object
+PathItem parsePathItem({
+  required MapContext pathItemJson,
+  required String path,
+}) {
+  // TODO(eseidel): Support $ref
+  // if (pathItemJson.containsKey(r'$ref')) {
+  //   final ref = pathItemJson[r'$ref'] as String;
+  //   _warnUnused(pathItemJson);
+  //   return RefOr<PathItem>.ref(ref);
+  // }
+  final summary = _optional<String>(pathItemJson, 'summary');
+  _ignored<List<dynamic>>(pathItemJson, 'parameters');
+  // final parameters = _mapOptionalList(
+  //   pathItemJson,
+  //   'parameters',
+  //   (child, index) => parseParameter(child.addSnakeName('parameter$index')),
+  // ).toList();
+
+  final description = _optional<String>(pathItemJson, 'description');
+  final operations = _parseOperations(pathItemJson, path);
+
+  _warnUnused(pathItemJson);
+  return PathItem(
+    path: path,
+    summary: summary ?? '',
+    description: description ?? '',
+    // parameters: parameters,
+    operations: operations,
   );
 }
 
@@ -491,6 +533,28 @@ Info parseInfo(MapContext json) {
   return Info(title, version);
 }
 
+/// Parse the paths section of a spec.
+/// https://spec.openapis.org/oas/v3.1.0#paths-object
+Paths parsePaths(MapContext pathsJson) {
+  final paths = <String, PathItem>{};
+  // Paths object only has patterned fields, so we just walk the keys.
+  for (final path in pathsJson.keys) {
+    final pathItemJson = _optionalMap(pathsJson, path);
+    if (pathItemJson == null) {
+      continue;
+    }
+    _expect(pathItemJson.isNotEmpty, pathItemJson, 'Path cannot be empty');
+    _expect(
+      path.startsWith('/'),
+      pathItemJson,
+      'Path must start with /: $path',
+    );
+
+    paths[path] = parsePathItem(pathItemJson: pathItemJson, path: path);
+  }
+  return Paths(paths: paths);
+}
+
 OpenApi parseOpenApi(MapContext json) {
   final minimumVersion = Version.parse('3.0.0');
   final versionString = _required<String>(json, 'openapi');
@@ -508,29 +572,14 @@ OpenApi parseOpenApi(MapContext json) {
   final firstServer = servers.indexAsMap(0);
   final serverUrl = _required<String>(firstServer, 'url');
 
-  final paths = _requiredMap(json, 'paths');
-  final endpoints = <Endpoint>[];
-  for (final path in paths.keys) {
-    final pathContext = paths.childAsMap(path);
-    _expect(path.isNotEmpty, pathContext, 'Path cannot be empty');
-    _expect(path.startsWith('/'), pathContext, 'Path must start with /: $path');
-    for (final method in Method.values) {
-      final methodValue = _optionalMap(pathContext, method.key);
-      if (methodValue == null) {
-        continue;
-      }
-      endpoints.add(
-        parseEndpoint(endpointJson: methodValue, path: path, method: method),
-      );
-    }
-  }
+  final paths = parsePaths(_requiredMap(json, 'paths'));
   final components = parseComponents(_optionalMap(json, 'components'));
   _warnUnused(json);
   return OpenApi(
     serverUrl: Uri.parse(serverUrl),
     version: version,
     info: info,
-    endpoints: endpoints,
+    paths: paths,
     components: components,
   );
 }
@@ -676,6 +725,7 @@ class MapContext extends ParseContext {
   );
 
   bool get isEmpty => json.isEmpty;
+  bool get isNotEmpty => json.isNotEmpty;
 
   dynamic operator [](String key) {
     _markUsed(key);

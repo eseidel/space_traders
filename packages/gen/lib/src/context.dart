@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:collection/collection.dart';
+import 'package:equatable/equatable.dart';
 import 'package:file/file.dart';
 import 'package:mustache_template/mustache_template.dart';
 import 'package:path/path.dart' as p;
@@ -34,6 +35,33 @@ class Paths {
   }
 }
 
+/// A convenience class created for each operation within a path item
+/// for compatibility with our existing rendering code.
+class Endpoint extends Equatable {
+  const Endpoint({
+    required this.method,
+    required this.pathItem,
+    required this.operation,
+  });
+
+  final Method method;
+  final PathItem pathItem;
+  final Operation operation;
+
+  String get path => pathItem.path;
+
+  String get tag => pathItem.tags.firstOrNull ?? 'Default';
+
+  String get snakeName => operation.snakeName;
+
+  String get summary => operation.summary;
+
+  List<Parameter> get parameters => operation.parameters;
+
+  @override
+  List<Object?> get props => [method, pathItem, operation];
+}
+
 /// The spec calls these tags, but the Dart openapi generator groups endpoints
 /// by tag into an API class so we do too.
 class Api {
@@ -47,6 +75,18 @@ class Api {
 }
 
 extension OpenApiGeneration on OpenApi {
+  /// The endpoints of the spec.
+  List<Endpoint> get endpoints => paths.paths.values
+      .expand(
+        (p) => p.operations.entries.map(
+          (e) => Endpoint(method: e.key, pathItem: p, operation: e.value),
+        ),
+      )
+      .toList();
+
+  /// Set of all endpoint tags in the spec.
+  Set<String> get tags => endpoints.map((e) => e.tag).toSet();
+
   List<Api> get apis => tags
       .sorted()
       .map(
@@ -70,14 +110,16 @@ extension _EndpointGeneration on Endpoint {
   /// If there are multiple responses, we return the first one with a content
   /// type.
   SchemaRef? get responseTypeRef =>
-      responses.contentfulResponses.firstOrNull?.content;
+      operation.responses.contentfulResponses.firstOrNull?.content;
 
   Map<String, dynamic> toTemplateContext(_Context context) {
     final serverParameters = parameters
         .map((param) => param.toTemplateContext(context))
         .toList();
 
-    final bodyObject = context._maybeResolve<RequestBody>(this.requestBody);
+    final bodyObject = context._maybeResolve<RequestBody>(
+      operation.requestBody,
+    );
     final requestBody = bodyObject?.toTemplateContext(context);
     // Parameters as passed to the Dart function call, including the request
     // body if it exists.
@@ -1019,14 +1061,14 @@ class _RenderContext {
   void collectApi(Api api) {
     for (final endpoint in api.endpoints) {
       visitRef(endpoint.responseTypeRef);
-      for (final response in endpoint.responses.contentfulResponses) {
+      for (final response in endpoint.operation.responses.contentfulResponses) {
         visitRef(response.content);
       }
       for (final param in endpoint.parameters) {
         visitRef(param.type);
       }
-      if (endpoint.requestBody != null) {
-        visitRef(endpoint.requestBody);
+      if (endpoint.operation.requestBody != null) {
+        visitRef(endpoint.operation.requestBody);
       }
     }
   }
