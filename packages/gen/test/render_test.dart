@@ -780,7 +780,7 @@ void main() {
           isA<UnimplementedError>().having(
             (e) => e.toString(),
             'message',
-            contains('cookie'),
+            contains('Cookie parameters are not yet supported'),
           ),
         ),
       );
