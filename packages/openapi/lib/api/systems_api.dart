@@ -90,6 +90,7 @@ class SystemsApi {
         'page': page.toString(),
         'limit': limit.toString(),
         'type': ?type?.toJson(),
+        'traits': traits.toString(),
       },
     );
 
@@ -174,7 +175,7 @@ class SystemsApi {
           '/systems/{systemSymbol}/waypoints/{waypointSymbol}/construction/supply'
               .replaceAll('{systemSymbol}', systemSymbol)
               .replaceAll('{waypointSymbol}', waypointSymbol),
-      bodyJson: supplyConstructionRequest.toJson(),
+      body: supplyConstructionRequest.toJson(),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {

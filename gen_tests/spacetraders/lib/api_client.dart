@@ -4,7 +4,15 @@ import 'dart:io';
 import 'package:http/http.dart';
 import 'package:spacetraders/api_exception.dart';
 
-enum Method { delete, get, patch, post, put }
+enum Method {
+  delete,
+  get,
+  patch,
+  post,
+  put;
+
+  bool get supportsBody => this != get && this != delete;
+}
 
 class ApiClient {
   ApiClient({Uri? baseUri, Client? client, this.defaultHeaders = const {}})
@@ -27,23 +35,23 @@ class ApiClient {
     // Body is nullable to allow for post requests which have an optional body
     // to not have to generate two separate calls depending on whether the
     // body is present or not.
-    Map<String, dynamic>? bodyJson,
+    dynamic body,
     Map<String, String> headerParameters = const {},
   }) async {
     final uri = resolvePath(path);
-    if (method == Method.get && bodyJson != null) {
-      throw ArgumentError('Body is not allowed for GET requests');
+    if (!method.supportsBody && body != null) {
+      throw ArgumentError('Body is not allowed for ${method.name} requests');
     }
 
+    final encodedBody = body != null ? jsonEncode(body) : null;
     final maybeContentType = <String, String>{
       ...defaultHeaders,
-      if (bodyJson != null) 'Content-Type': 'application/json',
+      if (encodedBody != null) 'Content-Type': 'application/json',
       ...headerParameters,
     };
     // Just pass null to http if we have no headers to set.
     // This makes our calls match openapi (and thus our tests pass).
     final headers = maybeContentType.isEmpty ? null : maybeContentType;
-    final body = bodyJson != null ? jsonEncode(bodyJson) : null;
 
     try {
       switch (method) {
@@ -55,11 +63,11 @@ class ApiClient {
           );
           return client.get(withParams, headers: headers);
         case Method.patch:
-          return client.patch(uri, headers: headers, body: body);
+          return client.patch(uri, headers: headers, body: encodedBody);
         case Method.post:
-          return client.post(uri, headers: headers, body: body);
+          return client.post(uri, headers: headers, body: encodedBody);
         case Method.put:
-          return client.put(uri, headers: headers, body: body);
+          return client.put(uri, headers: headers, body: encodedBody);
       }
     } on SocketException catch (error, trace) {
       throw ApiException.withInner(
