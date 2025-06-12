@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:http/http.dart';
 import 'package:openapi/api_exception.dart';
 
-enum Method { get, post, patch }
+enum Method { get, post, patch, put }
 
 class ApiClient {
   ApiClient({Uri? baseUri, Client? client, this.defaultHeaders = const {}})
@@ -56,6 +56,8 @@ class ApiClient {
           return client.post(uri, headers: headers, body: body);
         case Method.patch:
           return client.patch(uri, headers: headers, body: body);
+        case Method.put:
+          return client.put(uri, headers: headers, body: body);
       }
     } on SocketException catch (error, trace) {
       throw ApiException.withInner(
