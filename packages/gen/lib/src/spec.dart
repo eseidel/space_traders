@@ -269,7 +269,7 @@ enum Method {
 class MediaType extends Equatable {
   const MediaType({required this.schema});
 
-  final SchemaRef schema;
+  final Schema schema;
 
   @override
   List<Object?> get props => [schema];
@@ -430,8 +430,7 @@ class Response extends Equatable {
   final String description;
 
   /// The content of this response.
-  /// The official spec has a map here by mime type, but we only support json.
-  final SchemaRef? content;
+  final Map<String, MediaType>? content;
 
   /// Whether this response has content.
   /// We only support json, so we check for a schema with a type.
@@ -442,11 +441,13 @@ class Response extends Equatable {
     if (content == null) {
       return false;
     }
-    final schema = content.schema;
-    if (schema == null) {
-      return false;
+    for (final mediaType in content.values) {
+      final schema = mediaType.schema;
+      if (schema.type != SchemaType.unknown) {
+        return true;
+      }
     }
-    return schema.type != SchemaType.unknown;
+    return false;
   }
 
   @override

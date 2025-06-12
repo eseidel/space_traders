@@ -57,7 +57,13 @@ class SpecWalker {
   void _operation(Operation operation) {
     visitor.visitOperation(operation);
     for (final response in operation.responses.responses.values) {
-      _maybeRef(response.content);
+      final content = response.content;
+      if (content == null) {
+        continue;
+      }
+      for (final mediaType in content.values) {
+        _schema(mediaType.schema);
+      }
     }
     for (final parameter in operation.parameters) {
       _parameter(parameter);

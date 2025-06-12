@@ -4,37 +4,41 @@ import 'package:test/test.dart';
 void main() {
   group('RefOr', () {
     test('equality', () {
-      const bodyOne = RequestBody(
+      final schema = Schema(
+        pointer: '#/components/schemas/Foo',
+        snakeName: 'foo',
+        description: 'Foo',
+        type: SchemaType.object,
+        properties: const {},
+        required: const [],
+        items: null,
+        enumValues: const [],
+        format: '',
+        additionalProperties: null,
+        defaultValue: null,
+        example: null,
+        useNewType: false,
+      );
+
+      final bodyOne = RequestBody(
         pointer: '#/components/requestBodies/Foo',
         description: 'Foo',
-        content: {
-          'application/json': MediaType(
-            schema: SchemaRef.ref('#/components/schemas/Foo'),
-          ),
-        },
+        content: {'application/json': MediaType(schema: schema)},
         isRequired: true,
       );
-      const bodyTwo = RequestBody(
+      final bodyTwo = RequestBody(
         pointer: '#/components/requestBodies/Foo',
         description: 'Foo',
-        content: {
-          'application/json': MediaType(
-            schema: SchemaRef.ref('#/components/schemas/Foo'),
-          ),
-        },
+        content: {'application/json': MediaType(schema: schema)},
         isRequired: true,
       );
-      const refOrOne = RefOr.object(bodyOne);
-      const refOrTwo = RefOr.object(bodyTwo);
-      const refOrThree = RefOr.object(
+      final refOrOne = RefOr.object(bodyOne);
+      final refOrTwo = RefOr.object(bodyTwo);
+      final refOrThree = RefOr.object(
         RequestBody(
           pointer: '#/components/requestBodies/Bar',
           description: 'Bar',
-          content: {
-            'application/json': MediaType(
-              schema: SchemaRef.ref('#/components/schemas/Bar'),
-            ),
-          },
+          content: {'application/json': MediaType(schema: schema)},
           isRequired: true,
         ),
       );

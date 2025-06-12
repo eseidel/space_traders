@@ -307,7 +307,7 @@ RefOr<RequestBody>? parseRequestBodyOrRef(MapContext? json) {
 Map<String, MediaType> _parseContent(MapContext contentJson) {
   final mediaTypes = <String, MediaType>{};
   for (final mimeType in contentJson.keys) {
-    final schema = parseSchemaOrRef(
+    final schema = parseSchema(
       contentJson.childAsMap(mimeType).childAsMap('schema'),
     );
     mediaTypes[mimeType] = MediaType(schema: schema);
@@ -421,6 +421,20 @@ PathItem parsePathItem({
   );
 }
 
+Map<String, MediaType> _parseMediaTypes(MapContext contentJson) {
+  final mediaTypes = <String, MediaType>{};
+  for (final mimeType in contentJson.keys) {
+    final schema = parseSchema(
+      contentJson.childAsMap(mimeType).childAsMap('schema'),
+    );
+    mediaTypes[mimeType] = MediaType(schema: schema);
+  }
+  if (mediaTypes.isEmpty) {
+    _error(contentJson, 'Empty content');
+  }
+  return mediaTypes;
+}
+
 Response _parseResponse(MapContext responseJson) {
   final description = _required<String>(responseJson, 'description');
   _ignored<dynamic>(responseJson, 'headers');
@@ -429,9 +443,8 @@ Response _parseResponse(MapContext responseJson) {
   if (content == null) {
     return Response(description: description);
   }
-  final jsonResponse = _requiredMap(content, 'application/json');
-  final schema = jsonResponse.childAsMap('schema').addSnakeName('response');
-  return Response(description: description, content: parseSchemaOrRef(schema));
+  final mediaTypes = _parseMediaTypes(content.addSnakeName('response'));
+  return Response(description: description, content: mediaTypes);
 }
 
 Responses parseResponses(MapContext responsesJson) {
