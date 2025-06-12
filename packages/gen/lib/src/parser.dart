@@ -138,9 +138,6 @@ Parameter parseParameter(MapContext json) {
     _error(json, 'Parameter must have either schema or content.');
   }
 
-  if (sendIn == SendIn.cookie) {
-    _unimplemented(json, 'in=cookie');
-  }
   if (sendIn == SendIn.path) {
     final schemaType = type.schema?.type;
     if (schemaType != SchemaType.string && schemaType != SchemaType.integer) {
