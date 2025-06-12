@@ -26,7 +26,7 @@ class CountingApiClient extends ApiClient {
       method: method,
       path: path,
       queryParameters: queryParameters,
-      headerParameters: queryParameters,
+      headerParameters: headerParameters,
       bodyJson: bodyJson,
     );
     // logger.info(response.body);
