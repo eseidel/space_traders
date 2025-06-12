@@ -1056,12 +1056,6 @@ class _RenderContext {
     }
   }
 
-  void maybeCollectSchema(Schema? schema) {
-    if (schema != null) {
-      collectSchema(schema);
-    }
-  }
-
   /// Collect an API and all its endpoints and responses.
   // TODO(eseidel): Could use Visitor for this?
   void collectApi(Api api) {
