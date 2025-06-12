@@ -103,14 +103,14 @@ extension _EndpointGeneration on Endpoint {
   /// The type of the response.
   /// If there are multiple responses, we return the first one with a content
   /// type.
-  SchemaRef? get responseType => operation
-      .responses
-      .contentfulResponses
-      .firstOrNull
-      ?.content
-      ?.values
-      .first
-      .schema;
+  SchemaRef? get responseType {
+    final responses = operation.responses;
+    final content = responses.contentfulResponses.firstOrNull?.content;
+    if (content == null) {
+      return null;
+    }
+    return _contentSchemaRef(content, path);
+  }
 
   Map<String, dynamic> toTemplateContext(_Context context) {
     final serverParameters = parameters
@@ -657,18 +657,23 @@ extension _ParameterGeneration on Parameter {
   }
 }
 
+SchemaRef? _contentSchemaRef(Map<String, MediaType> content, String pointer) {
+  final schemaRef = content['application/json']?.schema;
+  if (schemaRef != null) {
+    return schemaRef;
+  }
+  // If there is no application/json media type, use the first one.
+  // This is a hack to make petstore work enough for now.
+  final firstKey = content.keys.first;
+  logger
+    ..warn('No application/json media type found for $pointer')
+    ..detail('Using first media type: $firstKey');
+  return content[firstKey]?.schema;
+}
+
 extension _RequestBodyGeneration on RequestBody {
   Map<String, dynamic> toTemplateContext(_Context context) {
-    var schemaRef = content['application/json']?.schema;
-    // If there is no application/json media type, use the first one.
-    // This is a hack to make petstore work enough for now.
-    if (schemaRef == null) {
-      final firstKey = content.keys.first;
-      logger
-        ..warn('No application/json media type found for $pointer')
-        ..detail('Using first media type: $firstKey');
-      schemaRef = content[firstKey]?.schema;
-    }
+    final schemaRef = _contentSchemaRef(content, pointer);
     if (schemaRef == null) {
       throw StateError('Schema is null: $this');
     }
