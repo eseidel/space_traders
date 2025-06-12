@@ -265,11 +265,15 @@ enum Method {
   String get key => name.toLowerCase();
 }
 
+/// A media type is a mime type and a schema.
+/// https://spec.openapis.org/oas/v3.0.0#mediaTypeObject
 @immutable
 class MediaType extends Equatable {
+  /// Create a new media type.
   const MediaType({required this.schema});
 
-  final Schema schema;
+  /// 3.0.1 seems to allow a ref in MediaType, but 3.1.0 does not.
+  final SchemaRef schema;
 
   @override
   List<Object?> get props => [schema];
@@ -442,8 +446,9 @@ class Response extends Equatable {
       return false;
     }
     for (final mediaType in content.values) {
-      final schema = mediaType.schema;
-      if (schema.type != SchemaType.unknown) {
+      final schemaRef = mediaType.schema;
+      // This does not resolve the schema, so it will not work with refs.
+      if (schemaRef.schema?.type != SchemaType.unknown) {
         return true;
       }
     }

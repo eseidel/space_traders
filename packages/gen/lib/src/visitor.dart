@@ -62,7 +62,7 @@ class SpecWalker {
         continue;
       }
       for (final mediaType in content.values) {
-        _schema(mediaType.schema);
+        _ref(mediaType.schema);
       }
     }
     for (final parameter in operation.parameters) {

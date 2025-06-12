@@ -103,7 +103,7 @@ extension _EndpointGeneration on Endpoint {
   /// The type of the response.
   /// If there are multiple responses, we return the first one with a content
   /// type.
-  Schema? get responseType => operation
+  SchemaRef? get responseType => operation
       .responses
       .contentfulResponses
       .firstOrNull
@@ -125,7 +125,8 @@ extension _EndpointGeneration on Endpoint {
     // body if it exists.
     final dartParameters = [...serverParameters, ?requestBody];
 
-    final returnType = responseType?.typeName(context) ?? 'void';
+    final returnType =
+        context._maybeResolve(responseType)?.typeName(context) ?? 'void';
 
     final namedParameters = dartParameters.where((p) => p['required'] == false);
     final positionalParameters = dartParameters.where(
@@ -658,19 +659,20 @@ extension _ParameterGeneration on Parameter {
 
 extension _RequestBodyGeneration on RequestBody {
   Map<String, dynamic> toTemplateContext(_Context context) {
-    var schema = content['application/json']?.schema;
+    var schemaRef = content['application/json']?.schema;
     // If there is no application/json media type, use the first one.
     // This is a hack to make petstore work enough for now.
-    if (schema == null) {
+    if (schemaRef == null) {
       final firstKey = content.keys.first;
       logger
         ..warn('No application/json media type found for $pointer')
         ..detail('Using first media type: $firstKey');
-      schema = content[firstKey]?.schema;
+      schemaRef = content[firstKey]?.schema;
     }
-    if (schema == null) {
+    if (schemaRef == null) {
       throw StateError('Schema is null: $this');
     }
+    final schema = context._resolve(schemaRef);
     final typeName = schema.typeName(context);
     final paramName = typeName[0].toLowerCase() + typeName.substring(1);
     // TODO(eseidel): Share code with Parameter.toTemplateContext.
@@ -1064,10 +1066,10 @@ class _RenderContext {
   // TODO(eseidel): Could use Visitor for this?
   void collectApi(Api api) {
     for (final endpoint in api.endpoints) {
-      maybeCollectSchema(endpoint.responseType);
+      visitRef(endpoint.responseType);
       for (final response in endpoint.operation.responses.contentfulResponses) {
         for (final mediaType in response.content!.values) {
-          collectSchema(mediaType.schema);
+          visitRef(mediaType.schema);
         }
       }
       for (final param in endpoint.parameters) {
@@ -1081,7 +1083,7 @@ class _RenderContext {
 
   void collectRequestBody(RequestBody requestBody) {
     for (final value in requestBody.content.values) {
-      collectSchema(value.schema);
+      visitRef(value.schema);
     }
   }
 

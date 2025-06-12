@@ -160,6 +160,10 @@ Parameter parseParameter(MapContext json) {
 
 /// Parse a schema from a json object.
 Schema parseSchema(MapContext json) {
+  if (json.containsKey(r'$ref')) {
+    _error(json, r'$ref not expected');
+  }
+
   final type = SchemaType.fromJson(
     _optional<String>(json, 'type') ?? 'unknown',
   );
@@ -410,7 +414,7 @@ PathItem parsePathItem({
 Map<String, MediaType> _parseMediaTypes(MapContext contentJson) {
   final mediaTypes = <String, MediaType>{};
   for (final mimeType in contentJson.keys) {
-    final schema = parseSchema(
+    final schema = parseSchemaOrRef(
       contentJson.childAsMap(mimeType).childAsMap('schema'),
     );
     mediaTypes[mimeType] = MediaType(schema: schema);
