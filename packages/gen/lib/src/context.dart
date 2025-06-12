@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:collection/collection.dart';
-import 'package:equatable/equatable.dart';
 import 'package:file/file.dart';
 import 'package:mustache_template/mustache_template.dart';
 import 'package:path/path.dart' as p;
@@ -37,7 +36,7 @@ class Paths {
 
 /// A convenience class created for each operation within a path item
 /// for compatibility with our existing rendering code.
-class Endpoint extends Equatable {
+class Endpoint {
   const Endpoint({
     required this.method,
     required this.pathItem,
@@ -54,12 +53,7 @@ class Endpoint extends Equatable {
 
   String get snakeName => operation.snakeName;
 
-  String get summary => operation.summary;
-
   List<Parameter> get parameters => operation.parameters;
-
-  @override
-  List<Object?> get props => [method, pathItem, operation];
 }
 
 /// The spec calls these tags, but the Dart openapi generator groups endpoints

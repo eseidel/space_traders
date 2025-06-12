@@ -724,7 +724,6 @@ class MapContext extends ParseContext {
     usedKeys: usedKeys,
   );
 
-  bool get isEmpty => json.isEmpty;
   bool get isNotEmpty => json.isNotEmpty;
 
   dynamic operator [](String key) {

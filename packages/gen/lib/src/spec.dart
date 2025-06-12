@@ -489,11 +489,7 @@ class Paths extends Equatable {
   final Map<String, PathItem> paths;
 
   Iterable<String> get keys => paths.keys;
-  Iterable<PathItem> get values => paths.values;
   PathItem operator [](String path) => paths[path]!;
-
-  Set<String> get tags =>
-      paths.values.map((e) => e.tags.firstOrNull ?? 'Default').toSet();
 
   @override
   List<Object?> get props => [paths];

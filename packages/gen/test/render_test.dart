@@ -776,7 +776,13 @@ void main() {
       await expectLater(renderToDirectory(spec: withIn('query')), completes);
       await expectLater(
         renderToDirectory(spec: withIn('cookie')),
-        throwsA(isA<UnimplementedError>()),
+        throwsA(
+          isA<UnimplementedError>().having(
+            (e) => e.toString(),
+            'message',
+            contains('cookie'),
+          ),
+        ),
       );
       await expectLater(renderToDirectory(spec: withIn('header')), completes);
     });
