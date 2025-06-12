@@ -52,6 +52,7 @@ import 'package:spacetraders/model/sell_cargo_request.dart';
 import 'package:spacetraders/model/ship_refine201_response.dart';
 import 'package:spacetraders/model/ship_refine_request.dart';
 import 'package:spacetraders/model/siphon_resources201_response.dart';
+import 'package:spacetraders/model/survey.dart';
 import 'package:spacetraders/model/transfer_cargo200_response.dart';
 import 'package:spacetraders/model/transfer_cargo_request.dart';
 import 'package:spacetraders/model/warp_ship200_response.dart';
@@ -266,7 +267,7 @@ class FleetApi {
 
   Future<ExtractResourcesWithSurvey201Response> extractResourcesWithSurvey(
     String shipSymbol, {
-    dynamic dynamic,
+    Survey? survey,
   }) async {
     final response = await client.invokeApi(
       method: Method.post,
@@ -274,7 +275,7 @@ class FleetApi {
         '{shipSymbol}',
         shipSymbol,
       ),
-      bodyJson: dynamic,
+      bodyJson: survey?.toJson(),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
