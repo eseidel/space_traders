@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:http/http.dart';
 import 'package:openapi/api_exception.dart';
 
-enum Method { get, post, patch, put }
+enum Method { delete, get, patch, post, put }
 
 class ApiClient {
   ApiClient({Uri? baseUri, Client? client, this.defaultHeaders = const {}})
@@ -47,15 +47,17 @@ class ApiClient {
 
     try {
       switch (method) {
+        case Method.delete:
+          return client.delete(uri, headers: headers);
         case Method.get:
           final withParams = uri.replace(
             queryParameters: {...baseUri.queryParameters, ...queryParameters},
           );
           return client.get(withParams, headers: headers);
-        case Method.post:
-          return client.post(uri, headers: headers, body: body);
         case Method.patch:
           return client.patch(uri, headers: headers, body: body);
+        case Method.post:
+          return client.post(uri, headers: headers, body: body);
         case Method.put:
           return client.put(uri, headers: headers, body: body);
       }
