@@ -72,7 +72,7 @@ class SystemStats {
   final int cachedJumpGates;
 
   /// Percentage of charts that are asteroids.
-  /// Asteroids are always(?) baren, so rarely worth visiting or charting.
+  /// Asteroids are always(?) barren, so rarely worth visiting or charting.
   double get asteroidChartPercent => chartedAsteroids / reachableAsteroids;
 
   /// Percentage of charts that are non-asteroids.

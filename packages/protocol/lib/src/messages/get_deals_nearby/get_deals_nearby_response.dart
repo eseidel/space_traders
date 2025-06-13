@@ -77,7 +77,7 @@ class DealsNearbyResponse {
   /// The maximum credits available for the deals.
   final int credits;
 
-  /// The extra sell opportunities available for the deals, includin contracts.
+  /// The extra sell opportunities available for the deals, including contracts.
   final List<SellOpp> extraSellOpps;
 
   final int tradeSymbolCount;
