@@ -336,7 +336,7 @@ class Operation extends Equatable {
   final Responses responses;
 
   /// The parameters of this operation.
-  final List<Parameter> parameters;
+  final List<RefOr<Parameter>> parameters;
 
   /// The request body of this operation.
   final RefOr<RequestBody>? requestBody;
