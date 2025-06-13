@@ -496,7 +496,12 @@ Components parseComponents(MapContext? componentsJson) {
     return const Components();
   }
   final keys = componentsJson.keys.toList();
-  final supportedKeys = ['schemas', 'securitySchemes', 'requestBodies'];
+  final supportedKeys = [
+    'schemas',
+    'securitySchemes',
+    'requestBodies',
+    'parameters',
+  ];
 
   for (final key in keys) {
     if (!supportedKeys.contains(key)) {
@@ -527,8 +532,17 @@ Components parseComponents(MapContext? componentsJson) {
     'requestBodies',
     parseRequestBody,
   );
+  final parameters = _parseComponent<Parameter>(
+    componentsJson,
+    'parameters',
+    parseParameter,
+  );
   _warnUnused(componentsJson);
-  return Components(schemas: schemas, requestBodies: requestBodies);
+  return Components(
+    schemas: schemas,
+    requestBodies: requestBodies,
+    parameters: parameters,
+  );
 }
 
 Info parseInfo(MapContext json) {
