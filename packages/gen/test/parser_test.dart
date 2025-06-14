@@ -121,6 +121,24 @@ void main() {
         'components': {
           'schemas': {
             'Foo': {'type': 'object'},
+            'Bar': {
+              'anyOf': [
+                {'type': 'boolean'},
+                {'type': 'string'},
+              ],
+            },
+            'Baz': {
+              'allOf': [
+                {'type': 'boolean'},
+                {'type': 'string'},
+              ],
+            },
+            'Qux': {
+              'oneOf': [
+                {'type': 'boolean'},
+                {'type': 'string'},
+              ],
+            },
           },
         },
       };

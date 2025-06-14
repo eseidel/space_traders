@@ -258,9 +258,7 @@ class Schema extends SchemaBase {
 
   @override
   List<Object?> get props => [
-    pointer,
-    snakeName,
-    type,
+    super.props,
     properties,
     required,
     description,
