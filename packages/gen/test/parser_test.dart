@@ -14,7 +14,7 @@ void main() {
       );
     }
 
-    Map<String, Schema> parseTestSchemas(Map<String, dynamic> schemasJson) {
+    Map<String, SchemaBase> parseTestSchemas(Map<String, dynamic> schemasJson) {
       final specJson = {
         'openapi': '3.1.0',
         'info': {'title': 'Space Traders API', 'version': '1.0.0'},
@@ -180,7 +180,7 @@ void main() {
       };
       final logger = _MockLogger();
       final schemas = runWithLogger(logger, () => parseTestSchemas(json));
-      final schema = schemas['User']!;
+      final schema = schemas['User']! as Schema;
       expect(schema.type, SchemaType.array);
       expect(schema.items!.ref, '#/components/schemas/Value');
     });
@@ -301,7 +301,7 @@ void main() {
       };
       final logger = _MockLogger();
       final schemas = runWithLogger(logger, () => parseTestSchemas(json));
-      final schema = schemas['User']!;
+      final schema = schemas['User']! as Schema;
       expect(schema.type, SchemaType.object);
       expect(schema.properties['value']!.ref, '#/components/schemas/Value');
 
