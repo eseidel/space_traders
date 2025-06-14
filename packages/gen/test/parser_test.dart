@@ -940,6 +940,33 @@ void main() {
         ),
       ]);
     });
+
+    test('ignores securitySchemes', () {
+      final json = {
+        'openapi': '3.1.0',
+        'info': {'title': 'Space Traders API', 'version': '1.0.0'},
+        'servers': [
+          {'url': 'https://api.spacetraders.io/v2'},
+        ],
+        'paths': {
+          '/users': {
+            'get': {
+              'responses': {
+                '200': {'description': 'OK'},
+              },
+            },
+          },
+        },
+        'components': {
+          'securitySchemes': {
+            'foo': {'type': 'http'},
+          },
+        },
+      };
+      final logger = _MockLogger();
+      runWithLogger(logger, () => parseTestSpec(json));
+      verify(() => logger.warn('Ignoring securitySchemes.')).called(1);
+    });
   });
 
   group('ParseContext', () {
