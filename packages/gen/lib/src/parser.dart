@@ -83,12 +83,13 @@ Never _unimplemented(ParseContext json, String message) {
   throw UnimplementedError('$message not supported in $json');
 }
 
-void _ignored<T>(MapContext parent, String key) {
+void _ignored<T>(MapContext parent, String key, {bool warn = false}) {
   final value = parent[key];
   if (value != null) {
-    logger.detail(
-      'Ignoring key: $key (${value.runtimeType}) in ${parent.pointer}',
-    );
+    final message =
+        'Ignoring key: $key (${value.runtimeType}) in ${parent.pointer}';
+    final method = warn ? logger.warn : logger.detail;
+    method(message);
   }
   if (value != null) {
     _expectType<T>(parent, key, value);
@@ -536,8 +537,8 @@ Map<String, T> _parseComponent<T>(
           .addSnakeName(snakeName, isTopLevelComponent: true);
       values[name] = parse(childContext);
     }
+    _warnUnused(valuesJson);
   }
-  _warnUnused(json);
   return values;
 }
 
@@ -548,31 +549,19 @@ Components parseComponents(MapContext? componentsJson) {
     return const Components();
   }
   _refNotExpected(componentsJson);
-  final keys = componentsJson.keys.toList();
-  final supportedKeys = [
-    'schemas',
-    'securitySchemes',
-    'requestBodies',
-    'parameters',
-  ];
 
-  for (final key in keys) {
-    if (!supportedKeys.contains(key)) {
-      final value = componentsJson[key] as Json;
-      if (value.isNotEmpty) {
-        _unimplemented(componentsJson, key);
-      }
+  void failIfPresent(String key) {
+    final value = _optional<Map<String, dynamic>>(componentsJson, key);
+    if (value != null) {
+      _unimplemented(componentsJson, key);
     }
-  }
-
-  final securitySchemesJson = _optionalMap(componentsJson, 'securitySchemes');
-  if (securitySchemesJson != null) {
-    logger.warn('Ignoring securitySchemes.');
   }
 
   final schemas = _parseComponent<SchemaBase>(componentsJson, 'schemas', (
     childContext,
   ) {
+    // TODO(eseidel): This should call parseSchema instead.
+    // But currently depends on anyOf hacks in parseSchemaOrRef.
     final ref = parseSchemaOrRef(childContext);
     final schema = ref.schema;
     if (schema == null) {
@@ -580,21 +569,35 @@ Components parseComponents(MapContext? componentsJson) {
     }
     return schema;
   });
-  final requestBodies = _parseComponent<RequestBody>(
+  final responses = _parseComponent<Response>(
     componentsJson,
-    'requestBodies',
-    parseRequestBody,
+    'responses',
+    _parseResponse,
   );
   final parameters = _parseComponent<Parameter>(
     componentsJson,
     'parameters',
     parseParameter,
   );
+  final requestBodies = _parseComponent<RequestBody>(
+    componentsJson,
+    'requestBodies',
+    parseRequestBody,
+  );
+  failIfPresent('headers');
+  final securitySchemesJson = _optionalMap(componentsJson, 'securitySchemes');
+  if (securitySchemesJson != null) {
+    _warn(componentsJson, 'Ignoring securitySchemes');
+  }
+  failIfPresent('links');
+  failIfPresent('callbacks');
+
   _warnUnused(componentsJson);
   return Components(
     schemas: schemas,
     requestBodies: requestBodies,
     parameters: parameters,
+    responses: responses,
   );
 }
 

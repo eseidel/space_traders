@@ -521,6 +521,7 @@ class Components extends Equatable {
     this.schemas = const {},
     this.requestBodies = const {},
     this.parameters = const {},
+    this.responses = const {},
   });
 
   final Map<String, SchemaBase> schemas;
@@ -528,7 +529,7 @@ class Components extends Equatable {
 
   // final Map<String, SecurityScheme> securitySchemes;
   final Map<String, RequestBody> requestBodies;
-  // final Map<String, Response> responses;
+  final Map<String, Response> responses;
   // final Map<String, Header> headers;
   // final Map<String, Example> examples;
   // final Map<String, Link> links;
