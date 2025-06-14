@@ -198,7 +198,7 @@ void main() {
       expect(schemas['User']!.type, SchemaType.boolean);
     });
 
-    test('anyOf not generally supported', () {
+    test('anyOf parses as SchemaAnyOf', () {
       final json = {
         'User': {
           'anyOf': [
@@ -208,20 +208,8 @@ void main() {
         },
       };
       final logger = _MockLogger();
-      expect(
-        () => runWithLogger(logger, () => parseTestSchemas(json)),
-        throwsA(
-          isA<UnimplementedError>().having(
-            (e) => e.message,
-            'message',
-            equals(
-              'anyOf with 2 items not supported in '
-              'MapContext(/components/schemas/User, '
-              '{anyOf: [{type: boolean}, {type: string}]})',
-            ),
-          ),
-        ),
-      );
+      final schemas = runWithLogger(logger, () => parseTestSchemas(json));
+      expect(schemas['User'], isA<SchemaAnyOf>());
     });
 
     test('allOf with one item', () {
@@ -247,20 +235,8 @@ void main() {
         },
       };
       final logger = _MockLogger();
-      expect(
-        () => runWithLogger(logger, () => parseTestSchemas(json)),
-        throwsA(
-          isA<UnimplementedError>().having(
-            (e) => e.message,
-            'message',
-            equals(
-              'allOf with 2 items not supported in '
-              'MapContext(/components/schemas/User, '
-              '{allOf: [{type: boolean}, {type: string}]})',
-            ),
-          ),
-        ),
-      );
+      final schemas = runWithLogger(logger, () => parseTestSchemas(json));
+      expect(schemas['User'], isA<SchemaAllOf>());
     });
 
     test('oneOf not supported', () {
@@ -272,20 +248,8 @@ void main() {
         },
       };
       final logger = _MockLogger();
-      expect(
-        () => runWithLogger(logger, () => parseTestSchemas(json)),
-        throwsA(
-          isA<UnimplementedError>().having(
-            (e) => e.message,
-            'message',
-            equals(
-              'oneOf not supported in '
-              'MapContext(/components/schemas/User, '
-              '{oneOf: [{type: boolean}]})',
-            ),
-          ),
-        ),
-      );
+      final schemas = runWithLogger(logger, () => parseTestSchemas(json));
+      expect(schemas['User'], isA<SchemaOneOf>());
     });
 
     test('components schemas as ref not supported', () {
