@@ -148,12 +148,7 @@ Parameter parseParameter(MapContext json) {
 
   if (sendIn == SendIn.path) {
     final schema = type.schema;
-    final SchemaType schemaType;
-    if (schema is Schema) {
-      schemaType = schema.type;
-    } else {
-      _error(json, 'Path parameters must be strings or integers');
-    }
+    final schemaType = schema?.type;
     if (schemaType != SchemaType.string && schemaType != SchemaType.integer) {
       _error(json, 'Path parameters must be strings or integers');
     }
