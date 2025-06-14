@@ -13,6 +13,12 @@ T _required<T>(MapContext json, String key) {
   return value as T;
 }
 
+void _refNotExpected(MapContext json) {
+  if (json.containsKey(r'$ref')) {
+    _error(json, r'$ref not expected');
+  }
+}
+
 MapContext _requiredMap(MapContext json, String key) {
   final value = json[key];
   // Check the value is not null to avoid the childAsMap throwing StateError.
@@ -116,6 +122,7 @@ RefOr<Parameter> parseParameterOrRef(MapContext json) {
 
 /// Parse a parameter from a json object.
 Parameter parseParameter(MapContext json) {
+  _refNotExpected(json);
   final schema = _optionalMap(json, 'schema');
   final hasSchema = schema != null;
   final hasContent = _optional<Json>(json, 'content') != null;
@@ -169,9 +176,7 @@ Parameter parseParameter(MapContext json) {
 
 /// Parse a schema from a json object.
 Schema parseSchema(MapContext json) {
-  if (json.containsKey(r'$ref')) {
-    _error(json, r'$ref not expected');
-  }
+  _refNotExpected(json);
 
   final type = SchemaType.fromJson(
     _optional<String>(json, 'type') ?? 'unknown',
@@ -348,6 +353,7 @@ RefOr<RequestBody>? parseRequestBodyOrRef(MapContext? json) {
 }
 
 RequestBody parseRequestBody(MapContext json) {
+  _refNotExpected(json);
   final content = _parseMediaTypes(_requiredMap(json, 'content'));
   final description = _optional<String>(json, 'description');
 
@@ -364,6 +370,7 @@ RequestBody parseRequestBody(MapContext json) {
 }
 
 Operation _parseOperation(MapContext operationJson, String path) {
+  _refNotExpected(operationJson);
   final snakeName = snakeFromKebab(
     _optional<String>(operationJson, 'operationId') ??
         Uri.parse(path).pathSegments.last,
@@ -406,6 +413,7 @@ Operation _parseOperation(MapContext operationJson, String path) {
 }
 
 Map<Method, Operation> _parseOperations(MapContext context, String path) {
+  _refNotExpected(context);
   final operations = <Method, Operation>{};
   for (final method in Method.values) {
     final methodValue = _optionalMap(context, method.key);
@@ -424,6 +432,7 @@ PathItem parsePathItem({
   required MapContext pathItemJson,
   required String path,
 }) {
+  _refNotExpected(pathItemJson);
   // TODO(eseidel): Support $ref
   // if (pathItemJson.containsKey(r'$ref')) {
   //   final ref = pathItemJson[r'$ref'] as String;
@@ -453,6 +462,7 @@ PathItem parsePathItem({
 }
 
 Map<String, MediaType> _parseMediaTypes(MapContext contentJson) {
+  _refNotExpected(contentJson);
   final mediaTypes = <String, MediaType>{};
   for (final mimeType in contentJson.keys) {
     final schema = parseSchemaOrRef(
@@ -466,7 +476,17 @@ Map<String, MediaType> _parseMediaTypes(MapContext contentJson) {
   return mediaTypes;
 }
 
+RefOr<Response> parseResponseOrRef(MapContext json) {
+  final ref = _optional<String>(json, r'$ref');
+  if (ref != null) {
+    _warnUnused(json);
+    return RefOr<Response>.ref(ref);
+  }
+  return RefOr<Response>.object(_parseResponse(json));
+}
+
 Response _parseResponse(MapContext responseJson) {
+  _refNotExpected(responseJson);
   final description = _required<String>(responseJson, 'description');
   _ignored<dynamic>(responseJson, 'headers');
   _ignored<dynamic>(responseJson, 'links');
@@ -485,7 +505,7 @@ Responses parseResponses(MapContext responsesJson) {
   _ignored<Map<String, dynamic>>(responsesJson, 'default');
   responseCodes.remove('default');
 
-  final responses = <int, Response>{};
+  final responses = <int, RefOr<Response>>{};
   for (final responseCode in responseCodes) {
     final responseJson = responsesJson
         .childAsMap(responseCode)
@@ -494,7 +514,7 @@ Responses parseResponses(MapContext responsesJson) {
     if (responseCodeInt == null) {
       _error(responsesJson, 'Invalid response code: $responseCode');
     }
-    responses[responseCodeInt] = _parseResponse(responseJson);
+    responses[responseCodeInt] = parseResponseOrRef(responseJson);
   }
   _warnUnused(responsesJson);
   return Responses(responses: responses);
@@ -505,6 +525,7 @@ Map<String, T> _parseComponent<T>(
   String key,
   T Function(MapContext) parse,
 ) {
+  _refNotExpected(json);
   final valuesJson = _optionalMap(json, key);
   final values = <String, T>{};
   if (valuesJson != null) {
@@ -526,6 +547,7 @@ Components parseComponents(MapContext? componentsJson) {
   if (componentsJson == null) {
     return const Components();
   }
+  _refNotExpected(componentsJson);
   final keys = componentsJson.keys.toList();
   final supportedKeys = [
     'schemas',
@@ -577,6 +599,7 @@ Components parseComponents(MapContext? componentsJson) {
 }
 
 Info parseInfo(MapContext json) {
+  _refNotExpected(json);
   final title = _required<String>(json, 'title');
   final version = _required<String>(json, 'version');
   _ignored<String>(json, 'summary');
@@ -591,6 +614,7 @@ Info parseInfo(MapContext json) {
 /// Parse the paths section of a spec.
 /// https://spec.openapis.org/oas/v3.1.0#paths-object
 Paths parsePaths(MapContext pathsJson) {
+  _refNotExpected(pathsJson);
   final paths = <String, PathItem>{};
   // Paths object only has patterned fields, so we just walk the keys.
   for (final path in pathsJson.keys) {
@@ -611,6 +635,7 @@ Paths parsePaths(MapContext pathsJson) {
 }
 
 OpenApi parseOpenApi(MapContext json) {
+  _refNotExpected(json);
   final minimumVersion = Version.parse('3.0.0');
   final versionString = _required<String>(json, 'openapi');
   final version = Version.parse(versionString);

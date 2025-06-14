@@ -747,11 +747,21 @@ void main() {
       };
       final spec = parseTestSpec(json);
       expect(
-        spec.paths['/users'].operations[Method.get]!.responses[200]!.content,
+        spec
+            .paths['/users']
+            .operations[Method.get]!
+            .responses[200]!
+            .object
+            ?.content,
         isNotNull,
       );
       expect(
-        spec.paths['/users'].operations[Method.get]!.responses[204]!.content,
+        spec
+            .paths['/users']
+            .operations[Method.get]!
+            .responses[204]!
+            .object
+            ?.content,
         isNotNull,
       );
     });
