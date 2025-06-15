@@ -113,6 +113,12 @@ void main() {
                       'schema': {'type': 'object'},
                     },
                   },
+                  'headers': {
+                    'X-Foo': {
+                      'description': 'Foo',
+                      'schema': {'type': 'string'},
+                    },
+                  },
                 },
               },
             },
