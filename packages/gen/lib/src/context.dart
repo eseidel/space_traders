@@ -972,6 +972,9 @@ class _Context {
   /// Write a file.
   void _writeFile({required String path, required String content}) {
     if (_writtenFiles.contains(path)) {
+      final existing = fs.file(p.join(outDir.path, path)).readAsStringSync();
+      logger.info('Existing file: $existing');
+      logger.info('New file: $content');
       throw Exception('File already written: $path');
     }
     _writtenFiles.add(path);

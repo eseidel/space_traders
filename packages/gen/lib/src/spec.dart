@@ -146,6 +146,7 @@ class RefOr<T> extends Equatable {
   List<Object?> get props => [ref, object];
 }
 
+@immutable
 class SchemaRef extends RefOr<SchemaBase> {
   const SchemaRef.ref(String super.ref) : super.ref();
   const SchemaRef.schema(SchemaBase super.schema) : super.object();
@@ -153,6 +154,7 @@ class SchemaRef extends RefOr<SchemaBase> {
   SchemaBase? get schema => object;
 }
 
+@immutable
 sealed class SchemaBase extends Equatable {
   const SchemaBase({
     required this.pointer,
@@ -168,6 +170,7 @@ sealed class SchemaBase extends Equatable {
   List<Object?> get props => [pointer, snakeName, type];
 }
 
+@immutable
 class SchemaAnyOf extends SchemaBase {
   const SchemaAnyOf({
     required super.pointer,
@@ -181,6 +184,7 @@ class SchemaAnyOf extends SchemaBase {
   List<Object?> get props => [super.props, schemas];
 }
 
+@immutable
 class SchemaAllOf extends SchemaBase {
   const SchemaAllOf({
     required super.pointer,
@@ -194,6 +198,7 @@ class SchemaAllOf extends SchemaBase {
   List<Object?> get props => [super.props, schemas];
 }
 
+@immutable
 class SchemaOneOf extends SchemaBase {
   const SchemaOneOf({
     required super.pointer,
