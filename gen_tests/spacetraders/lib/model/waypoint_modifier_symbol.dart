@@ -1,9 +1,9 @@
 enum WaypointModifierSymbol {
-  STRIPPED._('STRIPPED'),
-  UNSTABLE._('UNSTABLE'),
-  RADIATION_LEAK._('RADIATION_LEAK'),
-  CRITICAL_LIMIT._('CRITICAL_LIMIT'),
-  CIVIL_UNREST._('CIVIL_UNREST');
+  stripped._('STRIPPED'),
+  unstable._('UNSTABLE'),
+  radiationLeak._('RADIATION_LEAK'),
+  criticalLimit._('CRITICAL_LIMIT'),
+  civilUnrest._('CIVIL_UNREST');
 
   const WaypointModifierSymbol._(this.value);
 

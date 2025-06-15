@@ -1,8 +1,8 @@
 enum ShipEngineSymbol {
-  IMPULSE_DRIVE_I._('ENGINE_IMPULSE_DRIVE_I'),
-  ION_DRIVE_I._('ENGINE_ION_DRIVE_I'),
-  ION_DRIVE_II._('ENGINE_ION_DRIVE_II'),
-  HYPER_DRIVE_I._('ENGINE_HYPER_DRIVE_I');
+  engineImpulseDriveI._('ENGINE_IMPULSE_DRIVE_I'),
+  engineIonDriveI._('ENGINE_ION_DRIVE_I'),
+  engineIonDriveIi._('ENGINE_ION_DRIVE_II'),
+  engineHyperDriveI._('ENGINE_HYPER_DRIVE_I');
 
   const ShipEngineSymbol._(this.value);
 

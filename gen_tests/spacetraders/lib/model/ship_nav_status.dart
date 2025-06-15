@@ -1,7 +1,7 @@
 enum ShipNavStatus {
-  IN_TRANSIT._('IN_TRANSIT'),
-  IN_ORBIT._('IN_ORBIT'),
-  DOCKED._('DOCKED');
+  inTransit._('IN_TRANSIT'),
+  inOrbit._('IN_ORBIT'),
+  docked._('DOCKED');
 
   const ShipNavStatus._(this.value);
 
