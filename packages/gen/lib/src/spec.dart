@@ -534,7 +534,7 @@ class Response extends Equatable {
   }
 
   @override
-  List<Object?> get props => [description, content];
+  List<Object?> get props => [description, content, headers];
 }
 
 @immutable
