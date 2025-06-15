@@ -391,7 +391,7 @@ RequestBody parseRequestBody(MapContext json) {
     pointer: json.pointer.toString(),
     isRequired: isRequired,
     description: description,
-    content: content ?? {},
+    content: content,
   );
   json.addObject(body);
   _warnUnused(json);
@@ -490,10 +490,14 @@ PathItem parsePathItem({
   );
 }
 
-Map<String, MediaType>? _parseMediaTypes(MapContext? contentJson) {
+Map<String, MediaType>? _maybeMediaTypes(MapContext? contentJson) {
   if (contentJson == null) {
     return null;
   }
+  return _parseMediaTypes(contentJson);
+}
+
+Map<String, MediaType> _parseMediaTypes(MapContext contentJson) {
   _refNotExpected(contentJson);
   final mediaTypes = <String, MediaType>{};
   for (final mimeType in contentJson.keys) {
@@ -534,7 +538,7 @@ Response _parseResponse(MapContext responseJson) {
   final headers = _parseHeaders(_optionalMap(responseJson, 'headers'));
   _ignored<dynamic>(responseJson, 'links');
   final content = _optionalMap(responseJson, 'content');
-  final mediaTypes = _parseMediaTypes(content?.addSnakeName('response'));
+  final mediaTypes = _maybeMediaTypes(content?.addSnakeName('response'));
   return Response(
     description: description,
     content: mediaTypes,
