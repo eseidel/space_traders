@@ -1227,7 +1227,7 @@ class _SchemaSet {
 
 _SchemaSet _importsForSchema(Schema schema) {
   final collector = _RenderedSchemaVisitor();
-  SpecWalker(collector).walkSchema(schema);
+  SpecWalker(collector, includeCollectionSchemas: false).walkSchema(schema);
   return _SchemaSet(collector.refs, collector.schemas);
 }
 
@@ -1236,7 +1236,10 @@ _SchemaSet _importsForApi(Api api) {
   // An Endpoint is a rendering-only concept.  The SpecWalker works on spec
   // classes, so walk to PathItems within the endpoints.
   for (final endpoint in api.endpoints) {
-    SpecWalker(collector).walkPathItem(endpoint.pathItem);
+    SpecWalker(
+      collector,
+      includeCollectionSchemas: false,
+    ).walkPathItem(endpoint.pathItem);
   }
   return _SchemaSet(collector.refs, collector.schemas);
 }

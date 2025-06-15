@@ -910,12 +910,7 @@ void main() {
       expect(out.childFile('lib/api/default_api.dart'), exists);
       expect(
         out.childDirectory('lib/model'),
-        hasFiles([
-          'users200_response.dart',
-          'user.dart',
-          // TODO(eseidel): This is wrong and should be removed.
-          'users200_response_all_of_1.dart',
-        ]),
+        hasFiles(['users200_response.dart']),
       );
     });
   });
