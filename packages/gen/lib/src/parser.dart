@@ -279,6 +279,16 @@ SchemaRef? _maybeSchemaOrRef(MapContext? json) {
   return parseSchemaOrRef(json);
 }
 
+List<SchemaRef> _parseSchemas(ListContext json, String name) {
+  final schemas = <SchemaRef>[];
+  for (var i = 0; i < json.length; i++) {
+    schemas.add(
+      parseSchemaOrRef(json.indexAsMap(i).addSnakeName('${name}_$i')),
+    );
+  }
+  return schemas;
+}
+
 /// Parse a schema or a reference to a schema.
 /// https://spec.openapis.org/oas/v3.0.0#schemaObject
 /// https://spec.openapis.org/oas/v3.0.0#relative-references-in-urls
@@ -290,36 +300,33 @@ SchemaRef parseSchemaOrRef(MapContext json) {
   }
 
   if (json.containsKey('oneOf')) {
-    final oneOf = json.childAsList('oneOf');
-    final schemas = <SchemaRef>[];
-    for (var i = 0; i < oneOf.length; i++) {
-      schemas.add(parseSchemaOrRef(oneOf.indexAsMap(i)));
-    }
-    return SchemaRef.schema(
+    final schema = SchemaRef.schema(
       SchemaOneOf(
         pointer: json.pointer.toString(),
         snakeName: json.snakeName,
-        schemas: schemas,
+        schemas: _parseSchemas(json.childAsList('oneOf'), 'one_of'),
       ),
     );
+    json.addObject(schema.schema);
+    return schema;
   }
 
   if (json.containsKey('allOf')) {
     final allOf = json.childAsList('allOf');
+    // TODO(eseidel): fix allOf with a single item to make a new type
+    // with the other types properties.
     if (allOf.length == 1) {
       return parseSchemaOrRef(allOf.indexAsMap(0));
     }
-    final schemas = <SchemaRef>[];
-    for (var i = 0; i < allOf.length; i++) {
-      schemas.add(parseSchemaOrRef(allOf.indexAsMap(i)));
-    }
-    return SchemaRef.schema(
+    final schema = SchemaRef.schema(
       SchemaAllOf(
         pointer: json.pointer.toString(),
         snakeName: json.snakeName,
-        schemas: schemas,
+        schemas: _parseSchemas(allOf, 'all_of'),
       ),
     );
+    json.addObject(schema.schema);
+    return schema;
   }
 
   if (json.containsKey('anyOf')) {
@@ -353,17 +360,15 @@ SchemaRef parseSchemaOrRef(MapContext json) {
       }
     }
 
-    final schemas = <SchemaRef>[];
-    for (var i = 0; i < anyOf.length; i++) {
-      schemas.add(parseSchemaOrRef(anyOf.indexAsMap(i)));
-    }
-    return SchemaRef.schema(
+    final schema = SchemaRef.schema(
       SchemaAnyOf(
         pointer: json.pointer.toString(),
         snakeName: json.snakeName,
-        schemas: schemas,
+        schemas: _parseSchemas(anyOf, 'any_of'),
       ),
     );
+    json.addObject(schema.schema);
+    return schema;
   }
 
   return SchemaRef.schema(parseSchema(json));

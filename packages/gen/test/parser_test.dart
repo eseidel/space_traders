@@ -260,7 +260,21 @@ void main() {
       };
       final logger = _MockLogger();
       final schemas = runWithLogger(logger, () => parseTestSchemas(json));
-      expect(schemas['User'], isA<SchemaAllOf>());
+      final schema = schemas['User']!;
+      expect(schema, isA<SchemaAllOf>());
+      final allOf = schema as SchemaAllOf;
+      expect(allOf.snakeName, 'user');
+      expect(allOf.schemas.length, 2);
+      expect(allOf.schemas.first, isA<SchemaRef>());
+      expect(allOf.schemas.last, isA<SchemaRef>());
+      expect(allOf.schemas.first.schema, isA<Schema>());
+      expect(allOf.schemas.last.schema, isA<Schema>());
+      final first = allOf.schemas.first.schema! as Schema;
+      final last = allOf.schemas.last.schema! as Schema;
+      expect(first.type, SchemaType.boolean);
+      expect(first.snakeName, 'user_all_of_0');
+      expect(last.type, SchemaType.string);
+      expect(last.snakeName, 'user_all_of_1');
     });
 
     test('oneOf not supported', () {

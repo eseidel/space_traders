@@ -127,6 +127,20 @@ class SpecWalker {
       }
       _maybeRef(schema.items);
       _maybeRef(schema.additionalProperties);
+    } else if (schema is SchemaAllOf) {
+      for (final ref in schema.schemas) {
+        _ref(ref);
+      }
+    } else if (schema is SchemaAnyOf) {
+      for (final ref in schema.schemas) {
+        _ref(ref);
+      }
+    } else if (schema is SchemaOneOf) {
+      for (final ref in schema.schemas) {
+        _ref(ref);
+      }
+    } else {
+      throw UnimplementedError('walkSchema: ${schema.runtimeType}');
     }
   }
 }
