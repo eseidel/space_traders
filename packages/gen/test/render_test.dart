@@ -856,5 +856,62 @@ void main() {
         );
       },
     );
+
+    test('allOf renders', () async {
+      final spec = {
+        'openapi': '3.1.0',
+        'info': {'title': 'Space Traders API', 'version': '1.0.0'},
+        'servers': [
+          {'url': 'https://api.spacetraders.io/v2'},
+        ],
+        'paths': {
+          '/users': {
+            'get': {
+              'responses': {
+                '200': {
+                  'description': 'OK',
+                  'content': {
+                    'application/json': {
+                      'schema': {
+                        'allOf': [
+                          {r'$ref': '#/components/schemas/User'},
+                          {
+                            'type': 'object',
+                            'properties': {
+                              'id': {'type': 'number'},
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        'components': {
+          'schemas': {
+            'User': {
+              'type': 'object',
+              'properties': {
+                'name': {'type': 'string'},
+                'age': {'type': 'number'},
+              },
+              'required': ['name', 'age'],
+            },
+          },
+        },
+      };
+      final fs = MemoryFileSystem.test();
+      final out = fs.directory('spacetraders');
+
+      await renderToDirectory(spec: spec, outDir: out);
+      expect(out.childFile('lib/api/default_api.dart'), exists);
+      expect(
+        out.childDirectory('lib/model'),
+        hasFiles(['users200_response.dart']),
+      );
+    });
   });
 }

@@ -28,16 +28,18 @@ class _RefCollector extends Visitor {
 Iterable<String> collectRefs(OpenApi root) {
   final refs = <String>{};
   final collector = _RefCollector(refs);
-  SpecWalker(collector).walkRoot(root);
+  SpecWalker(collector, includeCollectionSchemas: true).walkRoot(root);
   return refs;
 }
 
 // Would be nice if Dart had a generic way to do this, without needing to
 // teach the walker about all the types.
 class SpecWalker {
-  SpecWalker(this.visitor);
+  SpecWalker(this.visitor, {required this.includeCollectionSchemas});
 
   final Visitor visitor;
+
+  final bool includeCollectionSchemas;
 
   void walkRoot(OpenApi root) {
     visitor.visitRoot(root);
@@ -127,6 +129,26 @@ class SpecWalker {
       }
       _maybeRef(schema.items);
       _maybeRef(schema.additionalProperties);
+    } else if (schema is SchemaAllOf) {
+      if (includeCollectionSchemas) {
+        for (final ref in schema.schemas) {
+          _ref(ref);
+        }
+      }
+    } else if (schema is SchemaAnyOf) {
+      if (includeCollectionSchemas) {
+        for (final ref in schema.schemas) {
+          _ref(ref);
+        }
+      }
+    } else if (schema is SchemaOneOf) {
+      if (includeCollectionSchemas) {
+        for (final ref in schema.schemas) {
+          _ref(ref);
+        }
+      }
+    } else {
+      throw UnimplementedError('walkSchema: ${schema.runtimeType}');
     }
   }
 }

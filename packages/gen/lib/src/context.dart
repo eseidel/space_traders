@@ -25,12 +25,12 @@ class Paths {
     return 'api/${api.fileName}.dart';
   }
 
-  static String modelFilePath(Schema schema) {
+  static String modelFilePath(SchemaBase schema) {
     // openapi generator does not use /src/ in the path.
     return 'lib/model/${schema.fileName}.dart';
   }
 
-  static String modelPackagePath(Schema schema) {
+  static String modelPackagePath(SchemaBase schema) {
     return 'model/${schema.fileName}.dart';
   }
 }
@@ -180,7 +180,48 @@ extension _EndpointGeneration on Endpoint {
 
 enum SchemaRenderType { enumeration, object, stringNewtype, numberNewtype, pod }
 
+extension _SchemaAllOfGeneration on SchemaAllOf {
+  Schema syntheticSchema(_Context context) {
+    // Walk all of the allOf schemas, grab their properties.
+    final properties = <String, SchemaRef>{};
+    for (final schema in schemas) {
+      final schemaRef = context._resolve(schema);
+      if (schemaRef is Schema) {
+        properties.addAll(schemaRef.properties);
+      }
+    }
+    return Schema(
+      snakeName: snakeName,
+      pointer: pointer,
+      description: '',
+      defaultValue: null,
+      example: null,
+      required: const [],
+      type: SchemaType.object,
+      properties: properties,
+      items: null,
+      enumValues: const [],
+      format: null,
+      additionalProperties: null,
+      useNewType: true,
+    );
+  }
+}
+
 extension _SchemaBaseGeneration on SchemaBase {
+  /// Schema name in file name format.
+  String get fileName => snakeName;
+
+  Schema schemaToRender(_Context context) {
+    if (this is Schema) {
+      return this as Schema;
+    }
+    if (this is SchemaAllOf) {
+      return (this as SchemaAllOf).syntheticSchema(context);
+    }
+    throw UnimplementedError('schemaToRender for $runtimeType');
+  }
+
   bool get createsNewType {
     if (this is Schema) {
       return (this as Schema).createsNewType;
@@ -189,12 +230,16 @@ extension _SchemaBaseGeneration on SchemaBase {
     return true;
   }
 
+  /// Schema name in class name format. Only valid for enum, object and
+  /// newtype schemas.
+  String get className => camelFromSnake(snakeName);
+
   String typeName(_Context context) {
     if (this is Schema) {
       return (this as Schema).typeName(context);
     }
-    // TODO(eseidel): Support other schema types.
-    return 'dynamic';
+    // All collection types use a new class.
+    return className;
   }
 
   String nullableTypeName(_Context context) {
@@ -203,11 +248,12 @@ extension _SchemaBaseGeneration on SchemaBase {
   }
 
   String equalsExpression(String name, _Context context) {
-    if (this is Schema) {
-      return (this as Schema).equalsExpression(name, context);
-    }
-    // TODO(eseidel): Support other schema types.
-    _unimplemented('equalsExpression', pointer);
+    final schema = switch (this) {
+      final Schema s => s,
+      final SchemaAllOf s => s.syntheticSchema(context),
+      _ => _unimplemented('equalsExpression for $runtimeType', pointer),
+    };
+    return schema.equalsExpression(name, context);
   }
 
   String toJsonExpression(
@@ -215,15 +261,16 @@ extension _SchemaBaseGeneration on SchemaBase {
     _Context context, {
     required bool dartIsNullable,
   }) {
-    if (this is Schema) {
-      return (this as Schema).toJsonExpression(
-        dartName,
-        context,
-        dartIsNullable: dartIsNullable,
-      );
-    }
-    // TODO(eseidel): Support other schema types.
-    _unimplemented('toJsonExpression', pointer);
+    final schema = switch (this) {
+      final Schema s => s,
+      final SchemaAllOf s => s.syntheticSchema(context),
+      _ => _unimplemented('toJsonExpression for $runtimeType', pointer),
+    };
+    return schema.toJsonExpression(
+      dartName,
+      context,
+      dartIsNullable: dartIsNullable,
+    );
   }
 
   String fromJsonExpression(
@@ -232,32 +279,35 @@ extension _SchemaBaseGeneration on SchemaBase {
     required bool jsonIsNullable,
     required bool dartIsNullable,
   }) {
-    if (this is Schema) {
-      return (this as Schema).fromJsonExpression(
-        jsonValue,
-        context,
-        jsonIsNullable: jsonIsNullable,
-        dartIsNullable: dartIsNullable,
-      );
-    }
-    // TODO(eseidel): Support other schema types.
-    _unimplemented('fromJsonExpression', pointer);
+    final schema = switch (this) {
+      final Schema s => s,
+      final SchemaAllOf s => s.syntheticSchema(context),
+      _ => _unimplemented('fromJsonExpression for $runtimeType', pointer),
+    };
+    return schema.fromJsonExpression(
+      jsonValue,
+      context,
+      jsonIsNullable: jsonIsNullable,
+      dartIsNullable: dartIsNullable,
+    );
   }
 
   String? defaultValueString(_Context context) {
-    if (this is Schema) {
-      return (this as Schema).defaultValueString(context);
-    }
-    // TODO(eseidel): Support other schema types.
-    _unimplemented('defaultValueString', pointer);
+    final schema = switch (this) {
+      final Schema s => s,
+      final SchemaAllOf s => s.syntheticSchema(context),
+      _ => _unimplemented('defaultValueString for $runtimeType', pointer),
+    };
+    return schema.defaultValueString(context);
   }
 
   bool hasDefaultValue(_Context context) {
-    if (this is Schema) {
-      return (this as Schema).hasDefaultValue(context);
-    }
-    // TODO(eseidel): Support other schema types.
-    _unimplemented('hasDefaultValue', pointer);
+    final schema = switch (this) {
+      final Schema s => s,
+      final SchemaAllOf s => s.syntheticSchema(context),
+      _ => _unimplemented('hasDefaultValue for $runtimeType', pointer),
+    };
+    return schema.hasDefaultValue(context);
   }
 
   dynamic get defaultValue {
@@ -275,16 +325,13 @@ extension _SchemaBaseGeneration on SchemaBase {
 }
 
 extension _SchemaGeneration on Schema {
-  /// Schema name in file name format.
-  String get fileName => snakeName;
-
   /// Schema name in class name format. Only valid for enum, object and
   /// newtype schemas.
   String get className {
     if (!isEnum && type != SchemaType.object && !useNewType) {
       throw Exception('Schema is not an enum or object: $this');
     }
-    return camelFromSnake(snakeName);
+    return _SchemaBaseGeneration(this).className;
   }
 
   /// Whether this schema creates a new type and thus needs to be rendered.
@@ -879,6 +926,10 @@ class _Context {
   /// The quirks to use for rendering.
   final Quirks quirks;
 
+  /// Set of files that have been written.
+  /// Used to detect duplicate writes.
+  final Set<String> _writtenFiles = {};
+
   /// Load a template from the template directory.
   Template _loadTemplate(String name) {
     return Template(
@@ -921,6 +972,10 @@ class _Context {
 
   /// Write a file.
   void _writeFile({required String path, required String content}) {
+    if (_writtenFiles.contains(path)) {
+      throw Exception('File already written: $path');
+    }
+    _writtenFiles.add(path);
     _ensureFile(path).writeAsStringSync(content);
   }
 
@@ -986,14 +1041,16 @@ class _Context {
         continue;
       }
       final schema = _resolveUri<dynamic>(uri);
-      if (schema is Schema) {
-        final renderContext = _renderSchema(this, schema);
-        renderQueue.addAll([
-          ...urisFromSchemas(renderContext.schemas),
-          ...urisFromRefs(renderContext.refs),
-        ]);
-        rendered.add(uri);
+      if (schema is! SchemaBase) {
+        continue;
       }
+      final toRender = schema.schemaToRender(this);
+      final renderContext = _renderSchema(this, toRender);
+      renderQueue.addAll([
+        ...urisFromSchemas(renderContext.schemas),
+        ...urisFromRefs(renderContext.refs),
+      ]);
+      rendered.add(uri);
     }
     return rendered;
   }
@@ -1031,7 +1088,7 @@ class _Context {
   }
 
   /// Render the public API file.
-  void _renderPublicApi(Iterable<Schema> renderedModels) {
+  void _renderPublicApi(Iterable<SchemaBase> renderedModels) {
     final paths = [
       ...spec.apis.map(Paths.apiPackagePath),
       ...renderedModels.map(Paths.modelPackagePath),
@@ -1057,7 +1114,7 @@ class _Context {
     final rendered = _renderApis();
     _renderApiClient();
     // Render the combined api.dart exporting all rendered schemas.
-    final renderedModels = rendered.map(refRegistry.get<Schema>);
+    final renderedModels = rendered.map(refRegistry.get<SchemaBase>);
     _renderPublicApi(renderedModels);
     // Consider running pub upgrade here to ensure packages are up to date.
     // Might need to make offline configurable?
@@ -1179,7 +1236,7 @@ class _SchemaSet {
 
 _SchemaSet _importsForSchema(Schema schema) {
   final collector = _RenderedSchemaVisitor();
-  SpecWalker(collector).walkSchema(schema);
+  SpecWalker(collector, includeCollectionSchemas: false).walkSchema(schema);
   return _SchemaSet(collector.refs, collector.schemas);
 }
 
@@ -1188,7 +1245,10 @@ _SchemaSet _importsForApi(Api api) {
   // An Endpoint is a rendering-only concept.  The SpecWalker works on spec
   // classes, so walk to PathItems within the endpoints.
   for (final endpoint in api.endpoints) {
-    SpecWalker(collector).walkPathItem(endpoint.pathItem);
+    SpecWalker(
+      collector,
+      includeCollectionSchemas: false,
+    ).walkPathItem(endpoint.pathItem);
   }
   return _SchemaSet(collector.refs, collector.schemas);
 }
