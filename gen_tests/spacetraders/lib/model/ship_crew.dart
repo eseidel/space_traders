@@ -9,7 +9,7 @@ class ShipCrew {
     required this.capacity,
     required this.morale,
     required this.wages,
-    this.rotation = ShipCrewRotation.STRICT,
+    this.rotation = ShipCrewRotation.strict,
   });
 
   factory ShipCrew.fromJson(Map<String, dynamic> json) {

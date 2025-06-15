@@ -1,6 +1,6 @@
 enum MarketTransactionType {
-  PURCHASE._('PURCHASE'),
-  SELL._('SELL');
+  purchase._('PURCHASE'),
+  sell._('SELL');
 
   const MarketTransactionType._(this.value);
 

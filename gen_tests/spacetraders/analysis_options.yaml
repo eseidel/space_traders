@@ -3,5 +3,3 @@ linter:
   rules:
     # We do not generate docs yet.
     public_member_api_docs: false
-    # Currently using SCREAMING_CAPS for enum values.
-    constant_identifier_names: false

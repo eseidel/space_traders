@@ -1,7 +1,7 @@
 enum ShipConditionEventComponent {
-  FRAME._('FRAME'),
-  REACTOR._('REACTOR'),
-  ENGINE._('ENGINE');
+  frame._('FRAME'),
+  reactor._('REACTOR'),
+  engine._('ENGINE');
 
   const ShipConditionEventComponent._(this.value);
 

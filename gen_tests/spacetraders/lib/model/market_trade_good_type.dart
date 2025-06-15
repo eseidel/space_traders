@@ -1,7 +1,7 @@
 enum MarketTradeGoodType {
-  EXPORT._('EXPORT'),
-  IMPORT._('IMPORT'),
-  EXCHANGE._('EXCHANGE');
+  export._('EXPORT'),
+  import._('IMPORT'),
+  exchange._('EXCHANGE');
 
   const MarketTradeGoodType._(this.value);
 
