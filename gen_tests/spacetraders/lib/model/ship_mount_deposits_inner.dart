@@ -1,18 +1,18 @@
 enum ShipMountDepositsInner {
-  QUARTZ_SAND._('QUARTZ_SAND'),
-  SILICON_CRYSTALS._('SILICON_CRYSTALS'),
-  PRECIOUS_STONES._('PRECIOUS_STONES'),
-  ICE_WATER._('ICE_WATER'),
-  AMMONIA_ICE._('AMMONIA_ICE'),
-  IRON_ORE._('IRON_ORE'),
-  COPPER_ORE._('COPPER_ORE'),
-  SILVER_ORE._('SILVER_ORE'),
-  ALUMINUM_ORE._('ALUMINUM_ORE'),
-  GOLD_ORE._('GOLD_ORE'),
-  PLATINUM_ORE._('PLATINUM_ORE'),
-  DIAMONDS._('DIAMONDS'),
-  URANITE_ORE._('URANITE_ORE'),
-  MERITIUM_ORE._('MERITIUM_ORE');
+  quartzSand._('QUARTZ_SAND'),
+  siliconCrystals._('SILICON_CRYSTALS'),
+  preciousStones._('PRECIOUS_STONES'),
+  iceWater._('ICE_WATER'),
+  ammoniaIce._('AMMONIA_ICE'),
+  ironOre._('IRON_ORE'),
+  copperOre._('COPPER_ORE'),
+  silverOre._('SILVER_ORE'),
+  aluminumOre._('ALUMINUM_ORE'),
+  goldOre._('GOLD_ORE'),
+  platinumOre._('PLATINUM_ORE'),
+  diamonds._('DIAMONDS'),
+  uraniteOre._('URANITE_ORE'),
+  meritiumOre._('MERITIUM_ORE');
 
   const ShipMountDepositsInner._(this.value);
 

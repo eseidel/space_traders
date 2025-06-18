@@ -1,7 +1,7 @@
 enum ContractType {
-  PROCUREMENT._('PROCUREMENT'),
-  TRANSPORT._('TRANSPORT'),
-  SHUTTLE._('SHUTTLE');
+  procurement._('PROCUREMENT'),
+  transport._('TRANSPORT'),
+  shuttle._('SHUTTLE');
 
   const ContractType._(this.value);
 

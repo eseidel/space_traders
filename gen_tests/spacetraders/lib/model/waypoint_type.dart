@@ -1,18 +1,18 @@
 enum WaypointType {
-  PLANET._('PLANET'),
-  GAS_GIANT._('GAS_GIANT'),
-  MOON._('MOON'),
-  ORBITAL_STATION._('ORBITAL_STATION'),
-  JUMP_GATE._('JUMP_GATE'),
-  ASTEROID_FIELD._('ASTEROID_FIELD'),
-  ASTEROID._('ASTEROID'),
-  ENGINEERED_ASTEROID._('ENGINEERED_ASTEROID'),
-  ASTEROID_BASE._('ASTEROID_BASE'),
-  NEBULA._('NEBULA'),
-  DEBRIS_FIELD._('DEBRIS_FIELD'),
-  GRAVITY_WELL._('GRAVITY_WELL'),
-  ARTIFICIAL_GRAVITY_WELL._('ARTIFICIAL_GRAVITY_WELL'),
-  FUEL_STATION._('FUEL_STATION');
+  planet._('PLANET'),
+  gasGiant._('GAS_GIANT'),
+  moon._('MOON'),
+  orbitalStation._('ORBITAL_STATION'),
+  jumpGate._('JUMP_GATE'),
+  asteroidField._('ASTEROID_FIELD'),
+  asteroid._('ASTEROID'),
+  engineeredAsteroid._('ENGINEERED_ASTEROID'),
+  asteroidBase._('ASTEROID_BASE'),
+  nebula._('NEBULA'),
+  debrisField._('DEBRIS_FIELD'),
+  gravityWell._('GRAVITY_WELL'),
+  artificialGravityWell._('ARTIFICIAL_GRAVITY_WELL'),
+  fuelStation._('FUEL_STATION');
 
   const WaypointType._(this.value);
 

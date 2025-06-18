@@ -1,17 +1,17 @@
 enum ShipType {
-  PROBE._('SHIP_PROBE'),
-  MINING_DRONE._('SHIP_MINING_DRONE'),
-  SIPHON_DRONE._('SHIP_SIPHON_DRONE'),
-  INTERCEPTOR._('SHIP_INTERCEPTOR'),
-  LIGHT_HAULER._('SHIP_LIGHT_HAULER'),
-  COMMAND_FRIGATE._('SHIP_COMMAND_FRIGATE'),
-  EXPLORER._('SHIP_EXPLORER'),
-  HEAVY_FREIGHTER._('SHIP_HEAVY_FREIGHTER'),
-  LIGHT_SHUTTLE._('SHIP_LIGHT_SHUTTLE'),
-  ORE_HOUND._('SHIP_ORE_HOUND'),
-  REFINING_FREIGHTER._('SHIP_REFINING_FREIGHTER'),
-  SURVEYOR._('SHIP_SURVEYOR'),
-  BULK_FREIGHTER._('SHIP_BULK_FREIGHTER');
+  shipProbe._('SHIP_PROBE'),
+  shipMiningDrone._('SHIP_MINING_DRONE'),
+  shipSiphonDrone._('SHIP_SIPHON_DRONE'),
+  shipInterceptor._('SHIP_INTERCEPTOR'),
+  shipLightHauler._('SHIP_LIGHT_HAULER'),
+  shipCommandFrigate._('SHIP_COMMAND_FRIGATE'),
+  shipExplorer._('SHIP_EXPLORER'),
+  shipHeavyFreighter._('SHIP_HEAVY_FREIGHTER'),
+  shipLightShuttle._('SHIP_LIGHT_SHUTTLE'),
+  shipOreHound._('SHIP_ORE_HOUND'),
+  shipRefiningFreighter._('SHIP_REFINING_FREIGHTER'),
+  shipSurveyor._('SHIP_SURVEYOR'),
+  shipBulkFreighter._('SHIP_BULK_FREIGHTER');
 
   const ShipType._(this.value);
 

@@ -1,6 +1,6 @@
 enum ShipCrewRotation {
-  STRICT._('STRICT'),
-  RELAXED._('RELAXED');
+  strict._('STRICT'),
+  relaxed._('RELAXED');
 
   const ShipCrewRotation._(this.value);
 

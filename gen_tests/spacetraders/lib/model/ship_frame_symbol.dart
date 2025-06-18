@@ -1,20 +1,20 @@
 enum ShipFrameSymbol {
-  PROBE._('FRAME_PROBE'),
-  DRONE._('FRAME_DRONE'),
-  INTERCEPTOR._('FRAME_INTERCEPTOR'),
-  RACER._('FRAME_RACER'),
-  FIGHTER._('FRAME_FIGHTER'),
-  FRIGATE._('FRAME_FRIGATE'),
-  SHUTTLE._('FRAME_SHUTTLE'),
-  EXPLORER._('FRAME_EXPLORER'),
-  MINER._('FRAME_MINER'),
-  LIGHT_FREIGHTER._('FRAME_LIGHT_FREIGHTER'),
-  HEAVY_FREIGHTER._('FRAME_HEAVY_FREIGHTER'),
-  TRANSPORT._('FRAME_TRANSPORT'),
-  DESTROYER._('FRAME_DESTROYER'),
-  CRUISER._('FRAME_CRUISER'),
-  CARRIER._('FRAME_CARRIER'),
-  BULK_FREIGHTER._('FRAME_BULK_FREIGHTER');
+  frameProbe._('FRAME_PROBE'),
+  frameDrone._('FRAME_DRONE'),
+  frameInterceptor._('FRAME_INTERCEPTOR'),
+  frameRacer._('FRAME_RACER'),
+  frameFighter._('FRAME_FIGHTER'),
+  frameFrigate._('FRAME_FRIGATE'),
+  frameShuttle._('FRAME_SHUTTLE'),
+  frameExplorer._('FRAME_EXPLORER'),
+  frameMiner._('FRAME_MINER'),
+  frameLightFreighter._('FRAME_LIGHT_FREIGHTER'),
+  frameHeavyFreighter._('FRAME_HEAVY_FREIGHTER'),
+  frameTransport._('FRAME_TRANSPORT'),
+  frameDestroyer._('FRAME_DESTROYER'),
+  frameCruiser._('FRAME_CRUISER'),
+  frameCarrier._('FRAME_CARRIER'),
+  frameBulkFreighter._('FRAME_BULK_FREIGHTER');
 
   const ShipFrameSymbol._(this.value);
 

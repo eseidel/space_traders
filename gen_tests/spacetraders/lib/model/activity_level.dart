@@ -1,8 +1,8 @@
 enum ActivityLevel {
-  WEAK._('WEAK'),
-  GROWING._('GROWING'),
-  STRONG._('STRONG'),
-  RESTRICTED._('RESTRICTED');
+  weak._('WEAK'),
+  growing._('GROWING'),
+  strong._('STRONG'),
+  restricted._('RESTRICTED');
 
   const ActivityLevel._(this.value);
 

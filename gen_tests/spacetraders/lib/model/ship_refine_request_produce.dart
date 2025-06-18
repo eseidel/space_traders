@@ -1,13 +1,13 @@
 enum ShipRefineRequestProduce {
-  IRON._('IRON'),
-  COPPER._('COPPER'),
-  SILVER._('SILVER'),
-  GOLD._('GOLD'),
-  ALUMINUM._('ALUMINUM'),
-  PLATINUM._('PLATINUM'),
-  URANITE._('URANITE'),
-  MERITIUM._('MERITIUM'),
-  FUEL._('FUEL');
+  iron._('IRON'),
+  copper._('COPPER'),
+  silver._('SILVER'),
+  gold._('GOLD'),
+  aluminum._('ALUMINUM'),
+  platinum._('PLATINUM'),
+  uranite._('URANITE'),
+  meritium._('MERITIUM'),
+  fuel._('FUEL');
 
   const ShipRefineRequestProduce._(this.value);
 
