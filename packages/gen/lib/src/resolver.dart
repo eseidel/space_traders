@@ -1,0 +1,430 @@
+// The job here is to walk the spec and resolve all the references.
+// This also creates a tree that is more designed for rendering rather
+// than serialization/deserialization with the openapi spec.
+// This also discards all non-json values.
+
+import 'package:equatable/equatable.dart';
+import 'package:space_gen/src/parser.dart';
+import 'package:space_gen/src/spec.dart';
+
+class _ResolveContext {
+  _ResolveContext({required this.specUrl, required this.refRegistry});
+
+  /// The spec url of the spec.
+  final Uri specUrl;
+
+  /// The registry of all the objects we've parsed so far.
+  final RefRegistry refRegistry;
+
+  /// The registry of all the objects we've parsed so far.
+  /// Resolve a nullable [SchemaRef] into a nullable [Schema].
+  T? _maybeResolve<T>(RefOr<T>? ref) {
+    if (ref == null) {
+      return null;
+    }
+    return _resolve(ref);
+  }
+
+  /// Resolve a [SchemaRef] into a [Schema].
+  T _resolve<T>(RefOr<T> ref) {
+    if (ref.object != null) {
+      return ref.object!;
+    }
+    final uri = specUrl.resolve(ref.ref!);
+    return _resolveUri(uri);
+  }
+
+  /// Resolve a uri into a [Schema].
+  T _resolveUri<T>(Uri uri) => refRegistry.get<T>(uri);
+}
+
+List<ResolvedPath> _resolvePaths(Paths paths, _ResolveContext context) {
+  return paths.paths.entries.map((entry) {
+    final path = entry.key;
+    final pathItem = entry.value;
+    return ResolvedPath(
+      path: path,
+      operations: _resolveOperations(pathItem, context),
+    );
+  }).toList();
+}
+
+ResolvedSchema? _maybeResolveSchema(SchemaRef? ref, _ResolveContext context) {
+  if (ref == null) {
+    return null;
+  }
+  return _resolveSchema(ref, context);
+}
+
+ResolvedSchema _resolveSchema(SchemaRef ref, _ResolveContext context) {
+  final schema = context._maybeResolve(ref);
+  if (schema == null) {
+    throw Exception('Schema not found: $ref');
+  }
+  if (schema is Schema) {
+    if (schema.type == SchemaType.object) {
+      return SchemaObject(
+        properties: schema.properties.map((key, value) {
+          return MapEntry(key, _resolveSchema(value, context));
+        }),
+        snakeName: schema.snakeName,
+        additionalProperties: _maybeResolveSchema(
+          schema.additionalProperties,
+          context,
+        ),
+        required: schema.required,
+      );
+    }
+    if (schema.type == SchemaType.string) {
+      if (schema.enumValues.isNotEmpty) {
+        return SchemaEnum(
+          values: schema.enumValues,
+          snakeName: schema.snakeName,
+        );
+      }
+      return SchemaPod(type: PodType.string, snakeName: schema.snakeName);
+    }
+    if (schema.type == SchemaType.number) {
+      return SchemaPod(type: PodType.number, snakeName: schema.snakeName);
+    }
+    if (schema.type == SchemaType.boolean) {
+      return SchemaPod(type: PodType.boolean, snakeName: schema.snakeName);
+    }
+    if (schema.type == SchemaType.array) {
+      return SchemaArray(
+        items: _maybeResolveSchema(schema.items, context),
+        snakeName: schema.snakeName,
+      );
+    }
+  }
+  throw Exception('Schema is not a single schema: $ref');
+}
+
+ResolvedRequestBody? _resolveRequestBody(
+  RefOr<RequestBody>? ref,
+  _ResolveContext context,
+) {
+  if (ref == null) {
+    return null;
+  }
+  final requestBody = context._maybeResolve(ref);
+  if (requestBody == null) {
+    throw Exception('Request body not found: $ref');
+  }
+  final jsonSchema = requestBody.content['application/json']?.schema;
+  if (jsonSchema == null) {
+    throw Exception('Request body is not json: $ref');
+  }
+  return ResolvedRequestBody(
+    schema: _resolveSchema(jsonSchema, context),
+    description: requestBody.description,
+    required: requestBody.isRequired,
+  );
+}
+
+List<ResolvedParameter> _resolveParameters(
+  List<RefOr<Parameter>> parameters,
+  _ResolveContext context,
+) {
+  return parameters.map((parameter) {
+    final resolved = context._resolve(parameter);
+    return ResolvedParameter(
+      name: resolved.name,
+      sendIn: resolved.sendIn,
+      description: resolved.description,
+      required: resolved.isRequired,
+      schema: _resolveSchema(resolved.type, context),
+    );
+  }).toList();
+}
+
+List<ResolvedOperation> _resolveOperations(
+  PathItem pathItem,
+  _ResolveContext context,
+) {
+  return pathItem.operations.entries.map((entry) {
+    final method = entry.key;
+    final operation = entry.value;
+    final requestBody = _resolveRequestBody(operation.requestBody, context);
+    final responses = _resolveResponses(operation.responses, context);
+    return ResolvedOperation(
+      snakeName: operation.snakeName,
+      tags: operation.tags,
+      summary: operation.summary,
+      description: operation.description,
+      method: method,
+      path: pathItem.path,
+      requestBody: requestBody,
+      responses: responses,
+      parameters: _resolveParameters(operation.parameters, context),
+    );
+  }).toList();
+}
+
+List<ResolvedResponse> _resolveResponses(
+  Responses responses,
+  _ResolveContext context,
+) {
+  return responses.responses.entries.map((entry) {
+    final statusCode = int.parse(entry.key as String);
+    final response = context._resolve(entry.value);
+    final content = response.content;
+    // Should this just be a void response?
+    if (content == null) {
+      throw Exception('Response has no content: $response');
+    }
+    final jsonSchema = content['application/json']?.schema;
+    if (jsonSchema == null) {
+      throw Exception('Response content is not json: $response');
+    }
+    return ResolvedResponse(
+      statusCode: statusCode,
+      description: response.description,
+      content: _resolveSchema(jsonSchema, context),
+    );
+  }).toList();
+}
+
+ResolvedSpec resolveSpec(OpenApi spec, RefRegistry refRegistry) {
+  final context = _ResolveContext(
+    specUrl: spec.serverUrl,
+    refRegistry: refRegistry,
+  );
+  return ResolvedSpec(
+    serverUrl: spec.serverUrl,
+    paths: _resolvePaths(spec.paths, context),
+  );
+}
+
+class ResolvedSpec extends Equatable {
+  const ResolvedSpec({required this.serverUrl, required this.paths});
+
+  /// The server url of the spec.
+  final Uri serverUrl;
+
+  /// The paths of the spec.
+  final List<ResolvedPath> paths;
+
+  @override
+  List<Object?> get props => [serverUrl, paths];
+}
+
+class ResolvedPath {
+  const ResolvedPath({required this.path, required this.operations});
+
+  /// The path of the resolved path.
+  final String path;
+
+  /// The operations of the resolved path.
+  final List<ResolvedOperation> operations;
+}
+
+class ResolvedParameter extends Equatable {
+  const ResolvedParameter({
+    required this.name,
+    required this.sendIn,
+    required this.description,
+    required this.required,
+    required this.schema,
+  });
+
+  /// The name of the resolved parameter.
+  final String name;
+
+  /// The in of the resolved parameter.
+  final SendIn sendIn;
+
+  /// The description of the resolved parameter.
+  final String? description;
+
+  /// Whether the parameter is required.
+  final bool required;
+
+  /// The schema of the resolved parameter.
+  final ResolvedSchema schema;
+
+  @override
+  List<Object?> get props => [name, sendIn, description, required, schema];
+}
+
+class ResolvedRequestBody extends Equatable {
+  const ResolvedRequestBody({
+    required this.schema,
+    required this.description,
+    required this.required,
+  });
+
+  /// The schema of the resolved request body.
+  final ResolvedSchema schema;
+
+  /// The description of the resolved request body.
+  final String? description;
+
+  /// Whether the request body is required.
+  final bool required;
+
+  @override
+  List<Object?> get props => [schema];
+}
+
+class ResolvedOperation extends Equatable {
+  const ResolvedOperation({
+    required this.method,
+    required this.path,
+    required this.snakeName,
+    required this.requestBody,
+    required this.responses,
+    required this.tags,
+    required this.summary,
+    required this.description,
+    required this.parameters,
+  });
+
+  /// The method of the resolved operation.
+  final Method method;
+
+  /// The path of the resolved operation.
+  final String path;
+
+  /// The snake name of the resolved operation.
+  final String snakeName;
+
+  /// The parameters of the resolved operation.
+  final List<ResolvedParameter> parameters;
+
+  /// The request body of the resolved operation.
+  final ResolvedRequestBody? requestBody;
+
+  /// The responses of the resolved operation.
+  final List<ResolvedResponse> responses;
+
+  /// The tags of the resolved operation.
+  final List<String> tags;
+
+  /// The summary of the resolved operation.
+  final String summary;
+
+  /// The description of the resolved operation.
+  final String? description;
+
+  @override
+  List<Object?> get props => [
+    method,
+    path,
+    requestBody,
+    responses,
+    tags,
+    summary,
+    description,
+  ];
+}
+
+class ResolvedResponse extends Equatable {
+  const ResolvedResponse({
+    required this.statusCode,
+    required this.description,
+    required this.content,
+  });
+
+  /// The status code of the resolved response.
+  final int statusCode;
+
+  /// The description of the resolved response.
+  final String description;
+
+  /// The resolved content of the resolved response.
+  /// We only support json, so we only need a single content.
+  final ResolvedSchema content;
+
+  @override
+  List<Object?> get props => [statusCode, description, content];
+}
+
+abstract class ResolvedSchema extends Equatable {
+  const ResolvedSchema({required this.snakeName});
+
+  // Hack for now.
+  String get pointer => '';
+
+  /// The snake name of the resolved schema.
+  final String snakeName;
+
+  @override
+  List<Object?> get props => [snakeName];
+}
+
+enum PodType { string, number, boolean, dateTime }
+
+class SchemaPod extends ResolvedSchema {
+  const SchemaPod({required super.snakeName, required this.type});
+
+  /// The type of the resolved schema.
+  final PodType type;
+
+  @override
+  List<Object?> get props => [super.props, type];
+}
+
+class SchemaArray extends ResolvedSchema {
+  const SchemaArray({required super.snakeName, required this.items});
+
+  /// type of the items in the array
+  final ResolvedSchema? items;
+
+  @override
+  List<Object?> get props => [super.props, items];
+}
+
+class SchemaEnum extends ResolvedSchema {
+  const SchemaEnum({required super.snakeName, required this.values});
+
+  /// The values of the resolved schema.
+  final List<String> values;
+}
+
+class SchemaObject extends ResolvedSchema {
+  const SchemaObject({
+    required this.properties,
+    required super.snakeName,
+    required this.additionalProperties,
+    required this.required,
+  });
+
+  /// The properties of the resolved schema.
+  final Map<String, ResolvedSchema> properties;
+
+  /// The value type when the schema is a map.
+  // TODO(eseidel): Should this be a separate type?
+  final ResolvedSchema? additionalProperties;
+
+  /// The required properties of the resolved schema.
+  final List<String> required;
+
+  @override
+  List<Object?> get props => [super.props, properties, additionalProperties];
+}
+
+abstract class ResolvedSchemaCollection extends ResolvedSchema {
+  const ResolvedSchemaCollection({
+    required this.schemas,
+    required super.snakeName,
+  });
+
+  /// The schemas of the resolved schema collection.
+  final List<ResolvedSchema> schemas;
+
+  @override
+  List<Object?> get props => [super.props, schemas];
+}
+
+class SchemaOneOf extends ResolvedSchemaCollection {
+  const SchemaOneOf({required super.schemas, required super.snakeName});
+}
+
+class SchemaAnyOf extends ResolvedSchemaCollection {
+  const SchemaAnyOf({required super.schemas, required super.snakeName});
+}
+
+class SchemaAllOf extends ResolvedSchemaCollection {
+  const SchemaAllOf({required super.schemas, required super.snakeName});
+}
