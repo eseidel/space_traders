@@ -214,16 +214,8 @@ SchemaType _determineType({
     if (enumValues.every((e) => e is String)) {
       return SchemaType.string;
     }
-    if (enumValues.every((e) => e is int)) {
-      return SchemaType.integer;
-    }
-    if (enumValues.every((e) => e is num)) {
-      return SchemaType.number;
-    }
-    if (enumValues.every((e) => e is bool)) {
-      return SchemaType.boolean;
-    }
     // This is wrong, enums can be any type, but we don't support that yet.
+    // This also doesn't support nullable types.
   }
   return SchemaType.unknown;
 }
