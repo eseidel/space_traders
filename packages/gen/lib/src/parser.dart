@@ -174,6 +174,14 @@ Parameter parseParameter(MapContext json) {
 
 Header parseHeader(MapContext json) {
   _refNotExpected(json);
+
+  if (json.containsKey('name')) {
+    _error(json, 'Header name is not allowed');
+  }
+  if (json.containsKey('in')) {
+    _error(json, 'Header in is not allowed');
+  }
+
   final description = _optional<String>(json, 'description');
   _ignored<bool>(json, 'deprecated');
   _ignored<bool>(json, 'allowEmptyValue');
