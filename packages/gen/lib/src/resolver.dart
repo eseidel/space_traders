@@ -13,8 +13,8 @@ void _warn(String message, JsonPointer pointer) {
   logger.warn('$message in $pointer');
 }
 
-class _ResolveContext {
-  _ResolveContext({required this.specUrl, required this.refRegistry});
+class ResolveContext {
+  ResolveContext({required this.specUrl, required this.refRegistry});
 
   /// The spec url of the spec.
   final Uri specUrl;
@@ -44,7 +44,7 @@ class _ResolveContext {
   T _resolveUri<T>(Uri uri) => refRegistry.get<T>(uri);
 }
 
-List<ResolvedPath> _resolvePaths(Paths paths, _ResolveContext context) {
+List<ResolvedPath> _resolvePaths(Paths paths, ResolveContext context) {
   return paths.paths.entries.map((entry) {
     final path = entry.key;
     final pathItem = entry.value;
@@ -55,14 +55,14 @@ List<ResolvedPath> _resolvePaths(Paths paths, _ResolveContext context) {
   }).toList();
 }
 
-ResolvedSchema? _maybeResolveSchema(SchemaRef? ref, _ResolveContext context) {
+ResolvedSchema? _maybeResolveSchemaRef(SchemaRef? ref, ResolveContext context) {
   if (ref == null) {
     return null;
   }
-  return _resolveSchema(ref, context);
+  return resolveSchemaRef(ref, context);
 }
 
-ResolvedSchema _resolveSchema(SchemaRef ref, _ResolveContext context) {
+ResolvedSchema resolveSchemaRef(SchemaRef ref, ResolveContext context) {
   final schema = context._maybeResolve(ref);
   if (schema == null) {
     throw Exception('Schema not found: $ref');
@@ -72,10 +72,10 @@ ResolvedSchema _resolveSchema(SchemaRef ref, _ResolveContext context) {
       return SchemaObject(
         pointer: schema.pointer,
         properties: schema.properties.map((key, value) {
-          return MapEntry(key, _resolveSchema(value, context));
+          return MapEntry(key, resolveSchemaRef(value, context));
         }),
         snakeName: schema.snakeName,
-        additionalProperties: _maybeResolveSchema(
+        additionalProperties: _maybeResolveSchemaRef(
           schema.additionalProperties,
           context,
         ),
@@ -124,7 +124,7 @@ ResolvedSchema _resolveSchema(SchemaRef ref, _ResolveContext context) {
     }
     if (schema.type == SchemaType.array) {
       return SchemaArray(
-        items: _maybeResolveSchema(schema.items, context),
+        items: _maybeResolveSchemaRef(schema.items, context),
         snakeName: schema.snakeName,
         pointer: schema.pointer,
         defaultValue: schema.defaultValue,
@@ -142,7 +142,7 @@ ResolvedSchema _resolveSchema(SchemaRef ref, _ResolveContext context) {
 
 ResolvedRequestBody? _resolveRequestBody(
   RefOr<RequestBody>? ref,
-  _ResolveContext context,
+  ResolveContext context,
 ) {
   if (ref == null) {
     return null;
@@ -156,7 +156,7 @@ ResolvedRequestBody? _resolveRequestBody(
     throw Exception('Request body is not json: $ref');
   }
   return ResolvedRequestBody(
-    schema: _resolveSchema(jsonSchema, context),
+    schema: resolveSchemaRef(jsonSchema, context),
     description: requestBody.description,
     required: requestBody.isRequired,
   );
@@ -164,7 +164,7 @@ ResolvedRequestBody? _resolveRequestBody(
 
 List<ResolvedParameter> _resolveParameters(
   List<RefOr<Parameter>> parameters,
-  _ResolveContext context,
+  ResolveContext context,
 ) {
   return parameters.map((parameter) {
     final resolved = context._resolve(parameter);
@@ -173,14 +173,14 @@ List<ResolvedParameter> _resolveParameters(
       sendIn: resolved.sendIn,
       description: resolved.description,
       required: resolved.isRequired,
-      schema: _resolveSchema(resolved.type, context),
+      schema: resolveSchemaRef(resolved.type, context),
     );
   }).toList();
 }
 
 List<ResolvedOperation> _resolveOperations(
   PathItem pathItem,
-  _ResolveContext context,
+  ResolveContext context,
 ) {
   return pathItem.operations.entries.map((entry) {
     final method = entry.key;
@@ -201,7 +201,7 @@ List<ResolvedOperation> _resolveOperations(
   }).toList();
 }
 
-ResolvedSchema _resolveContent(Response response, _ResolveContext context) {
+ResolvedSchema _resolveContent(Response response, ResolveContext context) {
   final content = response.content;
   // Should this just be a void response?
   if (content == null) {
@@ -213,15 +213,15 @@ ResolvedSchema _resolveContent(Response response, _ResolveContext context) {
   }
   final jsonSchema = content['application/json']?.schema;
   if (jsonSchema != null) {
-    return _resolveSchema(jsonSchema, context);
+    return resolveSchemaRef(jsonSchema, context);
   }
   _warn('Response has no application/json schema: $response', response.pointer);
-  return _resolveSchema(content.values.first.schema, context);
+  return resolveSchemaRef(content.values.first.schema, context);
 }
 
 List<ResolvedResponse> _resolveResponses(
   Responses responses,
-  _ResolveContext context,
+  ResolveContext context,
 ) {
   return responses.responses.entries.map((entry) {
     final statusCode = entry.key;
@@ -271,7 +271,7 @@ ResolvedSpec resolveSpec(OpenApi spec) {
     logger.detail('  - $uri');
   }
 
-  final context = _ResolveContext(
+  final context = ResolveContext(
     specUrl: spec.serverUrl,
     refRegistry: refRegistry,
   );

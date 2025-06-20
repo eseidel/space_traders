@@ -7,7 +7,6 @@ import 'package:mustache_template/mustache_template.dart';
 import 'package:path/path.dart' as p;
 import 'package:space_gen/src/logger.dart';
 import 'package:space_gen/src/render_tree.dart';
-import 'package:space_gen/src/resolver.dart';
 import 'package:space_gen/src/string.dart';
 import 'package:space_gen/src/types.dart';
 
@@ -539,16 +538,12 @@ class SchemaRenderer {
   /// Create a new context for rendering the spec.
   SchemaRenderer({
     required this.specUrl,
-    required this.spec,
     required this.templateProvider,
     this.quirks = const Quirks(),
   });
 
   /// The url of the spec being rendered.  Used for resolving relative urls.
   final Uri specUrl;
-
-  /// The spec being rendered.
-  final RenderSpec spec;
 
   /// The provider of templates.
   final TemplateProvider templateProvider;
@@ -645,38 +640,4 @@ class Quirks {
 
   /// OpenAPI flattens everything into the top level `lib` folder.
   // final bool doNotUseSrcPaths;
-}
-
-void renderSpec({
-  required Uri specUri,
-  required String packageName,
-  required Directory outDir,
-  required ResolvedSpec spec,
-  Directory? templateDir,
-  RunProcess? runProcess,
-  Quirks quirks = const Quirks(),
-}) {
-  final templateProvider = TemplateProvider.fromDirectory(
-    templateDir ?? const LocalFileSystem().directory('lib/templates'),
-  );
-
-  // Prepare a resolved spec for rendering converting into render objects.
-  final renderSpec = toRenderSpec(spec);
-  // SchemaRenderer is responsible for rendering schemas and APIs into strings.
-  final schemaRenderer = SchemaRenderer(
-    specUrl: specUri,
-    spec: renderSpec,
-    templateProvider: templateProvider,
-    quirks: quirks,
-  );
-
-  // FileRenderer is responsible for deciding the layout of the files
-  // and rendering the rest of directory structure.
-  FileRenderer(
-    outDir: outDir,
-    packageName: packageName,
-    templateProvider: templateProvider,
-    runProcess: runProcess,
-    schemaRenderer: schemaRenderer,
-  ).render(renderSpec);
 }

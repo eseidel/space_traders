@@ -1,10 +1,16 @@
 import 'package:file/file.dart';
+import 'package:file/local.dart';
+import 'package:meta/meta.dart';
 import 'package:space_gen/src/context.dart';
 import 'package:space_gen/src/loader.dart';
 import 'package:space_gen/src/logger.dart';
 import 'package:space_gen/src/parser.dart';
+import 'package:space_gen/src/render_tree.dart';
 import 'package:space_gen/src/resolver.dart';
+import 'package:space_gen/src/spec.dart';
 import 'package:space_gen/src/visitor.dart';
+
+export 'package:space_gen/src/context.dart' show Quirks;
 
 Future<void> loadAndRenderSpec({
   required Uri specUri,
@@ -48,4 +54,70 @@ Future<void> loadAndRenderSpec({
     runProcess: runProcess,
     quirks: quirks,
   );
+}
+
+void renderSpec({
+  required Uri specUri,
+  required String packageName,
+  required Directory outDir,
+  required ResolvedSpec spec,
+  Directory? templateDir,
+  RunProcess? runProcess,
+  Quirks quirks = const Quirks(),
+}) {
+  final templateProvider = TemplateProvider.fromDirectory(
+    templateDir ?? const LocalFileSystem().directory('lib/templates'),
+  );
+
+  // Prepare a resolved spec for rendering converting into render objects.
+  final renderSpec = toRenderSpec(spec);
+  // SchemaRenderer is responsible for rendering schemas and APIs into strings.
+  final schemaRenderer = SchemaRenderer(
+    specUrl: specUri,
+    templateProvider: templateProvider,
+    quirks: quirks,
+  );
+
+  // FileRenderer is responsible for deciding the layout of the files
+  // and rendering the rest of directory structure.
+  FileRenderer(
+    outDir: outDir,
+    packageName: packageName,
+    templateProvider: templateProvider,
+    runProcess: runProcess,
+    schemaRenderer: schemaRenderer,
+  ).render(renderSpec);
+}
+
+/// Convenient for testing, should eventually clean up more and expose as API.
+@visibleForTesting
+String renderSchema(
+  Map<String, dynamic> schemaJson, {
+  String schemaName = 'test',
+  Directory? templateDir,
+  Quirks quirks = const Quirks(),
+}) {
+  final specUri = Uri.parse('https://example.com');
+  final parsedSchema = parseSchema(
+    MapContext.initial(schemaJson).addSnakeName(schemaName),
+  );
+  final resolveContext = ResolveContext(
+    specUrl: specUri,
+    refRegistry: RefRegistry(),
+  );
+  final resolvedSchema = resolveSchemaRef(
+    SchemaRef.schema(parsedSchema),
+    resolveContext,
+  );
+  final templateProvider = TemplateProvider.fromDirectory(
+    templateDir ?? const LocalFileSystem().directory('lib/templates'),
+  );
+
+  final renderSchema = toRenderSchema(resolvedSchema);
+  final schemaRenderer = SchemaRenderer(
+    specUrl: specUri,
+    templateProvider: templateProvider,
+    quirks: quirks,
+  );
+  return schemaRenderer.renderSchema(renderSchema);
 }
