@@ -227,7 +227,7 @@ class RenderTreeWalker {
 }
 
 class _ModelCollector extends RenderTreeVisitor {
-  final List<RenderSchema> schemas = [];
+  final Set<RenderSchema> schemas = {};
 
   @override
   void visitSchema(RenderSchema schema) {
@@ -235,7 +235,7 @@ class _ModelCollector extends RenderTreeVisitor {
   }
 }
 
-List<RenderSchema> collectModelSchemas(RenderSpec spec) {
+Set<RenderSchema> collectModelSchemas(RenderSpec spec) {
   final collector = _ModelCollector();
   RenderTreeWalker(visitor: collector).walkRoot(spec);
   return collector.schemas;
@@ -385,13 +385,13 @@ class FileRenderer {
   }
 
   /// Render the public API file.
-  void _renderPublicApi(List<Api> apis, List<RenderSchema> schemas) {
-    final paths = [
+  void _renderPublicApi(List<Api> apis, Set<RenderSchema> schemas) {
+    final paths = {
       ...apis.map(apiPackagePath),
       ...schemas.map(modelPackagePath),
       'api_client.dart',
       'api_exception.dart',
-    ];
+    };
     final exports = paths
         .map((path) => 'package:$packageName/$path')
         .sorted()
@@ -403,6 +403,20 @@ class FileRenderer {
     );
   }
 
+  bool rendersToSeparateFile(RenderSchema schema) {
+    return switch (schema) {
+      RenderEnum() => true,
+      RenderStringNewType() => true,
+      RenderNumberNewType() => true,
+      RenderObject() => true,
+      RenderArray() => false,
+      RenderPod() => false,
+      RenderUnknown() => false,
+      RenderVoid() => false,
+      RenderSchema() => false,
+    };
+  }
+
   /// Render the entire spec.
   void render(RenderSpec spec) {
     // Collect all the Apis and Model Schemas.
@@ -412,7 +426,9 @@ class FileRenderer {
     // And then for each rendered we collect any imports, by asking for the
     // file path for each referenced schema?
     final apis = spec.apis;
-    final schemas = collectModelSchemas(spec);
+    final schemas = collectModelSchemas(
+      spec,
+    ).where(rendersToSeparateFile).toSet();
 
     // Set up the package directory.
     _renderDirectory();
@@ -431,13 +447,6 @@ class FileRenderer {
       _writeFile(path: outPath, content: content);
     }
     for (final schema in schemas) {
-      if (schema is RenderVoid ||
-          schema is RenderUnknown ||
-          schema is RenderArray ||
-          schema is RenderPod) {
-        continue;
-      }
-
       final content = schemaRenderer.renderSchema(schema);
       // final referencedSchemas = collectSchemasFromModel(schema);
       final outPath = modelFilePath(schema);
