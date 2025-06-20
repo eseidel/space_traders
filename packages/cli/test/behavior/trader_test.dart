@@ -4,6 +4,7 @@ import 'package:cli/central_command.dart';
 import 'package:cli/logger.dart';
 import 'package:db/db.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:openapi/api.dart' as openapi;
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
@@ -86,8 +87,8 @@ void main() {
     when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
-    when(() => shipNav.waypointSymbol).thenReturn(start.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(start.systemString);
+    when(() => shipNav.waypointSymbol).thenReturn(start.toOpenApi());
+    when(() => shipNav.systemSymbol).thenReturn(start.system.toOpenApi());
 
     final market = Market(
       symbol: start.waypoint,
@@ -202,7 +203,7 @@ void main() {
             agent: agent.toOpenApi(),
             cargo: shipCargo,
             transaction: MarketTransaction(
-              waypointSymbol: start.waypoint,
+              waypointSymbol: start.toOpenApi(),
               shipSymbol: shipSymbol.symbol,
               tradeSymbol: TradeSymbol.ADVANCED_CIRCUITRY.value,
               units: 10,
@@ -284,8 +285,8 @@ void main() {
 
     // We do not need to dock.
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
-    when(() => shipNav.waypointSymbol).thenReturn(start.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(start.systemString);
+    when(() => shipNav.waypointSymbol).thenReturn(start.toOpenApi());
+    when(() => shipNav.systemSymbol).thenReturn(start.system.toOpenApi());
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
     // Needed by navigateShipAndLog to show time left.
     final arrivalTime = DateTime(2022);
@@ -293,7 +294,7 @@ void main() {
     final departure = ShipNavRouteWaypoint(
       symbol: start.waypoint,
       type: WaypointType.ASTEROID,
-      systemSymbol: start.systemString,
+      systemSymbol: start.system.toOpenApi(),
       x: 0,
       y: 0,
     );
@@ -302,7 +303,7 @@ void main() {
         destination: ShipNavRouteWaypoint(
           symbol: end.waypoint,
           type: WaypointType.ASTEROID,
-          systemSymbol: end.systemString,
+          systemSymbol: end.system.toOpenApi(),
           x: 0,
           y: 0,
         ),
@@ -422,7 +423,7 @@ void main() {
       totalPrice: 100,
       type: MarketTransactionType.PURCHASE,
       tradeSymbol: TradeSymbol.FUEL.value,
-      waypointSymbol: start.waypoint,
+      waypointSymbol: start.toOpenApi(),
       shipSymbol: shipSymbol.symbol,
       timestamp: DateTime(2021),
     );
@@ -456,7 +457,7 @@ void main() {
             agent: agent.toOpenApi(),
             cargo: shipCargo,
             transaction: MarketTransaction(
-              waypointSymbol: start.waypoint,
+              waypointSymbol: start.toOpenApi(),
               shipSymbol: shipSymbol.symbol,
               tradeSymbol: TradeSymbol.ADVANCED_CIRCUITRY.value,
               units: 10,
@@ -619,18 +620,20 @@ void main() {
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
-    when(() => shipNav.waypointSymbol).thenReturn(shipLocation.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(shipLocation.systemString);
+    when(() => shipNav.waypointSymbol).thenReturn(shipLocation.toOpenApi());
+    when(
+      () => shipNav.systemSymbol,
+    ).thenReturn(shipLocation.system.toOpenApi());
     when(() => ship.fuel).thenReturn(ShipFuel(capacity: 100, current: 100));
     final shipEngine = _MockShipEngine();
     when(() => shipEngine.speed).thenReturn(10);
-    when(() => shipEngine.condition).thenReturn(1);
+    when(() => shipEngine.condition).thenReturn(ShipComponentCondition(1));
     when(() => ship.engine).thenReturn(shipEngine);
     final shipFrame = _MockShipFrame();
-    when(() => shipFrame.condition).thenReturn(1);
+    when(() => shipFrame.condition).thenReturn(ShipComponentCondition(1));
     when(() => ship.frame).thenReturn(shipFrame);
     final shipReactor = _MockShipReactor();
-    when(() => shipReactor.condition).thenReturn(1);
+    when(() => shipReactor.condition).thenReturn(ShipComponentCondition(1));
     when(() => ship.reactor).thenReturn(shipReactor);
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
     when(() => ship.modules).thenReturn([]);
@@ -742,7 +745,7 @@ void main() {
       ShipNavRouteWaypoint(
         symbol: shipLocation.waypoint,
         type: WaypointType.ASTEROID,
-        systemSymbol: shipLocation.systemString,
+        systemSymbol: shipLocation.system.toOpenApi(),
         x: 0,
         y: 0,
       ),
@@ -751,7 +754,7 @@ void main() {
       ShipNavRouteWaypoint(
         symbol: start.waypoint,
         type: WaypointType.ASTEROID,
-        systemSymbol: start.systemString,
+        systemSymbol: start.system.toOpenApi(),
         x: 0,
         y: 0,
       ),
@@ -867,8 +870,12 @@ void main() {
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
-    when(() => shipNav.waypointSymbol).thenReturn('S-A-B');
-    when(() => shipNav.systemSymbol).thenReturn('S-A');
+    when(
+      () => shipNav.waypointSymbol,
+    ).thenReturn(openapi.WaypointSymbol('S-A-B'));
+    when(
+      () => shipNav.systemSymbol,
+    ).thenReturn(SystemSymbol.fromString('S-A').toOpenApi());
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
 
     const shipSymbol = ShipSymbol('S', 1);
@@ -883,12 +890,12 @@ void main() {
     const shipSpeed = 10;
     when(() => shipEngine.speed).thenReturn(shipSpeed);
     when(() => ship.engine).thenReturn(shipEngine);
-    when(() => shipEngine.condition).thenReturn(1);
+    when(() => shipEngine.condition).thenReturn(ShipComponentCondition(1));
     final shipFrame = _MockShipFrame();
-    when(() => shipFrame.condition).thenReturn(1);
+    when(() => shipFrame.condition).thenReturn(ShipComponentCondition(1));
     when(() => ship.frame).thenReturn(shipFrame);
     final shipReactor = _MockShipReactor();
-    when(() => shipReactor.condition).thenReturn(1);
+    when(() => shipReactor.condition).thenReturn(ShipComponentCondition(1));
     when(() => ship.reactor).thenReturn(shipReactor);
     when(() => ship.modules).thenReturn([]);
 
@@ -1018,8 +1025,8 @@ void main() {
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
-    when(() => shipNav.waypointSymbol).thenReturn(end.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(end.systemString);
+    when(() => shipNav.waypointSymbol).thenReturn(end.toOpenApi());
+    when(() => shipNav.systemSymbol).thenReturn(end.system.toOpenApi());
     const shipSymbol = ShipSymbol('S', 1);
     when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
@@ -1129,8 +1136,8 @@ void main() {
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
-    when(() => shipNav.waypointSymbol).thenReturn(end.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(end.systemString);
+    when(() => shipNav.waypointSymbol).thenReturn(end.toOpenApi());
+    when(() => shipNav.systemSymbol).thenReturn(end.system.toOpenApi());
     const shipSymbol = ShipSymbol('S', 1);
     when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
@@ -1343,8 +1350,8 @@ void main() {
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
-    when(() => shipNav.waypointSymbol).thenReturn(end.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(end.systemString);
+    when(() => shipNav.waypointSymbol).thenReturn(end.toOpenApi());
+    when(() => shipNav.systemSymbol).thenReturn(end.system.toOpenApi());
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
 
     const shipSymbol = ShipSymbol('S', 1);

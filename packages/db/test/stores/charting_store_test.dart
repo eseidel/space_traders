@@ -20,7 +20,7 @@ void main() {
           chart: Chart(
             submittedBy: 'foo',
             submittedOn: DateTime.timestamp(),
-            waypointSymbol: waypointSymbol.waypoint,
+            waypointSymbol: waypointSymbol.toOpenApi(),
           ),
         ),
       );
@@ -43,7 +43,7 @@ void main() {
         Waypoint.test(
           waypointSymbol2,
           chart: Chart(
-            waypointSymbol: waypointSymbol2.waypoint,
+            waypointSymbol: waypointSymbol2.toOpenApi(),
             submittedBy: 'bar',
             submittedOn: DateTime.timestamp(),
           ),

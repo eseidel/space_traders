@@ -15,11 +15,13 @@ Query upsertSystemRecordQuery(SystemRecord system) => Query(
       type = @type, x = @x, y = @y, waypoint_symbols = @waypoint_symbols
       ''',
   parameters: {
-    'symbol': system.symbol.system,
+    'symbol': system.symbol.toOpenApi(),
     'type': system.type.value,
     'x': system.position.x,
     'y': system.position.y,
-    'waypoint_symbols': system.waypointSymbols.map((e) => e.waypoint).toList(),
+    'waypoint_symbols': system.waypointSymbols
+        .map((e) => e.toOpenApi())
+        .toList(),
   },
 );
 
@@ -29,7 +31,7 @@ Query systemRecordBySymbolQuery(SystemSymbol symbol) => Query(
       SELECT * FROM system_record_
       WHERE symbol = @symbol
       ''',
-  parameters: {'symbol': symbol.system},
+  parameters: {'symbol': symbol.toOpenApi()},
 );
 
 /// Create a SystemRecord from a column map.

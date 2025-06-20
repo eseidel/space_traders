@@ -76,11 +76,11 @@ extension ShipyardShipUtils on ShipyardShip {
 /// Extensions onto ShipNav to make it easier to work with.
 extension ShipNavUtils on ShipNav {
   /// Returns the current SystemSymbol of the ship.
-  SystemSymbol get systemSymbolObject => SystemSymbol.fromString(systemSymbol);
+  SystemSymbol get systemSymbolObject => SystemSymbol.fromOpenApi(systemSymbol);
 
   /// Returns the current WaypointSymbol of the ship.
   WaypointSymbol get waypointSymbolObject =>
-      WaypointSymbol.fromString(waypointSymbol);
+      WaypointSymbol.fromOpenApi(waypointSymbol);
 }
 
 /// Extensions onto ShipNavRoute to make it easier to work with.
@@ -116,7 +116,7 @@ extension ShipNavRouteWaypointUtils on ShipNavRouteWaypoint {
   WaypointSymbol get waypointSymbol => WaypointSymbol.fromString(symbol);
 
   /// Returns the SystemSymbol of the waypoint.
-  SystemSymbol get systemSymbolObject => SystemSymbol.fromString(systemSymbol);
+  SystemSymbol get systemSymbolObject => SystemSymbol.fromOpenApi(systemSymbol);
 
   /// Returns the WaypointPosition of the waypoint.
   WaypointPosition get position => WaypointPosition(x, y, systemSymbolObject);
@@ -237,7 +237,7 @@ extension MarketTransactionUtils on MarketTransaction {
 
   /// Returns the WaypointSymbol for the given transaction.
   WaypointSymbol get waypointSymbolObject =>
-      WaypointSymbol.fromString(waypointSymbol);
+      WaypointSymbol.fromOpenApi(waypointSymbol);
 }
 
 /// Extensions onto ShipyardTransaction to make it easier to work with.
@@ -247,7 +247,7 @@ extension ShipyardTransactionUtils on ShipyardTransaction {
 
   /// Returns the WaypointSymbol for the given transaction.
   WaypointSymbol get waypointSymbolObject =>
-      WaypointSymbol.fromString(waypointSymbol);
+      WaypointSymbol.fromOpenApi(waypointSymbol);
 }
 
 /// Extensions onto ScrapTransaction to make it easier to work with.
@@ -257,7 +257,7 @@ extension ScrapTransactionUtils on ScrapTransaction {
 
   /// Returns the WaypointSymbol for the given transaction.
   WaypointSymbol get waypointSymbolObject =>
-      WaypointSymbol.fromString(waypointSymbol);
+      WaypointSymbol.fromOpenApi(waypointSymbol);
 }
 
 /// Extensions onto ShipModificationTransaction to make it easier to work with.

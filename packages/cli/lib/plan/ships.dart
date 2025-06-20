@@ -140,15 +140,15 @@ ShipNav _makeShipNav({required SystemWaypoint origin, required DateTime now}) {
   final originSymbol = origin.symbol;
   final waypoint = ShipNavRouteWaypoint(
     symbol: originSymbol.waypoint,
-    systemSymbol: originSymbol.systemString,
+    systemSymbol: originSymbol.system.toOpenApi(),
     type: origin.type,
     x: origin.position.x,
     y: origin.position.y,
   );
 
   return ShipNav(
-    systemSymbol: originSymbol.systemString,
-    waypointSymbol: originSymbol.waypoint,
+    systemSymbol: originSymbol.system.toOpenApi(),
+    waypointSymbol: originSymbol.toOpenApi(),
     route: ShipNavRoute(
       destination: waypoint,
       origin: waypoint,

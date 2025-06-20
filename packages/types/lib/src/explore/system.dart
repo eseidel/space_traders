@@ -20,7 +20,7 @@ class SystemWaypoint extends Equatable {
 
   /// Creates a new [SystemWaypoint] from an OpenAPI [openapi.SystemWaypoint].
   factory SystemWaypoint.fromOpenApi(openapi.SystemWaypoint waypoint) {
-    final waypointSymbol = WaypointSymbol.fromJson(waypoint.symbol);
+    final waypointSymbol = WaypointSymbol.fromOpenApi(waypoint.symbol);
     return SystemWaypoint(
       symbol: waypointSymbol,
       type: waypoint.type,
@@ -84,7 +84,7 @@ class SystemWaypoint extends Equatable {
     return ShipNavRouteWaypoint(
       symbol: symbol.waypoint,
       type: type,
-      systemSymbol: symbol.systemString,
+      systemSymbol: symbol.system.toOpenApi(),
       x: position.x,
       y: position.y,
     );
@@ -94,7 +94,7 @@ class SystemWaypoint extends Equatable {
   @protected
   openapi.SystemWaypoint toOpenApi() {
     return openapi.SystemWaypoint(
-      symbol: symbol.toJson(),
+      symbol: symbol.toOpenApi(),
       type: type,
       x: position.x,
       y: position.y,
@@ -309,9 +309,9 @@ class Waypoint {
 
   /// Creates a new [Waypoint] from an OpenAPI [openapi.Waypoint].
   factory Waypoint.fromOpenApi(openapi.Waypoint waypoint) {
-    final systemSymbol = SystemSymbol.fromString(waypoint.systemSymbol);
+    final systemSymbol = SystemSymbol.fromOpenApi(waypoint.systemSymbol);
     return Waypoint(
-      symbol: WaypointSymbol.fromJson(waypoint.symbol),
+      symbol: WaypointSymbol.fromOpenApi(waypoint.symbol),
       type: waypoint.type,
       position: WaypointPosition(waypoint.x, waypoint.y, systemSymbol),
       isUnderConstruction: waypoint.isUnderConstruction,
@@ -395,9 +395,9 @@ class Waypoint {
   @visibleForTesting
   openapi.Waypoint toOpenApi() {
     return openapi.Waypoint(
-      symbol: symbol.toJson(),
+      symbol: symbol.toOpenApi(),
       type: type,
-      systemSymbol: symbol.systemString,
+      systemSymbol: symbol.system.toOpenApi(),
       x: position.x,
       y: position.y,
       isUnderConstruction: isUnderConstruction,

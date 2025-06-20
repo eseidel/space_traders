@@ -75,8 +75,10 @@ void main() {
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     final waypointSymbol = WaypointSymbol.fromString('S-A-W');
-    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.systemString);
+    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.toOpenApi());
+    when(
+      () => shipNav.systemSymbol,
+    ).thenReturn(waypointSymbol.system.toOpenApi());
     when(() => ship.mounts).thenReturn([
       // A mount in our template, we will leave it be.
       ShipMount(
@@ -101,9 +103,9 @@ void main() {
         description: 'description',
         powerOutput: 0,
         requirements: ShipRequirements(),
-        condition: 1,
-        quality: 1,
-        integrity: 1,
+        condition: ShipComponentCondition(1),
+        quality: ShipComponentQuality(1),
+        integrity: ShipComponentIntegrity(1),
       ),
     );
     when(() => ship.fuel).thenReturn(ShipFuel(current: 100, capacity: 100));
@@ -330,7 +332,7 @@ void main() {
     final waypointSymbol = WaypointSymbol.fromString('S-A-W');
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
+    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.toOpenApi());
     when(() => ship.mounts).thenReturn([]);
     when(() => ship.fuel).thenReturn(ShipFuel(current: 100, capacity: 100));
     final shipEngine = _MockShipEngine();

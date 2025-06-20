@@ -1,7 +1,9 @@
 import 'package:meta/meta.dart';
 import 'package:spacetraders/model/chart.dart';
+import 'package:spacetraders/model/system_symbol.dart';
 import 'package:spacetraders/model/waypoint_faction.dart';
 import 'package:spacetraders/model/waypoint_orbital.dart';
+import 'package:spacetraders/model/waypoint_symbol.dart';
 import 'package:spacetraders/model/waypoint_trait.dart';
 import 'package:spacetraders/model/waypoint_type.dart';
 import 'package:spacetraders/model_helpers.dart';
@@ -22,9 +24,9 @@ class ScannedWaypoint {
 
   factory ScannedWaypoint.fromJson(Map<String, dynamic> json) {
     return ScannedWaypoint(
-      symbol: json['symbol'] as String,
+      symbol: WaypointSymbol(json['symbol'] as String),
       type: WaypointType.fromJson(json['type'] as String),
-      systemSymbol: json['systemSymbol'] as String,
+      systemSymbol: SystemSymbol(json['systemSymbol'] as String),
       x: json['x'] as int,
       y: json['y'] as int,
       orbitals: (json['orbitals'] as List)
@@ -53,9 +55,9 @@ class ScannedWaypoint {
     return ScannedWaypoint.fromJson(json);
   }
 
-  final String symbol;
+  final WaypointSymbol symbol;
   final WaypointType type;
-  final String systemSymbol;
+  final SystemSymbol systemSymbol;
   final int x;
   final int y;
   final List<WaypointOrbital> orbitals;
@@ -65,9 +67,9 @@ class ScannedWaypoint {
 
   Map<String, dynamic> toJson() {
     return {
-      'symbol': symbol,
+      'symbol': symbol.toJson(),
       'type': type.toJson(),
-      'systemSymbol': systemSymbol,
+      'systemSymbol': systemSymbol.toJson(),
       'x': x,
       'y': y,
       'orbitals': orbitals.map((e) => e.toJson()).toList(),

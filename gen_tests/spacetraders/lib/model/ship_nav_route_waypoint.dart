@@ -1,4 +1,5 @@
 import 'package:meta/meta.dart';
+import 'package:spacetraders/model/system_symbol.dart';
 import 'package:spacetraders/model/waypoint_type.dart';
 
 @immutable
@@ -15,7 +16,7 @@ class ShipNavRouteWaypoint {
     return ShipNavRouteWaypoint(
       symbol: json['symbol'] as String,
       type: WaypointType.fromJson(json['type'] as String),
-      systemSymbol: json['systemSymbol'] as String,
+      systemSymbol: SystemSymbol(json['systemSymbol'] as String),
       x: json['x'] as int,
       y: json['y'] as int,
     );
@@ -32,7 +33,7 @@ class ShipNavRouteWaypoint {
 
   final String symbol;
   final WaypointType type;
-  final String systemSymbol;
+  final SystemSymbol systemSymbol;
   final int x;
   final int y;
 
@@ -40,7 +41,7 @@ class ShipNavRouteWaypoint {
     return {
       'symbol': symbol,
       'type': type.toJson(),
-      'systemSymbol': systemSymbol,
+      'systemSymbol': systemSymbol.toJson(),
       'x': x,
       'y': y,
     };

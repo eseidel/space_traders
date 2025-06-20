@@ -1,4 +1,5 @@
 import 'package:meta/meta.dart';
+import 'package:spacetraders/model/waypoint_symbol.dart';
 
 @immutable
 class ScrapTransaction {
@@ -11,7 +12,7 @@ class ScrapTransaction {
 
   factory ScrapTransaction.fromJson(Map<String, dynamic> json) {
     return ScrapTransaction(
-      waypointSymbol: json['waypointSymbol'] as String,
+      waypointSymbol: WaypointSymbol(json['waypointSymbol'] as String),
       shipSymbol: json['shipSymbol'] as String,
       totalPrice: json['totalPrice'] as int,
       timestamp: DateTime.parse(json['timestamp'] as String),
@@ -27,14 +28,14 @@ class ScrapTransaction {
     return ScrapTransaction.fromJson(json);
   }
 
-  final String waypointSymbol;
+  final WaypointSymbol waypointSymbol;
   final String shipSymbol;
   final int totalPrice;
   final DateTime timestamp;
 
   Map<String, dynamic> toJson() {
     return {
-      'waypointSymbol': waypointSymbol,
+      'waypointSymbol': waypointSymbol.toJson(),
       'shipSymbol': shipSymbol,
       'totalPrice': totalPrice,
       'timestamp': timestamp.toIso8601String(),

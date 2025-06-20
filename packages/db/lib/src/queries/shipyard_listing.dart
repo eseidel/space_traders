@@ -4,7 +4,7 @@ import 'package:types/types.dart';
 /// Lookup a shipyard listing by WaypointSymbol.
 Query shipyardListingByWaypointSymbolQuery(WaypointSymbol symbol) => Query(
   'SELECT * FROM shipyard_listing_ WHERE symbol = @symbol',
-  parameters: {'symbol': symbol.waypoint},
+  parameters: {'symbol': symbol.toOpenApi()},
 );
 
 /// Query all shipyard listings.

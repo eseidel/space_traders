@@ -1,4 +1,5 @@
 import 'package:openapi/model/market_transaction_type.dart';
+import 'package:openapi/model/waypoint_symbol.dart';
 
 class MarketTransaction {
   MarketTransaction({
@@ -15,7 +16,7 @@ class MarketTransaction {
   factory MarketTransaction.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
     return MarketTransaction(
-      waypointSymbol: json['waypointSymbol'] as String,
+      waypointSymbol: WaypointSymbol(json['waypointSymbol'] as String),
       shipSymbol: json['shipSymbol'] as String,
       tradeSymbol: json['tradeSymbol'] as String,
       type: MarketTransactionType.fromJson(json['type'] as String),
@@ -35,7 +36,7 @@ class MarketTransaction {
     return MarketTransaction.fromJson(json);
   }
 
-  String waypointSymbol;
+  WaypointSymbol waypointSymbol;
   String shipSymbol;
   String tradeSymbol;
   MarketTransactionType type;
@@ -46,7 +47,7 @@ class MarketTransaction {
 
   Map<String, dynamic> toJson() {
     return {
-      'waypointSymbol': waypointSymbol,
+      'waypointSymbol': waypointSymbol.toJson(),
       'shipSymbol': shipSymbol,
       'tradeSymbol': tradeSymbol,
       'type': type.toJson(),

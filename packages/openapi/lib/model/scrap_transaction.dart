@@ -1,3 +1,5 @@
+import 'package:openapi/model/waypoint_symbol.dart';
+
 class ScrapTransaction {
   ScrapTransaction({
     required this.waypointSymbol,
@@ -9,7 +11,7 @@ class ScrapTransaction {
   factory ScrapTransaction.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
     return ScrapTransaction(
-      waypointSymbol: json['waypointSymbol'] as String,
+      waypointSymbol: WaypointSymbol(json['waypointSymbol'] as String),
       shipSymbol: json['shipSymbol'] as String,
       totalPrice: json['totalPrice'] as int,
       timestamp: DateTime.parse(json['timestamp'] as String),
@@ -25,14 +27,14 @@ class ScrapTransaction {
     return ScrapTransaction.fromJson(json);
   }
 
-  String waypointSymbol;
+  WaypointSymbol waypointSymbol;
   String shipSymbol;
   int totalPrice;
   DateTime timestamp;
 
   Map<String, dynamic> toJson() {
     return {
-      'waypointSymbol': waypointSymbol,
+      'waypointSymbol': waypointSymbol.toJson(),
       'shipSymbol': shipSymbol,
       'totalPrice': totalPrice,
       'timestamp': timestamp.toIso8601String(),

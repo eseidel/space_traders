@@ -1,3 +1,5 @@
+import 'package:openapi/model/waypoint_symbol.dart';
+
 class Chart {
   Chart({
     required this.waypointSymbol,
@@ -8,7 +10,7 @@ class Chart {
   factory Chart.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
     return Chart(
-      waypointSymbol: json['waypointSymbol'] as String,
+      waypointSymbol: WaypointSymbol(json['waypointSymbol'] as String),
       submittedBy: json['submittedBy'] as String,
       submittedOn: DateTime.parse(json['submittedOn'] as String),
     );
@@ -23,13 +25,13 @@ class Chart {
     return Chart.fromJson(json);
   }
 
-  String waypointSymbol;
+  WaypointSymbol waypointSymbol;
   String submittedBy;
   DateTime submittedOn;
 
   Map<String, dynamic> toJson() {
     return {
-      'waypointSymbol': waypointSymbol,
+      'waypointSymbol': waypointSymbol.toJson(),
       'submittedBy': submittedBy,
       'submittedOn': submittedOn.toIso8601String(),
     };

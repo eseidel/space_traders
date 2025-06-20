@@ -296,7 +296,7 @@ class Transaction extends Equatable {
     return Transaction(
       transactionType: TransactionType.chart,
       shipSymbol: ShipSymbol.fromJson(transaction.shipSymbol),
-      waypointSymbol: WaypointSymbol.fromJson(transaction.waypointSymbol),
+      waypointSymbol: WaypointSymbol.fromOpenApi(transaction.waypointSymbol),
       tradeSymbol: null,
       shipType: null,
       quantity: 1,

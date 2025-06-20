@@ -268,10 +268,10 @@ class Ship {
   /// Create a test ship.
   @visibleForTesting
   factory Ship.test(ShipSymbol symbol) {
-    final waypoint = const WaypointSymbol.fallbackValue().waypoint;
-    final system = const SystemSymbol.fallbackValue().system;
+    final waypoint = const WaypointSymbol.fallbackValue().toOpenApi();
+    final system = const SystemSymbol.fallbackValue().toOpenApi();
     final navRouteWaypoint = ShipNavRouteWaypoint(
-      symbol: waypoint,
+      symbol: waypoint.value,
       type: openapi.WaypointType.PLANET,
       systemSymbol: system,
       x: 0,
@@ -310,9 +310,9 @@ class Ship {
         mountingPoints: 0,
         fuelCapacity: 0,
         requirements: ShipRequirements(),
-        condition: 1,
-        integrity: 1,
-        quality: 1,
+        condition: ShipComponentCondition(1),
+        integrity: ShipComponentIntegrity(1),
+        quality: ShipComponentQuality(1),
       ),
       reactor: ShipReactor(
         symbol: ShipReactorSymbol.SOLAR_I,
@@ -320,9 +320,9 @@ class Ship {
         description: '',
         powerOutput: 0,
         requirements: ShipRequirements(),
-        condition: 1,
-        integrity: 1,
-        quality: 1,
+        condition: ShipComponentCondition(1),
+        integrity: ShipComponentIntegrity(1),
+        quality: ShipComponentQuality(1),
       ),
       engine: ShipEngine(
         symbol: ShipEngineSymbol.HYPER_DRIVE_I,
@@ -330,9 +330,9 @@ class Ship {
         description: '',
         speed: 0,
         requirements: ShipRequirements(),
-        condition: 1,
-        integrity: 1,
-        quality: 1,
+        condition: ShipComponentCondition(1),
+        integrity: ShipComponentIntegrity(1),
+        quality: ShipComponentQuality(1),
       ),
       cooldown: Cooldown(
         shipSymbol: 'A',
@@ -428,9 +428,9 @@ ShipFrame testShipFrame() {
     symbol: ShipFrameSymbol.PROBE,
     name: 'name',
     description: 'description',
-    condition: 100,
-    integrity: 100,
-    quality: 100,
+    condition: ShipComponentCondition(100),
+    integrity: ShipComponentIntegrity(100),
+    quality: ShipComponentQuality(100),
     requirements: ShipRequirements(power: 100, crew: 100, slots: 100),
     moduleSlots: 100,
     mountingPoints: 100,
@@ -445,11 +445,11 @@ ShipReactor testShipReactor() {
     symbol: ShipReactorSymbol.SOLAR_I,
     name: 'name',
     description: 'description',
-    condition: 100,
-    integrity: 100,
+    condition: ShipComponentCondition(100),
+    integrity: ShipComponentIntegrity(100),
     powerOutput: 100,
     requirements: ShipRequirements(power: 100, crew: 100, slots: 100),
-    quality: 100,
+    quality: ShipComponentQuality(100),
   );
 }
 
@@ -460,11 +460,11 @@ ShipEngine testShipEngine() {
     symbol: ShipEngineSymbol.ION_DRIVE_I,
     name: 'name',
     description: 'description',
-    condition: 100,
-    integrity: 100,
+    condition: ShipComponentCondition(100),
+    integrity: ShipComponentIntegrity(100),
     speed: 100,
     requirements: ShipRequirements(power: 100, crew: 100, slots: 100),
-    quality: 100,
+    quality: ShipComponentQuality(100),
   );
 }
 

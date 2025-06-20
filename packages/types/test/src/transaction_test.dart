@@ -1,3 +1,4 @@
+import 'package:openapi/api.dart' as openapi;
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
@@ -69,7 +70,7 @@ void main() {
 
   test('Transaction.fromMarketTransaction', () {
     final marketTransaction = MarketTransaction(
-      waypointSymbol: 'A-B-C',
+      waypointSymbol: openapi.WaypointSymbol('A-B-C'),
       shipSymbol: 'S-1',
       tradeSymbol: 'FUEL',
       type: MarketTransactionType.PURCHASE,
@@ -98,7 +99,7 @@ void main() {
 
   test('Transaction.fromShipyardTransaction', () {
     final shipyardTransaction = ShipyardTransaction(
-      waypointSymbol: 'A-B-C',
+      waypointSymbol: openapi.WaypointSymbol('A-B-C'),
       shipSymbol: 'S-1',
       shipType: ShipType.EXPLORER.value,
       price: 100,
@@ -164,7 +165,7 @@ void main() {
 
   test('Transaction.fromChartTransaction', () {
     final chartTransaction = ChartTransaction(
-      waypointSymbol: 'A-B-C',
+      waypointSymbol: openapi.WaypointSymbol('A-B-C'),
       shipSymbol: 'S-1',
       totalPrice: 100,
       timestamp: DateTime(2021),

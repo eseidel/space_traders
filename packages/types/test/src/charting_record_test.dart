@@ -14,7 +14,7 @@ void main() {
           WaypointTraitSymbol.BARREN,
         },
         chart: Chart(
-          waypointSymbol: waypointSymbol.waypoint,
+          waypointSymbol: waypointSymbol.toOpenApi(),
           submittedBy: 'foo',
           submittedOn: now,
         ),

@@ -1,6 +1,8 @@
 import 'package:openapi/model/ship_nav_flight_mode.dart';
 import 'package:openapi/model/ship_nav_route.dart';
 import 'package:openapi/model/ship_nav_status.dart';
+import 'package:openapi/model/system_symbol.dart';
+import 'package:openapi/model/waypoint_symbol.dart';
 
 class ShipNav {
   ShipNav({
@@ -14,8 +16,8 @@ class ShipNav {
   factory ShipNav.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
     return ShipNav(
-      systemSymbol: json['systemSymbol'] as String,
-      waypointSymbol: json['waypointSymbol'] as String,
+      systemSymbol: SystemSymbol(json['systemSymbol'] as String),
+      waypointSymbol: WaypointSymbol(json['waypointSymbol'] as String),
       route: ShipNavRoute.fromJson(json['route'] as Map<String, dynamic>),
       status: ShipNavStatus.fromJson(json['status'] as String),
       flightMode: ShipNavFlightMode.fromJson(json['flightMode'] as String),
@@ -31,16 +33,16 @@ class ShipNav {
     return ShipNav.fromJson(json);
   }
 
-  String systemSymbol;
-  String waypointSymbol;
+  SystemSymbol systemSymbol;
+  WaypointSymbol waypointSymbol;
   ShipNavRoute route;
   ShipNavStatus status;
   ShipNavFlightMode flightMode;
 
   Map<String, dynamic> toJson() {
     return {
-      'systemSymbol': systemSymbol,
-      'waypointSymbol': waypointSymbol,
+      'systemSymbol': systemSymbol.toJson(),
+      'waypointSymbol': waypointSymbol.toJson(),
       'route': route.toJson(),
       'status': status.toJson(),
       'flightMode': flightMode.toJson(),

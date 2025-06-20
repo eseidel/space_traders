@@ -5,6 +5,7 @@ import 'package:cli/logger.dart';
 import 'package:cli/nav/navigation.dart';
 import 'package:db/db.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:openapi/api.dart' as openapi;
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
@@ -69,7 +70,9 @@ void main() {
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_TRANSIT);
     when(() => shipNavRoute.arrival).thenReturn(before);
     when(() => shipNav.route).thenReturn(shipNavRoute);
-    when(() => shipNav.waypointSymbol).thenReturn('A-B-C');
+    when(
+      () => shipNav.waypointSymbol,
+    ).thenReturn(openapi.WaypointSymbol('A-B-C'));
 
     final beforeResult = await runWithLogger(
       logger,
@@ -93,7 +96,9 @@ void main() {
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_TRANSIT);
     when(() => shipNavRoute.arrival).thenReturn(after);
     when(() => shipNav.route).thenReturn(shipNavRoute);
-    when(() => shipNav.waypointSymbol).thenReturn('A-B-C');
+    when(
+      () => shipNav.waypointSymbol,
+    ).thenReturn(openapi.WaypointSymbol('A-B-C'));
 
     final afterResult = await runWithLogger(
       logger,
@@ -155,8 +160,8 @@ void main() {
     final startSymbol = WaypointSymbol.fromString('A-B-C');
     final endSymbol = WaypointSymbol.fromString('D-E-F');
 
-    when(() => shipNav.waypointSymbol).thenReturn(startSymbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(startSymbol.systemString);
+    when(() => shipNav.waypointSymbol).thenReturn(startSymbol.toOpenApi());
+    when(() => shipNav.systemSymbol).thenReturn(startSymbol.system.toOpenApi());
 
     state.routePlan = RoutePlan(
       fuelCapacity: 100,
@@ -202,7 +207,7 @@ void main() {
           ),
           nav: shipNav,
           transaction: MarketTransaction(
-            waypointSymbol: startSymbol.waypoint,
+            waypointSymbol: startSymbol.toOpenApi(),
             shipSymbol: shipSymbol.symbol,
             tradeSymbol: TradeSymbol.ANTIMATTER.value,
             type: MarketTransactionType.PURCHASE,
@@ -320,7 +325,7 @@ void main() {
     final logger = _MockLogger();
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
     when(() => shipNav.route).thenReturn(shipNavRoute);
-    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
+    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.toOpenApi());
 
     final result = await runWithLogger(
       logger,
@@ -372,7 +377,7 @@ void main() {
     final logger = _MockLogger();
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
     when(() => shipNav.route).thenReturn(shipNavRoute);
-    when(() => shipNav.waypointSymbol).thenReturn(end.waypoint);
+    when(() => shipNav.waypointSymbol).thenReturn(end.toOpenApi());
 
     final result = await runWithLogger(
       logger,
@@ -425,7 +430,7 @@ void main() {
     final logger = _MockLogger();
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
     when(() => shipNav.route).thenReturn(shipNavRoute);
-    when(() => shipNav.waypointSymbol).thenReturn(other.waypoint);
+    when(() => shipNav.waypointSymbol).thenReturn(other.toOpenApi());
 
     expect(
       () async => await runWithLogger(
@@ -517,7 +522,7 @@ void main() {
       Duration? arrival,
     }) {
       when(() => shipNav.status).thenReturn(status);
-      when(() => shipNav.waypointSymbol).thenReturn(location.waypoint);
+      when(() => shipNav.waypointSymbol).thenReturn(location.toOpenApi());
       when(
         () => shipNavRoute.arrival,
       ).thenReturn(arrival == null ? now : now.add(const Duration(minutes: 1)));

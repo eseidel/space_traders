@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:mocktail/mocktail.dart';
+import 'package:openapi/api.dart' as openapi;
 import 'package:openapi/api.dart';
 import 'package:test/test.dart';
 
@@ -28,7 +29,7 @@ void main() {
                 factions: [],
                 waypoints: [
                   SystemWaypoint(
-                    symbol: 'X1-QB10-1',
+                    symbol: openapi.WaypointSymbol('X1-QB10-1'),
                     type: WaypointType.PLANET,
                     x: 0,
                     y: 0,

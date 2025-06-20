@@ -1,4 +1,5 @@
 import 'package:meta/meta.dart';
+import 'package:spacetraders/model/waypoint_symbol.dart';
 
 @immutable
 class Chart {
@@ -10,7 +11,7 @@ class Chart {
 
   factory Chart.fromJson(Map<String, dynamic> json) {
     return Chart(
-      waypointSymbol: json['waypointSymbol'] as String,
+      waypointSymbol: WaypointSymbol(json['waypointSymbol'] as String),
       submittedBy: json['submittedBy'] as String,
       submittedOn: DateTime.parse(json['submittedOn'] as String),
     );
@@ -25,13 +26,13 @@ class Chart {
     return Chart.fromJson(json);
   }
 
-  final String waypointSymbol;
+  final WaypointSymbol waypointSymbol;
   final String submittedBy;
   final DateTime submittedOn;
 
   Map<String, dynamic> toJson() {
     return {
-      'waypointSymbol': waypointSymbol,
+      'waypointSymbol': waypointSymbol.toJson(),
       'submittedBy': submittedBy,
       'submittedOn': submittedOn.toIso8601String(),
     };

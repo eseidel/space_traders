@@ -33,7 +33,7 @@ class FleetList extends StatelessWidget {
 
             return ListTile(
               title: Text(ship.symbol.hexNumber),
-              subtitle: Text(ship.nav.waypointSymbol),
+              subtitle: Text(ship.nav.waypointSymbol.value),
               leading: Text(cargoStatus),
             );
           },

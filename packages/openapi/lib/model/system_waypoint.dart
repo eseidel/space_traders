@@ -1,4 +1,5 @@
 import 'package:openapi/model/waypoint_orbital.dart';
+import 'package:openapi/model/waypoint_symbol.dart';
 import 'package:openapi/model/waypoint_type.dart';
 import 'package:openapi/model_helpers.dart';
 
@@ -15,7 +16,7 @@ class SystemWaypoint {
   factory SystemWaypoint.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
     return SystemWaypoint(
-      symbol: json['symbol'] as String,
+      symbol: WaypointSymbol(json['symbol'] as String),
       type: WaypointType.fromJson(json['type'] as String),
       x: json['x'] as int,
       y: json['y'] as int,
@@ -37,7 +38,7 @@ class SystemWaypoint {
     return SystemWaypoint.fromJson(json);
   }
 
-  String symbol;
+  WaypointSymbol symbol;
   WaypointType type;
   int x;
   int y;
@@ -46,7 +47,7 @@ class SystemWaypoint {
 
   Map<String, dynamic> toJson() {
     return {
-      'symbol': symbol,
+      'symbol': symbol.toJson(),
       'type': type.toJson(),
       'x': x,
       'y': y,

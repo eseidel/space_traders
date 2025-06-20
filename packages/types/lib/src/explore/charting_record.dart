@@ -30,7 +30,7 @@ class ChartedValues {
       chart:
           chart ??
           Chart(
-            waypointSymbol: waypointSymbol!.waypoint,
+            waypointSymbol: waypointSymbol!.toOpenApi(),
             submittedBy: 'agent',
             submittedOn: DateTime.timestamp(),
           ),

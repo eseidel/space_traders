@@ -66,13 +66,13 @@ void main() {
         CreateChart201Response(
           data: CreateChart201ResponseData(
             chart: Chart(
-              waypointSymbol: waypointSymbol.waypoint,
+              waypointSymbol: waypointSymbol.toOpenApi(),
               submittedBy: 'foo',
               submittedOn: DateTime(2021),
             ),
             agent: Agent.test().toOpenApi(),
             transaction: ChartTransaction(
-              waypointSymbol: waypointSymbol.waypoint,
+              waypointSymbol: waypointSymbol.toOpenApi(),
               shipSymbol: shipSymbol.symbol,
               totalPrice: 100,
               timestamp: DateTime(2021),
@@ -87,8 +87,10 @@ void main() {
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
-    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.systemString);
+    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.toOpenApi());
+    when(
+      () => shipNav.systemSymbol,
+    ).thenReturn(waypointSymbol.system.toOpenApi());
     final shipFuel = ShipFuel(capacity: 0, current: 0);
     when(() => ship.fuel).thenReturn(shipFuel);
 

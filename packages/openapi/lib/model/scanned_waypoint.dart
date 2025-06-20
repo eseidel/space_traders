@@ -1,6 +1,8 @@
 import 'package:openapi/model/chart.dart';
+import 'package:openapi/model/system_symbol.dart';
 import 'package:openapi/model/waypoint_faction.dart';
 import 'package:openapi/model/waypoint_orbital.dart';
+import 'package:openapi/model/waypoint_symbol.dart';
 import 'package:openapi/model/waypoint_trait.dart';
 import 'package:openapi/model/waypoint_type.dart';
 import 'package:openapi/model_helpers.dart';
@@ -21,9 +23,9 @@ class ScannedWaypoint {
   factory ScannedWaypoint.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
     return ScannedWaypoint(
-      symbol: json['symbol'] as String,
+      symbol: WaypointSymbol(json['symbol'] as String),
       type: WaypointType.fromJson(json['type'] as String),
-      systemSymbol: json['systemSymbol'] as String,
+      systemSymbol: SystemSymbol(json['systemSymbol'] as String),
       x: json['x'] as int,
       y: json['y'] as int,
       orbitals: (json['orbitals'] as List)
@@ -52,9 +54,9 @@ class ScannedWaypoint {
     return ScannedWaypoint.fromJson(json);
   }
 
-  String symbol;
+  WaypointSymbol symbol;
   WaypointType type;
-  String systemSymbol;
+  SystemSymbol systemSymbol;
   int x;
   int y;
   List<WaypointOrbital> orbitals;
@@ -64,9 +66,9 @@ class ScannedWaypoint {
 
   Map<String, dynamic> toJson() {
     return {
-      'symbol': symbol,
+      'symbol': symbol.toJson(),
       'type': type.toJson(),
-      'systemSymbol': systemSymbol,
+      'systemSymbol': systemSymbol.toJson(),
       'x': x,
       'y': y,
       'orbitals': orbitals.map((e) => e.toJson()).toList(),

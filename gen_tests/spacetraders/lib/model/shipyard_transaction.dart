@@ -1,4 +1,5 @@
 import 'package:meta/meta.dart';
+import 'package:spacetraders/model/waypoint_symbol.dart';
 
 @immutable
 class ShipyardTransaction {
@@ -13,7 +14,7 @@ class ShipyardTransaction {
 
   factory ShipyardTransaction.fromJson(Map<String, dynamic> json) {
     return ShipyardTransaction(
-      waypointSymbol: json['waypointSymbol'] as String,
+      waypointSymbol: WaypointSymbol(json['waypointSymbol'] as String),
       shipSymbol: json['shipSymbol'] as String,
       shipType: json['shipType'] as String,
       price: json['price'] as int,
@@ -31,7 +32,7 @@ class ShipyardTransaction {
     return ShipyardTransaction.fromJson(json);
   }
 
-  final String waypointSymbol;
+  final WaypointSymbol waypointSymbol;
   final String shipSymbol;
   final String shipType;
   final int price;
@@ -40,7 +41,7 @@ class ShipyardTransaction {
 
   Map<String, dynamic> toJson() {
     return {
-      'waypointSymbol': waypointSymbol,
+      'waypointSymbol': waypointSymbol.toJson(),
       'shipSymbol': shipSymbol,
       'shipType': shipType,
       'price': price,

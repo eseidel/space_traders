@@ -128,7 +128,7 @@ class ShipyardShipTraits extends Traits<ShipType, ShipyardShip> {
       ..purchasePrice = 0
       ..activity = null
       ..supply = SupplyLevel.ABUNDANT
-      ..frame.condition = 1.0;
+      ..frame.condition = ShipComponentCondition(1);
   }
 
   @override
@@ -156,7 +156,7 @@ class ShipEngineTraits extends Traits<ShipEngineSymbol, ShipEngine> {
 
   @override
   ShipEngine copyAndNormalize(ShipEngine record) =>
-      deepCopy(record)..condition = 1.0;
+      deepCopy(record)..condition = ShipComponentCondition(1);
 
   @override
   int compare(ShipEngine a, ShipEngine b) =>
@@ -183,7 +183,7 @@ class ShipReactorTraits extends Traits<ShipReactorSymbol, ShipReactor> {
 
   @override
   ShipReactor copyAndNormalize(ShipReactor record) =>
-      deepCopy(record)..condition = 1.0;
+      deepCopy(record)..condition = ShipComponentCondition(1);
 
   @override
   int compare(ShipReactor a, ShipReactor b) =>
