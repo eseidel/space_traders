@@ -150,33 +150,61 @@ class TemplateProvider {
   }
 }
 
+List<RenderSchema> collectModelSchemas(RenderSpec spec) {
+  final schemas = <RenderSchema>[];
+  for (final api in spec.apis) {
+    for (final endpoint in api.endpoints) {
+      final operation = endpoint.operation;
+      final requestBody = operation.requestBody;
+      if (requestBody != null) {
+        schemas.add(requestBody.schema);
+      }
+      for (final parameter in endpoint.parameters) {
+        schemas.add(parameter.type);
+      }
+      for (final response in operation.responses) {
+        schemas.add(response.content);
+      }
+      schemas.add(operation.returnType);
+    }
+  }
+  return schemas;
+}
+
+/// Responsible for rendering the entire spec.
+/// This FileRenderer is styled after the OpenAPI generator, eventually we
+/// should make this an interface that can be implemented by other renderers.
 class FileRenderer {
   FileRenderer({
     required this.outDir,
     required this.packageName,
     required this.templateProvider,
+    required this.schemaRenderer,
     RunProcess? runProcess,
-    this.quirks = const Quirks(),
   }) : fs = outDir.fileSystem,
        runProcess = runProcess ?? Process.runSync;
 
   /// The output directory.
   final Directory outDir;
 
+  /// The file system where the rendered files will go.
+  final FileSystem fs;
+
   /// The package name this spec is being rendered into.
   final String packageName;
 
-  /// The provider of templates.
+  /// The provider of templates.  Could be different from the one used by
+  /// the schema renderer, so we hold our own.
   final TemplateProvider templateProvider;
-
-  /// The file system where the rendered files will go.
-  final FileSystem fs;
 
   /// The function to run a process. Allows for mocking in tests.
   final RunProcess runProcess;
 
+  /// The renderer for schemas and APIs.
+  final SchemaRenderer schemaRenderer;
+
   /// The quirks to use for rendering.
-  final Quirks quirks;
+  Quirks get quirks => schemaRenderer.quirks;
 
   /// The path to the api file.
   static String apiFilePath(Api api) {
@@ -303,10 +331,7 @@ class FileRenderer {
   }
 
   /// Render the entire spec.
-  void render({
-    required RenderSpec spec,
-    required SchemaRenderer schemaRenderer,
-  }) {
+  void render(RenderSpec spec) {
     // Collect all the Apis and Model Schemas.
     // Do we walk through each endpoint and ask which class to put it on?
     // Do we then walk through each class and ask what file to put it in?
@@ -320,7 +345,6 @@ class FileRenderer {
     _renderDirectory();
     for (final api in apis) {
       final content = schemaRenderer.renderApi(api);
-      // final referencedSchemas = collectSchemasFromApi(api);
       // import 'dart:async';
       // import 'dart:convert';
 
@@ -483,26 +507,27 @@ void renderSpec({
   RunProcess? runProcess,
   Quirks quirks = const Quirks(),
 }) {
-  // TODO(eseidel): split the determination of which schemas go into what
-  // files out from the production of the code.
-
   final templateProvider = TemplateProvider.fromDirectory(
     templateDir ?? const LocalFileSystem().directory('lib/templates'),
   );
 
-  final fileRenderer = FileRenderer(
-    outDir: outDir,
-    packageName: packageName,
-    templateProvider: templateProvider,
-    runProcess: runProcess,
-    quirks: quirks,
-  );
+  // Prepare a resolved spec for rendering converting into render objects.
   final renderSpec = toRenderSpec(spec);
+  // SchemaRenderer is responsible for rendering schemas and APIs into strings.
   final schemaRenderer = SchemaRenderer(
     specUrl: specUri,
     spec: renderSpec,
     templateProvider: templateProvider,
     quirks: quirks,
   );
-  fileRenderer.render(spec: renderSpec, schemaRenderer: schemaRenderer);
+
+  // FileRenderer is responsible for deciding the layout of the files
+  // and rendering the rest of directory structure.
+  FileRenderer(
+    outDir: outDir,
+    packageName: packageName,
+    templateProvider: templateProvider,
+    runProcess: runProcess,
+    schemaRenderer: schemaRenderer,
+  ).render(renderSpec);
 }

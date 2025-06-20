@@ -223,12 +223,24 @@ void main() {
 
       await renderToDirectory(spec: spec, outDir: out);
       expect(out.existsSync(), isTrue);
-      expect(out.childFile('lib/api.dart'), exists);
-      expect(out.childFile('lib/api_client.dart'), exists);
-      expect(out.childFile('lib/api/default_api.dart'), exists);
-      expect(out.childFile('lib/model/get_user200_response.dart'), exists);
-      expect(out.childFile('lib/model/account.dart'), exists);
-      expect(out.childFile('lib/model/account_role.dart'), exists);
+      expect(
+        out.childDirectory('lib'),
+        hasFiles([
+          'api.dart',
+          'api_exception.dart',
+          'api_client.dart',
+          'model_helpers.dart',
+        ]),
+      );
+      expect(out.childDirectory('lib/api'), hasFiles(['default_api.dart']));
+      expect(
+        out.childDirectory('lib/model'),
+        hasFiles([
+          'account.dart',
+          'account_role.dart',
+          'get_user200_response.dart',
+        ]),
+      );
     });
 
     test('with request body', () async {

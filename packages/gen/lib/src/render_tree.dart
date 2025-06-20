@@ -132,42 +132,6 @@ RenderSpec toRenderSpec(ResolvedSpec spec) {
   );
 }
 
-List<RenderSchema> collectModelSchemas(RenderSpec spec) {
-  final schemas = <RenderSchema>[];
-  for (final api in spec.apis) {
-    for (final endpoint in api.endpoints) {
-      final operation = endpoint.operation;
-      final requestBody = operation.requestBody;
-      if (requestBody != null) {
-        schemas.add(requestBody.schema);
-      }
-      for (final parameter in endpoint.parameters) {
-        schemas.add(parameter.type);
-      }
-      for (final response in operation.responses) {
-        schemas.add(response.content);
-      }
-      schemas.add(operation.returnType);
-    }
-  }
-  return schemas;
-}
-
-List<RenderSchema> collectReferencedSchemas(RenderSchema schema) {
-  final schemas = <RenderSchema>[];
-  return schemas;
-}
-
-List<RenderSchema> collectSchemasFromApi(Api api) {
-  final schemas = <RenderSchema>[];
-  return schemas;
-}
-
-List<RenderSchema> collectSchemasFromModel(RenderSchema schema) {
-  final schemas = <RenderSchema>[];
-  return schemas;
-}
-
 // Convert a resolved spec to a spec that can be rendered.
 // This is the root of the render spec tree.
 class RenderSpec {
