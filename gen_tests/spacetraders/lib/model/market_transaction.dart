@@ -1,5 +1,6 @@
 import 'package:meta/meta.dart';
 import 'package:spacetraders/model/market_transaction_type.dart';
+import 'package:spacetraders/model/waypoint_symbol.dart';
 
 @immutable
 class MarketTransaction {
@@ -16,14 +17,14 @@ class MarketTransaction {
 
   factory MarketTransaction.fromJson(Map<String, dynamic> json) {
     return MarketTransaction(
-      waypointSymbol: json['waypointSymbol'] as String,
+      waypointSymbol: WaypointSymbol(json['waypointSymbol'] as String),
       shipSymbol: json['shipSymbol'] as String,
       tradeSymbol: json['tradeSymbol'] as String,
       type: MarketTransactionType.fromJson(json['type'] as String),
       units: json['units'] as int,
       pricePerUnit: json['pricePerUnit'] as int,
       totalPrice: json['totalPrice'] as int,
-      timestamp: DateTime.parse(json['timestamp'] as String),
+      timestamp: json['timestamp'] as String,
     );
   }
 
@@ -36,25 +37,25 @@ class MarketTransaction {
     return MarketTransaction.fromJson(json);
   }
 
-  final String waypointSymbol;
+  final WaypointSymbol waypointSymbol;
   final String shipSymbol;
   final String tradeSymbol;
   final MarketTransactionType type;
   final int units;
   final int pricePerUnit;
   final int totalPrice;
-  final DateTime timestamp;
+  final String timestamp;
 
   Map<String, dynamic> toJson() {
     return {
-      'waypointSymbol': waypointSymbol,
+      'waypointSymbol': waypointSymbol.toJson(),
       'shipSymbol': shipSymbol,
       'tradeSymbol': tradeSymbol,
       'type': type.toJson(),
       'units': units,
       'pricePerUnit': pricePerUnit,
       'totalPrice': totalPrice,
-      'timestamp': timestamp.toIso8601String(),
+      'timestamp': timestamp,
     };
   }
 

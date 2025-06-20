@@ -22,7 +22,7 @@ class Survey {
             (e) => SurveyDeposit.fromJson(e as Map<String, dynamic>),
           )
           .toList(),
-      expiration: DateTime.parse(json['expiration'] as String),
+      expiration: json['expiration'] as String,
       size: SurveySize.fromJson(json['size'] as String),
     );
   }
@@ -39,7 +39,7 @@ class Survey {
   final String signature;
   final String symbol;
   final List<SurveyDeposit> deposits;
-  final DateTime expiration;
+  final String expiration;
   final SurveySize size;
 
   Map<String, dynamic> toJson() {
@@ -47,7 +47,7 @@ class Survey {
       'signature': signature,
       'symbol': symbol,
       'deposits': deposits.map((e) => e.toJson()).toList(),
-      'expiration': expiration.toIso8601String(),
+      'expiration': expiration,
       'size': size.toJson(),
     };
   }

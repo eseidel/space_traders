@@ -18,8 +18,8 @@ class ShipNavRoute {
       origin: ShipNavRouteWaypoint.fromJson(
         json['origin'] as Map<String, dynamic>,
       ),
-      departureTime: DateTime.parse(json['departureTime'] as String),
-      arrival: DateTime.parse(json['arrival'] as String),
+      departureTime: json['departureTime'] as String,
+      arrival: json['arrival'] as String,
     );
   }
 
@@ -34,15 +34,15 @@ class ShipNavRoute {
 
   final ShipNavRouteWaypoint destination;
   final ShipNavRouteWaypoint origin;
-  final DateTime departureTime;
-  final DateTime arrival;
+  final String departureTime;
+  final String arrival;
 
   Map<String, dynamic> toJson() {
     return {
       'destination': destination.toJson(),
       'origin': origin.toJson(),
-      'departureTime': departureTime.toIso8601String(),
-      'arrival': arrival.toIso8601String(),
+      'departureTime': departureTime,
+      'arrival': arrival,
     };
   }
 

@@ -998,12 +998,14 @@ class RenderUnknown extends RenderSchema {
   @override
   String jsonStorageType({required bool isNullable}) => 'dynamic';
 
+  // We might need to jsonDecode(jsonEncode(dartName)) to get everything into
+  // json types.
   @override
   String toJsonExpression(
     String dartName,
     SchemaRenderer context, {
     required bool dartIsNullable,
-  }) => "throw UnimplementedError('RenderUnknown.toJson')";
+  }) => dartName;
 
   @override
   String fromJsonExpression(
@@ -1011,9 +1013,7 @@ class RenderUnknown extends RenderSchema {
     SchemaRenderer context, {
     required bool jsonIsNullable,
     required bool dartIsNullable,
-  }) {
-    return 'throw UnimplementedError("RenderUnknown.fromJson")';
-  }
+  }) => jsonValue;
 
   @override
   Map<String, dynamic> toTemplateContext(SchemaRenderer context) =>
@@ -1054,7 +1054,7 @@ class RenderVoid extends RenderSchema {
     SchemaRenderer context, {
     required bool jsonIsNullable,
     required bool dartIsNullable,
-  }) => 'throw UnimplementedError("RenderVoid.fromJson")';
+  }) => jsonValue;
 
   @override
   Map<String, dynamic> toTemplateContext(SchemaRenderer context) =>

@@ -54,7 +54,7 @@ class ShipMount {
       'name': name,
       'description': description,
       'strength': strength,
-      'deposits': deposits,
+      'deposits': deposits?.map((e) => e.toJson()).toList(),
       'requirements': requirements.toJson(),
     };
   }

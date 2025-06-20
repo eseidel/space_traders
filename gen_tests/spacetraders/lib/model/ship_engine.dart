@@ -1,4 +1,7 @@
 import 'package:meta/meta.dart';
+import 'package:spacetraders/model/ship_component_condition.dart';
+import 'package:spacetraders/model/ship_component_integrity.dart';
+import 'package:spacetraders/model/ship_component_quality.dart';
 import 'package:spacetraders/model/ship_engine_symbol.dart';
 import 'package:spacetraders/model/ship_requirements.dart';
 
@@ -19,14 +22,14 @@ class ShipEngine {
     return ShipEngine(
       symbol: ShipEngineSymbol.fromJson(json['symbol'] as String),
       name: json['name'] as String,
-      condition: (json['condition'] as num).toDouble(),
-      integrity: (json['integrity'] as num).toDouble(),
+      condition: ShipComponentCondition((json['condition'] as num).toDouble()),
+      integrity: ShipComponentIntegrity((json['integrity'] as num).toDouble()),
       description: json['description'] as String,
       speed: json['speed'] as int,
       requirements: ShipRequirements.fromJson(
         json['requirements'] as Map<String, dynamic>,
       ),
-      quality: (json['quality'] as num).toDouble(),
+      quality: ShipComponentQuality((json['quality'] as num).toDouble()),
     );
   }
 
@@ -41,23 +44,23 @@ class ShipEngine {
 
   final ShipEngineSymbol symbol;
   final String name;
-  final double condition;
-  final double integrity;
+  final ShipComponentCondition condition;
+  final ShipComponentIntegrity integrity;
   final String description;
   final int speed;
   final ShipRequirements requirements;
-  final double quality;
+  final ShipComponentQuality quality;
 
   Map<String, dynamic> toJson() {
     return {
       'symbol': symbol.toJson(),
       'name': name,
-      'condition': condition,
-      'integrity': integrity,
+      'condition': condition.toJson(),
+      'integrity': integrity.toJson(),
       'description': description,
       'speed': speed,
       'requirements': requirements.toJson(),
-      'quality': quality,
+      'quality': quality.toJson(),
     };
   }
 

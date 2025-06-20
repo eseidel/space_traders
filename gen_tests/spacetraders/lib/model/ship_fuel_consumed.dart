@@ -7,7 +7,7 @@ class ShipFuelConsumed {
   factory ShipFuelConsumed.fromJson(Map<String, dynamic> json) {
     return ShipFuelConsumed(
       amount: json['amount'] as int,
-      timestamp: DateTime.parse(json['timestamp'] as String),
+      timestamp: json['timestamp'] as String,
     );
   }
 
@@ -21,10 +21,10 @@ class ShipFuelConsumed {
   }
 
   final int amount;
-  final DateTime timestamp;
+  final String timestamp;
 
   Map<String, dynamic> toJson() {
-    return {'amount': amount, 'timestamp': timestamp.toIso8601String()};
+    return {'amount': amount, 'timestamp': timestamp};
   }
 
   @override

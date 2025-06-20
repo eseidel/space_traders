@@ -1,4 +1,5 @@
 import 'package:meta/meta.dart';
+import 'package:spacetraders/model/waypoint_symbol.dart';
 import 'package:spacetraders/model_helpers.dart';
 
 @immutable
@@ -7,7 +8,7 @@ class JumpGate {
 
   factory JumpGate.fromJson(Map<String, dynamic> json) {
     return JumpGate(
-      symbol: json['symbol'] as String,
+      symbol: WaypointSymbol(json['symbol'] as String),
       connections: (json['connections'] as List).cast<String>(),
     );
   }
@@ -21,11 +22,11 @@ class JumpGate {
     return JumpGate.fromJson(json);
   }
 
-  final String symbol;
+  final WaypointSymbol symbol;
   final List<String> connections;
 
   Map<String, dynamic> toJson() {
-    return {'symbol': symbol, 'connections': connections};
+    return {'symbol': symbol.toJson(), 'connections': connections};
   }
 
   @override

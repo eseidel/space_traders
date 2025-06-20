@@ -1,5 +1,4 @@
 import 'package:meta/meta.dart';
-import 'package:spacetraders/model_helpers.dart';
 
 @immutable
 class Cooldown {
@@ -15,7 +14,7 @@ class Cooldown {
       shipSymbol: json['shipSymbol'] as String,
       totalSeconds: json['totalSeconds'] as int,
       remainingSeconds: json['remainingSeconds'] as int,
-      expiration: maybeParseDateTime(json['expiration'] as String?),
+      expiration: json['expiration'] as String?,
     );
   }
 
@@ -31,14 +30,14 @@ class Cooldown {
   final String shipSymbol;
   final int totalSeconds;
   final int remainingSeconds;
-  final DateTime? expiration;
+  final String? expiration;
 
   Map<String, dynamic> toJson() {
     return {
       'shipSymbol': shipSymbol,
       'totalSeconds': totalSeconds,
       'remainingSeconds': remainingSeconds,
-      'expiration': expiration?.toIso8601String(),
+      'expiration': expiration,
     };
   }
 

@@ -16,7 +16,7 @@ class GetMyAccount200ResponseDataAccount {
       id: json['id'] as String,
       email: json['email'] as String,
       token: json['token'] as String?,
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      createdAt: json['createdAt'] as String,
     );
   }
 
@@ -34,15 +34,10 @@ class GetMyAccount200ResponseDataAccount {
   final String id;
   final String email;
   final String? token;
-  final DateTime createdAt;
+  final String createdAt;
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'email': email,
-      'token': token,
-      'createdAt': createdAt.toIso8601String(),
-    };
+    return {'id': id, 'email': email, 'token': token, 'createdAt': createdAt};
   }
 
   @override
