@@ -3,7 +3,6 @@
 // than serialization/deserialization with the openapi spec.
 // This also discards all non-json values.
 
-import 'package:equatable/equatable.dart';
 import 'package:space_gen/src/logger.dart';
 import 'package:space_gen/src/parser.dart';
 import 'package:space_gen/src/spec.dart';
@@ -289,7 +288,7 @@ ResolvedSpec resolveSpec(OpenApi spec) {
   );
 }
 
-class ResolvedSpec extends Equatable {
+class ResolvedSpec {
   const ResolvedSpec({required this.serverUrl, required this.paths});
 
   /// The server url of the spec.
@@ -297,9 +296,6 @@ class ResolvedSpec extends Equatable {
 
   /// The paths of the spec.
   final List<ResolvedPath> paths;
-
-  @override
-  List<Object?> get props => [serverUrl, paths];
 }
 
 class ResolvedPath {
@@ -312,7 +308,7 @@ class ResolvedPath {
   final List<ResolvedOperation> operations;
 }
 
-class ResolvedParameter extends Equatable {
+class ResolvedParameter {
   const ResolvedParameter({
     required this.name,
     required this.sendIn,
@@ -335,12 +331,9 @@ class ResolvedParameter extends Equatable {
 
   /// The schema of the resolved parameter.
   final ResolvedSchema schema;
-
-  @override
-  List<Object?> get props => [name, sendIn, description, required, schema];
 }
 
-class ResolvedRequestBody extends Equatable {
+class ResolvedRequestBody {
   const ResolvedRequestBody({
     required this.schema,
     required this.description,
@@ -355,12 +348,9 @@ class ResolvedRequestBody extends Equatable {
 
   /// Whether the request body is required.
   final bool required;
-
-  @override
-  List<Object?> get props => [schema];
 }
 
-class ResolvedOperation extends Equatable {
+class ResolvedOperation {
   const ResolvedOperation({
     required this.method,
     required this.path,
@@ -399,20 +389,9 @@ class ResolvedOperation extends Equatable {
 
   /// The description of the resolved operation.
   final String? description;
-
-  @override
-  List<Object?> get props => [
-    method,
-    path,
-    requestBody,
-    responses,
-    tags,
-    summary,
-    description,
-  ];
 }
 
-class ResolvedResponse extends Equatable {
+class ResolvedResponse {
   const ResolvedResponse({
     required this.statusCode,
     required this.description,
@@ -428,12 +407,9 @@ class ResolvedResponse extends Equatable {
   /// The resolved content of the resolved response.
   /// We only support json, so we only need a single content.
   final ResolvedSchema content;
-
-  @override
-  List<Object?> get props => [statusCode, description, content];
 }
 
-abstract class ResolvedSchema extends Equatable {
+abstract class ResolvedSchema {
   const ResolvedSchema({required this.snakeName, required this.pointer});
 
   /// Where this schema is located in the spec.
@@ -441,9 +417,6 @@ abstract class ResolvedSchema extends Equatable {
 
   /// The snake name of the resolved schema.
   final String snakeName;
-
-  @override
-  List<Object?> get props => [snakeName, pointer];
 }
 
 enum PodType { string, integer, number, boolean, dateTime }
@@ -461,9 +434,6 @@ class SchemaPod extends ResolvedSchema {
 
   /// The default value of the pop type.
   final dynamic defaultValue;
-
-  @override
-  List<Object?> get props => [super.props, type];
 }
 
 class SchemaArray extends ResolvedSchema {
@@ -479,9 +449,6 @@ class SchemaArray extends ResolvedSchema {
 
   /// The default value of the array type.
   final dynamic defaultValue;
-
-  @override
-  List<Object?> get props => [super.props, items];
 }
 
 class SchemaEnum extends ResolvedSchema {
@@ -516,9 +483,6 @@ class SchemaObject extends ResolvedSchema {
 
   /// The required properties of the resolved schema.
   final List<String> required;
-
-  @override
-  List<Object?> get props => [super.props, properties, additionalProperties];
 }
 
 /// An unknown schema, typically means empty (e.g. schema: {})
@@ -535,9 +499,6 @@ abstract class ResolvedSchemaCollection extends ResolvedSchema {
 
   /// The schemas of the resolved schema collection.
   final List<ResolvedSchema> schemas;
-
-  @override
-  List<Object?> get props => [super.props, schemas];
 }
 
 class SchemaOneOf extends ResolvedSchemaCollection {
