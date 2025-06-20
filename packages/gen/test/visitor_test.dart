@@ -1,11 +1,7 @@
-import 'package:mocktail/mocktail.dart';
-import 'package:space_gen/src/logger.dart';
 import 'package:space_gen/src/parser.dart';
 import 'package:space_gen/src/spec.dart';
 import 'package:space_gen/src/visitor.dart';
 import 'package:test/test.dart';
-
-class _MockLogger extends Mock implements Logger {}
 
 class _CountingVisitor extends Visitor {
   _CountingVisitor();
