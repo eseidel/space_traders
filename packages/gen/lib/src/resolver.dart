@@ -161,26 +161,31 @@ List<ResolvedOperation> _resolveOperations(
   }).toList();
 }
 
+ResolvedSchema _resolveContent(Response response, _ResolveContext context) {
+  final content = response.content;
+  // Should this just be a void response?
+  if (content == null) {
+    return const SchemaVoid(snakeName: 'void');
+  }
+  final jsonSchema = content['application/json']?.schema;
+  if (jsonSchema == null) {
+    throw Exception('Response content is not json: $response');
+  }
+  return _resolveSchema(jsonSchema, context);
+}
+
 List<ResolvedResponse> _resolveResponses(
   Responses responses,
   _ResolveContext context,
 ) {
   return responses.responses.entries.map((entry) {
-    final statusCode = int.parse(entry.key as String);
+    final statusCode = entry.key;
     final response = context._resolve(entry.value);
-    final content = response.content;
-    // Should this just be a void response?
-    if (content == null) {
-      throw Exception('Response has no content: $response');
-    }
-    final jsonSchema = content['application/json']?.schema;
-    if (jsonSchema == null) {
-      throw Exception('Response content is not json: $response');
-    }
+
     return ResolvedResponse(
       statusCode: statusCode,
       description: response.description,
-      content: _resolveSchema(jsonSchema, context),
+      content: _resolveContent(response, context),
     );
   }).toList();
 }
@@ -427,4 +432,8 @@ class SchemaAnyOf extends ResolvedSchemaCollection {
 
 class SchemaAllOf extends ResolvedSchemaCollection {
   const SchemaAllOf({required super.schemas, required super.snakeName});
+}
+
+class SchemaVoid extends ResolvedSchema {
+  const SchemaVoid({required super.snakeName});
 }

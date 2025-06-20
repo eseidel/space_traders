@@ -57,6 +57,8 @@ RenderSchema toRenderSchema(ResolvedSchema schema) {
             RenderUnknown(snakeName: schema.snakeName, pointer: schema.pointer),
         pointer: schema.pointer,
       );
+    case SchemaVoid():
+      return RenderVoid(snakeName: schema.snakeName, pointer: schema.pointer);
     default:
       throw UnimplementedError('Unknown schema: $schema');
   }
@@ -922,7 +924,7 @@ class RenderUnknown extends RenderSchema {
 
   @override
   String equalsExpression(String name, SchemaRenderer context) =>
-      'throw UnimplementedError()';
+      'identical(name, other.$name)';
 
   @override
   bool get createsNewType => false;
@@ -946,6 +948,43 @@ class RenderUnknown extends RenderSchema {
   }) {
     return 'throw UnimplementedError()';
   }
+
+  @override
+  Map<String, dynamic> toTemplateContext(SchemaRenderer context) =>
+      throw UnimplementedError('toTemplateContext for $this');
+}
+
+class RenderVoid extends RenderSchema {
+  const RenderVoid({required super.snakeName, required super.pointer});
+
+  @override
+  String typeName(SchemaRenderer context) => 'void';
+
+  @override
+  String equalsExpression(String name, SchemaRenderer context) =>
+      'throw UnimplementedError()';
+
+  @override
+  bool get createsNewType => false;
+
+  @override
+  String jsonStorageType({required bool isNullable}) =>
+      'throw UnimplementedError()';
+
+  @override
+  String toJsonExpression(
+    String dartName,
+    SchemaRenderer context, {
+    required bool dartIsNullable,
+  }) => 'throw UnimplementedError()';
+
+  @override
+  String fromJsonExpression(
+    String jsonValue,
+    SchemaRenderer context, {
+    required bool jsonIsNullable,
+    required bool dartIsNullable,
+  }) => 'throw UnimplementedError()';
 
   @override
   Map<String, dynamic> toTemplateContext(SchemaRenderer context) =>
