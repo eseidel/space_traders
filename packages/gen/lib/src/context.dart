@@ -122,39 +122,6 @@ class Api {
 
 enum SchemaRenderType { enumeration, object, stringNewtype, numberNewtype, pod }
 
-extension _RequestBodyGeneration on RenderRequestBody {
-  Map<String, dynamic> toTemplateContext(SchemaRenderer context) {
-    final typeName = schema.typeName(context);
-    // TODO(eseidel): Why don't we have a name for request bodies?
-    final paramName = (typeName[0].toLowerCase() + typeName.substring(1))
-        .split('<')
-        .first;
-    // TODO(eseidel): Share code with Parameter.toTemplateContext.
-    final isNullable = !required;
-    return {
-      'name': paramName,
-      'dartName': paramName,
-      'bracketedName': '{$paramName}',
-      'required': required,
-      'hasDefaultValue': schema.defaultValue != null,
-      'defaultValue': schema.defaultValueString(context),
-      'type': typeName,
-      'nullableType': schema.nullableTypeName(context),
-      'toJson': schema.toJsonExpression(
-        paramName,
-        context,
-        dartIsNullable: isNullable,
-      ),
-      'fromJson': schema.fromJsonExpression(
-        'json',
-        context,
-        jsonIsNullable: isNullable,
-        dartIsNullable: isNullable,
-      ),
-    };
-  }
-}
-
 typedef RunProcess =
     ProcessResult Function(
       String executable,
@@ -369,6 +336,7 @@ class FileRenderer {
     for (final schema in schemas) {
       if (schema is RenderVoid ||
           schema is RenderUnknown ||
+          schema is RenderArray ||
           schema is RenderPod) {
         continue;
       }

@@ -1,3 +1,6 @@
+import 'package:equatable/equatable.dart';
+import 'package:meta/meta.dart';
+
 /// The "in" of a parameter.  "in" is a keyword in Dart, so we use SendIn.
 /// e.g. query, header, path, cookie.
 /// https://spec.openapis.org/oas/v3.0.0#parameter-object
@@ -60,4 +63,37 @@ enum Method {
 
   /// The method as a lowercase string.
   String get key => name.toLowerCase();
+}
+
+/// Json pointer is a string that can be used to reference a value in a json
+/// object.
+/// https://spec.openapis.org/oas/v3.1.0#json-pointer
+@immutable
+class JsonPointer extends Equatable {
+  /// Create a new JsonPointer from a list of parts.
+  const JsonPointer.fromParts(this.parts);
+
+  /// Create a new JsonPointer from a string.
+  factory JsonPointer.parse(String string) {
+    if (!string.startsWith('#/')) {
+      throw FormatException('Invalid json pointer: $string');
+    }
+    return JsonPointer.fromParts(string.substring(2).split('/'));
+  }
+
+  /// The parts of the json pointer.
+  final List<String> parts;
+
+  /// This pointer encoded as a url-ready string.
+  String get location => '/${parts.map(urlEncode).join('/')}';
+
+  /// Encode a part of the json pointer as a url-ready string.
+  static String urlEncode(String part) =>
+      part.replaceAll('~', '~0').replaceAll('/', '~1');
+
+  @override
+  String toString() => '#/${parts.join('/')}';
+
+  @override
+  List<Object?> get props => [parts];
 }

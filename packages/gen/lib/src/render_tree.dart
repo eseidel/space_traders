@@ -4,7 +4,7 @@ import 'package:space_gen/src/resolver.dart';
 import 'package:space_gen/src/string.dart';
 import 'package:space_gen/src/types.dart';
 
-Never _unimplemented(String message, String pointer) {
+Never _unimplemented(String message, JsonPointer pointer) {
   throw UnimplementedError('$message at $pointer');
 }
 
@@ -32,6 +32,7 @@ RenderSchema toRenderSchema(ResolvedSchema schema) {
         snakeName: schema.snakeName,
         values: schema.values,
         pointer: schema.pointer,
+        defaultValue: schema.defaultValue,
       );
     case SchemaObject():
       return RenderObject(
@@ -48,6 +49,7 @@ RenderSchema toRenderSchema(ResolvedSchema schema) {
         snakeName: schema.snakeName,
         type: schema.type,
         pointer: schema.pointer,
+        defaultValue: schema.defaultValue,
       );
     case SchemaArray():
       return RenderArray(
@@ -56,11 +58,17 @@ RenderSchema toRenderSchema(ResolvedSchema schema) {
             maybeRenderSchema(schema.items) ??
             RenderUnknown(snakeName: schema.snakeName, pointer: schema.pointer),
         pointer: schema.pointer,
+        defaultValue: schema.defaultValue,
       );
     case SchemaVoid():
       return RenderVoid(snakeName: schema.snakeName, pointer: schema.pointer);
+    case SchemaUnknown():
+      return RenderUnknown(
+        snakeName: schema.snakeName,
+        pointer: schema.pointer,
+      );
     default:
-      throw UnimplementedError('Unknown schema: $schema');
+      _unimplemented('Unknown schema: $schema', schema.pointer);
   }
 }
 
@@ -264,6 +272,37 @@ class RenderRequestBody {
 
   /// Whether the request body is required.
   final bool required;
+
+  Map<String, dynamic> toTemplateContext(SchemaRenderer context) {
+    final typeName = schema.typeName(context);
+    // TODO(eseidel): Why don't we have a name for request bodies?
+    final paramName = (typeName[0].toLowerCase() + typeName.substring(1))
+        .split('<')
+        .first;
+    // TODO(eseidel): Share code with Parameter.toTemplateContext.
+    final isNullable = !required;
+    return {
+      'name': paramName,
+      'dartName': paramName,
+      'bracketedName': '{$paramName}',
+      'required': required,
+      'hasDefaultValue': schema.defaultValue != null,
+      'defaultValue': schema.defaultValueString(context),
+      'type': typeName,
+      'nullableType': schema.nullableTypeName(context),
+      'toJson': schema.toJsonExpression(
+        paramName,
+        context,
+        dartIsNullable: isNullable,
+      ),
+      'fromJson': schema.fromJsonExpression(
+        'json',
+        context,
+        jsonIsNullable: isNullable,
+        dartIsNullable: isNullable,
+      ),
+    };
+  }
 }
 
 class RenderResponse {
@@ -313,14 +352,12 @@ abstract class RenderSchema {
   final String snakeName;
 
   /// The pointer of the resolved schema.
-  final String pointer;
+  final JsonPointer pointer;
 
   /// Whether this schema creates a new type and thus needs to be rendered.
   bool get createsNewType;
 
-  dynamic get defaultValue {
-    _unimplemented('defaultValue', pointer);
-  }
+  dynamic get defaultValue;
 
   String orDefaultExpression({
     required SchemaRenderer context,
@@ -377,16 +414,22 @@ class RenderPod extends RenderSchema {
     required super.snakeName,
     required this.type,
     required super.pointer,
+    required this.defaultValue,
   });
 
   /// The type of the resolved schema.
   final PodType type;
 
   @override
+  final dynamic defaultValue;
+
+  @override
   String typeName(SchemaRenderer context) {
     switch (type) {
       case PodType.string:
         return 'String';
+      case PodType.integer:
+        return 'int';
       case PodType.number:
         return 'double';
       case PodType.boolean:
@@ -402,6 +445,8 @@ class RenderPod extends RenderSchema {
       case PodType.string:
       case PodType.dateTime:
         return isNullable ? 'String?' : 'String';
+      case PodType.integer:
+        return isNullable ? 'int?' : 'int';
       case PodType.number:
         return isNullable ? 'num?' : 'num';
       case PodType.boolean:
@@ -451,6 +496,8 @@ class RenderPod extends RenderSchema {
         }
       case PodType.string:
         return '$jsonValue as $jsonType $orDefault';
+      case PodType.integer:
+        return '($jsonValue as $jsonType).toInt() $orDefault';
       case PodType.number:
         return '($jsonValue as $jsonType).toDouble() $orDefault';
       case PodType.boolean:
@@ -493,7 +540,14 @@ abstract class RenderNewType extends RenderSchema {
 }
 
 class RenderStringNewType extends RenderNewType {
-  const RenderStringNewType({required super.snakeName, required super.pointer});
+  const RenderStringNewType({
+    required super.snakeName,
+    required super.pointer,
+    required this.defaultValue,
+  });
+
+  @override
+  final String? defaultValue;
 
   @override
   Map<String, dynamic> toTemplateContext(SchemaRenderer context) => {
@@ -523,7 +577,14 @@ class RenderStringNewType extends RenderNewType {
 }
 
 class RenderNumberNewType extends RenderNewType {
-  const RenderNumberNewType({required super.snakeName, required super.pointer});
+  const RenderNumberNewType({
+    required super.snakeName,
+    required super.pointer,
+    required this.defaultValue,
+  });
+
+  @override
+  final double? defaultValue;
 
   @override
   Map<String, dynamic> toTemplateContext(SchemaRenderer context) => {
@@ -569,6 +630,9 @@ class RenderObject extends RenderNewType {
 
   /// The required properties of the resolved schema.
   final List<String> required;
+
+  @override
+  dynamic get defaultValue => null;
 
   @override
   String jsonStorageType({required bool isNullable}) {
@@ -707,10 +771,14 @@ class RenderArray extends RenderSchema {
     required super.snakeName,
     required this.items,
     required super.pointer,
+    required this.defaultValue,
   });
 
   /// The items of the resolved schema.
   final RenderSchema items;
+
+  @override
+  final dynamic defaultValue;
 
   /// The type name of this schema.
   @override
@@ -797,7 +865,11 @@ class RenderEnum extends RenderNewType {
     required super.snakeName,
     required this.values,
     required super.pointer,
+    required this.defaultValue,
   });
+
+  @override
+  final dynamic defaultValue;
 
   /// The name of an enum value.
   String enumValueName(SchemaRenderer context, String jsonName) {
@@ -920,6 +992,10 @@ class RenderUnknown extends RenderSchema {
   const RenderUnknown({required super.snakeName, required super.pointer});
 
   @override
+  dynamic get defaultValue =>
+      throw UnimplementedError('defaultValue for $this');
+
+  @override
   String typeName(SchemaRenderer context) => 'dynamic';
 
   @override
@@ -956,6 +1032,10 @@ class RenderUnknown extends RenderSchema {
 
 class RenderVoid extends RenderSchema {
   const RenderVoid({required super.snakeName, required super.pointer});
+
+  @override
+  dynamic get defaultValue =>
+      throw UnimplementedError('defaultValue for $this');
 
   @override
   String typeName(SchemaRenderer context) => 'void';
