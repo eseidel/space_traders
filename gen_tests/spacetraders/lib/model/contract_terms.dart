@@ -13,7 +13,7 @@ class ContractTerms {
 
   factory ContractTerms.fromJson(Map<String, dynamic> json) {
     return ContractTerms(
-      deadline: json['deadline'] as String,
+      deadline: DateTime.parse(json['deadline'] as String),
       payment: ContractPayment.fromJson(
         json['payment'] as Map<String, dynamic>,
       ),
@@ -34,13 +34,13 @@ class ContractTerms {
     return ContractTerms.fromJson(json);
   }
 
-  final String deadline;
+  final DateTime deadline;
   final ContractPayment payment;
   final List<ContractDeliverGood>? deliver;
 
   Map<String, dynamic> toJson() {
     return {
-      'deadline': deadline,
+      'deadline': deadline.toIso8601String(),
       'payment': payment.toJson(),
       'deliver': deliver?.map((e) => e.toJson()).toList(),
     };

@@ -15,7 +15,7 @@ class ChartTransaction {
       waypointSymbol: WaypointSymbol(json['waypointSymbol'] as String),
       shipSymbol: json['shipSymbol'] as String,
       totalPrice: json['totalPrice'] as int,
-      timestamp: json['timestamp'] as String,
+      timestamp: DateTime.parse(json['timestamp'] as String),
     );
   }
 
@@ -31,14 +31,14 @@ class ChartTransaction {
   final WaypointSymbol waypointSymbol;
   final String shipSymbol;
   final int totalPrice;
-  final String timestamp;
+  final DateTime timestamp;
 
   Map<String, dynamic> toJson() {
     return {
       'waypointSymbol': waypointSymbol.toJson(),
       'shipSymbol': shipSymbol,
       'totalPrice': totalPrice,
-      'timestamp': timestamp,
+      'timestamp': timestamp.toIso8601String(),
     };
   }
 

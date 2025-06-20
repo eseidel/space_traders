@@ -13,7 +13,7 @@ class Chart {
     return Chart(
       waypointSymbol: WaypointSymbol(json['waypointSymbol'] as String),
       submittedBy: json['submittedBy'] as String,
-      submittedOn: json['submittedOn'] as String,
+      submittedOn: DateTime.parse(json['submittedOn'] as String),
     );
   }
 
@@ -28,13 +28,13 @@ class Chart {
 
   final WaypointSymbol waypointSymbol;
   final String submittedBy;
-  final String submittedOn;
+  final DateTime submittedOn;
 
   Map<String, dynamic> toJson() {
     return {
       'waypointSymbol': waypointSymbol.toJson(),
       'submittedBy': submittedBy,
-      'submittedOn': submittedOn,
+      'submittedOn': submittedOn.toIso8601String(),
     };
   }
 

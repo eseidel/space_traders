@@ -24,7 +24,7 @@ class MarketTransaction {
       units: json['units'] as int,
       pricePerUnit: json['pricePerUnit'] as int,
       totalPrice: json['totalPrice'] as int,
-      timestamp: json['timestamp'] as String,
+      timestamp: DateTime.parse(json['timestamp'] as String),
     );
   }
 
@@ -44,7 +44,7 @@ class MarketTransaction {
   final int units;
   final int pricePerUnit;
   final int totalPrice;
-  final String timestamp;
+  final DateTime timestamp;
 
   Map<String, dynamic> toJson() {
     return {
@@ -55,7 +55,7 @@ class MarketTransaction {
       'units': units,
       'pricePerUnit': pricePerUnit,
       'totalPrice': totalPrice,
-      'timestamp': timestamp,
+      'timestamp': timestamp.toIso8601String(),
     };
   }
 

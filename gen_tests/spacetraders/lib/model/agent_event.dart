@@ -16,7 +16,7 @@ class AgentEvent {
       type: json['type'] as String,
       message: json['message'] as String,
       data: json['data'],
-      createdAt: json['createdAt'] as String,
+      createdAt: DateTime.parse(json['createdAt'] as String),
     );
   }
 
@@ -33,7 +33,7 @@ class AgentEvent {
   final String type;
   final String message;
   final dynamic data;
-  final String createdAt;
+  final DateTime createdAt;
 
   Map<String, dynamic> toJson() {
     return {
@@ -41,7 +41,7 @@ class AgentEvent {
       'type': type,
       'message': message,
       'data': data,
-      'createdAt': createdAt,
+      'createdAt': createdAt.toIso8601String(),
     };
   }
 

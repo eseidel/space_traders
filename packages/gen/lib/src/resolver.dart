@@ -91,6 +91,14 @@ ResolvedSchema resolveSchemaRef(SchemaRef ref, ResolveContext context) {
           snakeName: schema.snakeName,
         );
       }
+      if (schema.format == 'date-time') {
+        return SchemaPod(
+          type: PodType.dateTime,
+          pointer: schema.pointer,
+          snakeName: schema.snakeName,
+          defaultValue: schema.defaultValue,
+        );
+      }
       return SchemaPod(
         type: PodType.string,
         pointer: schema.pointer,

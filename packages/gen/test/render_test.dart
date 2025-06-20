@@ -930,5 +930,62 @@ void main() {
         '',
       );
     });
+    test('with datetime', () {
+      final schema = {
+        'type': 'object',
+        'properties': {
+          'foo': {'type': 'string', 'format': 'date-time'},
+        },
+      };
+      final result = renderSchema(schema);
+      expect(
+        result,
+        '@immutable\n'
+        'class Test {\n'
+        '    Test(\n'
+        '        {  this.foo,\n'
+        '         }\n'
+        '    );\n'
+        '\n'
+        '    factory Test.fromJson(Map<String, dynamic>\n'
+        '        json) {\n'
+        '        return Test(\n'
+        "            foo: maybeParseDateTime(json['foo'] as String?) ,\n"
+        '        );\n'
+        '    }\n'
+        '\n'
+        '    /// Convenience to create a nullable type from a nullable json object.\n'
+        '    /// Useful when parsing optional fields.\n'
+        '    static Test? maybeFromJson(Map<String, dynamic>? json) {\n'
+        '        if (json == null) {\n'
+        '            return null;\n'
+        '        }\n'
+        '        return Test.fromJson(json);\n'
+        '    }\n'
+        '\n'
+        '    final  DateTime? foo;\n'
+        '\n'
+        '\n'
+        '    Map<String, dynamic> toJson() {\n'
+        '        return {\n'
+        "            'foo': foo?.toIso8601String(),\n"
+        '        };\n'
+        '    }\n'
+        '\n'
+        '    @override\n'
+        '    int get hashCode =>\n'
+        '          foo.hashCode;\n'
+        '\n'
+        '    @override\n'
+        '    bool operator ==(Object other) {\n'
+        '        if (identical(this, other)) return true;\n'
+        '        return other is Test\n'
+        '            && foo == other.foo\n'
+        '        ;\n'
+        '    }\n'
+        '}\n'
+        '',
+      );
+    });
   });
 }
