@@ -1054,7 +1054,7 @@ class RenderVoid extends RenderSchema {
     SchemaRenderer context, {
     required bool jsonIsNullable,
     required bool dartIsNullable,
-  }) => jsonValue;
+  }) => ''; // Unclear if this is correct.
 
   @override
   Map<String, dynamic> toTemplateContext(SchemaRenderer context) =>

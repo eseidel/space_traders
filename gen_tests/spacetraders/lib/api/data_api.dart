@@ -44,7 +44,7 @@ class DataApi {
     }
 
     if (response.body.isNotEmpty) {
-      return jsonDecode(response.body);
+      return;
     }
 
     throw ApiException(
