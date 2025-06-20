@@ -1361,7 +1361,6 @@ void main() {
         pointerParts: const ['root'],
         snakeNameStack: const [],
         refRegistry: RefRegistry(),
-        isTopLevelComponent: false,
         json: [
           {'foo': 'bar'},
           'baz',
@@ -1427,7 +1426,6 @@ void main() {
           additionalProperties: null,
           defaultValue: 'User',
           example: 'User',
-          useNewType: true,
         ),
       );
       final b = RefOr<SchemaBase>.object(
@@ -1444,7 +1442,6 @@ void main() {
           additionalProperties: null,
           defaultValue: 'User',
           example: 'User',
-          useNewType: true,
         ),
       );
       final c = RefOr<SchemaBase>.object(
@@ -1461,7 +1458,6 @@ void main() {
           additionalProperties: null,
           defaultValue: 'User',
           example: 'User',
-          useNewType: true,
         ),
       );
       expect(a.equalsIgnoringName(a), isTrue);
@@ -1470,7 +1466,6 @@ void main() {
     });
 
     test('object equals with different name 2', () {
-      // SchemaRef(null, Schema(name: users200_response, pointer: /paths//users/get/responses/200/content/application/json/schema, type: SchemaType.boolean, description: , useNewType: false)) != SchemaRef(null, Schema(name: users201_response, pointer: /paths//users/get/responses/201/content/application/json/schema, type: SchemaType.boolean, description: , useNewType: false)) not supported in MapContext(/paths//users/get, {responses: {200: {description: OK, content: {application/json: {schema: {type: boolean}}}}, 201: {description: Created, content: {application/json: {schema: {type: boolean}}}}}}
       final a = RefOr<SchemaBase>.object(
         Schema(
           pointer:
@@ -1486,7 +1481,6 @@ void main() {
           additionalProperties: null,
           defaultValue: null,
           example: null,
-          useNewType: false,
         ),
       );
       final b = RefOr<SchemaBase>.object(
@@ -1504,7 +1498,6 @@ void main() {
           additionalProperties: null,
           defaultValue: null,
           example: null,
-          useNewType: false,
         ),
       );
       expect(a.equalsIgnoringName(b), isTrue);

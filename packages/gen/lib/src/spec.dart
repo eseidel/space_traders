@@ -194,7 +194,6 @@ class Schema extends SchemaBase {
     required this.additionalProperties,
     required this.defaultValue,
     required this.example,
-    required this.useNewType,
   }) {
     if (type == SchemaType.object && snakeName.isEmpty) {
       throw ArgumentError.value(
@@ -234,10 +233,6 @@ class Schema extends SchemaBase {
   /// The default value of this schema.
   final dynamic defaultValue;
 
-  /// Whether to use the newtype pattern for this schema.
-  /// e.g. Wrap the underlying type in a named object.
-  final bool useNewType;
-
   @override
   List<Object?> get props => [
     super.props,
@@ -249,13 +244,12 @@ class Schema extends SchemaBase {
     format,
     additionalProperties,
     defaultValue,
-    useNewType,
   ];
 
   @override
   String toString() {
     return 'Schema(name: $snakeName, pointer: $pointer, type: $type, '
-        'description: $description, useNewType: $useNewType)';
+        'description: $description)';
   }
 }
 

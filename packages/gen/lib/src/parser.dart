@@ -294,7 +294,6 @@ Schema parseSchema(MapContext json) {
     additionalProperties: additionalPropertiesSchema,
     defaultValue: defaultValue,
     example: example,
-    useNewType: json.isTopLevelComponent,
   );
   json.addObject(schema);
   _warnUnused(json);
@@ -673,9 +672,7 @@ Map<String, T> _parseComponent<T>(
   if (valuesJson != null) {
     for (final name in valuesJson.keys) {
       final snakeName = snakeFromCamel(name);
-      final childContext = valuesJson
-          .childAsMap(name)
-          .addSnakeName(snakeName, isTopLevelComponent: true);
+      final childContext = valuesJson.childAsMap(name).addSnakeName(snakeName);
       final value = parse(childContext);
       values[name] = value;
     }
@@ -884,7 +881,6 @@ class MapContext extends ParseContext {
     required super.pointerParts,
     required super.snakeNameStack,
     required super.refRegistry,
-    required super.isTopLevelComponent,
     required this.json,
     // Only exposed in the constructor so that addSnakeName can pass it to
     // prevent resetting the usedKeys set.
@@ -900,7 +896,6 @@ class MapContext extends ParseContext {
          pointerParts: [...parent.pointerParts, key],
          snakeNameStack: parent.snakeNameStack,
          refRegistry: parent.refRegistry,
-         isTopLevelComponent: false,
          json: json,
        );
 
@@ -910,7 +905,6 @@ class MapContext extends ParseContext {
         pointerParts: [],
         snakeNameStack: [],
         refRegistry: RefRegistry(),
-        isTopLevelComponent: false,
         json: json,
       );
 
@@ -934,15 +928,11 @@ class MapContext extends ParseContext {
     return ListContext.fromParent(parent: this, json: child, key: key);
   }
 
-  MapContext addSnakeName(
-    String snakeName, {
-    bool isTopLevelComponent = false,
-  }) => MapContext(
+  MapContext addSnakeName(String snakeName) => MapContext(
     baseUrl: baseUrl,
     pointerParts: pointerParts,
     snakeNameStack: [...snakeNameStack, snakeName],
     refRegistry: refRegistry,
-    isTopLevelComponent: isTopLevelComponent,
     json: json,
     usedKeys: usedKeys,
   );
@@ -983,7 +973,6 @@ class ListContext extends ParseContext {
     required super.pointerParts,
     required super.snakeNameStack,
     required super.refRegistry,
-    required super.isTopLevelComponent,
     required this.json,
   });
 
@@ -996,7 +985,6 @@ class ListContext extends ParseContext {
          pointerParts: [...parent.pointerParts, key],
          snakeNameStack: parent.snakeNameStack,
          refRegistry: parent.refRegistry,
-         isTopLevelComponent: false,
          json: json,
        );
 
@@ -1028,7 +1016,6 @@ abstract class ParseContext {
     required this.pointerParts,
     required this.snakeNameStack,
     required this.refRegistry,
-    required this.isTopLevelComponent,
   }) {
     if (baseUrl.hasFragment) {
       throw ArgumentError.value(
@@ -1047,9 +1034,6 @@ abstract class ParseContext {
 
   /// Stack of name parts for the current schema.
   final List<String> snakeNameStack;
-
-  /// Whether the current schema is a top-level component.
-  final bool isTopLevelComponent;
 
   JsonPointer get pointer => JsonPointer(pointerParts);
 
