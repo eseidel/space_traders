@@ -235,10 +235,33 @@ class _ModelCollector extends RenderTreeVisitor {
   }
 }
 
-Set<RenderSchema> collectModelSchemas(RenderSpec spec) {
+Set<RenderSchema> collectAllSchemas(RenderSpec spec) {
   final collector = _ModelCollector();
   RenderTreeWalker(visitor: collector).walkRoot(spec);
   return collector.schemas;
+}
+
+Set<RenderSchema> collectSchemasUnderApi(Api api) {
+  final collector = _ModelCollector();
+  RenderTreeWalker(visitor: collector).walkApi(api);
+  return collector.schemas;
+}
+
+Set<RenderSchema> collectSchemasUnderSchema(RenderSchema schema) {
+  final collector = _ModelCollector();
+  RenderTreeWalker(visitor: collector).walkSchema(schema);
+  return collector.schemas;
+}
+
+class Import {
+  const Import(this.path, {this.asName});
+
+  final String path;
+  final String? asName;
+
+  Map<String, dynamic> toTemplateContext() {
+    return {'path': path, 'asName': asName};
+  }
 }
 
 /// Responsible for determining the layout of the files and rendering the
@@ -298,7 +321,7 @@ class FileRenderer {
     return 'model/${schema.snakeName}.dart';
   }
 
-  String packageImport(FileRenderer context, RenderSchema schema) {
+  String modelPackageImport(FileRenderer context, RenderSchema schema) {
     return 'package:${context.packageName}/model/${schema.snakeName}.dart';
   }
 
@@ -353,7 +376,7 @@ class FileRenderer {
   }
 
   /// Render the api client.
-  void _renderApiClient({required RenderSpec spec}) {
+  void _renderApiClient(RenderSpec spec) {
     _renderTemplate(
       template: 'api_exception',
       outPath: 'lib/api_exception.dart',
@@ -385,7 +408,7 @@ class FileRenderer {
   }
 
   /// Render the public API file.
-  void _renderPublicApi(List<Api> apis, Set<RenderSchema> schemas) {
+  void _renderPublicApi(Iterable<Api> apis, Iterable<RenderSchema> schemas) {
     final paths = {
       ...apis.map(apiPackagePath),
       ...schemas.map(modelPackagePath),
@@ -417,6 +440,68 @@ class FileRenderer {
     };
   }
 
+  void _renderApis(List<Api> apis) {
+    for (final api in apis) {
+      final content = schemaRenderer.renderApi(api);
+      final imports = [
+        const Import('dart:async'),
+        const Import('dart:convert'),
+        const Import('dart:io'),
+        Import('package:$packageName/api_client.dart'),
+        Import('package:$packageName/api_exception.dart'),
+        const Import('package:http/http.dart', asName: 'http'),
+      ];
+
+      final apiSchemas = collectSchemasUnderApi(
+        api,
+      ).where(rendersToSeparateFile);
+      final apiImports = apiSchemas
+          .map((s) => Import(modelPackageImport(this, s)))
+          .toList();
+      imports.addAll(apiImports);
+
+      final importsContext = imports.map((i) => i.toTemplateContext()).toList();
+      final outPath = apiFilePath(api);
+      _renderTemplate(
+        template: 'add_imports',
+        outPath: outPath,
+        context: {'imports': importsContext, 'content': content},
+      );
+    }
+  }
+
+  void _renderModels(Iterable<RenderSchema> schemas) {
+    for (final schema in schemas) {
+      final content = schemaRenderer.renderSchema(schema);
+      final referencedSchemas = collectSchemasUnderSchema(
+        schema,
+      ).where(rendersToSeparateFile).toSet();
+      final referencedImports = referencedSchemas
+          .map((s) => Import(modelPackageImport(this, s)))
+          .toList();
+
+      final imports = [
+        const Import('dart:convert'),
+        const Import('dart:io'),
+        const Import('package:meta/meta.dart'),
+        Import('package:$packageName/model_helpers.dart'),
+        ...referencedImports,
+      ];
+
+      final importsContext = [
+        ...imports,
+        ...referencedImports,
+      ].map((i) => i.toTemplateContext()).toList();
+
+      final outPath = modelFilePath(schema);
+      _renderTemplate(
+        template: 'add_imports',
+        outPath: outPath,
+        context: {'imports': importsContext, 'content': content},
+      );
+    }
+  }
+
   /// Render the entire spec.
   void render(RenderSpec spec) {
     // Collect all the Apis and Model Schemas.
@@ -425,36 +510,18 @@ class FileRenderer {
     // Then we walk through all model objects and ask what file to put them in?
     // And then for each rendered we collect any imports, by asking for the
     // file path for each referenced schema?
-    final apis = spec.apis;
-    final schemas = collectModelSchemas(
-      spec,
-    ).where(rendersToSeparateFile).toSet();
-
     // Set up the package directory.
     _renderDirectory();
-    for (final api in apis) {
-      final content = schemaRenderer.renderApi(api);
-      // import 'dart:async';
-      // import 'dart:convert';
+    // Render the apis (endpoint groups).
+    _renderApis(spec.apis);
 
-      // import 'package:{{{packageName}}}/api_client.dart';
-      // import 'package:http/http.dart' as http;
-      // {{#imports}}
-      // import '{{{.}}}';
-      // {{/imports}}
-
-      final outPath = apiFilePath(api);
-      _writeFile(path: outPath, content: content);
-    }
-    for (final schema in schemas) {
-      final content = schemaRenderer.renderSchema(schema);
-      // final referencedSchemas = collectSchemasFromModel(schema);
-      final outPath = modelFilePath(schema);
-      _writeFile(path: outPath, content: content);
-    }
-    _renderApiClient(spec: spec);
+    final schemas = collectAllSchemas(spec).where(rendersToSeparateFile);
+    // Render the models (schemas).
+    _renderModels(schemas);
+    // Render the api client.
+    _renderApiClient(spec);
     // Render the combined api.dart exporting all rendered schemas.
-    _renderPublicApi(apis, schemas);
+    _renderPublicApi(spec.apis, schemas);
     // Consider running pub upgrade here to ensure packages are up to date.
     // Might need to make offline configurable?
     _runDart(['pub', 'get', '--offline']);
