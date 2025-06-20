@@ -19,8 +19,7 @@ Future<void> loadAndRenderSpec({
   // Load the spec and warm the cache before rendering.
   final cache = Cache(fs);
   final specJson = await cache.load(specUri);
-  final context = MapContext.initial(specUri, specJson);
-  final spec = parseOpenApi(context);
+  final spec = parseOpenApi(specJson);
 
   // Pre-warm the cache. Rendering assumes all refs are present in the cache.
   for (final ref in collectRefs(spec)) {
@@ -30,7 +29,7 @@ Future<void> loadAndRenderSpec({
     await cache.load(resolved);
   }
 
-  final resolved = resolveSpec(spec, context.refRegistry);
+  final resolved = resolveSpec(spec);
   logger.info('Generating $specUri to ${outDir.path}');
 
   // Could make clearing of the directory optional.

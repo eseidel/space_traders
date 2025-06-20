@@ -6,6 +6,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:space_gen/src/parser.dart';
 import 'package:space_gen/src/spec.dart';
+import 'package:space_gen/src/visitor.dart';
 
 class _ResolveContext {
   _ResolveContext({required this.specUrl, required this.refRegistry});
@@ -190,7 +191,34 @@ List<ResolvedResponse> _resolveResponses(
   }).toList();
 }
 
-ResolvedSpec resolveSpec(OpenApi spec, RefRegistry refRegistry) {
+class RegistryBuilder extends Visitor {
+  RegistryBuilder(this.spec, this.refRegistry);
+  final OpenApi spec;
+  final RefRegistry refRegistry;
+
+  void add(HasPointer object) {
+    final uri = spec.serverUrl.resolve(object.pointer.location);
+    refRegistry.register(uri, object);
+  }
+
+  @override
+  void visitPathItem(PathItem pathItem) => add(pathItem);
+  @override
+  void visitOperation(Operation operation) => add(operation);
+  @override
+  void visitParameter(Parameter parameter) => add(parameter);
+  @override
+  void visitResponse(Response response) => add(response);
+  @override
+  void visitRequestBody(RequestBody requestBody) => add(requestBody);
+  @override
+  void visitSchema(SchemaBase schema) => add(schema);
+}
+
+ResolvedSpec resolveSpec(OpenApi spec) {
+  final refRegistry = RefRegistry();
+  final builder = RegistryBuilder(spec, refRegistry);
+  SpecWalker(builder).walkRoot(spec);
   final context = _ResolveContext(
     specUrl: spec.serverUrl,
     refRegistry: refRegistry,
