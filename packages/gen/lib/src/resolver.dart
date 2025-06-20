@@ -162,14 +162,28 @@ ResolvedRequestBody? _resolveRequestBody(
   if (requestBody == null) {
     _error('Request body not found', ref.pointer);
   }
-  final jsonSchema = requestBody.content['application/json']?.schema;
-  if (jsonSchema == null) {
-    _error('Request body is not json', requestBody.pointer);
+  final content = requestBody.content;
+  final jsonSchema = content['application/json']?.schema;
+  if (jsonSchema != null) {
+    return ResolvedRequestBody(
+      mimeType: MimeType.applicationJson,
+      schema: resolveSchemaRef(jsonSchema, context),
+      description: requestBody.description,
+      required: requestBody.isRequired,
+    );
   }
-  return ResolvedRequestBody(
-    schema: resolveSchemaRef(jsonSchema, context),
-    description: requestBody.description,
-    required: requestBody.isRequired,
+  final octetStreamSchema = content['application/octet-stream']?.schema;
+  if (octetStreamSchema != null) {
+    return ResolvedRequestBody(
+      mimeType: MimeType.applicationOctetStream,
+      schema: resolveSchemaRef(octetStreamSchema, context),
+      description: requestBody.description,
+      required: requestBody.isRequired,
+    );
+  }
+  _error(
+    'Request body has no application/json or application/octet-stream schema',
+    requestBody.pointer,
   );
 }
 
@@ -342,7 +356,11 @@ class ResolvedRequestBody {
     required this.schema,
     required this.description,
     required this.required,
+    required this.mimeType,
   });
+
+  /// The mime type of the resolved request body.
+  final MimeType mimeType;
 
   /// The schema of the resolved request body.
   final ResolvedSchema schema;

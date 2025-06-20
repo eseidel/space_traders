@@ -204,6 +204,11 @@ class RenderTreeWalker {
     walkOperation(endpoint.operation);
   }
 
+  void walkParameter(RenderParameter parameter) {
+    visitor.visitParameter(parameter);
+    walkSchema(parameter.type);
+  }
+
   void walkOperation(RenderOperation operation) {
     visitor.visitOperation(operation);
     if (operation.requestBody != null) {
@@ -211,6 +216,9 @@ class RenderTreeWalker {
     }
     for (final response in operation.responses) {
       walkResponse(response);
+    }
+    for (final parameter in operation.parameters) {
+      walkParameter(parameter);
     }
   }
 

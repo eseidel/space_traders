@@ -120,11 +120,20 @@ RenderRequestBody? toRenderRequestBody(ResolvedRequestBody? requestBody) {
   if (requestBody == null) {
     return null;
   }
-  return RenderRequestBody(
-    description: requestBody.description,
-    required: requestBody.required,
-    schema: toRenderSchema(requestBody.schema),
-  );
+  switch (requestBody.mimeType) {
+    case MimeType.applicationJson:
+      return RenderRequestBodyJson(
+        schema: toRenderSchema(requestBody.schema),
+        description: requestBody.description,
+        required: requestBody.required,
+      );
+    case MimeType.applicationOctetStream:
+      return RenderRequestBodyOctetStream(
+        schema: toRenderSchema(requestBody.schema),
+        description: requestBody.description,
+        required: requestBody.required,
+      );
+  }
 }
 
 RenderOperation toRenderOperation(ResolvedOperation operation) {
@@ -248,7 +257,7 @@ class RenderOperation {
   final String? description;
 }
 
-class RenderRequestBody {
+abstract class RenderRequestBody {
   const RenderRequestBody({
     required this.schema,
     required this.description,
@@ -264,12 +273,27 @@ class RenderRequestBody {
   /// Whether the request body is required.
   final bool required;
 
+  String requestBodyClassName(SchemaRenderer context) {
+    // TODO(eseidel): Why don't we have a name for request bodies?
+    final typeName = schema.typeName(context);
+    return (typeName[0].toLowerCase() + typeName.substring(1)).split('<').first;
+  }
+
+  Map<String, dynamic> toTemplateContext(SchemaRenderer context) =>
+      throw UnimplementedError('RenderRequestBody.toTemplateContext');
+}
+
+class RenderRequestBodyJson extends RenderRequestBody {
+  const RenderRequestBodyJson({
+    required super.schema,
+    required super.description,
+    required super.required,
+  });
+
+  @override
   Map<String, dynamic> toTemplateContext(SchemaRenderer context) {
     final typeName = schema.typeName(context);
-    // TODO(eseidel): Why don't we have a name for request bodies?
-    final paramName = (typeName[0].toLowerCase() + typeName.substring(1))
-        .split('<')
-        .first;
+    final paramName = requestBodyClassName(context);
     // TODO(eseidel): Share code with Parameter.toTemplateContext.
     final isNullable = !required;
     return {
@@ -281,17 +305,35 @@ class RenderRequestBody {
       'defaultValue': schema.defaultValueString(context),
       'type': typeName,
       'nullableType': schema.nullableTypeName(context),
-      'toJson': schema.toJsonExpression(
+      'encodedBody': schema.toJsonExpression(
         paramName,
         context,
         dartIsNullable: isNullable,
       ),
-      'fromJson': schema.fromJsonExpression(
-        'json',
-        context,
-        jsonIsNullable: isNullable,
-        dartIsNullable: isNullable,
-      ),
+    };
+  }
+}
+
+class RenderRequestBodyOctetStream extends RenderRequestBody {
+  const RenderRequestBodyOctetStream({
+    required super.schema,
+    required super.description,
+    required super.required,
+  });
+
+  @override
+  Map<String, dynamic> toTemplateContext(SchemaRenderer context) {
+    final paramName = requestBodyClassName(context);
+    return {
+      'name': paramName,
+      'dartName': paramName,
+      'bracketedName': '{$paramName}',
+      'required': required,
+      'hasDefaultValue': schema.defaultValue != null,
+      'defaultValue': schema.defaultValueString(context),
+      'type': schema.typeName(context),
+      'nullableType': schema.nullableTypeName(context),
+      'encodedBody': paramName,
     };
   }
 }
