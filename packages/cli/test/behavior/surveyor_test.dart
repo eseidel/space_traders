@@ -43,8 +43,10 @@ void main() {
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
     final waypointSymbol = WaypointSymbol.fromString('S-A-W');
-    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.systemString);
+    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.toOpenApi());
+    when(
+      () => shipNav.systemSymbol,
+    ).thenReturn(waypointSymbol.system.toOpenApi());
     when(() => ship.mounts).thenReturn([
       ShipMount(
         symbol: ShipMountSymbol.SURVEYOR_I,

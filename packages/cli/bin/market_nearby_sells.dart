@@ -17,8 +17,8 @@ Future<void> command(Database db, ArgResults argResults) async {
 
   final miner = ships.ships.firstWhere((s) => s.isMiner);
   final ship = miner.deepCopy();
-  ship.nav.waypointSymbol = hqMine.waypoint;
-  ship.nav.systemSymbol = hqMine.systemString;
+  ship.nav.waypointSymbol = hqMine.toOpenApi();
+  ship.nav.systemSymbol = hqMine.system.toOpenApi();
   logger.info('Finding markets which buy $tradeSymbol near $hqMine.');
 
   // List all markets nearby which buy diamonds.

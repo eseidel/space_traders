@@ -3,6 +3,7 @@ import 'package:cli/logger.dart';
 import 'package:cli/net/actions.dart';
 import 'package:db/db.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:openapi/api.dart' as openapi;
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
@@ -131,7 +132,9 @@ void main() {
     when(() => ship.symbol).thenReturn(ShipSymbol.fromString('S-1'));
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
+    when(
+      () => shipNav.waypointSymbol,
+    ).thenReturn(openapi.WaypointSymbol('S-A-W'));
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
     when(() => db.upsertShip(ship)).thenAnswer((_) async {});
 
@@ -160,7 +163,9 @@ void main() {
 
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
+    when(
+      () => shipNav.waypointSymbol,
+    ).thenReturn(openapi.WaypointSymbol('S-A-W'));
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     when(() => db.upsertShip(ship)).thenAnswer((_) async {});
 
@@ -184,7 +189,7 @@ void main() {
 
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
     when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.waypointSymbol).thenReturn('A');
+    when(() => shipNav.waypointSymbol).thenReturn(openapi.WaypointSymbol('A'));
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
     final shipFuel = ShipFuel(current: 0, capacity: 0);
@@ -327,7 +332,7 @@ void main() {
     when(() => shipFrame.symbol).thenReturn(ShipFrameSymbol.CARRIER);
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
+    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.toOpenApi());
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
     const shipSymbol = ShipSymbol('S', 1);
@@ -348,7 +353,7 @@ void main() {
     final agent = Agent.test();
     when(() => db.upsertAgent(agent)).thenAnswer((_) async {});
     final marketTransaction = MarketTransaction(
-      waypointSymbol: waypointSymbol.waypoint,
+      waypointSymbol: waypointSymbol.toOpenApi(),
       shipSymbol: shipSymbol.symbol,
       tradeSymbol: tradeSymbol.value,
       type: MarketTransactionType.PURCHASE,
@@ -635,7 +640,7 @@ void main() {
             agent: agent.toOpenApi(),
             cargo: ShipCargo(capacity: 10, units: 0),
             transaction: MarketTransaction(
-              waypointSymbol: 'S-A-W',
+              waypointSymbol: openapi.WaypointSymbol('S-A-W'),
               shipSymbol: shipSymbol.symbol,
               tradeSymbol: TradeSymbol.ADVANCED_CIRCUITRY.value,
               type: MarketTransactionType.SELL,
@@ -760,7 +765,7 @@ void main() {
     when(() => ship.symbol).thenReturn(shipSymbol);
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
+    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.toOpenApi());
 
     final waypoint = Waypoint.test(
       waypointSymbol,
@@ -772,13 +777,13 @@ void main() {
           data: CreateChart201ResponseData(
             waypoint: waypoint.toOpenApi(),
             chart: Chart(
-              waypointSymbol: waypointSymbol.waypoint,
+              waypointSymbol: waypointSymbol.toOpenApi(),
               submittedBy: 'S',
               submittedOn: DateTime(2021),
             ),
             agent: Agent.test().toOpenApi(),
             transaction: ChartTransaction(
-              waypointSymbol: waypointSymbol.waypoint,
+              waypointSymbol: waypointSymbol.toOpenApi(),
               shipSymbol: shipSymbol.symbol,
               totalPrice: 100,
               timestamp: DateTime(2021),
@@ -849,7 +854,9 @@ void main() {
     when(() => ship.symbol).thenReturn(shipSymbol);
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
+    when(
+      () => shipNav.waypointSymbol,
+    ).thenReturn(openapi.WaypointSymbol('S-A-W'));
     final contract = Contract.test(
       id: 'C-1',
       terms: ContractTerms(
@@ -910,7 +917,9 @@ void main() {
     when(() => ship.symbol).thenReturn(shipSymbol);
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
+    when(
+      () => shipNav.waypointSymbol,
+    ).thenReturn(openapi.WaypointSymbol('S-A-W'));
     final contract = Contract.test(
       id: 'C-1',
       terms: ContractTerms(
@@ -969,8 +978,8 @@ void main() {
     final endSymbol = WaypointSymbol.fromString('S-B-W');
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.waypointSymbol).thenReturn(startSymbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(startSymbol.systemString);
+    when(() => shipNav.waypointSymbol).thenReturn(startSymbol.toOpenApi());
+    when(() => shipNav.systemSymbol).thenReturn(startSymbol.system.toOpenApi());
     const shipNavStatus = ShipNavStatus.DOCKED;
     when(() => shipNav.status).thenReturn(shipNavStatus);
     final logger = _MockLogger();
@@ -991,7 +1000,7 @@ void main() {
               remainingSeconds: 0,
             ),
             transaction: MarketTransaction(
-              waypointSymbol: startSymbol.waypoint,
+              waypointSymbol: startSymbol.toOpenApi(),
               shipSymbol: shipSymbol.symbol,
               tradeSymbol: TradeSymbol.ANTIMATTER.value,
               type: MarketTransactionType.PURCHASE,
@@ -1078,7 +1087,7 @@ void main() {
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
     final waypointSymbol = WaypointSymbol.fromString('S-A-W');
-    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
+    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.toOpenApi());
     final marketListingStore = _MockMarketListingStore();
     when(() => db.marketListings).thenReturn(marketListingStore);
     when(() => marketListingStore.at(waypointSymbol)).thenAnswer((_) async {
@@ -1090,7 +1099,7 @@ void main() {
     final agent = Agent.test(credits: 10000000);
     final cargo = ShipCargo(capacity: 100, units: 0);
     final transaction = MarketTransaction(
-      waypointSymbol: waypointSymbol.waypoint,
+      waypointSymbol: waypointSymbol.toOpenApi(),
       shipSymbol: shipSymbol.symbol,
       tradeSymbol: TradeSymbol.FUEL.value,
       type: MarketTransactionType.PURCHASE,
@@ -1174,7 +1183,7 @@ void main() {
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
-    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
+    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.toOpenApi());
     final logger = _MockLogger();
 
     final request = WarpShipRequest(waypointSymbol: waypointSymbol.waypoint);
@@ -1257,7 +1266,7 @@ void main() {
           agent: agent.toOpenApi(),
           transaction: ScrapTransaction(
             shipSymbol: shipSymbol.symbol,
-            waypointSymbol: waypointSymbol.waypoint,
+            waypointSymbol: waypointSymbol.toOpenApi(),
             totalPrice: 100,
             timestamp: DateTime(2021),
           ),

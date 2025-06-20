@@ -1,3 +1,5 @@
+import 'package:openapi/model/waypoint_symbol.dart';
+
 class ShipyardTransaction {
   ShipyardTransaction({
     required this.waypointSymbol,
@@ -11,7 +13,7 @@ class ShipyardTransaction {
   factory ShipyardTransaction.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
     return ShipyardTransaction(
-      waypointSymbol: json['waypointSymbol'] as String,
+      waypointSymbol: WaypointSymbol(json['waypointSymbol'] as String),
       shipSymbol: json['shipSymbol'] as String,
       shipType: json['shipType'] as String,
       price: json['price'] as int,
@@ -29,7 +31,7 @@ class ShipyardTransaction {
     return ShipyardTransaction.fromJson(json);
   }
 
-  String waypointSymbol;
+  WaypointSymbol waypointSymbol;
   String shipSymbol;
   String shipType;
   int price;
@@ -38,7 +40,7 @@ class ShipyardTransaction {
 
   Map<String, dynamic> toJson() {
     return {
-      'waypointSymbol': waypointSymbol,
+      'waypointSymbol': waypointSymbol.toJson(),
       'shipSymbol': shipSymbol,
       'shipType': shipType,
       'price': price,

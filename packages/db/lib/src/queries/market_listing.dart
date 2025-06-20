@@ -4,7 +4,7 @@ import 'package:types/types.dart';
 /// Lookup a market listing by WaypointSymbol.
 Query marketListingByWaypointSymbolQuery(WaypointSymbol symbol) => Query(
   'SELECT * FROM market_listing_ WHERE symbol = @symbol',
-  parameters: {'symbol': symbol.waypoint},
+  parameters: {'symbol': symbol.toOpenApi()},
 );
 
 /// Query all market listings.
@@ -13,7 +13,7 @@ Query allMarketListingsQuery() => const Query('SELECT * FROM market_listing_');
 /// Query all market listings within a system.
 Query marketListingsInSystemQuery(SystemSymbol system) => Query(
   'SELECT * FROM market_listing_ WHERE starts_with(symbol, @system)',
-  parameters: {'system': system.system},
+  parameters: {'system': system.toOpenApi()},
 );
 
 /// Query to upsert a market listing.
@@ -41,7 +41,7 @@ Query marketsWithImportInSystemQuery(
         OR @tradeSymbol = ANY(exchange))
       ''',
       parameters: {
-        'system': system.system,
+        'system': system.toOpenApi(),
         'tradeSymbol': tradeSymbol.toJson(),
       },
     );
@@ -55,7 +55,10 @@ Query marketsWithExportInSystemQuery(
       SELECT symbol FROM market_listing_
       WHERE starts_with(symbol, @system) AND @tradeSymbol = ANY(exports)
       ''',
-  parameters: {'system': system.system, 'tradeSymbol': tradeSymbol.toJson()},
+  parameters: {
+    'system': system.toOpenApi(),
+    'tradeSymbol': tradeSymbol.toJson(),
+  },
 );
 
 /// Query to return all markets which buys a given symbol within a system.
@@ -68,7 +71,10 @@ Query marketsWhichBuysTradeSymbolInSystemQuery(
       WHERE starts_with(symbol, @system)
       AND (@tradeSymbol = ANY(imports) OR @tradeSymbol = ANY(exchange))
       ''',
-  parameters: {'system': system.system, 'tradeSymbol': tradeSymbol.toJson()},
+  parameters: {
+    'system': system.toOpenApi(),
+    'tradeSymbol': tradeSymbol.toJson(),
+  },
 );
 
 /// Query to return if we know of a market which trades a given symbol.

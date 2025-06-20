@@ -49,7 +49,9 @@ void main() {
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.systemSymbol).thenReturn(shipLocation.systemString);
+    when(
+      () => shipNav.systemSymbol,
+    ).thenReturn(shipLocation.system.toOpenApi());
 
     final system = System.test(
       shipLocation.system,

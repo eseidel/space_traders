@@ -1,10 +1,15 @@
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
+import 'package:openapi/api.dart' as openapi;
 
 /// Type-safe representation of a Waypoint Symbol
 @immutable
 class WaypointSymbol {
   const WaypointSymbol._(this.waypoint, this.system);
+
+  /// Create a WaypointSymbol from an OpenAPI WaypointSymbol.
+  factory WaypointSymbol.fromOpenApi(openapi.WaypointSymbol symbol) =>
+      WaypointSymbol.fromString(symbol.value);
 
   /// Fallback value for mocking.
   const WaypointSymbol.fallbackValue()
@@ -60,6 +65,9 @@ class WaypointSymbol {
     return waypoint.substring(firstHyphen + 1);
   }
 
+  /// Convert to OpenAPI's WaypointSymbol.
+  openapi.WaypointSymbol toOpenApi() => openapi.WaypointSymbol(waypoint);
+
   @override
   String toString() => sectorLocalName;
 
@@ -94,6 +102,11 @@ int _countHyphens(String str) {
 /// Type-safe representation of a System Symbol
 @immutable
 class SystemSymbol {
+  /// Create a SystemSymbol from an OpenAPI SystemSymbol.
+  factory SystemSymbol.fromOpenApi(openapi.SystemSymbol symbol) =>
+      SystemSymbol._(symbol.value);
+
+  /// Create a SystemSymbol from a string.
   const SystemSymbol._(this.system);
 
   /// Fallback value for mocking.
@@ -126,6 +139,9 @@ class SystemSymbol {
 
   /// The full system symbol.
   final String system;
+
+  /// Convert to OpenAPI's SystemSymbol.
+  openapi.SystemSymbol toOpenApi() => openapi.SystemSymbol(system);
 
   /// Convert to JSON.
   String toJson() => system;

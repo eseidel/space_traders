@@ -225,8 +225,10 @@ void main() {
     final waypointSymbol = WaypointSymbol.fromString('S-A-A');
     when(() => ship.fuel).thenReturn(ShipFuel(current: 100, capacity: 100));
     when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.systemString);
+    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.toOpenApi());
+    when(
+      () => shipNav.systemSymbol,
+    ).thenReturn(waypointSymbol.system.toOpenApi());
     when(() => ship.engine).thenReturn(shipEngine);
     when(() => shipEngine.speed).thenReturn(30);
     when(() => ship.cargo).thenReturn(shipCargo);
@@ -399,7 +401,7 @@ void main() {
     final nearSymbol = WaypointSymbol.fromString('S-A-NEAR');
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.waypointSymbol).thenReturn(nearSymbol.waypoint);
+    when(() => shipNav.waypointSymbol).thenReturn(nearSymbol.toOpenApi());
     const fuelCapacity = 100;
     when(
       () => ship.fuel,
@@ -513,7 +515,7 @@ void main() {
     final farSymbol = WaypointSymbol.fromString('S-A-FAR');
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.waypointSymbol).thenReturn(nearSymbol.waypoint);
+    when(() => shipNav.waypointSymbol).thenReturn(nearSymbol.toOpenApi());
     const fuelCapacity = 100;
     when(
       () => ship.fuel,

@@ -1,3 +1,4 @@
+import 'package:openapi/model/waypoint_symbol.dart';
 import 'package:openapi/model_helpers.dart';
 
 class JumpGate {
@@ -6,7 +7,7 @@ class JumpGate {
   factory JumpGate.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
     return JumpGate(
-      symbol: json['symbol'] as String,
+      symbol: WaypointSymbol(json['symbol'] as String),
       connections: (json['connections'] as List).cast<String>(),
     );
   }
@@ -20,11 +21,11 @@ class JumpGate {
     return JumpGate.fromJson(json);
   }
 
-  String symbol;
+  WaypointSymbol symbol;
   List<String> connections;
 
   Map<String, dynamic> toJson() {
-    return {'symbol': symbol, 'connections': connections};
+    return {'symbol': symbol.toJson(), 'connections': connections};
   }
 
   @override

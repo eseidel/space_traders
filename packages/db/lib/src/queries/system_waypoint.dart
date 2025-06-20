@@ -15,11 +15,11 @@ Query upsertSystemWaypointQuery(SystemWaypoint waypoint) => Query(
       type = @type, x = @x, y = @y, system = @system
       ''',
   parameters: {
-    'symbol': waypoint.symbol.waypoint,
+    'symbol': waypoint.symbol.toOpenApi(),
     'type': waypoint.type.value,
     'x': waypoint.position.x,
     'y': waypoint.position.y,
-    'system': waypoint.system.system,
+    'system': waypoint.system.toOpenApi(),
   },
 );
 
@@ -29,7 +29,7 @@ Query systemWaypointsBySystemQuery(SystemSymbol system) => Query(
       SELECT * FROM system_waypoint_
       WHERE system = @system
       ''',
-  parameters: {'system': system.system},
+  parameters: {'system': system.toOpenApi()},
 );
 
 /// Query to return all system waypoints for a given system.
@@ -41,7 +41,7 @@ Query systemWaypointsBySystemAndTypeQuery(
       SELECT * FROM system_waypoint_
       WHERE system = @system AND type = @type
       ''',
-  parameters: {'system': system.system, 'type': type.value},
+  parameters: {'system': system.toOpenApi(), 'type': type.value},
 );
 
 /// Lookup a SystemWaypoint by symbol.
@@ -50,7 +50,7 @@ Query systemWaypointBySymbolQuery(WaypointSymbol symbol) => Query(
       SELECT * FROM system_waypoint_  
       WHERE symbol = @symbol
       ''',
-  parameters: {'symbol': symbol.waypoint},
+  parameters: {'symbol': symbol.toOpenApi()},
 );
 
 /// Create a SystemWaypoint from a column map.

@@ -72,7 +72,7 @@ void main() {
     ).thenReturn([waypointSymbol.system]);
 
     final chart = Chart(
-      waypointSymbol: waypointSymbol.waypoint,
+      waypointSymbol: waypointSymbol.toOpenApi(),
       submittedBy: 'foo',
       submittedOn: DateTime(2021),
     );
@@ -85,7 +85,7 @@ void main() {
             chart: chart,
             waypoint: waypoint.toOpenApi(),
             transaction: ChartTransaction(
-              waypointSymbol: waypointSymbol.waypoint,
+              waypointSymbol: waypointSymbol.toOpenApi(),
               shipSymbol: shipSymbol.symbol,
               totalPrice: 100,
               timestamp: DateTime(2021),
@@ -98,8 +98,10 @@ void main() {
 
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
-    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.systemString);
+    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.toOpenApi());
+    when(
+      () => shipNav.systemSymbol,
+    ).thenReturn(waypointSymbol.system.toOpenApi());
     final shipFuel = ShipFuel(capacity: 0, current: 0);
     when(() => ship.fuel).thenReturn(shipFuel);
 
@@ -191,8 +193,8 @@ void main() {
     when(() => ship.symbol).thenReturn(shipSymbol);
     final shipNav = _MockShipNav();
     when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.systemSymbol).thenReturn(systemASymbol.system);
-    when(() => shipNav.waypointSymbol).thenReturn(waypointAASymbol.waypoint);
+    when(() => shipNav.systemSymbol).thenReturn(systemASymbol.toOpenApi());
+    when(() => shipNav.waypointSymbol).thenReturn(waypointAASymbol.toOpenApi());
 
     final systems = [
       System.test(

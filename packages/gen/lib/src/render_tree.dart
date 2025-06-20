@@ -314,28 +314,6 @@ class RenderResponse {
   final RenderSchema content;
 }
 
-// String jsonStorageType({required bool isNullable}) {
-//   switch (type) {
-//     case SchemaType.string:
-//       return isNullable ? 'String?' : 'String';
-//     case SchemaType.integer:
-//       return isNullable ? 'int?' : 'int';
-//     case SchemaType.number:
-//       // Dart's json parser parses '1' as an int, and int is a separate
-//       // type from double, however both are subtypes of num, so we can cast
-//       // to num and then convert to double.
-//       return isNullable ? 'num?' : 'num';
-//     case SchemaType.boolean:
-//       return isNullable ? 'bool?' : 'bool';
-//     case SchemaType.object:
-//       return isNullable ? 'Map<String, dynamic>?' : 'Map<String, dynamic>';
-//     case SchemaType.array:
-//       return isNullable ? 'List<dynamic>?' : 'List<dynamic>';
-//     case SchemaType.unknown:
-//       return 'dynamic';
-//   }
-// }
-
 abstract class RenderSchema {
   const RenderSchema({required this.snakeName, required this.pointer});
 

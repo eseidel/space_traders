@@ -83,15 +83,15 @@ void main() {
         description: 'description',
         powerOutput: 0,
         requirements: ShipRequirements(),
-        condition: 1,
-        integrity: 1,
-        quality: 1,
+        condition: ShipComponentCondition(1),
+        integrity: ShipComponentIntegrity(1),
+        quality: ShipComponentQuality(1),
       ),
     );
 
     final symbol = WaypointSymbol.fromString('S-A-W');
-    when(() => shipNav.waypointSymbol).thenReturn(symbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(symbol.systemString);
+    when(() => shipNav.waypointSymbol).thenReturn(symbol.toOpenApi());
+    when(() => shipNav.systemSymbol).thenReturn(symbol.system.toOpenApi());
 
     final agent = Agent.test();
     registerFallbackValue(agent);
@@ -129,7 +129,7 @@ void main() {
     final transaction = _MockShipyardTransaction();
     when(() => transaction.shipSymbol).thenReturn(shipSymbol.symbol);
     when(() => transaction.price).thenReturn(2);
-    when(() => transaction.waypointSymbol).thenReturn(symbol.waypoint);
+    when(() => transaction.waypointSymbol).thenReturn(symbol.toOpenApi());
     when(() => transaction.timestamp).thenReturn(DateTime(2021));
     when(() => transaction.shipType).thenReturn(shipType.value);
     when(

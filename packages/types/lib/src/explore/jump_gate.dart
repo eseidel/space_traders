@@ -12,7 +12,7 @@ class JumpGate extends Equatable {
   /// Creates a new  from a JumpGate.
   factory JumpGate.fromOpenApi(openapi.JumpGate jumpGate) {
     return JumpGate(
-      waypointSymbol: WaypointSymbol.fromJson(jumpGate.symbol),
+      waypointSymbol: WaypointSymbol.fromOpenApi(jumpGate.symbol),
       connections: jumpGate.connections.map(WaypointSymbol.fromString).toSet(),
     );
   }
@@ -41,7 +41,7 @@ class JumpGate extends Equatable {
   /// Converts this object to an OpenAPI object.
   openapi.JumpGate toOpenApi() {
     return openapi.JumpGate(
-      symbol: waypointSymbol.toJson(),
+      symbol: waypointSymbol.toOpenApi(),
       connections: connections.map((e) => e.toJson()).toList(),
     );
   }

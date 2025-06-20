@@ -4,6 +4,7 @@ import 'package:cli/logger.dart';
 import 'package:cli/logic/advance.dart';
 import 'package:db/db.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:openapi/api.dart' as openapi;
 import 'package:test/test.dart';
 import 'package:types/types.dart';
 
@@ -94,7 +95,9 @@ void main() {
     when(() => ship.symbol).thenReturn(shipSymbol);
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_TRANSIT);
-    when(() => shipNav.waypointSymbol).thenReturn('S-A-W');
+    when(
+      () => shipNav.waypointSymbol,
+    ).thenReturn(openapi.WaypointSymbol('S-A-W'));
     when(() => shipNav.route).thenReturn(shipNavRoute);
     when(() => shipNavRoute.arrival).thenReturn(arrivalTime);
     final centralCommand = _MockCentralCommand();

@@ -96,8 +96,8 @@ void main() {
       final ship = _MockShip();
       final shipNav = _MockShipNav();
       when(() => ship.symbol).thenReturn(shipSymbol);
-      when(() => shipNav.waypointSymbol).thenReturn(start.waypoint);
-      when(() => shipNav.systemSymbol).thenReturn(start.systemString);
+      when(() => shipNav.waypointSymbol).thenReturn(start.toOpenApi());
+      when(() => shipNav.systemSymbol).thenReturn(start.system.toOpenApi());
       when(() => ship.nav).thenReturn(shipNav);
       final behaviorState = BehaviorState(
         shipSymbol,
@@ -354,7 +354,9 @@ void main() {
     );
     final shipNav = _MockShipNav();
     final waypointSymbol = WaypointSymbol.fromString('W-A-Y');
-    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.systemString);
+    when(
+      () => shipNav.systemSymbol,
+    ).thenReturn(waypointSymbol.system.toOpenApi());
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipCache.ships).thenReturn([ship]);
     centralCommand.nextShipBuyJob = ShipBuyJob(

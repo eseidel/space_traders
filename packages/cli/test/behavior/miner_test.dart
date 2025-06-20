@@ -144,8 +144,10 @@ void main() {
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
     final waypointSymbol = WaypointSymbol.fromString('S-A-W');
-    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.systemString);
+    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.toOpenApi());
+    when(
+      () => shipNav.systemSymbol,
+    ).thenReturn(waypointSymbol.system.toOpenApi());
     when(() => ship.mounts).thenReturn([
       ShipMount(
         symbol: ShipMountSymbol.MINING_LASER_II,
@@ -343,8 +345,8 @@ void main() {
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
     final symbol = WaypointSymbol.fromString('S-A-W');
-    when(() => shipNav.waypointSymbol).thenReturn(symbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(symbol.systemString);
+    when(() => shipNav.waypointSymbol).thenReturn(symbol.toOpenApi());
+    when(() => shipNav.systemSymbol).thenReturn(symbol.system.toOpenApi());
     const tradeSymbol = TradeSymbol.DIAMONDS;
     final shipCargo = ShipCargo(
       capacity: 60,
@@ -421,8 +423,8 @@ void main() {
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
     final symbol = WaypointSymbol.fromString('S-A-W');
-    when(() => shipNav.waypointSymbol).thenReturn(symbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(symbol.systemString);
+    when(() => shipNav.waypointSymbol).thenReturn(symbol.toOpenApi());
+    when(() => shipNav.systemSymbol).thenReturn(symbol.system.toOpenApi());
     const tradeSymbol = TradeSymbol.DIAMONDS;
     final shipCargo = ShipCargo(
       capacity: 60,
@@ -465,7 +467,7 @@ void main() {
     final haulerCargo = ShipCargo(capacity: 60, units: 0, inventory: []);
     final haulerNavRoute = _MockShipNavRoute();
     when(() => haulerNav.route).thenReturn(haulerNavRoute);
-    when(() => haulerNav.waypointSymbol).thenReturn(symbol.waypoint);
+    when(() => haulerNav.waypointSymbol).thenReturn(symbol.toOpenApi());
     when(() => haulerNav.status).thenReturn(ShipNavStatus.IN_TRANSIT);
     final arrival = now.add(const Duration(minutes: 1));
     when(() => haulerNavRoute.arrival).thenReturn(arrival);
@@ -553,8 +555,10 @@ void main() {
     when(() => ship.nav).thenReturn(shipNav);
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     final waypointSymbol = WaypointSymbol.fromString('S-A-W');
-    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.waypoint);
-    when(() => shipNav.systemSymbol).thenReturn(waypointSymbol.systemString);
+    when(() => shipNav.waypointSymbol).thenReturn(waypointSymbol.toOpenApi());
+    when(
+      () => shipNav.systemSymbol,
+    ).thenReturn(waypointSymbol.system.toOpenApi());
     when(() => ship.mounts).thenReturn([
       ShipMount(
         symbol: ShipMountSymbol.MINING_LASER_II,
@@ -640,7 +644,7 @@ void main() {
       totalPrice: cargoCapacity * 100,
       type: MarketTransactionType.SELL,
       shipSymbol: shipSymbol.symbol,
-      waypointSymbol: waypointSymbol.waypoint,
+      waypointSymbol: waypointSymbol.toOpenApi(),
       timestamp: now,
     );
     final transactionStore = _MockTransactionStore();

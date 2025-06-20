@@ -1,3 +1,4 @@
+import 'package:openapi/model/system_symbol.dart';
 import 'package:openapi/model/waypoint_type.dart';
 
 class ShipNavRouteWaypoint {
@@ -14,7 +15,7 @@ class ShipNavRouteWaypoint {
     return ShipNavRouteWaypoint(
       symbol: json['symbol'] as String,
       type: WaypointType.fromJson(json['type'] as String),
-      systemSymbol: json['systemSymbol'] as String,
+      systemSymbol: SystemSymbol(json['systemSymbol'] as String),
       x: json['x'] as int,
       y: json['y'] as int,
     );
@@ -31,7 +32,7 @@ class ShipNavRouteWaypoint {
 
   String symbol;
   WaypointType type;
-  String systemSymbol;
+  SystemSymbol systemSymbol;
   int x;
   int y;
 
@@ -39,7 +40,7 @@ class ShipNavRouteWaypoint {
     return {
       'symbol': symbol,
       'type': type.toJson(),
-      'systemSymbol': systemSymbol,
+      'systemSymbol': systemSymbol.toJson(),
       'x': x,
       'y': y,
     };
