@@ -404,8 +404,10 @@ void main() {
       final out = fs.directory('spacetraders');
 
       await renderToDirectory(spec: spec, outDir: out);
-      expect(out.childFile('lib/model/user.dart'), exists);
-      expect(out.childFile('lib/model/multiplier.dart'), exists);
+      expect(
+        out.childDirectory('lib/model'),
+        hasFiles(['get_user200_response.dart', 'user.dart', 'multiplier.dart']),
+      );
     });
 
     test('with default enum value', () async {
@@ -608,8 +610,8 @@ void main() {
 
       await renderToDirectory(spec: spec, outDir: out);
       expect(
-        out.childFile('lib/model/purchase_cargo_request.dart'),
-        isNot(exists),
+        out.childDirectory('lib/model'),
+        hasFiles(['purchase_cargo_request.dart']),
       );
       expect(out.childFile('lib/api/default_api.dart'), exists);
     });

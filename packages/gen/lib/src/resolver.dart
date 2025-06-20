@@ -9,6 +9,10 @@ import 'package:space_gen/src/parser.dart';
 import 'package:space_gen/src/spec.dart';
 import 'package:space_gen/src/visitor.dart';
 
+void _warn(String message, JsonPointer pointer) {
+  logger.warn('$message in $pointer');
+}
+
 class _ResolveContext {
   _ResolveContext({required this.specUrl, required this.refRegistry});
 
@@ -203,11 +207,16 @@ ResolvedSchema _resolveContent(Response response, _ResolveContext context) {
   if (content == null) {
     return SchemaVoid(snakeName: 'void', pointer: response.pointer);
   }
-  final jsonSchema = content['application/json']?.schema;
-  if (jsonSchema == null) {
-    throw Exception('Response content is not json: $response');
+  if (content.isEmpty) {
+    _warn('Response has no content: $response', response.pointer);
+    return SchemaVoid(snakeName: 'void', pointer: response.pointer);
   }
-  return _resolveSchema(jsonSchema, context);
+  final jsonSchema = content['application/json']?.schema;
+  if (jsonSchema != null) {
+    return _resolveSchema(jsonSchema, context);
+  }
+  _warn('Response has no application/json schema: $response', response.pointer);
+  return _resolveSchema(content.values.first.schema, context);
 }
 
 List<ResolvedResponse> _resolveResponses(

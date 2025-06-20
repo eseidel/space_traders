@@ -25,6 +25,15 @@ RenderSchema? maybeRenderSchema(ResolvedSchema? schema) {
   return toRenderSchema(schema);
 }
 
+bool isTopLevelComponent(JsonPointer pointer) {
+  if (pointer.parts.length != 3) {
+    return false;
+  }
+  final first = pointer.parts[0];
+  final second = pointer.parts[1];
+  return first == 'components' && second == 'schemas';
+}
+
 RenderSchema toRenderSchema(ResolvedSchema schema) {
   switch (schema) {
     case SchemaEnum():
@@ -45,6 +54,24 @@ RenderSchema toRenderSchema(ResolvedSchema schema) {
         required: schema.required,
       );
     case SchemaPod():
+      // Unclear if this is an OpenApi generator quirk or desired behavior,
+      // but openapi creates a new file for each top level component, even
+      // if it's a simple type.  Matching this behavior for now.
+      final useNewType = isTopLevelComponent(schema.pointer);
+      if (useNewType && schema.type == PodType.string) {
+        return RenderStringNewType(
+          snakeName: schema.snakeName,
+          pointer: schema.pointer,
+          defaultValue: schema.defaultValue as String?,
+        );
+      }
+      if (useNewType && schema.type == PodType.number) {
+        return RenderNumberNewType(
+          snakeName: schema.snakeName,
+          pointer: schema.pointer,
+          defaultValue: schema.defaultValue as double?,
+        );
+      }
       return RenderPod(
         snakeName: schema.snakeName,
         type: schema.type,
@@ -956,8 +983,7 @@ class RenderUnknown extends RenderSchema {
   const RenderUnknown({required super.snakeName, required super.pointer});
 
   @override
-  dynamic get defaultValue =>
-      throw UnimplementedError('defaultValue for $this');
+  dynamic get defaultValue => null;
 
   @override
   String typeName(SchemaRenderer context) => 'dynamic';

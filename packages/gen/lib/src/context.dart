@@ -150,30 +150,103 @@ class TemplateProvider {
   }
 }
 
-List<RenderSchema> collectModelSchemas(RenderSpec spec) {
-  final schemas = <RenderSchema>[];
-  for (final api in spec.apis) {
-    for (final endpoint in api.endpoints) {
-      final operation = endpoint.operation;
-      final requestBody = operation.requestBody;
-      if (requestBody != null) {
-        schemas.add(requestBody.schema);
-      }
-      for (final parameter in endpoint.parameters) {
-        schemas.add(parameter.type);
-      }
-      for (final response in operation.responses) {
-        schemas.add(response.content);
-      }
-      schemas.add(operation.returnType);
-    }
-  }
-  return schemas;
+class RenderTreeVisitor {
+  void visitSchema(RenderSchema schema) {}
+  void visitApi(Api api) {}
+  void visitEndpoint(Endpoint endpoint) {}
+  void visitOperation(RenderOperation operation) {}
+  void visitParameter(RenderParameter parameter) {}
+  void visitRequestBody(RenderRequestBody requestBody) {}
+  void visitResponse(RenderResponse response) {}
 }
 
-/// Responsible for rendering the entire spec.
-/// This FileRenderer is styled after the OpenAPI generator, eventually we
-/// should make this an interface that can be implemented by other renderers.
+class RenderTreeWalker {
+  RenderTreeWalker({required this.visitor});
+  final RenderTreeVisitor visitor;
+
+  void walkRoot(RenderSpec spec) {
+    for (final api in spec.apis) {
+      walkApi(api);
+    }
+  }
+
+  void maybeWalkSchema(RenderSchema? schema) {
+    if (schema != null) {
+      walkSchema(schema);
+    }
+  }
+
+  void walkSchema(RenderSchema schema) {
+    visitor.visitSchema(schema);
+    switch (schema) {
+      case RenderObject():
+        for (final property in schema.properties.values) {
+          walkSchema(property);
+        }
+        maybeWalkSchema(schema.additionalProperties);
+      case RenderArray():
+        maybeWalkSchema(schema.items);
+      case RenderEnum():
+      case RenderStringNewType():
+      case RenderNumberNewType():
+      case RenderPod():
+        break;
+    }
+  }
+
+  void walkApi(Api api) {
+    for (final endpoint in api.endpoints) {
+      walkEndpoint(endpoint);
+    }
+  }
+
+  void walkEndpoint(Endpoint endpoint) {
+    visitor.visitEndpoint(endpoint);
+    walkOperation(endpoint.operation);
+  }
+
+  void walkOperation(RenderOperation operation) {
+    visitor.visitOperation(operation);
+    if (operation.requestBody != null) {
+      walkRequestBody(operation.requestBody!);
+    }
+    for (final response in operation.responses) {
+      walkResponse(response);
+    }
+  }
+
+  void walkRequestBody(RenderRequestBody requestBody) {
+    visitor.visitRequestBody(requestBody);
+    walkSchema(requestBody.schema);
+  }
+
+  void walkResponse(RenderResponse response) {
+    visitor.visitResponse(response);
+    walkSchema(response.content);
+  }
+}
+
+class _ModelCollector extends RenderTreeVisitor {
+  final List<RenderSchema> schemas = [];
+
+  @override
+  void visitSchema(RenderSchema schema) {
+    schemas.add(schema);
+  }
+}
+
+List<RenderSchema> collectModelSchemas(RenderSpec spec) {
+  final collector = _ModelCollector();
+  RenderTreeWalker(visitor: collector).walkRoot(spec);
+  return collector.schemas;
+}
+
+/// Responsible for determining the layout of the files and rendering the
+/// for the directory structure of the rendered spec.
+///
+/// This FileRenderer uses a directory structure that is similar to the
+/// OpenAPI generator.  Eventually we should make this an interface to allow
+/// rendering to other directory structures.
 class FileRenderer {
   FileRenderer({
     required this.outDir,
