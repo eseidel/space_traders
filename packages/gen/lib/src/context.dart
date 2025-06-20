@@ -353,21 +353,30 @@ class FileRenderer {
     _renderDirectory();
     for (final api in apis) {
       final content = schemaRenderer.renderApi(api);
-      final referencedSchemas = collectSchemasFromApi(api);
-      _renderTemplate(
-        template: 'api',
-        outPath: apiFilePath(api),
-        context: {'content': content, 'referencedSchemas': referencedSchemas},
-      );
+      // final referencedSchemas = collectSchemasFromApi(api);
+      // import 'dart:async';
+      // import 'dart:convert';
+
+      // import 'package:{{{packageName}}}/api_client.dart';
+      // import 'package:http/http.dart' as http;
+      // {{#imports}}
+      // import '{{{.}}}';
+      // {{/imports}}
+
+      final outPath = apiFilePath(api);
+      _writeFile(path: outPath, content: content);
     }
     for (final schema in schemas) {
+      if (schema is RenderVoid ||
+          schema is RenderUnknown ||
+          schema is RenderPod) {
+        continue;
+      }
+
       final content = schemaRenderer.renderSchema(schema);
-      final referencedSchemas = collectSchemasFromModel(schema);
-      _renderTemplate(
-        template: 'schema',
-        outPath: modelFilePath(schema),
-        context: {'content': content, 'referencedSchemas': referencedSchemas},
-      );
+      // final referencedSchemas = collectSchemasFromModel(schema);
+      final outPath = modelFilePath(schema);
+      _writeFile(path: outPath, content: content);
     }
     _renderApiClient(spec: spec);
     // Render the combined api.dart exporting all rendered schemas.
