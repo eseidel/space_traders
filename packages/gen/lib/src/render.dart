@@ -4,6 +4,7 @@ import 'package:space_gen/src/loader.dart';
 import 'package:space_gen/src/logger.dart';
 import 'package:space_gen/src/parser.dart';
 import 'package:space_gen/src/resolver.dart';
+import 'package:space_gen/src/visitor.dart';
 
 Future<void> loadAndRenderSpec({
   required Uri specUri,
@@ -20,14 +21,15 @@ Future<void> loadAndRenderSpec({
   final specJson = await cache.load(specUri);
   final spec = parseOpenApi(specJson);
 
-  // TODO(eseidel): Re-enable this when we have a multi-file example spec.
+  // TODO(eseidel): The cache is not used for anything yet.
+  // We need a multi-file example spec to test this.
   // Pre-warm the cache. Rendering assumes all refs are present in the cache.
-  // for (final ref in collectRefs(spec)) {
-  //   // If any of the refs are network urls, we need to fetch them.
-  //   // The cache does not handle fragments, so we need to remove them.
-  //   final resolved = specUri.resolve(ref).removeFragment();
-  //   await cache.load(resolved);
-  // }
+  for (final ref in collectRefs(spec)) {
+    // If any of the refs are network urls, we need to fetch them.
+    // The cache does not handle fragments, so we need to remove them.
+    final resolved = specUri.resolve(ref).removeFragment();
+    await cache.load(resolved);
+  }
 
   final resolved = resolveSpec(spec);
   logger.info('Generating $specUri to ${outDir.path}');
