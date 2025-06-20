@@ -498,7 +498,7 @@ class RenderPod extends RenderSchema {
 
   @override
   Map<String, dynamic> toTemplateContext(SchemaRenderer context) =>
-      throw UnimplementedError('toTemplateContext for $this');
+      throw UnimplementedError('RenderPod.toTemplateContext');
 }
 
 abstract class RenderNewType extends RenderSchema {
@@ -563,7 +563,7 @@ class RenderStringNewType extends RenderNewType {
       jsonIsNullable: jsonIsNullable,
       dartIsNullable: dartIsNullable,
     );
-    return '$jsonValue as $jsonType $orDefault';
+    return '$className(($jsonValue as $jsonType) $orDefault)';
   }
 }
 
@@ -600,7 +600,7 @@ class RenderNumberNewType extends RenderNewType {
       jsonIsNullable: jsonIsNullable,
       dartIsNullable: dartIsNullable,
     );
-    return '($jsonValue as $jsonType).toDouble() $orDefault';
+    return '$className(($jsonValue as $jsonType).toDouble() $orDefault)';
   }
 }
 
@@ -848,7 +848,7 @@ class RenderArray extends RenderSchema {
 
   @override
   Map<String, dynamic> toTemplateContext(SchemaRenderer context) =>
-      throw UnimplementedError('toTemplateContext for $this');
+      throw UnimplementedError('RenderArray.toTemplateContext');
 }
 
 class RenderEnum extends RenderNewType {
@@ -990,7 +990,7 @@ class RenderUnknown extends RenderSchema {
 
   @override
   String equalsExpression(String name, SchemaRenderer context) =>
-      'identical(name, other.$name)';
+      'identical($name, other.$name)';
 
   @override
   bool get createsNewType => false;
@@ -1003,7 +1003,7 @@ class RenderUnknown extends RenderSchema {
     String dartName,
     SchemaRenderer context, {
     required bool dartIsNullable,
-  }) => 'throw UnimplementedError()';
+  }) => "throw UnimplementedError('RenderUnknown.toJson')";
 
   @override
   String fromJsonExpression(
@@ -1012,12 +1012,12 @@ class RenderUnknown extends RenderSchema {
     required bool jsonIsNullable,
     required bool dartIsNullable,
   }) {
-    return 'throw UnimplementedError()';
+    return 'throw UnimplementedError("RenderUnknown.fromJson")';
   }
 
   @override
   Map<String, dynamic> toTemplateContext(SchemaRenderer context) =>
-      throw UnimplementedError('toTemplateContext for $this');
+      throw UnimplementedError('RenderUnknown.toTemplateContext');
 }
 
 class RenderVoid extends RenderSchema {
@@ -1025,28 +1025,28 @@ class RenderVoid extends RenderSchema {
 
   @override
   dynamic get defaultValue =>
-      throw UnimplementedError('defaultValue for $this');
+      throw UnimplementedError('RenderVoid.defaultValue');
 
   @override
   String typeName(SchemaRenderer context) => 'void';
 
   @override
   String equalsExpression(String name, SchemaRenderer context) =>
-      'throw UnimplementedError()';
+      'throw UnimplementedError("RenderVoid.equalsExpression")';
 
   @override
   bool get createsNewType => false;
 
   @override
   String jsonStorageType({required bool isNullable}) =>
-      'throw UnimplementedError()';
+      'throw UnimplementedError("RenderVoid.jsonStorageType")';
 
   @override
   String toJsonExpression(
     String dartName,
     SchemaRenderer context, {
     required bool dartIsNullable,
-  }) => 'throw UnimplementedError()';
+  }) => 'throw UnimplementedError("RenderVoid.toJson")';
 
   @override
   String fromJsonExpression(
@@ -1054,9 +1054,9 @@ class RenderVoid extends RenderSchema {
     SchemaRenderer context, {
     required bool jsonIsNullable,
     required bool dartIsNullable,
-  }) => 'throw UnimplementedError()';
+  }) => 'throw UnimplementedError("RenderVoid.fromJson")';
 
   @override
   Map<String, dynamic> toTemplateContext(SchemaRenderer context) =>
-      throw UnimplementedError('toTemplateContext for $this');
+      throw UnimplementedError('RenderVoid.toTemplateContext');
 }
