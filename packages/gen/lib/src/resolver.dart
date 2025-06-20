@@ -4,6 +4,7 @@
 // This also discards all non-json values.
 
 import 'package:equatable/equatable.dart';
+import 'package:space_gen/src/logger.dart';
 import 'package:space_gen/src/parser.dart';
 import 'package:space_gen/src/spec.dart';
 import 'package:space_gen/src/visitor.dart';
@@ -197,7 +198,7 @@ class RegistryBuilder extends Visitor {
   final RefRegistry refRegistry;
 
   void add(HasPointer object) {
-    final uri = spec.serverUrl.resolve(object.pointer.location);
+    final uri = spec.serverUrl.replace(fragment: object.pointer.location);
     refRegistry.register(uri, object);
   }
 
@@ -213,12 +214,20 @@ class RegistryBuilder extends Visitor {
   void visitRequestBody(RequestBody requestBody) => add(requestBody);
   @override
   void visitSchema(SchemaBase schema) => add(schema);
+  @override
+  void visitHeader(Header header) => add(header);
 }
 
 ResolvedSpec resolveSpec(OpenApi spec) {
   final refRegistry = RefRegistry();
   final builder = RegistryBuilder(spec, refRegistry);
   SpecWalker(builder).walkRoot(spec);
+
+  logger.detail('Registered schemas:');
+  for (final uri in refRegistry.uris) {
+    logger.detail('  - $uri');
+  }
+
   final context = _ResolveContext(
     specUrl: spec.serverUrl,
     refRegistry: refRegistry,
