@@ -1,5 +1,4 @@
 import 'package:file/file.dart';
-import 'package:file/local.dart';
 import 'package:meta/meta.dart';
 import 'package:space_gen/src/context.dart';
 import 'package:space_gen/src/loader.dart';
@@ -65,9 +64,9 @@ void renderSpec({
   RunProcess? runProcess,
   Quirks quirks = const Quirks(),
 }) {
-  final templateProvider = TemplateProvider.fromDirectory(
-    templateDir ?? const LocalFileSystem().directory('lib/templates'),
-  );
+  final templateProvider = templateDir == null
+      ? TemplateProvider.defaultLocation()
+      : TemplateProvider.fromDirectory(templateDir);
 
   // Prepare a resolved spec for rendering converting into render objects.
   final renderSpec = toRenderSpec(spec);
@@ -109,9 +108,9 @@ String renderSchema(
     SchemaRef.schema(parsedSchema),
     resolveContext,
   );
-  final templateProvider = TemplateProvider.fromDirectory(
-    templateDir ?? const LocalFileSystem().directory('lib/templates'),
-  );
+  final templateProvider = templateDir == null
+      ? TemplateProvider.defaultLocation()
+      : TemplateProvider.fromDirectory(templateDir);
 
   final renderSchema = toRenderSchema(resolvedSchema);
   final schemaRenderer = SchemaRenderer(
