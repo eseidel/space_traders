@@ -2,6 +2,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:space_gen/src/logger.dart';
 import 'package:space_gen/src/parser.dart';
 import 'package:space_gen/src/resolver.dart';
+import 'package:space_gen/src/types.dart';
 import 'package:test/test.dart';
 
 class _MockLogger extends Mock implements Logger {}
@@ -416,6 +417,32 @@ void main() {
           ),
         ),
       );
+    });
+  });
+
+  group('ResolvedSchema', () {
+    test('equality', () {
+      final schema1 = ResolvedObject(
+        snakeName: 'Foo',
+        pointer: JsonPointer.parse(
+          '#/paths//users/get/responses/200/content/application/json/schema',
+        ),
+        properties: const {},
+        additionalProperties: null,
+        required: const [],
+      );
+      final schema2 = ResolvedObject(
+        snakeName: 'Foo',
+        pointer: JsonPointer.parse(
+          '#/paths//users/get/responses/201/content/application/json/schema',
+        ),
+        properties: const {},
+        additionalProperties: null,
+        required: const [],
+      );
+      expect(schema1, equals(schema1));
+      // Different pointer.
+      expect(schema1, isNot(equals(schema2)));
     });
   });
 }
