@@ -474,38 +474,6 @@ class Response extends Equatable implements HasPointer {
   /// The possible headers for this response.
   final Map<String, RefOr<Header>>? headers;
 
-  /// Whether this response has content.
-  /// We only support json, so we check for a schema with a type.
-  /// This is a bit of a hack for the space traders spec which has a 204
-  /// response with an empty schema.
-  static bool hasContent(RefOr<Response> response) {
-    if (response.ref != null) {
-      return true;
-    }
-    final content = response.object?.content;
-    if (content == null) {
-      return false;
-    }
-    for (final mediaType in content.values) {
-      final schemaRef = mediaType.schema;
-      final schema = schemaRef.schema;
-      if (schema == null) {
-        // Assume refs have content.
-        return true;
-      }
-      if (schema is Schema) {
-        // Any non-empty schema has content.
-        if (schema.type != SchemaType.unknown) {
-          return true;
-        }
-      } else {
-        // All collection-type schemas have content.
-        return true;
-      }
-    }
-    return false;
-  }
-
   @override
   List<Object?> get props => [pointer, description, content, headers];
 }
