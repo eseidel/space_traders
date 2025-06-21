@@ -953,7 +953,7 @@ void main() {
         ),
       ).called(1);
     });
-    test('additionalProperties bool is ignored', () {
+    test('additionalProperties=true is treated as unknown', () {
       final json = {
         'openapi': '3.1.0',
         'info': {'title': 'Space Traders API', 'version': '1.0.0'},
@@ -980,8 +980,7 @@ void main() {
           },
         },
       };
-      final logger = _MockLogger();
-      final spec = runWithLogger(logger, () => parseTestSpec(json));
+      final spec = parseTestSpec(json);
       final schema =
           spec
                   .paths['/users']
@@ -992,12 +991,9 @@ void main() {
                   .schema
                   .object!
               as Schema;
-      expect(schema.additionalProperties, isNull);
-      verify(
-        () => logger.detail(
-          'Ignoring key: additionalProperties (bool) in #/paths//users/get/responses/200/content/application/json/schema',
-        ),
-      ).called(1);
+      expect(schema.type, SchemaType.object);
+      expect(schema.additionalProperties, isNotNull);
+      expect(schema.additionalProperties!.object!.type, SchemaType.unknown);
     });
     test('additionalProperties must be a boolean or a map', () {
       final json = {
