@@ -834,6 +834,8 @@ class RenderObject extends RenderNewType {
     return '$className.$jsonMethod($jsonValue as $jsonType) $orDefault';
   }
 
+  // This would probably be easier if we did a copyWith and then compared with
+  // normal equals provided by Equatable.
   @override
   bool equalsIgnoringName(RenderSchema other) {
     if (other is! RenderObject) {
