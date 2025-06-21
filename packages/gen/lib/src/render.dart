@@ -102,7 +102,7 @@ String renderSchema(
     SchemaRef.schema(parsedSchema, const JsonPointer.empty()),
     ResolveContext.test(),
   );
-  final templateProvider = TemplateProvider.defaultLocation()
+  final templateProvider = TemplateProvider.defaultLocation();
 
   final renderSchema = toRenderSchema(resolvedSchema);
   final schemaRenderer = SchemaRenderer(
