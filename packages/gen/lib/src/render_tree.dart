@@ -447,6 +447,16 @@ abstract class RenderSchema {
 
   Map<String, dynamic> toTemplateContext(SchemaRenderer context);
 
+  static bool maybeEqualsIgnoringName(RenderSchema? a, RenderSchema? b) {
+    if (a == null && b == null) {
+      return true;
+    }
+    if (a == null || b == null) {
+      return false;
+    }
+    return a.equalsIgnoringName(b);
+  }
+
   // This is a heuristic to help understand if two schemas are the same so we
   // can safely generate a single return value for a response.  We don't
   // currently support union response types.
@@ -837,13 +847,13 @@ class RenderObject extends RenderNewType {
         return false;
       }
     }
-    if (additionalProperties != null &&
-        !additionalProperties!.equalsIgnoringName(
-          other.additionalProperties!,
-        )) {
+    if (!RenderSchema.maybeEqualsIgnoringName(
+      additionalProperties,
+      other.additionalProperties,
+    )) {
       return false;
     }
-    if (required != other.required) {
+    if (!const ListEquality<String>().equals(required, other.required)) {
       return false;
     }
     return super.equalsIgnoringName(other);
