@@ -535,5 +535,35 @@ void main() {
       // Different values.
       expect(schema1, isNot(equals(schema2)));
     });
+    test('ResolvedAnyOf equality', () {
+      final pointer200 = JsonPointer.parse(
+        '#/paths//users/get/responses/200/content/application/json/schema',
+      );
+      final schema1 = ResolvedAnyOf(
+        snakeName: 'Foo',
+        pointer: pointer200,
+        schemas: [
+          ResolvedPod(
+            type: PodType.string,
+            pointer: pointer200,
+            snakeName: 'Foo',
+          ),
+        ],
+      );
+      final schema2 = ResolvedAnyOf(
+        snakeName: 'Foo',
+        pointer: pointer200,
+        schemas: [
+          ResolvedPod(
+            type: PodType.string,
+            pointer: pointer200,
+            snakeName: 'Foo',
+          ),
+        ],
+      );
+      expect(schema1, equals(schema1));
+      // Same schemas.
+      expect(schema1, equals(schema2));
+    });
   });
 }
