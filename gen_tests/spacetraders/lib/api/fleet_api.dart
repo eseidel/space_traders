@@ -18,7 +18,7 @@ import 'package:spacetraders/model/get_my_ship_cargo200_response.dart';
 import 'package:spacetraders/model/get_my_ships200_response.dart';
 import 'package:spacetraders/model/get_repair_ship200_response.dart';
 import 'package:spacetraders/model/get_scrap_ship200_response.dart';
-import 'package:spacetraders/model/get_ship_cooldown200_response.dart';
+import 'package:spacetraders/model/get_ship_cooldown_response.dart';
 import 'package:spacetraders/model/get_ship_modules200_response.dart';
 import 'package:spacetraders/model/get_ship_nav200_response.dart';
 import 'package:spacetraders/model/install_mount201_response.dart';
@@ -188,7 +188,7 @@ class FleetApi {
     );
   }
 
-  Future<GetShipCooldown200Response> getShipCooldown(String shipSymbol) async {
+  Future<GetShipCooldownResponse> getShipCooldown(String shipSymbol) async {
     final response = await client.invokeApi(
       method: Method.get,
       path: '/my/ships/{shipSymbol}/cooldown'.replaceAll(
@@ -202,8 +202,8 @@ class FleetApi {
     }
 
     if (response.body.isNotEmpty) {
-      return GetShipCooldown200Response.fromJson(
-        jsonDecode(response.body) as Map<String, dynamic>,
+      return GetShipCooldownResponse.fromJson(
+        jsonDecode(response.body) as dynamic,
       );
     }
 
