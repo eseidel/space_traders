@@ -94,6 +94,8 @@ RenderSchema toRenderSchema(ResolvedSchema schema) {
         snakeName: schema.snakeName,
         pointer: schema.pointer,
       );
+    case SchemaBinary():
+      return RenderBinary(snakeName: schema.snakeName, pointer: schema.pointer);
     default:
       _unimplemented('Unknown schema: $schema', schema.pointer);
   }
@@ -1079,4 +1081,44 @@ class RenderVoid extends RenderSchema {
   @override
   Map<String, dynamic> toTemplateContext(SchemaRenderer context) =>
       throw UnimplementedError('RenderVoid.toTemplateContext');
+}
+
+class RenderBinary extends RenderSchema {
+  const RenderBinary({required super.snakeName, required super.pointer});
+
+  @override
+  dynamic get defaultValue => null;
+
+  @override
+  String typeName(SchemaRenderer context) => 'Uint8List';
+
+  @override
+  String equalsExpression(String name, SchemaRenderer context) =>
+      'identical($name, other.$name)';
+
+  @override
+  bool get createsNewType => false;
+
+  @override
+  String jsonStorageType({required bool isNullable}) =>
+      'throw UnimplementedError("RenderBinary.jsonStorageType")';
+
+  @override
+  String toJsonExpression(
+    String dartName,
+    SchemaRenderer context, {
+    required bool dartIsNullable,
+  }) => 'throw UnimplementedError("RenderBinary.toJson")';
+
+  @override
+  String fromJsonExpression(
+    String jsonValue,
+    SchemaRenderer context, {
+    required bool jsonIsNullable,
+    required bool dartIsNullable,
+  }) => 'throw UnimplementedError("RenderBinary.fromJson")';
+
+  @override
+  Map<String, dynamic> toTemplateContext(SchemaRenderer context) =>
+      throw UnimplementedError('RenderBinary.toTemplateContext');
 }
