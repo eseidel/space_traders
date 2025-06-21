@@ -468,7 +468,7 @@ class RenderPod extends RenderSchema {
     required super.snakeName,
     required this.type,
     required super.pointer,
-    required this.defaultValue,
+    this.defaultValue,
   });
 
   /// The type of the resolved schema.
@@ -855,7 +855,7 @@ class RenderArray extends RenderSchema {
     required super.snakeName,
     required this.items,
     required super.pointer,
-    required this.defaultValue,
+    this.defaultValue,
   });
 
   /// The items of the resolved schema.

@@ -1,4 +1,5 @@
 import 'package:space_gen/src/render_tree.dart';
+import 'package:space_gen/src/resolver.dart';
 import 'package:space_gen/src/types.dart';
 import 'package:test/test.dart';
 
@@ -31,6 +32,41 @@ void main() {
         },
         additionalProperties: null,
         required: [],
+      );
+      expect(a.equalsIgnoringName(c), isFalse);
+    });
+
+    test('RenderArray', () {
+      const a = RenderArray(
+        snakeName: 'a',
+        pointer: JsonPointer.empty(),
+        items: RenderPod(
+          snakeName: 'a',
+          pointer: JsonPointer.empty(),
+          type: PodType.string,
+        ),
+      );
+      expect(a.equalsIgnoringName(a), isTrue);
+
+      const b = RenderArray(
+        snakeName: 'b',
+        pointer: JsonPointer.empty(),
+        items: RenderPod(
+          snakeName: 'b',
+          pointer: JsonPointer.empty(),
+          type: PodType.string,
+        ),
+      );
+      expect(a.equalsIgnoringName(b), isTrue);
+
+      const c = RenderArray(
+        snakeName: 'a',
+        pointer: JsonPointer.empty(),
+        items: RenderPod(
+          snakeName: 'a',
+          pointer: JsonPointer.empty(),
+          type: PodType.boolean,
+        ),
       );
       expect(a.equalsIgnoringName(c), isFalse);
     });
