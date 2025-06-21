@@ -686,9 +686,9 @@ class RenderObject extends RenderNewType {
   const RenderObject({
     required super.snakeName,
     required this.properties,
-    required this.additionalProperties,
-    required this.required,
     required super.pointer,
+    this.additionalProperties,
+    this.required = const [],
   });
 
   /// The properties of the resolved schema.
@@ -841,11 +841,18 @@ class RenderObject extends RenderNewType {
     if (other is! RenderObject) {
       return false;
     }
-    if (properties.length != other.properties.length) {
+    if (!const SetEquality<String>().equals(
+      properties.keys.toSet(),
+      other.properties.keys.toSet(),
+    )) {
       return false;
     }
     for (final entry in properties.entries) {
-      if (!entry.value.equalsIgnoringName(other.properties[entry.key]!)) {
+      final otherEntry = other.properties[entry.key];
+      if (otherEntry == null) {
+        return false;
+      }
+      if (!entry.value.equalsIgnoringName(otherEntry)) {
         return false;
       }
     }

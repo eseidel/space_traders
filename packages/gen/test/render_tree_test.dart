@@ -10,8 +10,6 @@ void main() {
         snakeName: 'a',
         pointer: JsonPointer.empty(),
         properties: <String, RenderSchema>{},
-        additionalProperties: null,
-        required: [],
       );
       expect(a.equalsIgnoringName(a), isTrue);
 
@@ -19,8 +17,6 @@ void main() {
         snakeName: 'b',
         pointer: JsonPointer.empty(),
         properties: <String, RenderSchema>{},
-        additionalProperties: null,
-        required: [],
       );
       expect(a.equalsIgnoringName(b), isTrue);
 
@@ -30,8 +26,6 @@ void main() {
         properties: <String, RenderSchema>{
           'a': RenderUnknown(snakeName: 'a', pointer: JsonPointer.empty()),
         },
-        additionalProperties: null,
-        required: [],
       );
       expect(a.equalsIgnoringName(c), isFalse);
 
@@ -45,8 +39,6 @@ void main() {
             type: PodType.string,
           ),
         },
-        additionalProperties: null,
-        required: [],
       );
       expect(a.equalsIgnoringName(d), isFalse);
 
@@ -59,7 +51,6 @@ void main() {
           pointer: JsonPointer.empty(),
           type: PodType.string,
         ),
-        required: [],
       );
       expect(a.equalsIgnoringName(e), isFalse);
 
@@ -67,7 +58,6 @@ void main() {
         snakeName: 'a',
         pointer: JsonPointer.empty(),
         properties: <String, RenderSchema>{},
-        additionalProperties: null,
         required: ['a'],
       );
       expect(a.equalsIgnoringName(f), isFalse);
@@ -81,9 +71,21 @@ void main() {
           pointer: JsonPointer.empty(),
           type: PodType.boolean,
         ),
-        required: [],
       );
       expect(e.equalsIgnoringName(g), isFalse);
+
+      const h = RenderObject(
+        snakeName: 'a',
+        pointer: JsonPointer.empty(),
+        properties: <String, RenderSchema>{
+          'e': RenderPod(
+            snakeName: 'e',
+            pointer: JsonPointer.empty(),
+            type: PodType.string,
+          ),
+        },
+      );
+      expect(d.equalsIgnoringName(h), isFalse);
     });
 
     test('RenderArray', () {
