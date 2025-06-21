@@ -1030,7 +1030,7 @@ void main() {
   });
 
   group('renderOperation', () {
-    test('smoke test', () {
+    test('application/octet-stream', () {
       final operation = {
         'tags': ['pet'],
         'summary': 'Uploads an image.',
@@ -1077,6 +1077,59 @@ void main() {
         '            .replaceAll(\'{petId}\', "\${ petId }")\n'
         '            ,\n'
         '            body: uint8List,\n'
+        '        );\n'
+        '\n'
+        '        if (response.statusCode >= HttpStatus.badRequest) {\n'
+        '            throw ApiException(response.statusCode, response.body.toString());\n'
+        '        }\n'
+        '\n'
+        '        if (response.body.isNotEmpty) {\n'
+        '            return ;\n'
+        '        }\n'
+        '\n'
+        "        throw ApiException(response.statusCode, 'Unhandled response from \$uploadFile');\n"
+        '    }\n'
+        '}\n'
+        '',
+      );
+    });
+
+    test('text/plain', () {
+      final operation = {
+        'tags': ['pet'],
+        'summary': 'Uploads an image.',
+        'operationId': 'uploadFile',
+        'requestBody': {
+          'content': {
+            'text/plain': {
+              'schema': {'type': 'string'},
+            },
+          },
+        },
+        'responses': {
+          '200': {'description': 'successful operation'},
+        },
+      };
+      final result = renderOperation(
+        path: '/pet/{petId}/uploadFile',
+        operationJson: operation,
+        serverUrl: Uri.parse('https://example.com'),
+      );
+      expect(
+        result,
+        'class PetApi {\n'
+        '    PetApi(ApiClient? client) : client = client ?? ApiClient();\n'
+        '\n'
+        '    final ApiClient client;\n'
+        '\n'
+        '    Future<void> uploadFile(\n'
+        '        { String? string, }\n'
+        '    ) async {\n'
+        '        final response = await client.invokeApi(\n'
+        '            method: Method.post,\n'
+        "            path: '/pet/{petId}/uploadFile'\n"
+        ',\n'
+        '            body: string,\n'
         '        );\n'
         '\n'
         '        if (response.statusCode >= HttpStatus.badRequest) {\n'
