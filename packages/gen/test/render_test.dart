@@ -876,9 +876,7 @@ void main() {
     test('smoke test', () {
       final schema = {
         'type': 'object',
-        'properties': {
-          'foo': {'type': 'unknown'},
-        },
+        'properties': {'foo': <String, dynamic>{}},
       };
       final result = renderSchema(schema);
       expect(

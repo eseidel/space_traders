@@ -104,6 +104,7 @@ enum SchemaType {
   /// If 'type' is missing.
   unknown; // if 'type' is missing.
 
+  // Should this be parseSchemaType instead?
   static SchemaType fromJson(String json) {
     switch (json) {
       case 'string':
@@ -118,10 +119,9 @@ enum SchemaType {
         return array;
       case 'object':
         return object;
-      case 'unknown':
-        return unknown;
+      // Intentionally fall through for unknown.
       default:
-        throw ArgumentError.value(json, 'json', 'Unknown SchemaType');
+        throw FormatException('Unknown SchemaType: $json');
     }
   }
 }
