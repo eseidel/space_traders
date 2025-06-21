@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:petstore/api_client.dart';
 import 'package:petstore/api_exception.dart';
@@ -169,13 +170,13 @@ class PetApi {
   Future<ApiResponse> uploadFile(
     int petId, {
     String? additionalMetadata,
-    String? string,
+    Uint8List? uint8List,
   }) async {
     final response = await client.invokeApi(
       method: Method.post,
       path: '/pet/{petId}/uploadImage'.replaceAll('{petId}', '$petId'),
       queryParameters: {'additionalMetadata': additionalMetadata.toString()},
-      body: string,
+      body: uint8List,
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
