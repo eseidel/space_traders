@@ -107,5 +107,28 @@ void main() {
       );
       expect(a.equalsIgnoringName(c), isFalse);
     });
+
+    test('RenderEnum', () {
+      const a = RenderEnum(
+        snakeName: 'a',
+        pointer: JsonPointer.empty(),
+        values: ['a', 'b', 'c'],
+      );
+      expect(a.equalsIgnoringName(a), isTrue);
+
+      const b = RenderEnum(
+        snakeName: 'b',
+        pointer: JsonPointer.empty(),
+        values: ['a', 'b', 'c'],
+      );
+      expect(a.equalsIgnoringName(b), isTrue);
+
+      const c = RenderEnum(
+        snakeName: 'a',
+        pointer: JsonPointer.empty(),
+        values: ['a', 'b'],
+      );
+      expect(a.equalsIgnoringName(c), isFalse);
+    });
   });
 }

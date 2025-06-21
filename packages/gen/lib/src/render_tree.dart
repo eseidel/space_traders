@@ -970,7 +970,7 @@ class RenderEnum extends RenderNewType {
     required super.snakeName,
     required this.values,
     required super.pointer,
-    required this.defaultValue,
+    this.defaultValue,
   });
 
   @override
