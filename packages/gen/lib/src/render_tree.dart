@@ -117,7 +117,7 @@ RenderSchema toRenderSchema(ResolvedSchema schema) {
         pointer: schema.pointer,
       );
     case ResolvedAnyOf():
-      // The parser already handles anyOf with 1 schema to just be that schema.
+      // The resolver already makes anyOf with 1 schema to just be that schema.
       // For multiple schemas, we just generate a oneOf, which is wrong.
       // anyOf means that at least one of the schemas must be valid.
       // Which presumably translates into a single schema with all properties
