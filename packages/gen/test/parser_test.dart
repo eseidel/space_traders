@@ -1147,7 +1147,8 @@ void main() {
       );
       verify(
         () => logger.warn(
-          'boolean enums are not supported, ignoring enum values in #/paths//users/get/responses/200/content/application/json/schema',
+          'boolean enums are not supported, ignoring enum values in '
+          '#/paths//users/get/responses/200/content/application/json/schema',
         ),
       ).called(1);
     });
