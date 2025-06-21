@@ -281,8 +281,7 @@ abstract class RenderRequestBody {
     return (typeName[0].toLowerCase() + typeName.substring(1)).split('<').first;
   }
 
-  Map<String, dynamic> toTemplateContext(SchemaRenderer context) =>
-      throw UnimplementedError('RenderRequestBody.toTemplateContext');
+  Map<String, dynamic> toTemplateContext(SchemaRenderer context);
 }
 
 class RenderRequestBodyJson extends RenderRequestBody {
