@@ -1103,6 +1103,40 @@ void main() {
         '',
       );
     });
+
+    test('oneOf', () {
+      final schema = {
+        'oneOf': [
+          {'type': 'string'},
+          {'type': 'number'},
+        ],
+      };
+      final result = renderSchema(schema);
+      expect(
+        result,
+        '\n'
+        'sealed class Test {\n'
+        '    static Test fromJson(dynamic jsonArg) {\n'
+        '        // Determine which schema to use based on the json.\n'
+        '        // TODO(eseidel): Implement this.\n'
+        "        throw UnimplementedError('Test.fromJson');\n"
+        '    }\n'
+        '\n'
+        '    /// Convenience to create a nullable type from a nullable json object.\n'
+        '    /// Useful when parsing optional fields.\n'
+        '    static Test? maybeFromJson(dynamic json) {\n'
+        '        if (json == null) {\n'
+        '            return null;\n'
+        '        }\n'
+        '        return Test.fromJson(json);\n'
+        '    }\n'
+        '\n'
+        '    /// Require all subclasses to implement toJson.\n'
+        '    dynamic toJson();\n'
+        '}\n'
+        '',
+      );
+    });
   });
 
   group('renderOperation', () {
