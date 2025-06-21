@@ -1065,8 +1065,15 @@ class RenderOneOf extends RenderNewType {
     if (other is! RenderOneOf) {
       return false;
     }
-    return schemas.every((e) => e.equalsIgnoringName(e)) &&
-        super.equalsIgnoringName(other);
+    if (schemas.length != other.schemas.length) {
+      return false;
+    }
+    for (var i = 0; i < schemas.length; i++) {
+      if (!schemas[i].equalsIgnoringName(other.schemas[i])) {
+        return false;
+      }
+    }
+    return super.equalsIgnoringName(other);
   }
 
   // We can potentially do better than dynamic by comparing the schemas.

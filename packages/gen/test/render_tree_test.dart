@@ -130,5 +130,51 @@ void main() {
       );
       expect(a.equalsIgnoringName(c), isFalse);
     });
+
+    test('RenderOneOf', () {
+      const a = RenderOneOf(
+        snakeName: 'a',
+        pointer: JsonPointer.empty(),
+        schemas: [
+          RenderPod(
+            snakeName: 'a',
+            pointer: JsonPointer.empty(),
+            type: PodType.string,
+          ),
+        ],
+      );
+      expect(a.equalsIgnoringName(a), isTrue);
+
+      const b = RenderOneOf(
+        snakeName: 'b',
+        pointer: JsonPointer.empty(),
+        schemas: [
+          RenderPod(
+            snakeName: 'b',
+            pointer: JsonPointer.empty(),
+            type: PodType.string,
+          ),
+        ],
+      );
+      expect(a.equalsIgnoringName(b), isTrue);
+
+      const c = RenderOneOf(
+        snakeName: 'a',
+        pointer: JsonPointer.empty(),
+        schemas: [
+          RenderPod(
+            snakeName: 'a',
+            pointer: JsonPointer.empty(),
+            type: PodType.string,
+          ),
+          RenderPod(
+            snakeName: 'b',
+            pointer: JsonPointer.empty(),
+            type: PodType.string,
+          ),
+        ],
+      );
+      expect(a.equalsIgnoringName(c), isFalse);
+    });
   });
 }
