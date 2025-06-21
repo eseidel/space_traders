@@ -384,5 +384,38 @@ void main() {
         ),
       );
     });
+    test('items is required for type=array', () {
+      final json = {'type': 'array'};
+      final logger = _MockLogger();
+      expect(
+        () => runWithLogger(logger, () => parseAndResolveTestSchema(json)),
+        throwsA(
+          isA<FormatException>().having(
+            (e) => e.message,
+            'message',
+            equals(
+              'items must be a schema for type=array in #/paths//users/get/responses/200/content/application/json/schema',
+            ),
+          ),
+        ),
+      );
+    });
+
+    test('items must be an schema for type=array', () {
+      final json = {'type': 'array', 'items': true};
+      final logger = _MockLogger();
+      expect(
+        () => runWithLogger(logger, () => parseAndResolveTestSchema(json)),
+        throwsA(
+          isA<FormatException>().having(
+            (e) => e.message,
+            'message',
+            equals(
+              "'items' is not of type Map<String, dynamic>: true in #/paths//users/get/responses/200/content/application/json/schema",
+            ),
+          ),
+        ),
+      );
+    });
   });
 }
