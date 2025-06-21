@@ -514,5 +514,26 @@ void main() {
         ),
       );
     });
+    test('ResolvedEnum equality', () {
+      final schema1 = ResolvedEnum(
+        snakeName: 'Foo',
+        pointer: JsonPointer.parse(
+          '#/paths//users/get/responses/200/content/application/json/schema',
+        ),
+        values: const ['bar', 'baz'],
+        defaultValue: null,
+      );
+      final schema2 = ResolvedEnum(
+        snakeName: 'Foo',
+        pointer: JsonPointer.parse(
+          '#/paths//users/get/responses/200/content/application/json/schema',
+        ),
+        values: const ['bar', 'qux'],
+        defaultValue: null,
+      );
+      expect(schema1, equals(schema1));
+      // Different values.
+      expect(schema1, isNot(equals(schema2)));
+    });
   });
 }
