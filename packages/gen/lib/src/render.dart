@@ -93,7 +93,6 @@ void renderSpec({
 String renderSchema(
   Map<String, dynamic> schemaJson, {
   String schemaName = 'test',
-  Directory? templateDir,
   Quirks quirks = const Quirks(),
 }) {
   final parsedSchema = parseSchema(
@@ -103,9 +102,7 @@ String renderSchema(
     SchemaRef.schema(parsedSchema, const JsonPointer.empty()),
     ResolveContext.test(),
   );
-  final templateProvider = templateDir == null
-      ? TemplateProvider.defaultLocation()
-      : TemplateProvider.fromDirectory(templateDir);
+  final templateProvider = TemplateProvider.defaultLocation()
 
   final renderSchema = toRenderSchema(resolvedSchema);
   final schemaRenderer = SchemaRenderer(
@@ -120,7 +117,6 @@ String renderOperation({
   required String path,
   required Map<String, dynamic> operationJson,
   required Uri serverUrl,
-  required Directory? templateDir,
   Quirks quirks = const Quirks(),
 }) {
   final parsedOperation = parseOperation(
@@ -134,9 +130,7 @@ String renderOperation({
     context: ResolveContext.test(),
   );
   final renderOperation = toRenderOperation(resolvedOperation);
-  final templateProvider = templateDir == null
-      ? TemplateProvider.defaultLocation()
-      : TemplateProvider.fromDirectory(templateDir);
+  final templateProvider = TemplateProvider.defaultLocation();
   final schemaRenderer = SchemaRenderer(
     templateProvider: templateProvider,
     quirks: quirks,

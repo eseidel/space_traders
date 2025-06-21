@@ -1019,7 +1019,6 @@ void main() {
         path: '/pet/{petId}/uploadImage',
         operationJson: operation,
         serverUrl: Uri.parse('https://example.com'),
-        templateDir: null,
       );
       expect(
         result,
