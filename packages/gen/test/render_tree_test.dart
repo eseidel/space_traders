@@ -71,6 +71,19 @@ void main() {
         required: ['a'],
       );
       expect(a.equalsIgnoringName(f), isFalse);
+
+      const g = RenderObject(
+        snakeName: 'a',
+        pointer: JsonPointer.empty(),
+        properties: <String, RenderSchema>{},
+        additionalProperties: RenderPod(
+          snakeName: 'a',
+          pointer: JsonPointer.empty(),
+          type: PodType.boolean,
+        ),
+        required: [],
+      );
+      expect(e.equalsIgnoringName(g), isFalse);
     });
 
     test('RenderArray', () {
