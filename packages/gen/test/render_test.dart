@@ -1517,5 +1517,47 @@ void main() {
         '',
       );
     });
+
+    test('No successful responses', () {
+      final json = {
+        'summary': 'Get user',
+        'responses': {
+          '400': {'description': 'Bad Request'},
+        },
+      };
+      final result = renderOperation(
+        path: '/users',
+        operationJson: json,
+        serverUrl: Uri.parse('https://api.spacetraders.io/v2'),
+      );
+      expect(
+        result,
+        'class DefaultApi {\n'
+        '    DefaultApi(ApiClient? client) : client = client ?? ApiClient();\n'
+        '\n'
+        '    final ApiClient client;\n'
+        '\n'
+        '    Future<void> users(\n'
+        '    ) async {\n'
+        '        final response = await client.invokeApi(\n'
+        '            method: Method.post,\n'
+        "            path: '/users'\n"
+        ',\n'
+        '        );\n'
+        '\n'
+        '        if (response.statusCode >= HttpStatus.badRequest) {\n'
+        '            throw ApiException(response.statusCode, response.body.toString());\n'
+        '        }\n'
+        '\n'
+        '        if (response.body.isNotEmpty) {\n'
+        '            return ;\n'
+        '        }\n'
+        '\n'
+        "        throw ApiException(response.statusCode, 'Unhandled response from \$users');\n"
+        '    }\n'
+        '}\n'
+        '',
+      );
+    });
   });
 }

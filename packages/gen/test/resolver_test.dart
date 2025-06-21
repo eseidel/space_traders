@@ -417,31 +417,6 @@ void main() {
         ),
       );
     });
-    test('No successful responses', () {
-      final json = {
-        'openapi': '3.1.0',
-        'info': {'title': 'Space Traders API', 'version': '1.0.0'},
-        'servers': [
-          {'url': 'https://api.spacetraders.io/v2'},
-        ],
-        'paths': {
-          '/users': {
-            'get': {
-              'summary': 'Get user',
-              'responses': {
-                '400': {'description': 'Bad Request'},
-              },
-            },
-          },
-        },
-      };
-      final logger = _MockLogger();
-      final spec = runWithLogger(logger, () => parseAndResolveTestSpec(json));
-      expect(
-        spec.paths.first.operations.first.responses.first.content,
-        isA<ResolvedVoid>(),
-      );
-    });
   });
 
   group('ResolvedSchema', () {
