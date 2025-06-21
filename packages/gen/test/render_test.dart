@@ -1027,6 +1027,82 @@ void main() {
         '',
       );
     });
+
+    test('allOf', () {
+      final schema = {
+        'allOf': [
+          {
+            'type': 'object',
+            'properties': {
+              'foo': {'type': 'string'},
+            },
+          },
+          {
+            'type': 'object',
+            'properties': {
+              'bar': {'type': 'number'},
+            },
+          },
+        ],
+      };
+      final logger = _MockLogger();
+      final result = runWithLogger(logger, () => renderSchema(schema));
+      expect(
+        result,
+        '@immutable\n'
+        'class Test {\n'
+        '    Test(\n'
+        '        {  this.foo, this.bar,\n'
+        '         }\n'
+        '    );\n'
+        '\n'
+        '    factory Test.fromJson(Map<String, dynamic>\n'
+        '        json) {\n'
+        '        return Test(\n'
+        "            foo: json['foo'] as String? ,\n"
+        "            bar: (json['bar'] as num?).toDouble() ,\n"
+        '        );\n'
+        '    }\n'
+        '\n'
+        '    /// Convenience to create a nullable type from a nullable json object.\n'
+        '    /// Useful when parsing optional fields.\n'
+        '    static Test? maybeFromJson(Map<String, dynamic>? json) {\n'
+        '        if (json == null) {\n'
+        '            return null;\n'
+        '        }\n'
+        '        return Test.fromJson(json);\n'
+        '    }\n'
+        '\n'
+        '    final  String? foo;\n'
+        '    final  double? bar;\n'
+        '\n'
+        '\n'
+        '    Map<String, dynamic> toJson() {\n'
+        '        return {\n'
+        "            'foo': foo,\n"
+        "            'bar': bar,\n"
+        '        };\n'
+        '    }\n'
+        '\n'
+        '    @override\n'
+        '    int get hashCode =>\n'
+        '        Object.hash(\n'
+        '          foo,\n'
+        '          bar,\n'
+        '        );\n'
+        '\n'
+        '    @override\n'
+        '    bool operator ==(Object other) {\n'
+        '        if (identical(this, other)) return true;\n'
+        '        return other is Test\n'
+        '            && foo == other.foo\n'
+        '            && bar == other.bar\n'
+        '        ;\n'
+        '    }\n'
+        '}\n'
+        '',
+      );
+    });
   });
 
   group('renderOperation', () {
