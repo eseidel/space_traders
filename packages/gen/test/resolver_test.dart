@@ -421,7 +421,7 @@ void main() {
   });
 
   group('ResolvedSchema', () {
-    test('equality', () {
+    test('RenderObject equality', () {
       final schema1 = ResolvedObject(
         snakeName: 'Foo',
         pointer: JsonPointer.parse(
@@ -443,6 +443,52 @@ void main() {
       expect(schema1, equals(schema1));
       // Different pointer.
       expect(schema1, isNot(equals(schema2)));
+    });
+    test('RenderArray equality', () {
+      final pointer200 = JsonPointer.parse(
+        '#/paths//users/get/responses/200/content/application/json/schema',
+      );
+      final pointer201 = JsonPointer.parse(
+        '#/paths//users/get/responses/201/content/application/json/schema',
+      );
+      final schema1 = ResolvedArray(
+        snakeName: 'Foo',
+        pointer: pointer200,
+        items: ResolvedPod(
+          type: PodType.string,
+          pointer: pointer200,
+          snakeName: 'Foo',
+        ),
+      );
+      final schema2 = ResolvedArray(
+        snakeName: 'Foo',
+        pointer: pointer201,
+        items: ResolvedPod(
+          type: PodType.string,
+          pointer: pointer200,
+          snakeName: 'Foo',
+        ),
+      );
+      expect(schema1, equals(schema1));
+      // Different pointer.
+      expect(schema1, isNot(equals(schema2)));
+      // Different items.
+      expect(
+        schema1,
+        isNot(
+          equals(
+            ResolvedArray(
+              snakeName: 'Foo',
+              pointer: pointer200,
+              items: ResolvedPod(
+                type: PodType.integer,
+                pointer: pointer200,
+                snakeName: 'Foo',
+              ),
+            ),
+          ),
+        ),
+      );
     });
   });
 }

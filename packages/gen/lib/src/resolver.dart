@@ -568,8 +568,8 @@ class ResolvedPod extends ResolvedSchema {
   const ResolvedPod({
     required super.snakeName,
     required super.pointer,
-    required this.defaultValue,
     required this.type,
+    this.defaultValue,
   });
 
   /// The type of the resolved schema.
@@ -587,7 +587,7 @@ class ResolvedArray extends ResolvedSchema {
     required super.pointer,
     required super.snakeName,
     required this.items,
-    required this.defaultValue,
+    this.defaultValue,
   });
 
   /// type of the items in the array
