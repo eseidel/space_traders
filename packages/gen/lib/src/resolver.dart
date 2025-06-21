@@ -19,6 +19,12 @@ Never _error(String message, JsonPointer pointer) {
 class ResolveContext {
   ResolveContext({required this.specUrl, required this.refRegistry});
 
+  /// Used for cases where we need a ResolveContext, but don't actually
+  /// plan to look up any objects in the registry.
+  ResolveContext.test()
+    : specUrl = Uri.parse('https://example.com'),
+      refRegistry = RefRegistry();
+
   /// The spec url of the spec.
   final Uri specUrl;
 
@@ -203,25 +209,37 @@ List<ResolvedParameter> _resolveParameters(
   }).toList();
 }
 
+ResolvedOperation resolveOperation({
+  required String path,
+  required Method method,
+  required Operation operation,
+  required ResolveContext context,
+}) {
+  final requestBody = _resolveRequestBody(operation.requestBody, context);
+  final responses = _resolveResponses(operation.responses, context);
+  return ResolvedOperation(
+    snakeName: operation.snakeName,
+    tags: operation.tags,
+    summary: operation.summary,
+    description: operation.description,
+    method: method,
+    path: path,
+    requestBody: requestBody,
+    responses: responses,
+    parameters: _resolveParameters(operation.parameters, context),
+  );
+}
+
 List<ResolvedOperation> _resolveOperations(
   PathItem pathItem,
   ResolveContext context,
 ) {
   return pathItem.operations.entries.map((entry) {
-    final method = entry.key;
-    final operation = entry.value;
-    final requestBody = _resolveRequestBody(operation.requestBody, context);
-    final responses = _resolveResponses(operation.responses, context);
-    return ResolvedOperation(
-      snakeName: operation.snakeName,
-      tags: operation.tags,
-      summary: operation.summary,
-      description: operation.description,
-      method: method,
+    return resolveOperation(
       path: pathItem.path,
-      requestBody: requestBody,
-      responses: responses,
-      parameters: _resolveParameters(operation.parameters, context),
+      method: entry.key,
+      operation: entry.value,
+      context: context,
     );
   }).toList();
 }

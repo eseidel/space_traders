@@ -545,13 +545,9 @@ class FileRenderer {
 class SchemaRenderer {
   /// Create a new context for rendering the spec.
   SchemaRenderer({
-    required this.specUrl,
     required this.templateProvider,
     this.quirks = const Quirks(),
   });
-
-  /// The url of the spec being rendered.  Used for resolving relative urls.
-  final Uri specUrl;
 
   /// The provider of templates.
   final TemplateProvider templateProvider;
@@ -589,20 +585,19 @@ class SchemaRenderer {
     return templateProvider.loadTemplate(template).renderString(schemaContext);
   }
 
-  /// Renders an api to a string, does not render the imports.
-  String renderApi(Api api) {
-    final endpoints = api.endpoints
-        .map((e) => e.toTemplateContext(this))
-        .toList();
-
-    // The OpenAPI generator only includes the APIs in the api/ directory
-    // all other classes and enums go in the model/ directory even ones
-    // which were defined inline in the main spec.
+  String renderEndpoints({
+    required String className,
+    required List<Endpoint> endpoints,
+  }) {
     return templateProvider.loadTemplate('api').renderString({
-      'className': api.className,
-      'endpoints': endpoints,
+      'className': className,
+      'endpoints': endpoints.map((e) => e.toTemplateContext(this)).toList(),
     });
   }
+
+  /// Renders an api to a string, does not render the imports.
+  String renderApi(Api api) =>
+      renderEndpoints(className: api.className, endpoints: api.endpoints);
 }
 
 /// Quirks are a set of flags that can be used to customize the generated code.
