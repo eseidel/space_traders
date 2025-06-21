@@ -77,6 +77,7 @@ export 'package:spacetraders/model/get_repair_ship200_response_data.dart';
 export 'package:spacetraders/model/get_scrap_ship200_response.dart';
 export 'package:spacetraders/model/get_scrap_ship200_response_data.dart';
 export 'package:spacetraders/model/get_ship_cooldown200_response.dart';
+export 'package:spacetraders/model/get_ship_cooldown_response.dart';
 export 'package:spacetraders/model/get_ship_modules200_response.dart';
 export 'package:spacetraders/model/get_ship_nav200_response.dart';
 export 'package:spacetraders/model/get_shipyard200_response.dart';
