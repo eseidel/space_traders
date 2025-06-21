@@ -217,8 +217,18 @@ ResolvedRequestBody? _resolveRequestBody(
       required: requestBody.isRequired,
     );
   }
+  final textPlainSchema = content['text/plain']?.schema;
+  if (textPlainSchema != null) {
+    return ResolvedRequestBody(
+      mimeType: MimeType.textPlain,
+      schema: resolveSchemaRef(textPlainSchema, context),
+      description: requestBody.description,
+      required: requestBody.isRequired,
+    );
+  }
   _error(
-    'Request body has no application/json or application/octet-stream schema',
+    'Request body has no application/json, '
+    'application/octet-stream, or text/plain schema',
     requestBody.pointer,
   );
 }

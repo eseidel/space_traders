@@ -292,7 +292,32 @@ Schema parseSchema(MapContext json) {
   SchemaRef? additionalPropertiesSchema;
   if (additionalPropertiesJson != null) {
     if (additionalPropertiesJson is bool) {
-      _ignored<bool>(json, 'additionalProperties');
+      if (additionalPropertiesJson) {
+        // Create a synthetic "unknown" schema for additionalProperties=true.
+        // Could do this at the resolver level instead.
+        additionalPropertiesSchema = SchemaRef.schema(
+          // The name and pointer are never used, but need to be unique to
+          // avoid the resolver from throwing a duplicate name error.
+          Schema(
+            pointer: JsonPointer.fromParts([
+              ...json.pointerParts,
+              'additionalProperties',
+            ]),
+            snakeName: 'additionalProperties',
+            type: SchemaType.unknown,
+            properties: const <String, SchemaRef>{},
+            required: const <String>[],
+            description: '',
+            items: null,
+            enumValues: const <String>[],
+            format: null,
+            additionalProperties: null,
+            defaultValue: null,
+            example: null,
+          ),
+          json.pointer,
+        );
+      }
     } else if (additionalPropertiesJson is Map<String, dynamic>) {
       final additionalProperties = _optionalMap(json, 'additionalProperties');
       if (additionalProperties != null) {
