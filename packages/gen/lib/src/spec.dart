@@ -440,16 +440,6 @@ class Responses extends Equatable {
 
   // default is not yet supported.
 
-  /// The contentful responses of this endpoint.
-  Iterable<RefOr<Response>> get successfulResponsesWithContent {
-    final successfulResponseKeys = responses.keys.where(
-      (e) => e >= 200 && e < 300,
-    );
-    return successfulResponseKeys
-        .map((e) => responses[e]!)
-        .where(Response.hasContent);
-  }
-
   /// Whether this endpoint has any responses.
   bool get isEmpty => responses.isEmpty;
 
