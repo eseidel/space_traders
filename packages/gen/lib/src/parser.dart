@@ -337,10 +337,15 @@ SchemaEnum? _handleEnum({
   if (!enumValues.every((e) => e is String)) {
     _error(json, 'enumValues must be a list of strings: $enumValues');
   }
+  // This also implicitly validates that the type of the default value
+  // matches the type of the enum values.
+  if (defaultValue != null && !enumValues.contains(defaultValue)) {
+    _error(json, 'defaultValue must be one of the enum values: $defaultValue');
+  }
   return SchemaEnum(
     pointer: json.pointer,
     snakeName: json.snakeName,
-    defaultValue: defaultValue,
+    defaultValue: defaultValue as String?,
     enumValues: enumValues.cast<String>(),
   );
 }

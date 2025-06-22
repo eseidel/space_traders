@@ -167,12 +167,13 @@ class SchemaEnum extends Schema {
     required this.enumValues,
   });
 
-  final dynamic defaultValue;
+  final String? defaultValue;
 
+  // Only string enums are supported for now.
   final List<String> enumValues;
 
   @override
-  List<Object?> get props => [super.props, defaultValue];
+  List<Object?> get props => [super.props, defaultValue, enumValues];
 }
 
 class SchemaNull extends Schema {
