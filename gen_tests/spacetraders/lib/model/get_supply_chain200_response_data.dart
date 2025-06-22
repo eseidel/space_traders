@@ -1,5 +1,5 @@
 import 'package:meta/meta.dart';
-import 'package:spacetraders/model/get_supply_chain200_response_data_export_to_import_map.dart';
+import 'package:spacetraders/model_helpers.dart';
 
 @immutable
 class GetSupplyChain200ResponseData {
@@ -7,10 +7,9 @@ class GetSupplyChain200ResponseData {
 
   factory GetSupplyChain200ResponseData.fromJson(Map<String, dynamic> json) {
     return GetSupplyChain200ResponseData(
-      exportToImportMap:
-          GetSupplyChain200ResponseDataExportToImportMap.fromJson(
-            json['exportToImportMap'] as Map<String, dynamic>,
-          ),
+      exportToImportMap: json['exportToImportMap']
+          .map((key, value) => MapEntry(key, (value as List).cast<String>()))
+          .toMap(),
     );
   }
 
@@ -25,10 +24,10 @@ class GetSupplyChain200ResponseData {
     return GetSupplyChain200ResponseData.fromJson(json);
   }
 
-  final GetSupplyChain200ResponseDataExportToImportMap exportToImportMap;
+  final Map<String, List<String>> exportToImportMap;
 
   Map<String, dynamic> toJson() {
-    return {'exportToImportMap': exportToImportMap.toJson()};
+    return {'exportToImportMap': exportToImportMap.map(MapEntry.new).toMap()};
   }
 
   @override
@@ -38,6 +37,6 @@ class GetSupplyChain200ResponseData {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     return other is GetSupplyChain200ResponseData &&
-        exportToImportMap == other.exportToImportMap;
+        mapsEqual(exportToImportMap, other.exportToImportMap);
   }
 }

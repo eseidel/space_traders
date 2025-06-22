@@ -92,7 +92,6 @@ export 'package:spacetraders/model/get_status200_response_server_resets.dart';
 export 'package:spacetraders/model/get_status200_response_stats.dart';
 export 'package:spacetraders/model/get_supply_chain200_response.dart';
 export 'package:spacetraders/model/get_supply_chain200_response_data.dart';
-export 'package:spacetraders/model/get_supply_chain200_response_data_export_to_import_map.dart';
 export 'package:spacetraders/model/get_system200_response.dart';
 export 'package:spacetraders/model/get_system_waypoints200_response.dart';
 export 'package:spacetraders/model/get_systems200_response.dart';
