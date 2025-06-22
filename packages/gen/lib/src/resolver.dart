@@ -184,6 +184,22 @@ ResolvedSchema resolveSchemaRef(SchemaRef ref, ResolveContext context) {
       pointer: schema.pointer,
     );
   }
+  if (schema is SchemaNull) {
+    return ResolvedNull(snakeName: schema.snakeName, pointer: schema.pointer);
+  }
+  if (schema is SchemaUnknown) {
+    return ResolvedUnknown(
+      snakeName: schema.snakeName,
+      pointer: schema.pointer,
+    );
+  }
+  if (schema is SchemaMap) {
+    return ResolvedMap(
+      valueSchema: resolveSchemaRef(schema.valueSchema, context),
+      snakeName: schema.snakeName,
+      pointer: schema.pointer,
+    );
+  }
   _error('Missing code to resolve schema: $schema', schema.pointer);
 }
 
@@ -666,4 +682,14 @@ class ResolvedBinary extends ResolvedSchema {
 
 class ResolvedNull extends ResolvedSchema {
   const ResolvedNull({required super.snakeName, required super.pointer});
+}
+
+class ResolvedMap extends ResolvedSchema {
+  const ResolvedMap({
+    required super.snakeName,
+    required super.pointer,
+    required this.valueSchema,
+  });
+
+  final ResolvedSchema valueSchema;
 }

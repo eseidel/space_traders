@@ -181,7 +181,10 @@ void main() {
             (e) => e.message,
             'message',
             equals(
-              'allOf only supports objects in #/paths//users/get/responses/200/content/application/json/schema/allOf/0',
+              'allOf only supports objects: '
+              'ResolvedPod(snakeName: users200_response, pointer: '
+              '#/paths//users/get/responses/200/content/application/json/schema/allOf/0) '
+              'in #/paths//users/get/responses/200/content/application/json/schema',
             ),
           ),
         ),
@@ -395,7 +398,7 @@ void main() {
             (e) => e.message,
             'message',
             equals(
-              'items must be a schema for type=array in #/paths//users/get/responses/200/content/application/json/schema',
+              'items is required for type=array in #/paths//users/get/responses/200/content/application/json/schema',
             ),
           ),
         ),

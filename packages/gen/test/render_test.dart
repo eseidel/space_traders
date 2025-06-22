@@ -505,7 +505,8 @@ void main() {
       final out = fs.directory('spacetraders');
 
       await renderToDirectory(spec: spec, outDir: out);
-      expect(out.childFile('lib/model/get_user200_response.dart'), exists);
+      // No model files are needed for the Map.
+      expect(out.childDirectory('lib/model').existsSync(), isFalse);
     });
 
     test('with inner types', () async {
@@ -1200,11 +1201,18 @@ void main() {
           '200': {'description': 'successful operation'},
         },
       };
-      final result = renderOperation(
-        path: '/pet/{petId}/uploadImage',
-        operationJson: operation,
-        serverUrl: Uri.parse('https://example.com'),
+      final logger = _MockLogger();
+      final result = runWithLogger(
+        logger,
+        () => renderOperation(
+          path: '/pet/{petId}/uploadImage',
+          operationJson: operation,
+          serverUrl: Uri.parse('https://example.com'),
+        ),
       );
+      verify(
+        () => logger.detail('Unused keys: format in #/parameters/0/schema'),
+      ).called(1);
       expect(
         result,
         'class PetApi {\n'

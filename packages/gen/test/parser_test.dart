@@ -957,19 +957,17 @@ void main() {
         },
       };
       final spec = parseTestSpec(json);
-      final schema =
-          spec
-                  .paths['/users']
-                  .operations[Method.get]!
-                  .responses[200]!
-                  .object!
-                  .content!['application/json']!
-                  .schema
-                  .object!
-              as SchemaObject;
-      expect(schema, isA<SchemaObject>());
-      expect(schema.additionalProperties, isNotNull);
-      expect(schema.additionalProperties!.object, isA<SchemaUnknown>());
+      final schema = spec
+          .paths['/users']
+          .operations[Method.get]!
+          .responses[200]!
+          .object!
+          .content!['application/json']!
+          .schema
+          .object!;
+      expect(schema, isA<SchemaMap>());
+      final map = schema as SchemaMap;
+      expect(map.valueSchema.object, isA<SchemaUnknown>());
     });
     test('additionalProperties must be a boolean or a map', () {
       final json = {

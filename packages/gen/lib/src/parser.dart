@@ -299,6 +299,7 @@ SchemaRef? _handleAdditionalProperties(MapContext parent) {
         SchemaUnknown(
           pointer: parent.pointer.add('additionalProperties'),
           snakeName: 'additionalProperties',
+          description: parent['description'] as String?,
         ),
         parent.pointer,
       );
@@ -347,7 +348,6 @@ SchemaEnum? _handleEnum({
 Schema _createCorrectSchemaSubtype(MapContext json) {
   final collectionType = _handleCollectionTypes(json);
   if (collectionType != null) {
-    _warn(json, 'collection types');
     return collectionType;
   }
 
@@ -356,6 +356,13 @@ Schema _createCorrectSchemaSubtype(MapContext json) {
   final type = _optional<String>(json, 'type');
   if (type == 'null') {
     return SchemaNull(pointer: json.pointer, snakeName: json.snakeName);
+  }
+
+  if (type == 'string') {
+    final format = _optional<String>(json, 'format');
+    if (format == 'binary') {
+      return SchemaBinary(pointer: json.pointer, snakeName: json.snakeName);
+    }
   }
 
   final defaultValue = _optional<dynamic>(json, 'default');
@@ -378,11 +385,14 @@ Schema _createCorrectSchemaSubtype(MapContext json) {
     );
   }
 
-  final items = _optionalMap(json, 'items');
-  SchemaRef? itemSchema;
-  if (items != null) {
+  if (type == 'array') {
+    final items = _optionalMap(json, 'items');
+
+    if (items == null) {
+      _error(json, 'items is required for type=array');
+    }
     const innerName = 'inner'; // Matching OpenAPI.
-    itemSchema = parseSchemaOrRef(items.addSnakeName(innerName));
+    final itemSchema = parseSchemaOrRef(items.addSnakeName(innerName));
     return SchemaArray(
       pointer: json.pointer,
       snakeName: json.snakeName,
@@ -391,16 +401,34 @@ Schema _createCorrectSchemaSubtype(MapContext json) {
     );
   }
 
-  final properties = <String, SchemaRef>{};
+  final description = _optional<String>(json, 'description');
+
+  final additionalPropertiesSchema = _handleAdditionalProperties(json);
+
   final propertiesJson = _optionalMap(json, 'properties');
-  if (propertiesJson != null) {
-    for (final name in propertiesJson.json.keys) {
-      final snakeName = snakeFromCamel(name);
-      final childContext = propertiesJson
-          .childAsMap(name)
-          .addSnakeName(snakeName);
-      properties[name] = parseSchemaOrRef(childContext);
+  if (propertiesJson == null) {
+    if (additionalPropertiesSchema == null) {
+      return SchemaUnknown(
+        pointer: json.pointer,
+        snakeName: json.snakeName,
+        description: description,
+      );
     }
+    return SchemaMap(
+      pointer: json.pointer,
+      snakeName: json.snakeName,
+      valueSchema: additionalPropertiesSchema,
+      description: description,
+    );
+  }
+
+  final properties = <String, SchemaRef>{};
+  for (final name in propertiesJson.json.keys) {
+    final snakeName = snakeFromCamel(name);
+    final childContext = propertiesJson
+        .childAsMap(name)
+        .addSnakeName(snakeName);
+    properties[name] = parseSchemaOrRef(childContext);
   }
 
   // Some of these probably apply to enum and array types.
@@ -414,8 +442,6 @@ Schema _createCorrectSchemaSubtype(MapContext json) {
   _ignored<dynamic>(json, 'externalDocs');
 
   final required = _optionalList<String>(json, 'required') ?? [];
-  final description = _optional<String>(json, 'description');
-  final additionalPropertiesSchema = _handleAdditionalProperties(json);
 
   return SchemaObject(
     pointer: json.pointer,

@@ -137,8 +137,22 @@ abstract class SchemaObjectBase extends Schema {
   const SchemaObjectBase({required super.pointer, required super.snakeName});
 }
 
+/// Map isn't a type in the spec, but rather inferred by having
+/// additionalProperties and no other properties.
 class SchemaMap extends Schema {
-  const SchemaMap({required super.pointer, required super.snakeName});
+  const SchemaMap({
+    required super.pointer,
+    required super.snakeName,
+    required this.valueSchema,
+    required this.description,
+  });
+
+  final SchemaRef valueSchema;
+
+  final String? description;
+
+  @override
+  List<Object?> get props => [super.props, valueSchema, description];
 }
 
 class SchemaBinary extends Schema {
@@ -182,7 +196,13 @@ class SchemaArray extends Schema {
 }
 
 class SchemaUnknown extends Schema {
-  const SchemaUnknown({required super.pointer, required super.snakeName});
+  const SchemaUnknown({
+    required super.pointer,
+    required super.snakeName,
+    required this.description,
+  });
+
+  final String? description;
 }
 
 abstract class SchemaCombiner extends SchemaObjectBase {
