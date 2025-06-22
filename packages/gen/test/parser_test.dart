@@ -7,12 +7,62 @@ import 'package:test/test.dart';
 class _MockLogger extends Mock implements Logger {}
 
 void main() {
+  group('determinePodType', () {
+    test('fromJson', () {
+      final logger = _MockLogger();
+      PodType? parse(String type, {bool expectLogs = false, String? format}) {
+        reset(logger);
+        final json = {'type': type, 'format': format};
+        // Only wrap with logger if we expect logs, that way it will fail if
+        // we do log but don't expect it.
+        if (expectLogs) {
+          return runWithLogger(
+            logger,
+            () => determinePodType(MapContext.initial(json)),
+          );
+        }
+        return determinePodType(MapContext.initial(json));
+      }
+
+      expect(parse('string'), PodType.string);
+      expect(parse('string', format: 'binary'), isNull);
+      expect(parse('string', format: 'date-time'), PodType.dateTime);
+      expect(parse('string', format: 'foo', expectLogs: true), PodType.string);
+      verify(() => logger.warn('Unknown string format: foo in #/')).called(1);
+      expect(parse('number'), PodType.number);
+      expect(parse('integer'), PodType.integer);
+      expect(parse('boolean'), PodType.boolean);
+      expect(parse('array'), isNull);
+      expect(parse('object'), isNull);
+      expect(
+        () => parse('unknown'),
+        throwsA(
+          isA<FormatException>().having(
+            (e) => e.message,
+            'message',
+            equals('Unknown pod type: unknown in #/'),
+          ),
+        ),
+      );
+      expect(
+        () => parse('invalid'),
+        throwsA(
+          isA<FormatException>().having(
+            (e) => e.message,
+            'message',
+            equals('Unknown pod type: invalid in #/'),
+          ),
+        ),
+      );
+    });
+  });
+
   group('parser', () {
     OpenApi parseTestSpec(Map<String, dynamic> json) {
       return parseOpenApi(json);
     }
 
-    Map<String, SchemaBase> parseTestSchemas(Map<String, dynamic> schemasJson) {
+    Map<String, Schema> parseTestSchemas(Map<String, dynamic> schemasJson) {
       final specJson = {
         'openapi': '3.1.0',
         'info': {'title': 'Space Traders API', 'version': '1.0.0'},
@@ -75,7 +125,7 @@ void main() {
             (e) => e.message,
             'message',
             equals(
-              'enumValues for type=SchemaType.number not supported in '
+              'enumValues for type=number not supported in '
               'MapContext(#/components/schemas/NumberEnum, '
               '{type: number, enum: [1, 2, 3]})',
             ),
@@ -92,7 +142,7 @@ void main() {
       };
       final logger = _MockLogger();
       final schemas = runWithLogger(logger, () => parseTestSchemas(json));
-      expect(schemas['Enum']!.type, SchemaType.string);
+      expect(schemas['Enum'], isA<SchemaEnum>());
     });
 
     test('OpenApi equals', () {
@@ -224,8 +274,8 @@ void main() {
       };
       final logger = _MockLogger();
       final schemas = runWithLogger(logger, () => parseTestSchemas(json));
-      final schema = schemas['User']! as Schema;
-      expect(schema.type, SchemaType.object);
+      final schema = schemas['User']! as SchemaObject;
+      expect(schema, isA<SchemaObject>());
       expect(schema.properties['value']!.ref, '#/components/schemas/Value');
 
       // Just not as a direct alias/redirect
@@ -916,10 +966,10 @@ void main() {
                   .content!['application/json']!
                   .schema
                   .object!
-              as Schema;
-      expect(schema.type, SchemaType.object);
+              as SchemaObject;
+      expect(schema, isA<SchemaObject>());
       expect(schema.additionalProperties, isNotNull);
-      expect(schema.additionalProperties!.object!.type, SchemaType.unknown);
+      expect(schema.additionalProperties!.object, isA<SchemaUnknown>());
     });
     test('additionalProperties must be a boolean or a map', () {
       final json = {
@@ -1023,13 +1073,12 @@ void main() {
             .object!
             .content!['application/json']!
             .schema
-            .object!
-            .type,
-        equals(SchemaType.boolean),
+            .object,
+        isA<SchemaPod>().having((s) => s.type, 'type', equals(PodType.boolean)),
       );
       verify(
-        () => logger.warn(
-          'boolean enums are not supported, ignoring enum values in '
+        () => logger.detail(
+          'Ignoring key: type (String) in '
           '#/paths//users/get/responses/200/content/application/json/schema',
         ),
       ).called(1);

@@ -570,8 +570,6 @@ class RenderPod extends RenderSchema {
         return 'bool';
       case PodType.dateTime:
         return 'DateTime';
-      case PodType.null_:
-        _unimplemented('RenderPod(null).typeName', pointer);
     }
   }
 
@@ -587,8 +585,6 @@ class RenderPod extends RenderSchema {
         return isNullable ? 'num?' : 'num';
       case PodType.boolean:
         return isNullable ? 'bool?' : 'bool';
-      case PodType.null_:
-        _unimplemented('RenderPod(null).jsonStorageType', pointer);
     }
   }
 
@@ -640,8 +636,6 @@ class RenderPod extends RenderSchema {
         return '($jsonValue as $jsonType).toDouble() $orDefault';
       case PodType.boolean:
         return '($jsonValue as $jsonType) $orDefault';
-      case PodType.null_:
-        _unimplemented('RenderPod(null).fromJsonExpression', pointer);
     }
   }
 
