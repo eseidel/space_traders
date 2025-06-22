@@ -836,10 +836,10 @@ class RefRegistry {
   T get<T>(Uri uri) {
     final object = objectsByUri[uri];
     if (object == null) {
-      throw StateError('$T not found: $uri');
+      throw FormatException('$T not found: $uri');
     }
     if (object is! T) {
-      throw StateError('Expected $T, got $object');
+      throw FormatException('Expected $T, got $object');
     }
     return object;
   }

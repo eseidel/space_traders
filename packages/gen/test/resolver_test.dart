@@ -420,6 +420,103 @@ void main() {
         ),
       );
     });
+    test('schema not found', () {
+      final json = {
+        'openapi': '3.1.0',
+        'info': {'title': 'Space Traders API', 'version': '1.0.0'},
+        'servers': [
+          {'url': 'https://api.spacetraders.io/v2'},
+        ],
+        'paths': {
+          '/users': {
+            'get': {
+              'summary': 'Get user',
+              'responses': {
+                '200': {
+                  'description': 'OK',
+                  'content': {
+                    'application/json': {
+                      'schema': {r'$ref': '#/components/schemas/Missing'},
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      };
+      final logger = _MockLogger();
+      expect(
+        () => runWithLogger(logger, () => parseAndResolveTestSpec(json)),
+        throwsA(
+          isA<FormatException>().having(
+            (e) => e.message,
+            'message',
+            equals(
+              'Schema? not found: '
+              'https://api.spacetraders.io/v2#/components/schemas/Missing',
+            ),
+          ),
+        ),
+      );
+    });
+    test('schema ref to wrong object type', () {
+      final json = {
+        'openapi': '3.1.0',
+        'info': {'title': 'Space Traders API', 'version': '1.0.0'},
+        'servers': [
+          {'url': 'https://api.spacetraders.io/v2'},
+        ],
+        'paths': {
+          '/users': {
+            'get': {
+              'summary': 'Get user',
+              'responses': {
+                '200': {
+                  'description': 'OK',
+                  'content': {
+                    'application/json': {
+                      'schema': {
+                        r'$ref': '#/components/requestBodies/RequestBody',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        'components': {
+          'requestBodies': {
+            'RequestBody': {
+              'type': 'object',
+              'content': {
+                'application/json': {
+                  'schema': {'type': 'string'},
+                },
+              },
+            },
+          },
+        },
+      };
+      final logger = _MockLogger();
+      expect(
+        () => runWithLogger(logger, () => parseAndResolveTestSpec(json)),
+        throwsA(
+          isA<FormatException>().having(
+            (e) => e.message,
+            'message',
+            equals(
+              'Expected Schema?, got '
+              'RequestBody(#/components/requestBodies/RequestBody, null, '
+              '{application/json: MediaType(SchemaRef(null, '
+              'SchemaPod([#/components/requestBodies/RequestBody/content/application/json/schema, '
+              'request_body], PodType.string, null)))}, false)',
+            ),
+          ),
+        ),
+      );
+    });
   });
 
   group('ResolvedSchema', () {
