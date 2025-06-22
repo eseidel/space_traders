@@ -4,7 +4,6 @@ import 'dart:io';
 
 import 'package:petstore/api_client.dart';
 import 'package:petstore/api_exception.dart';
-import 'package:petstore/model/get_inventory200_response.dart';
 import 'package:petstore/model/order.dart';
 
 class StoreApi {
@@ -12,7 +11,7 @@ class StoreApi {
 
   final ApiClient client;
 
-  Future<GetInventory200Response> getInventory() async {
+  Future<Map<String, int>> getInventory() async {
     final response = await client.invokeApi(
       method: Method.get,
       path: '/store/inventory',
@@ -23,9 +22,9 @@ class StoreApi {
     }
 
     if (response.body.isNotEmpty) {
-      return GetInventory200Response.fromJson(
-        jsonDecode(response.body) as Map<String, dynamic>,
-      );
+      return jsonDecode(
+        response.body,
+      ).map((key, value) => MapEntry(key, value as int)).toMap();
     }
 
     throw ApiException(
