@@ -225,6 +225,18 @@ void main() {
                 {'type': 'string'},
               ],
             },
+            'Map': {
+              'type': 'object',
+              'additionalProperties': {'type': 'string'},
+            },
+            'Enum': {
+              'type': 'string',
+              'enum': ['foo', 'bar', 'baz'],
+            },
+            'Array': {
+              'type': 'array',
+              'items': {'type': 'string'},
+            },
           },
         },
       };
