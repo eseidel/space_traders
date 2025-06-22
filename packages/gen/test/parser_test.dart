@@ -133,7 +133,28 @@ void main() {
         ),
       );
     });
-
+    test('enum values must match type', () {
+      final json = {
+        'Enum': {
+          'type': 'string',
+          'enum': ['foo', 1],
+        },
+      };
+      final logger = _MockLogger();
+      expect(
+        () => runWithLogger(logger, () => parseTestSchemas(json)),
+        throwsA(
+          isA<FormatException>().having(
+            (e) => e.message,
+            'message',
+            equals(
+              'enumValues must be a list of strings: [foo, 1] '
+              'in #/components/schemas/Enum',
+            ),
+          ),
+        ),
+      );
+    });
     test('infer enum type', () {
       final json = {
         'Enum': {

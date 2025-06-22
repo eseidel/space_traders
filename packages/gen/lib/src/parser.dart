@@ -335,7 +335,7 @@ SchemaEnum? _handleEnum({
     }
   }
   if (!enumValues.every((e) => e is String)) {
-    _unimplemented(json, 'enumValues must be a list of strings');
+    _error(json, 'enumValues must be a list of strings: $enumValues');
   }
   return SchemaEnum(
     pointer: json.pointer,
