@@ -193,7 +193,6 @@ RenderRequestBody? toRenderRequestBody(ResolvedRequestBody? requestBody) {
         required: requestBody.required,
       );
   }
-  return null;
 }
 
 RenderSchema _determineReturnType(ResolvedOperation operation) {

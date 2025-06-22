@@ -7,8 +7,8 @@ import 'package:space_gen/src/logger.dart';
 import 'package:space_gen/src/quirks.dart';
 import 'package:space_gen/src/render/render_tree.dart';
 import 'package:space_gen/src/render/schema_renderer.dart';
+import 'package:space_gen/src/render/templates.dart';
 import 'package:space_gen/src/render/tree_visitor.dart';
-import 'package:space_gen/src/templates.dart';
 
 typedef RunProcess =
     ProcessResult Function(

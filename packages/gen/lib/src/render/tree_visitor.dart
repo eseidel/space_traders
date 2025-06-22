@@ -68,8 +68,9 @@ class RenderTreeWalker {
 
   void walkOperation(RenderOperation operation) {
     visitor.visitOperation(operation);
-    if (operation.requestBody != null) {
-      walkRequestBody(operation.requestBody);
+    final requestBody = operation.requestBody;
+    if (requestBody != null) {
+      walkRequestBody(requestBody);
     }
     for (final response in operation.responses) {
       walkResponse(response);

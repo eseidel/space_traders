@@ -1,15 +1,15 @@
 import 'package:file/file.dart';
 import 'package:meta/meta.dart';
-import 'package:space_gen/src/context.dart';
 import 'package:space_gen/src/loader.dart';
 import 'package:space_gen/src/logger.dart';
 import 'package:space_gen/src/parse/spec.dart';
 import 'package:space_gen/src/parse/visitor.dart';
 import 'package:space_gen/src/parser.dart';
 import 'package:space_gen/src/quirks.dart';
+import 'package:space_gen/src/render/file_renderer.dart';
+import 'package:space_gen/src/render/render_tree.dart';
 import 'package:space_gen/src/render/schema_renderer.dart';
 import 'package:space_gen/src/render/templates.dart';
-import 'package:space_gen/src/render_tree.dart';
 import 'package:space_gen/src/resolver.dart';
 import 'package:space_gen/src/string.dart';
 
