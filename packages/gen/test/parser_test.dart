@@ -1159,6 +1159,28 @@ void main() {
           ),
         );
       });
+
+      test('defaultValue must be a valid enum value', () {
+        final json = {
+          'conclusion': {
+            'type': 'string',
+            'enum': ['success', 'failure'],
+            'default': 'neutral',
+          },
+        };
+        expect(
+          () => parseTestSchemas(json),
+          throwsA(
+            isA<FormatException>().having(
+              (e) => e.message,
+              'message',
+              equals(
+                'defaultValue must be one of the enum values: neutral in #/components/schemas/conclusion',
+              ),
+            ),
+          ),
+        );
+      });
     });
 
     test('tags must be a list of strings', () {
