@@ -41,7 +41,7 @@ class CreateSurvey201ResponseData {
   }
 
   @override
-  int get hashCode => Object.hash(cooldown, surveys);
+  int get hashCode => Object.hashAll([cooldown, surveys]);
 
   @override
   bool operator ==(Object other) {

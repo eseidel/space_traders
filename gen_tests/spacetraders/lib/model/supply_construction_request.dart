@@ -39,7 +39,7 @@ class SupplyConstructionRequest {
   }
 
   @override
-  int get hashCode => Object.hash(shipSymbol, tradeSymbol, units);
+  int get hashCode => Object.hashAll([shipSymbol, tradeSymbol, units]);
 
   @override
   bool operator ==(Object other) {

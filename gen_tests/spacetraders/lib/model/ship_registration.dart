@@ -39,7 +39,7 @@ class ShipRegistration {
   }
 
   @override
-  int get hashCode => Object.hash(name, factionSymbol, role);
+  int get hashCode => Object.hashAll([name, factionSymbol, role]);
 
   @override
   bool operator ==(Object other) {

@@ -54,8 +54,14 @@ class ShipModule {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(symbol, name, description, capacity, range, requirements);
+  int get hashCode => Object.hashAll([
+    symbol,
+    name,
+    description,
+    capacity,
+    range,
+    requirements,
+  ]);
 
   @override
   bool operator ==(Object other) {

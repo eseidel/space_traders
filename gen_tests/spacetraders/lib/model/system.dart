@@ -74,7 +74,7 @@ class System {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     constellation,
     symbol,
     sectorSymbol,
@@ -84,7 +84,7 @@ class System {
     waypoints,
     factions,
     name,
-  );
+  ]);
 
   @override
   bool operator ==(Object other) {

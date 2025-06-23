@@ -53,7 +53,7 @@ class Order {
 
   @override
   int get hashCode =>
-      Object.hash(id, petId, quantity, shipDate, status, complete);
+      Object.hashAll([id, petId, quantity, shipDate, status, complete]);
 
   @override
   bool operator ==(Object other) {

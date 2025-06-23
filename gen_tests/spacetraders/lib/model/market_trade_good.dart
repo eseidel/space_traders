@@ -58,7 +58,7 @@ class MarketTradeGood {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     symbol,
     type,
     tradeVolume,
@@ -66,7 +66,7 @@ class MarketTradeGood {
     activity,
     purchasePrice,
     sellPrice,
-  );
+  ]);
 
   @override
   bool operator ==(Object other) {

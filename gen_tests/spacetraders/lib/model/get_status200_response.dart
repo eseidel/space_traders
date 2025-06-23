@@ -93,7 +93,7 @@ class GetStatus200Response {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     status,
     version,
     resetDate,
@@ -104,7 +104,7 @@ class GetStatus200Response {
     serverResets,
     announcements,
     links,
-  );
+  ]);
 
   @override
   bool operator ==(Object other) {

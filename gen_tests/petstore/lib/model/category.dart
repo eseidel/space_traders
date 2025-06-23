@@ -25,7 +25,7 @@ class Category {
   }
 
   @override
-  int get hashCode => Object.hash(id, name);
+  int get hashCode => Object.hashAll([id, name]);
 
   @override
   bool operator ==(Object other) {

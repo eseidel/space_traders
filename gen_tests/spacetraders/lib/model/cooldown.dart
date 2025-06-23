@@ -44,7 +44,7 @@ class Cooldown {
 
   @override
   int get hashCode =>
-      Object.hash(shipSymbol, totalSeconds, remainingSeconds, expiration);
+      Object.hashAll([shipSymbol, totalSeconds, remainingSeconds, expiration]);
 
   @override
   bool operator ==(Object other) {

@@ -53,7 +53,7 @@ class SiphonResources201ResponseData {
   }
 
   @override
-  int get hashCode => Object.hash(siphon, cooldown, cargo, events);
+  int get hashCode => Object.hashAll([siphon, cooldown, cargo, events]);
 
   @override
   bool operator ==(Object other) {

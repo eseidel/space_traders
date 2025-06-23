@@ -30,7 +30,7 @@ class JumpGate {
   }
 
   @override
-  int get hashCode => Object.hash(symbol, connections);
+  int get hashCode => Object.hashAll([symbol, connections]);
 
   @override
   bool operator ==(Object other) {

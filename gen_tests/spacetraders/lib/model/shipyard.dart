@@ -62,8 +62,13 @@ class Shipyard {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(symbol, shipTypes, transactions, ships, modificationsFee);
+  int get hashCode => Object.hashAll([
+    symbol,
+    shipTypes,
+    transactions,
+    ships,
+    modificationsFee,
+  ]);
 
   @override
   bool operator ==(Object other) {

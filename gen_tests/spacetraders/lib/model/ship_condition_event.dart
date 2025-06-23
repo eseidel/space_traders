@@ -46,7 +46,7 @@ class ShipConditionEvent {
   }
 
   @override
-  int get hashCode => Object.hash(symbol, component, name, description);
+  int get hashCode => Object.hashAll([symbol, component, name, description]);
 
   @override
   bool operator ==(Object other) {

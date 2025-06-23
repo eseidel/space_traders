@@ -36,7 +36,7 @@ class GetStatus200ResponseLeaderboardsMostSubmittedChartsInner {
   }
 
   @override
-  int get hashCode => Object.hash(agentSymbol, chartCount);
+  int get hashCode => Object.hashAll([agentSymbol, chartCount]);
 
   @override
   bool operator ==(Object other) {

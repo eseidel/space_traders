@@ -47,7 +47,8 @@ class ShipNavRoute {
   }
 
   @override
-  int get hashCode => Object.hash(destination, origin, departureTime, arrival);
+  int get hashCode =>
+      Object.hashAll([destination, origin, departureTime, arrival]);
 
   @override
   bool operator ==(Object other) {

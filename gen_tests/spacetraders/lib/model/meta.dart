@@ -30,7 +30,7 @@ class Meta {
   }
 
   @override
-  int get hashCode => Object.hash(total, page, limit);
+  int get hashCode => Object.hashAll([total, page, limit]);
 
   @override
   bool operator ==(Object other) {

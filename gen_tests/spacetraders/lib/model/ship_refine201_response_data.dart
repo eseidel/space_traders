@@ -59,7 +59,7 @@ class ShipRefine201ResponseData {
   }
 
   @override
-  int get hashCode => Object.hash(cargo, cooldown, produced, consumed);
+  int get hashCode => Object.hashAll([cargo, cooldown, produced, consumed]);
 
   @override
   bool operator ==(Object other) {

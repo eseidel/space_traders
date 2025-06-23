@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:spacetraders/api_client.dart';
 import 'package:spacetraders/api_exception.dart';
 import 'package:spacetraders/model/get_agent200_response.dart';

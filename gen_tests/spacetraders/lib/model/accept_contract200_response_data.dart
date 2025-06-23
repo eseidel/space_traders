@@ -35,7 +35,7 @@ class AcceptContract200ResponseData {
   }
 
   @override
-  int get hashCode => Object.hash(contract, agent);
+  int get hashCode => Object.hashAll([contract, agent]);
 
   @override
   bool operator ==(Object other) {

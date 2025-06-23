@@ -48,7 +48,7 @@ class RefuelShip200ResponseData {
   }
 
   @override
-  int get hashCode => Object.hash(agent, fuel, cargo, transaction);
+  int get hashCode => Object.hashAll([agent, fuel, cargo, transaction]);
 
   @override
   bool operator ==(Object other) {

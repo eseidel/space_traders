@@ -51,7 +51,8 @@ class ScannedSystem {
   }
 
   @override
-  int get hashCode => Object.hash(symbol, sectorSymbol, type, x, y, distance);
+  int get hashCode =>
+      Object.hashAll([symbol, sectorSymbol, type, x, y, distance]);
 
   @override
   bool operator ==(Object other) {

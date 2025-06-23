@@ -39,7 +39,7 @@ class SupplyConstruction201ResponseData {
   }
 
   @override
-  int get hashCode => Object.hash(construction, cargo);
+  int get hashCode => Object.hashAll([construction, cargo]);
 
   @override
   bool operator ==(Object other) {

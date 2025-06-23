@@ -97,7 +97,7 @@ class Waypoint {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     symbol,
     type,
     systemSymbol,
@@ -110,7 +110,7 @@ class Waypoint {
     modifiers,
     chart,
     isUnderConstruction,
-  );
+  ]);
 
   @override
   bool operator ==(Object other) {

@@ -46,7 +46,7 @@ class GetMyAccount200ResponseDataAccount {
   }
 
   @override
-  int get hashCode => Object.hash(id, email, token, createdAt);
+  int get hashCode => Object.hashAll([id, email, token, createdAt]);
 
   @override
   bool operator ==(Object other) {

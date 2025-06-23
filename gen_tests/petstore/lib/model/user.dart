@@ -58,7 +58,7 @@ class User {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     id,
     username,
     firstName,
@@ -67,7 +67,7 @@ class User {
     password,
     phone,
     userStatus,
-  );
+  ]);
 
   @override
   bool operator ==(Object other) {

@@ -7,9 +7,11 @@ class GetSupplyChain200ResponseData {
 
   factory GetSupplyChain200ResponseData.fromJson(Map<String, dynamic> json) {
     return GetSupplyChain200ResponseData(
-      exportToImportMap: json['exportToImportMap']
-          .map((key, value) => MapEntry(key, (value as List).cast<String>()))
-          .toMap(),
+      exportToImportMap: {
+        for (final entry
+            in (json['exportToImportMap'] as Map<String, dynamic>).entries)
+          entry.key: (entry.value as List).cast<String>(),
+      },
     );
   }
 
@@ -27,7 +29,11 @@ class GetSupplyChain200ResponseData {
   final Map<String, List<String>> exportToImportMap;
 
   Map<String, dynamic> toJson() {
-    return {'exportToImportMap': exportToImportMap.map(MapEntry.new).toMap()};
+    return {
+      'exportToImportMap': {
+        for (final entry in exportToImportMap.entries) entry.key: entry.value,
+      },
+    };
   }
 
   @override

@@ -60,8 +60,14 @@ class ShipMount {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(symbol, name, description, strength, deposits, requirements);
+  int get hashCode => Object.hashAll([
+    symbol,
+    name,
+    description,
+    strength,
+    deposits,
+    requirements,
+  ]);
 
   @override
   bool operator ==(Object other) {

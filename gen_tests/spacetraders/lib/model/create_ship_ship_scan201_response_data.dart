@@ -45,7 +45,7 @@ class CreateShipShipScan201ResponseData {
   }
 
   @override
-  int get hashCode => Object.hash(cooldown, ships);
+  int get hashCode => Object.hashAll([cooldown, ships]);
 
   @override
   bool operator ==(Object other) {

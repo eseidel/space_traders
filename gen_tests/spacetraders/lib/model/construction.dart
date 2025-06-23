@@ -44,7 +44,7 @@ class Construction {
   }
 
   @override
-  int get hashCode => Object.hash(symbol, materials, isComplete);
+  int get hashCode => Object.hashAll([symbol, materials, isComplete]);
 
   @override
   bool operator ==(Object other) {

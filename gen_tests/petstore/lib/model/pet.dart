@@ -58,7 +58,8 @@ class Pet {
   }
 
   @override
-  int get hashCode => Object.hash(id, name, category, photoUrls, tags, status);
+  int get hashCode =>
+      Object.hashAll([id, name, category, photoUrls, tags, status]);
 
   @override
   bool operator ==(Object other) {
