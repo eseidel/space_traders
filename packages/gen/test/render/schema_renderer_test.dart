@@ -124,7 +124,11 @@ void main() {
       final schema = {
         'type': 'object',
         'properties': {
-          'foo': {'type': 'string', 'format': 'uri'},
+          'foo': {
+            'type': 'string',
+            'format': 'uri',
+            'default': 'https://example.com',
+          },
         },
       };
       final result = renderSchema(schema);
@@ -133,7 +137,7 @@ void main() {
         '@immutable\n'
         'class Test {\n'
         '    Test(\n'
-        '        {  this.foo,\n'
+        "        {  this.foo = Uri.parse('https://example.com'),\n"
         '         }\n'
         '    );\n'
         '\n'
