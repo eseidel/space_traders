@@ -61,7 +61,7 @@ class Contract {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     id,
     factionSymbol,
     type,
@@ -70,7 +70,7 @@ class Contract {
     fulfilled,
     expiration,
     deadlineToAccept,
-  );
+  ]);
 
   @override
   bool operator ==(Object other) {

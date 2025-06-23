@@ -29,7 +29,7 @@ class JettisonRequest {
   }
 
   @override
-  int get hashCode => Object.hash(symbol, units);
+  int get hashCode => Object.hashAll([symbol, units]);
 
   @override
   bool operator ==(Object other) {

@@ -52,7 +52,7 @@ class ShipNav {
 
   @override
   int get hashCode =>
-      Object.hash(systemSymbol, waypointSymbol, route, status, flightMode);
+      Object.hashAll([systemSymbol, waypointSymbol, route, status, flightMode]);
 
   @override
   bool operator ==(Object other) {

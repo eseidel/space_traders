@@ -47,7 +47,7 @@ class ContractTerms {
   }
 
   @override
-  int get hashCode => Object.hash(deadline, payment, deliver);
+  int get hashCode => Object.hashAll([deadline, payment, deliver]);
 
   @override
   bool operator ==(Object other) {

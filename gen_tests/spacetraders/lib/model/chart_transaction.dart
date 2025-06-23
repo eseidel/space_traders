@@ -44,7 +44,7 @@ class ChartTransaction {
 
   @override
   int get hashCode =>
-      Object.hash(waypointSymbol, shipSymbol, totalPrice, timestamp);
+      Object.hashAll([waypointSymbol, shipSymbol, totalPrice, timestamp]);
 
   @override
   bool operator ==(Object other) {

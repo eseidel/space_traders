@@ -46,7 +46,7 @@ class AgentEvent {
   }
 
   @override
-  int get hashCode => Object.hash(id, type, message, data, createdAt);
+  int get hashCode => Object.hashAll([id, type, message, data, createdAt]);
 
   @override
   bool operator ==(Object other) {

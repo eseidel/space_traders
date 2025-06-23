@@ -35,7 +35,7 @@ class GetStatus200ResponseLeaderboardsMostCreditsInner {
   }
 
   @override
-  int get hashCode => Object.hash(agentSymbol, credits);
+  int get hashCode => Object.hashAll([agentSymbol, credits]);
 
   @override
   bool operator ==(Object other) {

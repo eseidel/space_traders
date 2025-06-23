@@ -41,7 +41,7 @@ class ShipFuel {
   }
 
   @override
-  int get hashCode => Object.hash(current, capacity, consumed);
+  int get hashCode => Object.hashAll([current, capacity, consumed]);
 
   @override
   bool operator ==(Object other) {

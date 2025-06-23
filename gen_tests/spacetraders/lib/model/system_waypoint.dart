@@ -58,7 +58,7 @@ class SystemWaypoint {
   }
 
   @override
-  int get hashCode => Object.hash(symbol, type, x, y, orbitals, orbits);
+  int get hashCode => Object.hashAll([symbol, type, x, y, orbitals, orbits]);
 
   @override
   bool operator ==(Object other) {

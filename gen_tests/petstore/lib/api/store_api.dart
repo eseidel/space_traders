@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:petstore/api_client.dart';
 import 'package:petstore/api_exception.dart';
 import 'package:petstore/model/order.dart';
@@ -22,9 +21,11 @@ class StoreApi {
     }
 
     if (response.body.isNotEmpty) {
-      return jsonDecode(
-        response.body,
-      ).map((key, value) => MapEntry(key, value as int)).toMap();
+      return {
+        for (final entry
+            in (jsonDecode(response.body) as Map<String, dynamic>).entries)
+          entry.key: (entry.value as int),
+      };
     }
 
     throw ApiException(

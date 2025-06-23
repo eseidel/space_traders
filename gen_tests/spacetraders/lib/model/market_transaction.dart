@@ -60,7 +60,7 @@ class MarketTransaction {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     waypointSymbol,
     shipSymbol,
     tradeSymbol,
@@ -69,7 +69,7 @@ class MarketTransaction {
     pricePerUnit,
     totalPrice,
     timestamp,
-  );
+  ]);
 
   @override
   bool operator ==(Object other) {

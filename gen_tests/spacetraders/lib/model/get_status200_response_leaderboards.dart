@@ -55,7 +55,7 @@ class GetStatus200ResponseLeaderboards {
   }
 
   @override
-  int get hashCode => Object.hash(mostCredits, mostSubmittedCharts);
+  int get hashCode => Object.hashAll([mostCredits, mostSubmittedCharts]);
 
   @override
   bool operator ==(Object other) {

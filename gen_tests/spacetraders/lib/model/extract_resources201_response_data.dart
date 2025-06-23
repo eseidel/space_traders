@@ -65,7 +65,7 @@ class ExtractResources201ResponseData {
 
   @override
   int get hashCode =>
-      Object.hash(extraction, cooldown, cargo, modifiers, events);
+      Object.hashAll([extraction, cooldown, cargo, modifiers, events]);
 
   @override
   bool operator ==(Object other) {

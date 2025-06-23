@@ -36,7 +36,7 @@ class ShipRefine201ResponseDataProducedInner {
   }
 
   @override
-  int get hashCode => Object.hash(tradeSymbol, units);
+  int get hashCode => Object.hashAll([tradeSymbol, units]);
 
   @override
   bool operator ==(Object other) {

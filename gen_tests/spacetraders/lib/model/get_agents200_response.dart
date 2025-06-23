@@ -38,7 +38,7 @@ class GetAgents200Response {
   }
 
   @override
-  int get hashCode => Object.hash(data, meta);
+  int get hashCode => Object.hashAll([data, meta]);
 
   @override
   bool operator ==(Object other) {

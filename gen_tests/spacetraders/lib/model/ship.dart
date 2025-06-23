@@ -94,7 +94,7 @@ class Ship {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     symbol,
     registration,
     nav,
@@ -107,7 +107,7 @@ class Ship {
     cargo,
     fuel,
     cooldown,
-  );
+  ]);
 
   @override
   bool operator ==(Object other) {

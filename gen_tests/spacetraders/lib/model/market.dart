@@ -68,8 +68,14 @@ class Market {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(symbol, exports, imports, exchange, transactions, tradeGoods);
+  int get hashCode => Object.hashAll([
+    symbol,
+    exports,
+    imports,
+    exchange,
+    transactions,
+    tradeGoods,
+  ]);
 
   @override
   bool operator ==(Object other) {

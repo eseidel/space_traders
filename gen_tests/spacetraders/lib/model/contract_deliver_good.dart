@@ -42,12 +42,12 @@ class ContractDeliverGood {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     tradeSymbol,
     destinationSymbol,
     unitsRequired,
     unitsFulfilled,
-  );
+  ]);
 
   @override
   bool operator ==(Object other) {

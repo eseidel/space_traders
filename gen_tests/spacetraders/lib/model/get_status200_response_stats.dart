@@ -46,7 +46,8 @@ class GetStatus200ResponseStats {
   }
 
   @override
-  int get hashCode => Object.hash(accounts, agents, ships, systems, waypoints);
+  int get hashCode =>
+      Object.hashAll([accounts, agents, ships, systems, waypoints]);
 
   @override
   bool operator ==(Object other) {

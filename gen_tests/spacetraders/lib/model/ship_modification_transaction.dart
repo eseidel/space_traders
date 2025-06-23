@@ -48,13 +48,13 @@ class ShipModificationTransaction {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     waypointSymbol,
     shipSymbol,
     tradeSymbol,
     totalPrice,
     timestamp,
-  );
+  ]);
 
   @override
   bool operator ==(Object other) {

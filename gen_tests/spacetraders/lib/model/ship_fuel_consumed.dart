@@ -28,7 +28,7 @@ class ShipFuelConsumed {
   }
 
   @override
-  int get hashCode => Object.hash(amount, timestamp);
+  int get hashCode => Object.hashAll([amount, timestamp]);
 
   @override
   bool operator ==(Object other) {

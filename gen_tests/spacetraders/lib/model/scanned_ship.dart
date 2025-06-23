@@ -73,8 +73,15 @@ class ScannedShip {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(symbol, registration, nav, frame, reactor, engine, mounts);
+  int get hashCode => Object.hashAll([
+    symbol,
+    registration,
+    nav,
+    frame,
+    reactor,
+    engine,
+    mounts,
+  ]);
 
   @override
   bool operator ==(Object other) {

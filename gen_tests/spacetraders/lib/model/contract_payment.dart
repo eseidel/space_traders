@@ -28,7 +28,7 @@ class ContractPayment {
   }
 
   @override
-  int get hashCode => Object.hash(onAccepted, onFulfilled);
+  int get hashCode => Object.hashAll([onAccepted, onFulfilled]);
 
   @override
   bool operator ==(Object other) {

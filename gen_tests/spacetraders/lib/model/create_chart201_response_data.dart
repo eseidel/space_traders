@@ -48,7 +48,7 @@ class CreateChart201ResponseData {
   }
 
   @override
-  int get hashCode => Object.hash(chart, waypoint, transaction, agent);
+  int get hashCode => Object.hashAll([chart, waypoint, transaction, agent]);
 
   @override
   bool operator ==(Object other) {

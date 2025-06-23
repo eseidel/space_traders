@@ -39,7 +39,7 @@ class TransferCargoRequest {
   }
 
   @override
-  int get hashCode => Object.hash(tradeSymbol, units, shipSymbol);
+  int get hashCode => Object.hashAll([tradeSymbol, units, shipSymbol]);
 
   @override
   bool operator ==(Object other) {

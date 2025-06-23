@@ -57,14 +57,14 @@ class Faction {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     symbol,
     name,
     description,
     headquarters,
     traits,
     isRecruiting,
-  );
+  ]);
 
   @override
   bool operator ==(Object other) {

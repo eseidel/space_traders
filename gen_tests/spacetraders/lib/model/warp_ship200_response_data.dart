@@ -46,7 +46,7 @@ class WarpShip200ResponseData {
   }
 
   @override
-  int get hashCode => Object.hash(nav, fuel, events);
+  int get hashCode => Object.hashAll([nav, fuel, events]);
 
   @override
   bool operator ==(Object other) {

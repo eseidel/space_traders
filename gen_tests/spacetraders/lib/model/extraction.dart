@@ -29,7 +29,7 @@ class Extraction {
   }
 
   @override
-  int get hashCode => Object.hash(shipSymbol, yield_);
+  int get hashCode => Object.hashAll([shipSymbol, yield_]);
 
   @override
   bool operator ==(Object other) {

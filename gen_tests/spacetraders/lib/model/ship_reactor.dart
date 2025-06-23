@@ -65,7 +65,7 @@ class ShipReactor {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     symbol,
     name,
     condition,
@@ -74,7 +74,7 @@ class ShipReactor {
     powerOutput,
     requirements,
     quality,
-  );
+  ]);
 
   @override
   bool operator ==(Object other) {

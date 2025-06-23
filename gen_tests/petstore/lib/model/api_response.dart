@@ -30,7 +30,7 @@ class ApiResponse {
   }
 
   @override
-  int get hashCode => Object.hash(code, type, message);
+  int get hashCode => Object.hashAll([code, type, message]);
 
   @override
   bool operator ==(Object other) {

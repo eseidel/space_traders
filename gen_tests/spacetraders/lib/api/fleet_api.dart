@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:spacetraders/api_client.dart';
 import 'package:spacetraders/api_exception.dart';
 import 'package:spacetraders/model/create_chart201_response.dart';
@@ -203,7 +202,7 @@ class FleetApi {
 
     if (response.body.isNotEmpty) {
       return GetShipCooldownResponse.fromJson(
-        jsonDecode(response.body) as dynamic,
+        jsonDecode(response.body) as Map<String, dynamic>,
       );
     }
 

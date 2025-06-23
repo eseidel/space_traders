@@ -35,7 +35,7 @@ class GetErrorCodes200ResponseErrorCodesInner {
   }
 
   @override
-  int get hashCode => Object.hash(code, name);
+  int get hashCode => Object.hashAll([code, name]);
 
   @override
   bool operator ==(Object other) {

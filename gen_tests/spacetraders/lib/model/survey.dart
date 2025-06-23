@@ -54,7 +54,7 @@ class Survey {
 
   @override
   int get hashCode =>
-      Object.hash(signature, symbol, deposits, expiration, size);
+      Object.hashAll([signature, symbol, deposits, expiration, size]);
 
   @override
   bool operator ==(Object other) {

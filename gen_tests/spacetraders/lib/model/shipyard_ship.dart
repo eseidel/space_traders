@@ -90,7 +90,7 @@ class ShipyardShip {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     type,
     name,
     description,
@@ -103,7 +103,7 @@ class ShipyardShip {
     modules,
     mounts,
     crew,
-  );
+  ]);
 
   @override
   bool operator ==(Object other) {

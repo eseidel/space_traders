@@ -50,14 +50,14 @@ class Agent {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     accountId,
     symbol,
     headquarters,
     credits,
     startingFaction,
     shipCount,
-  );
+  ]);
 
   @override
   bool operator ==(Object other) {

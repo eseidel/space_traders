@@ -30,7 +30,7 @@ class GetStatus200ResponseLinksInner {
   }
 
   @override
-  int get hashCode => Object.hash(name, url);
+  int get hashCode => Object.hashAll([name, url]);
 
   @override
   bool operator ==(Object other) {

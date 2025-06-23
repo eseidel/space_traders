@@ -35,7 +35,7 @@ class GetMyFactions200ResponseDataInner {
   }
 
   @override
-  int get hashCode => Object.hash(symbol, reputation);
+  int get hashCode => Object.hashAll([symbol, reputation]);
 
   @override
   bool operator ==(Object other) {

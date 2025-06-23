@@ -39,7 +39,8 @@ class Chart {
   }
 
   @override
-  int get hashCode => Object.hash(waypointSymbol, submittedBy, submittedOn);
+  int get hashCode =>
+      Object.hashAll([waypointSymbol, submittedBy, submittedOn]);
 
   @override
   bool operator ==(Object other) {

@@ -80,7 +80,7 @@ class ScannedWaypoint {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     symbol,
     type,
     systemSymbol,
@@ -90,7 +90,7 @@ class ScannedWaypoint {
     faction,
     traits,
     chart,
-  );
+  ]);
 
   @override
   bool operator ==(Object other) {

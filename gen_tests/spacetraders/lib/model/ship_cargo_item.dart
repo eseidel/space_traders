@@ -43,7 +43,7 @@ class ShipCargoItem {
   }
 
   @override
-  int get hashCode => Object.hash(symbol, name, description, units);
+  int get hashCode => Object.hashAll([symbol, name, description, units]);
 
   @override
   bool operator ==(Object other) {
