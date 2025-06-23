@@ -8,7 +8,7 @@ class JumpGate {
 
   factory JumpGate.fromJson(Map<String, dynamic> json) {
     return JumpGate(
-      symbol: WaypointSymbol(json['symbol'] as String),
+      symbol: WaypointSymbol.fromJson(json['symbol'] as String),
       connections: (json['connections'] as List).cast<String>(),
     );
   }

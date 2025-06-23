@@ -744,6 +744,8 @@ class RenderPod extends RenderSchema {
         return 'bool';
       case PodType.dateTime:
         return 'DateTime';
+      case PodType.uri:
+        return 'Uri';
     }
   }
 
@@ -752,6 +754,7 @@ class RenderPod extends RenderSchema {
     switch (type) {
       case PodType.string:
       case PodType.dateTime:
+      case PodType.uri:
         return isNullable ? 'String?' : 'String';
       case PodType.integer:
         return isNullable ? 'int?' : 'int';
@@ -802,6 +805,12 @@ class RenderPod extends RenderSchema {
           return 'maybeParseDateTime($jsonValue as $jsonType) $orDefault';
         } else {
           return 'DateTime.parse($jsonValue as $jsonType)';
+        }
+      case PodType.uri:
+        if (jsonIsNullable) {
+          return 'maybeParseUri($jsonValue as $jsonType) $orDefault';
+        } else {
+          return 'Uri.parse($jsonValue as $jsonType)';
         }
       case PodType.string:
         return '$jsonValue as $jsonType $orDefault';

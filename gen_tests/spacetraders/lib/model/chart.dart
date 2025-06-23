@@ -11,7 +11,7 @@ class Chart {
 
   factory Chart.fromJson(Map<String, dynamic> json) {
     return Chart(
-      waypointSymbol: WaypointSymbol(json['waypointSymbol'] as String),
+      waypointSymbol: WaypointSymbol.fromJson(json['waypointSymbol'] as String),
       submittedBy: json['submittedBy'] as String,
       submittedOn: DateTime.parse(json['submittedOn'] as String),
     );

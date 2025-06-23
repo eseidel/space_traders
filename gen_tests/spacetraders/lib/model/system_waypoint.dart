@@ -17,7 +17,7 @@ class SystemWaypoint {
 
   factory SystemWaypoint.fromJson(Map<String, dynamic> json) {
     return SystemWaypoint(
-      symbol: WaypointSymbol(json['symbol'] as String),
+      symbol: WaypointSymbol.fromJson(json['symbol'] as String),
       type: WaypointType.fromJson(json['type'] as String),
       x: json['x'] as int,
       y: json['y'] as int,

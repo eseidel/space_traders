@@ -14,7 +14,7 @@ class ShipyardTransaction {
 
   factory ShipyardTransaction.fromJson(Map<String, dynamic> json) {
     return ShipyardTransaction(
-      waypointSymbol: WaypointSymbol(json['waypointSymbol'] as String),
+      waypointSymbol: WaypointSymbol.fromJson(json['waypointSymbol'] as String),
       shipSymbol: json['shipSymbol'] as String,
       shipType: json['shipType'] as String,
       price: json['price'] as int,
