@@ -66,7 +66,11 @@ void main() {
       final schema = {
         'type': 'object',
         'properties': {
-          'foo': {'type': 'string', 'format': 'date-time'},
+          'foo': {
+            'type': 'string',
+            'format': 'date-time',
+            'default': '2012-04-23T18:25:43.511Z',
+          },
         },
       };
       final result = renderSchema(schema);
@@ -75,7 +79,7 @@ void main() {
         '@immutable\n'
         'class Test {\n'
         '    Test(\n'
-        '        {  this.foo,\n'
+        "        {  this.foo = DateTime.parse('2012-04-23T18:25:43.511Z'),\n"
         '         }\n'
         '    );\n'
         '\n'
