@@ -30,18 +30,30 @@ String _sharedPrefix(List<String> values) {
 
 /// Convert an enum value to a variable name.
 String variableSafeName(Quirks quirks, String jsonName) {
-  // TODO(eseidel): This quirk is wrong and should be removed.
-  if (quirks.screamingCapsEnums) {
-    return jsonName;
-  }
   // Make +1 in the github spec render as plus_1.
-  var escapedName = jsonName.replaceAll('+', 'plus_');
-  // Since jsonName is a raw string, it could have non-legal characters.
-  // We need to escape them.
-  // TODO(eseidel): Tweak this to make nicer names.
-  escapedName = escapedName.replaceAll(RegExp('[^a-zA-Z0-9_]'), '_');
-  // Dart style uses camelCase.
-  return camelFromScreamingCaps(escapedName);
+  var escapedName = jsonName
+      .replaceAll('+', 'plus_')
+      // ' is most commonly used as an apostrophe so just stripping it.
+      .replaceAll("'", '')
+      // Since jsonName is a raw string, it could have non-legal characters.
+      // We need to escape them.
+      // TODO(eseidel): Tweak this to make nicer names.
+      .replaceAll(RegExp('[^a-zA-Z0-9_]'), '_');
+  // first char must be a letter.
+  if (escapedName.isEmpty) {
+    return 'a';
+  }
+  final isDigit = RegExp('[0-9]').hasMatch(escapedName[0]);
+  if (isDigit) {
+    escapedName = 'n$escapedName';
+  }
+  // This should probably only apply to enums?
+  if (!quirks.screamingCapsEnums) {
+    // Dart style uses camelCase.
+    escapedName = camelFromScreamingCaps(escapedName);
+  }
+  // camelFromScreamingCaps removes '_', so do the avoid last.
+  return avoidReservedWord(escapedName);
 }
 
 class SpecResolver {
@@ -974,7 +986,7 @@ class RenderObject extends RenderNewType {
     final useRequired = required.contains(jsonName) && !hasDefaultValue;
     return {
       'dartName': dartName,
-      'jsonName': jsonName,
+      'jsonName': quoteString(jsonName),
       'useRequired': useRequired,
       'dartIsNullable': dartIsNullable,
       'hasDefaultValue': hasDefaultValue,
@@ -1291,7 +1303,8 @@ class RenderEnum extends RenderNewType {
       var dartName = variableSafeName(quirks, value);
       // OpenAPI also removes shared prefixes from enum values.
       dartName = dartName.replaceAll(sharedPrefix, '');
-      // And avoids reserved words.
+      // Avoid reserved words again in case removing the prefix caused
+      // a reserved word collision.
       dartName = avoidReservedWord(dartName);
       return dartName;
     }

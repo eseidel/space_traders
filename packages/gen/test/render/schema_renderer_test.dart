@@ -776,7 +776,7 @@ void main() {
         '    final ApiClient client;\n'
         '\n'
         '    Future<void> users(\n'
-        '        { String? foo = "bar", }\n'
+        "        { String? foo = 'bar', }\n"
         '    ) async {\n'
         '        final response = await client.invokeApi(\n'
         '            method: Method.post,\n'
@@ -810,8 +810,8 @@ void main() {
       expect(
         result,
         'enum Test {\n'
-        '    plus1._("+1"),\n'
-        '    donT._("don\'t"),\n'
+        "    plus1._('+1'),\n"
+        "    dont._('don\\'t'),\n"
         '    ;\n'
         '\n'
         '    const Test._(this.value);\n'
@@ -854,6 +854,7 @@ void main() {
           '123': {'type': 'string'},
           '+1': {'type': 'string'},
           "don't": {'type': 'string'},
+          'default': {'type': 'string'},
         },
       };
       final result = renderSchema(json);
@@ -862,7 +863,7 @@ void main() {
         '@immutable\n'
         'class Test {\n'
         '    Test(\n'
-        '        {  this.fooBar, this.notPrivate, this.barBaz, this.123, this.plus1, this.donT,\n'
+        '        {  this.fooBar, this.notPrivate, this.barBaz, this.n123, this.plus1, this.dont, this.default_,\n'
         '         }\n'
         '    );\n'
         '\n'
@@ -872,9 +873,10 @@ void main() {
         "            fooBar: json['foo-bar'] as String? ,\n"
         "            notPrivate: json['_not_private'] as String? ,\n"
         "            barBaz: json['bar baz'] as String? ,\n"
-        "            123: json['123'] as String? ,\n"
+        "            n123: json['123'] as String? ,\n"
         "            plus1: json['+1'] as String? ,\n"
-        "            donT: json['don't'] as String? ,\n"
+        "            dont: json['don't'] as String? ,\n"
+        "            default_: json['default'] as String? ,\n"
         '        );\n'
         '    }\n'
         '\n'
@@ -890,9 +892,10 @@ void main() {
         '    final  String? fooBar;\n'
         '    final  String? notPrivate;\n'
         '    final  String? barBaz;\n'
-        '    final  String? 123;\n'
+        '    final  String? n123;\n'
         '    final  String? plus1;\n'
-        '    final  String? donT;\n'
+        '    final  String? dont;\n'
+        '    final  String? default_;\n'
         '\n'
         '\n'
         '    Map<String, dynamic> toJson() {\n'
@@ -900,9 +903,10 @@ void main() {
         "            'foo-bar': fooBar,\n"
         "            '_not_private': notPrivate,\n"
         "            'bar baz': barBaz,\n"
-        "            '123': 123,\n"
+        "            '123': n123,\n"
         "            '+1': plus1,\n"
-        "            'don&#x27;t': donT,\n"
+        "            'don\\'t': dont,\n"
+        "            'default': default_,\n"
         '        };\n'
         '    }\n'
         '\n'
@@ -912,9 +916,10 @@ void main() {
         '          fooBar,\n'
         '          notPrivate,\n'
         '          barBaz,\n'
-        '          123,\n'
+        '          n123,\n'
         '          plus1,\n'
-        '          donT,\n'
+        '          dont,\n'
+        '          default_,\n'
         '        );\n'
         '\n'
         '    @override\n'
@@ -924,9 +929,10 @@ void main() {
         '            && fooBar == other.fooBar\n'
         '            && notPrivate == other.notPrivate\n'
         '            && barBaz == other.barBaz\n'
-        '            && 123 == other.123\n'
+        '            && n123 == other.n123\n'
         '            && plus1 == other.plus1\n'
-        '            && donT == other.donT\n'
+        '            && dont == other.dont\n'
+        '            && default_ == other.default_\n'
         '        ;\n'
         '    }\n'
         '}\n'

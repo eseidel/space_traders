@@ -65,7 +65,7 @@ bool isReservedWord(String word) {
 }
 
 String quoteString(String string) {
-  return '"${string.replaceAll('"', r'\"')}"';
+  return "'${string.replaceAll("'", r"\'")}'";
 }
 
 extension CapitalizeString on String {
