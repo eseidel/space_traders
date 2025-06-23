@@ -125,12 +125,7 @@ class SpecResolver {
       case ResolvedArray():
         return RenderArray(
           snakeName: schema.snakeName,
-          items:
-              maybeRenderSchema(schema.items) ??
-              RenderUnknown(
-                snakeName: schema.snakeName,
-                pointer: schema.pointer,
-              ),
+          items: toRenderSchema(schema.items),
           pointer: schema.pointer,
           defaultValue: schema.defaultValue,
         );
