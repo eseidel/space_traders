@@ -24,8 +24,8 @@ class ShipFrame {
     return ShipFrame(
       symbol: ShipFrameSymbol.fromJson(json['symbol'] as String),
       name: json['name'] as String,
-      condition: ShipComponentCondition((json['condition'] as num).toDouble()),
-      integrity: ShipComponentIntegrity((json['integrity'] as num).toDouble()),
+      condition: ShipComponentCondition.fromJson(json['condition'] as num),
+      integrity: ShipComponentIntegrity.fromJson(json['integrity'] as num),
       description: json['description'] as String,
       moduleSlots: json['moduleSlots'] as int,
       mountingPoints: json['mountingPoints'] as int,
@@ -33,7 +33,7 @@ class ShipFrame {
       requirements: ShipRequirements.fromJson(
         json['requirements'] as Map<String, dynamic>,
       ),
-      quality: ShipComponentQuality((json['quality'] as num).toDouble()),
+      quality: ShipComponentQuality.fromJson(json['quality'] as num),
     );
   }
 

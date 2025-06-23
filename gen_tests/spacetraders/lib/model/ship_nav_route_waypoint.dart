@@ -16,7 +16,7 @@ class ShipNavRouteWaypoint {
     return ShipNavRouteWaypoint(
       symbol: json['symbol'] as String,
       type: WaypointType.fromJson(json['type'] as String),
-      systemSymbol: SystemSymbol(json['systemSymbol'] as String),
+      systemSymbol: SystemSymbol.fromJson(json['systemSymbol'] as String),
       x: json['x'] as int,
       y: json['y'] as int,
     );

@@ -12,7 +12,7 @@ class ChartTransaction {
 
   factory ChartTransaction.fromJson(Map<String, dynamic> json) {
     return ChartTransaction(
-      waypointSymbol: WaypointSymbol(json['waypointSymbol'] as String),
+      waypointSymbol: WaypointSymbol.fromJson(json['waypointSymbol'] as String),
       shipSymbol: json['shipSymbol'] as String,
       totalPrice: json['totalPrice'] as int,
       timestamp: DateTime.parse(json['timestamp'] as String),

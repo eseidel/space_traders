@@ -17,7 +17,7 @@ class MarketTransaction {
 
   factory MarketTransaction.fromJson(Map<String, dynamic> json) {
     return MarketTransaction(
-      waypointSymbol: WaypointSymbol(json['waypointSymbol'] as String),
+      waypointSymbol: WaypointSymbol.fromJson(json['waypointSymbol'] as String),
       shipSymbol: json['shipSymbol'] as String,
       tradeSymbol: json['tradeSymbol'] as String,
       type: MarketTransactionType.fromJson(json['type'] as String),

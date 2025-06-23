@@ -22,14 +22,14 @@ class ShipReactor {
     return ShipReactor(
       symbol: ShipReactorSymbol.fromJson(json['symbol'] as String),
       name: json['name'] as String,
-      condition: ShipComponentCondition((json['condition'] as num).toDouble()),
-      integrity: ShipComponentIntegrity((json['integrity'] as num).toDouble()),
+      condition: ShipComponentCondition.fromJson(json['condition'] as num),
+      integrity: ShipComponentIntegrity.fromJson(json['integrity'] as num),
       description: json['description'] as String,
       powerOutput: json['powerOutput'] as int,
       requirements: ShipRequirements.fromJson(
         json['requirements'] as Map<String, dynamic>,
       ),
-      quality: ShipComponentQuality((json['quality'] as num).toDouble()),
+      quality: ShipComponentQuality.fromJson(json['quality'] as num),
     );
   }
 

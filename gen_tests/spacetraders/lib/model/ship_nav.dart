@@ -17,8 +17,8 @@ class ShipNav {
 
   factory ShipNav.fromJson(Map<String, dynamic> json) {
     return ShipNav(
-      systemSymbol: SystemSymbol(json['systemSymbol'] as String),
-      waypointSymbol: WaypointSymbol(json['waypointSymbol'] as String),
+      systemSymbol: SystemSymbol.fromJson(json['systemSymbol'] as String),
+      waypointSymbol: WaypointSymbol.fromJson(json['waypointSymbol'] as String),
       route: ShipNavRoute.fromJson(json['route'] as Map<String, dynamic>),
       status: ShipNavStatus.fromJson(json['status'] as String),
       flightMode: ShipNavFlightMode.fromJson(json['flightMode'] as String),
