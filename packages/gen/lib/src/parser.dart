@@ -553,9 +553,7 @@ RequestBody parseRequestBody(MapContext json) {
 String _snakeNameForOperation(MapContext operationJson, String path) {
   final operationId = _optional<String>(operationJson, 'operationId');
   if (operationId != null) {
-    // // Some specs, including GitHub, put the full path in the operationId.
-    // // Since we group based on tags, ignoring the path prefix for now.
-    // final parts = operationId.split('/');
+    // Some specs, including GitHub, put the full path in the operationId.
     return toSnakeCase(operationId.replaceAll('/', '_'));
   }
   return toSnakeCase(Uri.parse(path).pathSegments.last);
