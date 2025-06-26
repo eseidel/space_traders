@@ -98,6 +98,8 @@ class FileRenderer {
   /// The quirks to use for rendering.
   Quirks get quirks => schemaRenderer.quirks;
 
+  final Set<String> _writtenFiles = {};
+
   /// The path to the api file.
   static String apiFilePath(Api api) {
     // openapi generator does not use /src/ in the path.
@@ -136,6 +138,10 @@ class FileRenderer {
 
   /// Write a file.
   void _writeFile({required String path, required String content}) {
+    if (_writtenFiles.contains(path)) {
+      throw Exception('File $path already written');
+    }
+    _writtenFiles.add(path);
     _ensureFile(path).writeAsStringSync(content);
   }
 
@@ -315,6 +321,20 @@ class FileRenderer {
     _renderApis(spec.apis);
 
     final schemas = collectAllSchemas(spec).where(rendersToSeparateFile);
+
+    // List schemas with name collisions but different pointers.
+    final nameCollisions = schemas.groupListsBy((s) => s.snakeName);
+    for (final entry in nameCollisions.entries) {
+      if (entry.value.length > 1) {
+        logger.warn(
+          'Schema ${entry.key} has ${entry.value.length} name collisions',
+        );
+        for (final schema in entry.value) {
+          logger.info('${schema.pointer}');
+        }
+      }
+    }
+
     // Render the models (schemas).
     _renderModels(schemas);
     // Render the api client.
