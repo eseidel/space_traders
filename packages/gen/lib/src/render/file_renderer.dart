@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:file/file.dart';
+import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
 import 'package:space_gen/src/logger.dart';
 import 'package:space_gen/src/quirks.dart';
@@ -43,6 +44,22 @@ Set<RenderSchema> collectSchemasUnderSchema(RenderSchema schema) {
   final collector = _ModelCollector();
   RenderTreeWalker(visitor: collector).walkSchema(schema);
   return collector.schemas;
+}
+
+@visibleForTesting
+void logNameCollisions(Iterable<RenderSchema> schemas) {
+  // List schemas with name collisions but different pointers.
+  final nameCollisions = schemas.groupListsBy((s) => s.snakeName);
+  for (final entry in nameCollisions.entries) {
+    if (entry.value.length > 1) {
+      logger.warn(
+        'Schema ${entry.key} has ${entry.value.length} name collisions',
+      );
+      for (final schema in entry.value) {
+        logger.info('${schema.pointer}');
+      }
+    }
+  }
 }
 
 // Could make this comparable to have a nicer sort for our test results.
@@ -338,21 +355,6 @@ class FileRenderer {
     }
   }
 
-  void _printNameCollisions(Iterable<RenderSchema> schemas) {
-    // List schemas with name collisions but different pointers.
-    final nameCollisions = schemas.groupListsBy((s) => s.snakeName);
-    for (final entry in nameCollisions.entries) {
-      if (entry.value.length > 1) {
-        logger.warn(
-          'Schema ${entry.key} has ${entry.value.length} name collisions',
-        );
-        for (final schema in entry.value) {
-          logger.info('${schema.pointer}');
-        }
-      }
-    }
-  }
-
   /// Render the entire spec.
   void render(RenderSpec spec) {
     // Collect all the Apis and Model Schemas.
@@ -367,7 +369,7 @@ class FileRenderer {
     _renderApis(spec.apis);
 
     final schemas = collectAllSchemas(spec).where(rendersToSeparateFile);
-    _printNameCollisions(schemas);
+    logNameCollisions(schemas);
 
     // Render the models (schemas).
     _renderModels(schemas);
