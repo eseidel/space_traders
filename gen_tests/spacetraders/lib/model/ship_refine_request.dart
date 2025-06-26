@@ -1,5 +1,5 @@
 import 'package:meta/meta.dart';
-import 'package:spacetraders/model/ship_refine_request_produce.dart';
+import 'package:spacetraders/model/ship_refine_request_produce_prop.dart';
 
 @immutable
 class ShipRefineRequest {
@@ -7,7 +7,7 @@ class ShipRefineRequest {
 
   factory ShipRefineRequest.fromJson(Map<String, dynamic> json) {
     return ShipRefineRequest(
-      produce: ShipRefineRequestProduce.fromJson(json['produce'] as String),
+      produce: ShipRefineRequestProduceProp.fromJson(json['produce'] as String),
     );
   }
 
@@ -20,7 +20,7 @@ class ShipRefineRequest {
     return ShipRefineRequest.fromJson(json);
   }
 
-  final ShipRefineRequestProduce produce;
+  final ShipRefineRequestProduceProp produce;
 
   Map<String, dynamic> toJson() {
     return {'produce': produce.toJson()};

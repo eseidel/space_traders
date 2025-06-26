@@ -1,6 +1,6 @@
 import 'package:meta/meta.dart';
-import 'package:spacetraders/model/ship_mount_deposits_inner.dart';
-import 'package:spacetraders/model/ship_mount_symbol.dart';
+import 'package:spacetraders/model/ship_mount_deposits_prop_inner.dart';
+import 'package:spacetraders/model/ship_mount_symbol_prop.dart';
 import 'package:spacetraders/model/ship_requirements.dart';
 import 'package:spacetraders/model_helpers.dart';
 
@@ -17,13 +17,13 @@ class ShipMount {
 
   factory ShipMount.fromJson(Map<String, dynamic> json) {
     return ShipMount(
-      symbol: ShipMountSymbol.fromJson(json['symbol'] as String),
+      symbol: ShipMountSymbolProp.fromJson(json['symbol'] as String),
       name: json['name'] as String,
       description: json['description'] as String,
       strength: json['strength'] as int?,
       deposits: (json['deposits'] as List?)
-          ?.map<ShipMountDepositsInner>(
-            (e) => ShipMountDepositsInner.fromJson(e as String),
+          ?.map<ShipMountDepositsPropInner>(
+            (e) => ShipMountDepositsPropInner.fromJson(e as String),
           )
           .toList(),
       requirements: ShipRequirements.fromJson(
@@ -41,11 +41,11 @@ class ShipMount {
     return ShipMount.fromJson(json);
   }
 
-  final ShipMountSymbol symbol;
+  final ShipMountSymbolProp symbol;
   final String name;
   final String description;
   final int? strength;
-  final List<ShipMountDepositsInner>? deposits;
+  final List<ShipMountDepositsPropInner>? deposits;
   final ShipRequirements requirements;
 
   Map<String, dynamic> toJson() {

@@ -1,5 +1,5 @@
 import 'package:meta/meta.dart';
-import 'package:spacetraders/model/create_chart201_response_data.dart';
+import 'package:spacetraders/model/create_chart201_response_data_prop.dart';
 
 @immutable
 class CreateChart201Response {
@@ -7,7 +7,7 @@ class CreateChart201Response {
 
   factory CreateChart201Response.fromJson(Map<String, dynamic> json) {
     return CreateChart201Response(
-      data: CreateChart201ResponseData.fromJson(
+      data: CreateChart201ResponseDataProp.fromJson(
         json['data'] as Map<String, dynamic>,
       ),
     );
@@ -22,7 +22,7 @@ class CreateChart201Response {
     return CreateChart201Response.fromJson(json);
   }
 
-  final CreateChart201ResponseData data;
+  final CreateChart201ResponseDataProp data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

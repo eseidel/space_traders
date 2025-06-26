@@ -1,5 +1,5 @@
 import 'package:meta/meta.dart';
-import 'package:spacetraders/model/ship_crew_rotation.dart';
+import 'package:spacetraders/model/ship_crew_rotation_prop.dart';
 
 @immutable
 class ShipCrew {
@@ -9,7 +9,7 @@ class ShipCrew {
     required this.capacity,
     required this.morale,
     required this.wages,
-    this.rotation = ShipCrewRotation.strict,
+    this.rotation = ShipCrewRotationProp.strict,
   });
 
   factory ShipCrew.fromJson(Map<String, dynamic> json) {
@@ -17,7 +17,7 @@ class ShipCrew {
       current: json['current'] as int,
       required_: json['required'] as int,
       capacity: json['capacity'] as int,
-      rotation: ShipCrewRotation.fromJson(json['rotation'] as String),
+      rotation: ShipCrewRotationProp.fromJson(json['rotation'] as String),
       morale: json['morale'] as int,
       wages: json['wages'] as int,
     );
@@ -35,7 +35,7 @@ class ShipCrew {
   final int current;
   final int required_;
   final int capacity;
-  final ShipCrewRotation rotation;
+  final ShipCrewRotationProp rotation;
   final int morale;
   final int wages;
 

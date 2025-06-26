@@ -1,5 +1,5 @@
 import 'package:meta/meta.dart';
-import 'package:spacetraders/model/install_mount201_response_data.dart';
+import 'package:spacetraders/model/install_mount201_response_data_prop.dart';
 
 @immutable
 class InstallMount201Response {
@@ -7,7 +7,7 @@ class InstallMount201Response {
 
   factory InstallMount201Response.fromJson(Map<String, dynamic> json) {
     return InstallMount201Response(
-      data: InstallMount201ResponseData.fromJson(
+      data: InstallMount201ResponseDataProp.fromJson(
         json['data'] as Map<String, dynamic>,
       ),
     );
@@ -22,7 +22,7 @@ class InstallMount201Response {
     return InstallMount201Response.fromJson(json);
   }
 
-  final InstallMount201ResponseData data;
+  final InstallMount201ResponseDataProp data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

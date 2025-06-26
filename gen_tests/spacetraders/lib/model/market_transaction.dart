@@ -1,5 +1,5 @@
 import 'package:meta/meta.dart';
-import 'package:spacetraders/model/market_transaction_type.dart';
+import 'package:spacetraders/model/market_transaction_type_prop.dart';
 import 'package:spacetraders/model/waypoint_symbol.dart';
 
 @immutable
@@ -20,7 +20,7 @@ class MarketTransaction {
       waypointSymbol: WaypointSymbol.fromJson(json['waypointSymbol'] as String),
       shipSymbol: json['shipSymbol'] as String,
       tradeSymbol: json['tradeSymbol'] as String,
-      type: MarketTransactionType.fromJson(json['type'] as String),
+      type: MarketTransactionTypeProp.fromJson(json['type'] as String),
       units: json['units'] as int,
       pricePerUnit: json['pricePerUnit'] as int,
       totalPrice: json['totalPrice'] as int,
@@ -40,7 +40,7 @@ class MarketTransaction {
   final WaypointSymbol waypointSymbol;
   final String shipSymbol;
   final String tradeSymbol;
-  final MarketTransactionType type;
+  final MarketTransactionTypeProp type;
   final int units;
   final int pricePerUnit;
   final int totalPrice;

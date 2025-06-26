@@ -1,6 +1,6 @@
 import 'package:meta/meta.dart';
-import 'package:spacetraders/model/ship_condition_event_component.dart';
-import 'package:spacetraders/model/ship_condition_event_symbol.dart';
+import 'package:spacetraders/model/ship_condition_event_component_prop.dart';
+import 'package:spacetraders/model/ship_condition_event_symbol_prop.dart';
 
 @immutable
 class ShipConditionEvent {
@@ -13,8 +13,8 @@ class ShipConditionEvent {
 
   factory ShipConditionEvent.fromJson(Map<String, dynamic> json) {
     return ShipConditionEvent(
-      symbol: ShipConditionEventSymbol.fromJson(json['symbol'] as String),
-      component: ShipConditionEventComponent.fromJson(
+      symbol: ShipConditionEventSymbolProp.fromJson(json['symbol'] as String),
+      component: ShipConditionEventComponentProp.fromJson(
         json['component'] as String,
       ),
       name: json['name'] as String,
@@ -31,8 +31,8 @@ class ShipConditionEvent {
     return ShipConditionEvent.fromJson(json);
   }
 
-  final ShipConditionEventSymbol symbol;
-  final ShipConditionEventComponent component;
+  final ShipConditionEventSymbolProp symbol;
+  final ShipConditionEventComponentProp component;
   final String name;
   final String description;
 

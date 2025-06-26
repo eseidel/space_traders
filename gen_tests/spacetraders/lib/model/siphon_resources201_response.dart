@@ -1,5 +1,5 @@
 import 'package:meta/meta.dart';
-import 'package:spacetraders/model/siphon_resources201_response_data.dart';
+import 'package:spacetraders/model/siphon_resources201_response_data_prop.dart';
 
 @immutable
 class SiphonResources201Response {
@@ -7,7 +7,7 @@ class SiphonResources201Response {
 
   factory SiphonResources201Response.fromJson(Map<String, dynamic> json) {
     return SiphonResources201Response(
-      data: SiphonResources201ResponseData.fromJson(
+      data: SiphonResources201ResponseDataProp.fromJson(
         json['data'] as Map<String, dynamic>,
       ),
     );
@@ -22,7 +22,7 @@ class SiphonResources201Response {
     return SiphonResources201Response.fromJson(json);
   }
 
-  final SiphonResources201ResponseData data;
+  final SiphonResources201ResponseDataProp data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

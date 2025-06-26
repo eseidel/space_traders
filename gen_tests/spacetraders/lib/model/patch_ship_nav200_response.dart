@@ -1,5 +1,5 @@
 import 'package:meta/meta.dart';
-import 'package:spacetraders/model/patch_ship_nav200_response_data.dart';
+import 'package:spacetraders/model/patch_ship_nav200_response_data_prop.dart';
 
 @immutable
 class PatchShipNav200Response {
@@ -7,7 +7,7 @@ class PatchShipNav200Response {
 
   factory PatchShipNav200Response.fromJson(Map<String, dynamic> json) {
     return PatchShipNav200Response(
-      data: PatchShipNav200ResponseData.fromJson(
+      data: PatchShipNav200ResponseDataProp.fromJson(
         json['data'] as Map<String, dynamic>,
       ),
     );
@@ -22,7 +22,7 @@ class PatchShipNav200Response {
     return PatchShipNav200Response.fromJson(json);
   }
 
-  final PatchShipNav200ResponseData data;
+  final PatchShipNav200ResponseDataProp data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

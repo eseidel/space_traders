@@ -1,5 +1,5 @@
 import 'package:meta/meta.dart';
-import 'package:spacetraders/model/create_ship_system_scan201_response_data.dart';
+import 'package:spacetraders/model/create_ship_system_scan201_response_data_prop.dart';
 
 @immutable
 class CreateShipSystemScan201Response {
@@ -7,7 +7,7 @@ class CreateShipSystemScan201Response {
 
   factory CreateShipSystemScan201Response.fromJson(Map<String, dynamic> json) {
     return CreateShipSystemScan201Response(
-      data: CreateShipSystemScan201ResponseData.fromJson(
+      data: CreateShipSystemScan201ResponseDataProp.fromJson(
         json['data'] as Map<String, dynamic>,
       ),
     );
@@ -24,7 +24,7 @@ class CreateShipSystemScan201Response {
     return CreateShipSystemScan201Response.fromJson(json);
   }
 
-  final CreateShipSystemScan201ResponseData data;
+  final CreateShipSystemScan201ResponseDataProp data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

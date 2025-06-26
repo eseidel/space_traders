@@ -6,7 +6,7 @@ import 'package:spacetraders/model/ship_module.dart';
 import 'package:spacetraders/model/ship_mount.dart';
 import 'package:spacetraders/model/ship_reactor.dart';
 import 'package:spacetraders/model/ship_type.dart';
-import 'package:spacetraders/model/shipyard_ship_crew.dart';
+import 'package:spacetraders/model/shipyard_ship_crew_prop.dart';
 import 'package:spacetraders/model/supply_level.dart';
 import 'package:spacetraders/model_helpers.dart';
 
@@ -46,7 +46,7 @@ class ShipyardShip {
       mounts: (json['mounts'] as List)
           .map<ShipMount>((e) => ShipMount.fromJson(e as Map<String, dynamic>))
           .toList(),
-      crew: ShipyardShipCrew.fromJson(json['crew'] as Map<String, dynamic>),
+      crew: ShipyardShipCrewProp.fromJson(json['crew'] as Map<String, dynamic>),
     );
   }
 
@@ -70,7 +70,7 @@ class ShipyardShip {
   final ShipEngine engine;
   final List<ShipModule> modules;
   final List<ShipMount> mounts;
-  final ShipyardShipCrew crew;
+  final ShipyardShipCrewProp crew;
 
   Map<String, dynamic> toJson() {
     return {

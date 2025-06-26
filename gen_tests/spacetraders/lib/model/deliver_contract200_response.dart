@@ -1,5 +1,5 @@
 import 'package:meta/meta.dart';
-import 'package:spacetraders/model/deliver_contract200_response_data.dart';
+import 'package:spacetraders/model/deliver_contract200_response_data_prop.dart';
 
 @immutable
 class DeliverContract200Response {
@@ -7,7 +7,7 @@ class DeliverContract200Response {
 
   factory DeliverContract200Response.fromJson(Map<String, dynamic> json) {
     return DeliverContract200Response(
-      data: DeliverContract200ResponseData.fromJson(
+      data: DeliverContract200ResponseDataProp.fromJson(
         json['data'] as Map<String, dynamic>,
       ),
     );
@@ -22,7 +22,7 @@ class DeliverContract200Response {
     return DeliverContract200Response.fromJson(json);
   }
 
-  final DeliverContract200ResponseData data;
+  final DeliverContract200ResponseDataProp data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};
