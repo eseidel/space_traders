@@ -1,5 +1,5 @@
 import 'package:meta/meta.dart';
-import 'package:spacetraders/model/extract_resources_with_survey201_response_data.dart';
+import 'package:spacetraders/model/extract_resources_with_survey201_response_data_prop.dart';
 
 @immutable
 class ExtractResourcesWithSurvey201Response {
@@ -9,7 +9,7 @@ class ExtractResourcesWithSurvey201Response {
     Map<String, dynamic> json,
   ) {
     return ExtractResourcesWithSurvey201Response(
-      data: ExtractResourcesWithSurvey201ResponseData.fromJson(
+      data: ExtractResourcesWithSurvey201ResponseDataProp.fromJson(
         json['data'] as Map<String, dynamic>,
       ),
     );
@@ -26,7 +26,7 @@ class ExtractResourcesWithSurvey201Response {
     return ExtractResourcesWithSurvey201Response.fromJson(json);
   }
 
-  final ExtractResourcesWithSurvey201ResponseData data;
+  final ExtractResourcesWithSurvey201ResponseDataProp data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

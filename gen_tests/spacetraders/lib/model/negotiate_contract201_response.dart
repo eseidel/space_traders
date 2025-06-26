@@ -1,5 +1,5 @@
 import 'package:meta/meta.dart';
-import 'package:spacetraders/model/negotiate_contract201_response_data.dart';
+import 'package:spacetraders/model/negotiate_contract201_response_data_prop.dart';
 
 @immutable
 class NegotiateContract201Response {
@@ -7,7 +7,7 @@ class NegotiateContract201Response {
 
   factory NegotiateContract201Response.fromJson(Map<String, dynamic> json) {
     return NegotiateContract201Response(
-      data: NegotiateContract201ResponseData.fromJson(
+      data: NegotiateContract201ResponseDataProp.fromJson(
         json['data'] as Map<String, dynamic>,
       ),
     );
@@ -24,7 +24,7 @@ class NegotiateContract201Response {
     return NegotiateContract201Response.fromJson(json);
   }
 
-  final NegotiateContract201ResponseData data;
+  final NegotiateContract201ResponseDataProp data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

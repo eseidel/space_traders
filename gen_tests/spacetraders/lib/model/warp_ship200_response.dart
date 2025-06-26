@@ -1,5 +1,5 @@
 import 'package:meta/meta.dart';
-import 'package:spacetraders/model/warp_ship200_response_data.dart';
+import 'package:spacetraders/model/warp_ship200_response_data_prop.dart';
 
 @immutable
 class WarpShip200Response {
@@ -7,7 +7,7 @@ class WarpShip200Response {
 
   factory WarpShip200Response.fromJson(Map<String, dynamic> json) {
     return WarpShip200Response(
-      data: WarpShip200ResponseData.fromJson(
+      data: WarpShip200ResponseDataProp.fromJson(
         json['data'] as Map<String, dynamic>,
       ),
     );
@@ -22,7 +22,7 @@ class WarpShip200Response {
     return WarpShip200Response.fromJson(json);
   }
 
-  final WarpShip200ResponseData data;
+  final WarpShip200ResponseDataProp data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

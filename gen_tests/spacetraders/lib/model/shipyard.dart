@@ -1,6 +1,6 @@
 import 'package:meta/meta.dart';
 import 'package:spacetraders/model/shipyard_ship.dart';
-import 'package:spacetraders/model/shipyard_ship_types_inner.dart';
+import 'package:spacetraders/model/shipyard_ship_types_prop_inner.dart';
 import 'package:spacetraders/model/shipyard_transaction.dart';
 import 'package:spacetraders/model_helpers.dart';
 
@@ -18,8 +18,9 @@ class Shipyard {
     return Shipyard(
       symbol: json['symbol'] as String,
       shipTypes: (json['shipTypes'] as List)
-          .map<ShipyardShipTypesInner>(
-            (e) => ShipyardShipTypesInner.fromJson(e as Map<String, dynamic>),
+          .map<ShipyardShipTypesPropInner>(
+            (e) =>
+                ShipyardShipTypesPropInner.fromJson(e as Map<String, dynamic>),
           )
           .toList(),
       transactions: (json['transactions'] as List?)
@@ -46,7 +47,7 @@ class Shipyard {
   }
 
   final String symbol;
-  final List<ShipyardShipTypesInner> shipTypes;
+  final List<ShipyardShipTypesPropInner> shipTypes;
   final List<ShipyardTransaction>? transactions;
   final List<ShipyardShip>? ships;
   final int modificationsFee;

@@ -1,5 +1,5 @@
 import 'package:meta/meta.dart';
-import 'package:spacetraders/model/register201_response_data.dart';
+import 'package:spacetraders/model/register201_response_data_prop.dart';
 
 @immutable
 class Register201Response {
@@ -7,7 +7,7 @@ class Register201Response {
 
   factory Register201Response.fromJson(Map<String, dynamic> json) {
     return Register201Response(
-      data: Register201ResponseData.fromJson(
+      data: Register201ResponseDataProp.fromJson(
         json['data'] as Map<String, dynamic>,
       ),
     );
@@ -22,7 +22,7 @@ class Register201Response {
     return Register201Response.fromJson(json);
   }
 
-  final Register201ResponseData data;
+  final Register201ResponseDataProp data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

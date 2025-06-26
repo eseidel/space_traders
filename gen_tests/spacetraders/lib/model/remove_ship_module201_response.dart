@@ -1,5 +1,5 @@
 import 'package:meta/meta.dart';
-import 'package:spacetraders/model/remove_ship_module201_response_data.dart';
+import 'package:spacetraders/model/remove_ship_module201_response_data_prop.dart';
 
 @immutable
 class RemoveShipModule201Response {
@@ -7,7 +7,7 @@ class RemoveShipModule201Response {
 
   factory RemoveShipModule201Response.fromJson(Map<String, dynamic> json) {
     return RemoveShipModule201Response(
-      data: RemoveShipModule201ResponseData.fromJson(
+      data: RemoveShipModule201ResponseDataProp.fromJson(
         json['data'] as Map<String, dynamic>,
       ),
     );
@@ -24,7 +24,7 @@ class RemoveShipModule201Response {
     return RemoveShipModule201Response.fromJson(json);
   }
 
-  final RemoveShipModule201ResponseData data;
+  final RemoveShipModule201ResponseDataProp data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

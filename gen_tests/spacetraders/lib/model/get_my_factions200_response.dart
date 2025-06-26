@@ -1,5 +1,5 @@
 import 'package:meta/meta.dart';
-import 'package:spacetraders/model/get_my_factions200_response_data_inner.dart';
+import 'package:spacetraders/model/get_my_factions200_response_data_prop_inner.dart';
 import 'package:spacetraders/model/meta.dart';
 import 'package:spacetraders/model_helpers.dart';
 
@@ -10,8 +10,8 @@ class GetMyFactions200Response {
   factory GetMyFactions200Response.fromJson(Map<String, dynamic> json) {
     return GetMyFactions200Response(
       data: (json['data'] as List)
-          .map<GetMyFactions200ResponseDataInner>(
-            (e) => GetMyFactions200ResponseDataInner.fromJson(
+          .map<GetMyFactions200ResponseDataPropInner>(
+            (e) => GetMyFactions200ResponseDataPropInner.fromJson(
               e as Map<String, dynamic>,
             ),
           )
@@ -29,7 +29,7 @@ class GetMyFactions200Response {
     return GetMyFactions200Response.fromJson(json);
   }
 
-  final List<GetMyFactions200ResponseDataInner> data;
+  final List<GetMyFactions200ResponseDataPropInner> data;
   final Meta meta;
 
   Map<String, dynamic> toJson() {

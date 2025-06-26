@@ -1,5 +1,5 @@
 import 'package:meta/meta.dart';
-import 'package:spacetraders/model/ship_fuel_consumed.dart';
+import 'package:spacetraders/model/ship_fuel_consumed_prop.dart';
 
 @immutable
 class ShipFuel {
@@ -13,7 +13,7 @@ class ShipFuel {
     return ShipFuel(
       current: json['current'] as int,
       capacity: json['capacity'] as int,
-      consumed: ShipFuelConsumed.maybeFromJson(
+      consumed: ShipFuelConsumedProp.maybeFromJson(
         json['consumed'] as Map<String, dynamic>?,
       ),
     );
@@ -30,7 +30,7 @@ class ShipFuel {
 
   final int current;
   final int capacity;
-  final ShipFuelConsumed? consumed;
+  final ShipFuelConsumedProp? consumed;
 
   Map<String, dynamic> toJson() {
     return {

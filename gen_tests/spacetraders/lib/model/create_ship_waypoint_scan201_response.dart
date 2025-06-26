@@ -1,5 +1,5 @@
 import 'package:meta/meta.dart';
-import 'package:spacetraders/model/create_ship_waypoint_scan201_response_data.dart';
+import 'package:spacetraders/model/create_ship_waypoint_scan201_response_data_prop.dart';
 
 @immutable
 class CreateShipWaypointScan201Response {
@@ -9,7 +9,7 @@ class CreateShipWaypointScan201Response {
     Map<String, dynamic> json,
   ) {
     return CreateShipWaypointScan201Response(
-      data: CreateShipWaypointScan201ResponseData.fromJson(
+      data: CreateShipWaypointScan201ResponseDataProp.fromJson(
         json['data'] as Map<String, dynamic>,
       ),
     );
@@ -26,7 +26,7 @@ class CreateShipWaypointScan201Response {
     return CreateShipWaypointScan201Response.fromJson(json);
   }
 
-  final CreateShipWaypointScan201ResponseData data;
+  final CreateShipWaypointScan201ResponseDataProp data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

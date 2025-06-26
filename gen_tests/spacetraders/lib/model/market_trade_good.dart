@@ -1,6 +1,6 @@
 import 'package:meta/meta.dart';
 import 'package:spacetraders/model/activity_level.dart';
-import 'package:spacetraders/model/market_trade_good_type.dart';
+import 'package:spacetraders/model/market_trade_good_type_prop.dart';
 import 'package:spacetraders/model/supply_level.dart';
 import 'package:spacetraders/model/trade_symbol.dart';
 
@@ -19,7 +19,7 @@ class MarketTradeGood {
   factory MarketTradeGood.fromJson(Map<String, dynamic> json) {
     return MarketTradeGood(
       symbol: TradeSymbol.fromJson(json['symbol'] as String),
-      type: MarketTradeGoodType.fromJson(json['type'] as String),
+      type: MarketTradeGoodTypeProp.fromJson(json['type'] as String),
       tradeVolume: json['tradeVolume'] as int,
       supply: SupplyLevel.fromJson(json['supply'] as String),
       activity: ActivityLevel.maybeFromJson(json['activity'] as String?),
@@ -38,7 +38,7 @@ class MarketTradeGood {
   }
 
   final TradeSymbol symbol;
-  final MarketTradeGoodType type;
+  final MarketTradeGoodTypeProp type;
   final int tradeVolume;
   final SupplyLevel supply;
   final ActivityLevel? activity;

@@ -1,5 +1,5 @@
 import 'package:meta/meta.dart';
-import 'package:spacetraders/model/repair_ship200_response_data.dart';
+import 'package:spacetraders/model/repair_ship200_response_data_prop.dart';
 
 @immutable
 class RepairShip200Response {
@@ -7,7 +7,7 @@ class RepairShip200Response {
 
   factory RepairShip200Response.fromJson(Map<String, dynamic> json) {
     return RepairShip200Response(
-      data: RepairShip200ResponseData.fromJson(
+      data: RepairShip200ResponseDataProp.fromJson(
         json['data'] as Map<String, dynamic>,
       ),
     );
@@ -22,7 +22,7 @@ class RepairShip200Response {
     return RepairShip200Response.fromJson(json);
   }
 
-  final RepairShip200ResponseData data;
+  final RepairShip200ResponseDataProp data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

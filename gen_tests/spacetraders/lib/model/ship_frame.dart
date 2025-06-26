@@ -2,7 +2,7 @@ import 'package:meta/meta.dart';
 import 'package:spacetraders/model/ship_component_condition.dart';
 import 'package:spacetraders/model/ship_component_integrity.dart';
 import 'package:spacetraders/model/ship_component_quality.dart';
-import 'package:spacetraders/model/ship_frame_symbol.dart';
+import 'package:spacetraders/model/ship_frame_symbol_prop.dart';
 import 'package:spacetraders/model/ship_requirements.dart';
 
 @immutable
@@ -22,7 +22,7 @@ class ShipFrame {
 
   factory ShipFrame.fromJson(Map<String, dynamic> json) {
     return ShipFrame(
-      symbol: ShipFrameSymbol.fromJson(json['symbol'] as String),
+      symbol: ShipFrameSymbolProp.fromJson(json['symbol'] as String),
       name: json['name'] as String,
       condition: ShipComponentCondition.fromJson(json['condition'] as num),
       integrity: ShipComponentIntegrity.fromJson(json['integrity'] as num),
@@ -46,7 +46,7 @@ class ShipFrame {
     return ShipFrame.fromJson(json);
   }
 
-  final ShipFrameSymbol symbol;
+  final ShipFrameSymbolProp symbol;
   final String name;
   final ShipComponentCondition condition;
   final ShipComponentIntegrity integrity;

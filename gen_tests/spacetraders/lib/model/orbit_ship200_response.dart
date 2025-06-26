@@ -1,5 +1,5 @@
 import 'package:meta/meta.dart';
-import 'package:spacetraders/model/orbit_ship200_response_data.dart';
+import 'package:spacetraders/model/orbit_ship200_response_data_prop.dart';
 
 @immutable
 class OrbitShip200Response {
@@ -7,7 +7,7 @@ class OrbitShip200Response {
 
   factory OrbitShip200Response.fromJson(Map<String, dynamic> json) {
     return OrbitShip200Response(
-      data: OrbitShip200ResponseData.fromJson(
+      data: OrbitShip200ResponseDataProp.fromJson(
         json['data'] as Map<String, dynamic>,
       ),
     );
@@ -22,7 +22,7 @@ class OrbitShip200Response {
     return OrbitShip200Response.fromJson(json);
   }
 
-  final OrbitShip200ResponseData data;
+  final OrbitShip200ResponseDataProp data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

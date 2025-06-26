@@ -1,8 +1,8 @@
 import 'package:meta/meta.dart';
-import 'package:spacetraders/model/scanned_ship_engine.dart';
-import 'package:spacetraders/model/scanned_ship_frame.dart';
-import 'package:spacetraders/model/scanned_ship_mounts_inner.dart';
-import 'package:spacetraders/model/scanned_ship_reactor.dart';
+import 'package:spacetraders/model/scanned_ship_engine_prop.dart';
+import 'package:spacetraders/model/scanned_ship_frame_prop.dart';
+import 'package:spacetraders/model/scanned_ship_mounts_prop_inner.dart';
+import 'package:spacetraders/model/scanned_ship_reactor_prop.dart';
 import 'package:spacetraders/model/ship_nav.dart';
 import 'package:spacetraders/model/ship_registration.dart';
 import 'package:spacetraders/model_helpers.dart';
@@ -26,18 +26,19 @@ class ScannedShip {
         json['registration'] as Map<String, dynamic>,
       ),
       nav: ShipNav.fromJson(json['nav'] as Map<String, dynamic>),
-      frame: ScannedShipFrame.maybeFromJson(
+      frame: ScannedShipFrameProp.maybeFromJson(
         json['frame'] as Map<String, dynamic>?,
       ),
-      reactor: ScannedShipReactor.maybeFromJson(
+      reactor: ScannedShipReactorProp.maybeFromJson(
         json['reactor'] as Map<String, dynamic>?,
       ),
-      engine: ScannedShipEngine.fromJson(
+      engine: ScannedShipEngineProp.fromJson(
         json['engine'] as Map<String, dynamic>,
       ),
       mounts: (json['mounts'] as List?)
-          ?.map<ScannedShipMountsInner>(
-            (e) => ScannedShipMountsInner.fromJson(e as Map<String, dynamic>),
+          ?.map<ScannedShipMountsPropInner>(
+            (e) =>
+                ScannedShipMountsPropInner.fromJson(e as Map<String, dynamic>),
           )
           .toList(),
     );
@@ -55,10 +56,10 @@ class ScannedShip {
   final String symbol;
   final ShipRegistration registration;
   final ShipNav nav;
-  final ScannedShipFrame? frame;
-  final ScannedShipReactor? reactor;
-  final ScannedShipEngine engine;
-  final List<ScannedShipMountsInner>? mounts;
+  final ScannedShipFrameProp? frame;
+  final ScannedShipReactorProp? reactor;
+  final ScannedShipEngineProp engine;
+  final List<ScannedShipMountsPropInner>? mounts;
 
   Map<String, dynamic> toJson() {
     return {

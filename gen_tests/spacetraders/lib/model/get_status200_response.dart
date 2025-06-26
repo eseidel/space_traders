@@ -1,10 +1,10 @@
 import 'package:meta/meta.dart';
-import 'package:spacetraders/model/get_status200_response_announcements_inner.dart';
-import 'package:spacetraders/model/get_status200_response_health.dart';
-import 'package:spacetraders/model/get_status200_response_leaderboards.dart';
-import 'package:spacetraders/model/get_status200_response_links_inner.dart';
-import 'package:spacetraders/model/get_status200_response_server_resets.dart';
-import 'package:spacetraders/model/get_status200_response_stats.dart';
+import 'package:spacetraders/model/get_status200_response_announcements_prop_inner.dart';
+import 'package:spacetraders/model/get_status200_response_health_prop.dart';
+import 'package:spacetraders/model/get_status200_response_leaderboards_prop.dart';
+import 'package:spacetraders/model/get_status200_response_links_prop_inner.dart';
+import 'package:spacetraders/model/get_status200_response_server_resets_prop.dart';
+import 'package:spacetraders/model/get_status200_response_stats_prop.dart';
 import 'package:spacetraders/model_helpers.dart';
 
 @immutable
@@ -28,28 +28,28 @@ class GetStatus200Response {
       version: json['version'] as String,
       resetDate: json['resetDate'] as String,
       description: json['description'] as String,
-      stats: GetStatus200ResponseStats.fromJson(
+      stats: GetStatus200ResponseStatsProp.fromJson(
         json['stats'] as Map<String, dynamic>,
       ),
-      health: GetStatus200ResponseHealth.fromJson(
+      health: GetStatus200ResponseHealthProp.fromJson(
         json['health'] as Map<String, dynamic>,
       ),
-      leaderboards: GetStatus200ResponseLeaderboards.fromJson(
+      leaderboards: GetStatus200ResponseLeaderboardsProp.fromJson(
         json['leaderboards'] as Map<String, dynamic>,
       ),
-      serverResets: GetStatus200ResponseServerResets.fromJson(
+      serverResets: GetStatus200ResponseServerResetsProp.fromJson(
         json['serverResets'] as Map<String, dynamic>,
       ),
       announcements: (json['announcements'] as List)
-          .map<GetStatus200ResponseAnnouncementsInner>(
-            (e) => GetStatus200ResponseAnnouncementsInner.fromJson(
+          .map<GetStatus200ResponseAnnouncementsPropInner>(
+            (e) => GetStatus200ResponseAnnouncementsPropInner.fromJson(
               e as Map<String, dynamic>,
             ),
           )
           .toList(),
       links: (json['links'] as List)
-          .map<GetStatus200ResponseLinksInner>(
-            (e) => GetStatus200ResponseLinksInner.fromJson(
+          .map<GetStatus200ResponseLinksPropInner>(
+            (e) => GetStatus200ResponseLinksPropInner.fromJson(
               e as Map<String, dynamic>,
             ),
           )
@@ -70,12 +70,12 @@ class GetStatus200Response {
   final String version;
   final String resetDate;
   final String description;
-  final GetStatus200ResponseStats stats;
-  final GetStatus200ResponseHealth health;
-  final GetStatus200ResponseLeaderboards leaderboards;
-  final GetStatus200ResponseServerResets serverResets;
-  final List<GetStatus200ResponseAnnouncementsInner> announcements;
-  final List<GetStatus200ResponseLinksInner> links;
+  final GetStatus200ResponseStatsProp stats;
+  final GetStatus200ResponseHealthProp health;
+  final GetStatus200ResponseLeaderboardsProp leaderboards;
+  final GetStatus200ResponseServerResetsProp serverResets;
+  final List<GetStatus200ResponseAnnouncementsPropInner> announcements;
+  final List<GetStatus200ResponseLinksPropInner> links;
 
   Map<String, dynamic> toJson() {
     return {

@@ -1,5 +1,5 @@
 import 'package:meta/meta.dart';
-import 'package:spacetraders/model/jettison200_response_data.dart';
+import 'package:spacetraders/model/jettison200_response_data_prop.dart';
 
 @immutable
 class Jettison200Response {
@@ -7,7 +7,7 @@ class Jettison200Response {
 
   factory Jettison200Response.fromJson(Map<String, dynamic> json) {
     return Jettison200Response(
-      data: Jettison200ResponseData.fromJson(
+      data: Jettison200ResponseDataProp.fromJson(
         json['data'] as Map<String, dynamic>,
       ),
     );
@@ -22,7 +22,7 @@ class Jettison200Response {
     return Jettison200Response.fromJson(json);
   }
 
-  final Jettison200ResponseData data;
+  final Jettison200ResponseDataProp data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

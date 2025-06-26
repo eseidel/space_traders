@@ -1,5 +1,5 @@
 import 'package:meta/meta.dart';
-import 'package:spacetraders/model/transfer_cargo200_response_data.dart';
+import 'package:spacetraders/model/transfer_cargo200_response_data_prop.dart';
 
 @immutable
 class TransferCargo200Response {
@@ -7,7 +7,7 @@ class TransferCargo200Response {
 
   factory TransferCargo200Response.fromJson(Map<String, dynamic> json) {
     return TransferCargo200Response(
-      data: TransferCargo200ResponseData.fromJson(
+      data: TransferCargo200ResponseDataProp.fromJson(
         json['data'] as Map<String, dynamic>,
       ),
     );
@@ -22,7 +22,7 @@ class TransferCargo200Response {
     return TransferCargo200Response.fromJson(json);
   }
 
-  final TransferCargo200ResponseData data;
+  final TransferCargo200ResponseDataProp data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

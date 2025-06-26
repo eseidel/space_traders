@@ -1,5 +1,5 @@
 import 'package:meta/meta.dart';
-import 'package:spacetraders/model/get_supply_chain200_response_data.dart';
+import 'package:spacetraders/model/get_supply_chain200_response_data_prop.dart';
 
 @immutable
 class GetSupplyChain200Response {
@@ -7,7 +7,7 @@ class GetSupplyChain200Response {
 
   factory GetSupplyChain200Response.fromJson(Map<String, dynamic> json) {
     return GetSupplyChain200Response(
-      data: GetSupplyChain200ResponseData.fromJson(
+      data: GetSupplyChain200ResponseDataProp.fromJson(
         json['data'] as Map<String, dynamic>,
       ),
     );
@@ -22,7 +22,7 @@ class GetSupplyChain200Response {
     return GetSupplyChain200Response.fromJson(json);
   }
 
-  final GetSupplyChain200ResponseData data;
+  final GetSupplyChain200ResponseDataProp data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

@@ -1,5 +1,5 @@
 import 'package:meta/meta.dart';
-import 'package:spacetraders/model/ship_module_symbol.dart';
+import 'package:spacetraders/model/ship_module_symbol_prop.dart';
 import 'package:spacetraders/model/ship_requirements.dart';
 
 @immutable
@@ -15,7 +15,7 @@ class ShipModule {
 
   factory ShipModule.fromJson(Map<String, dynamic> json) {
     return ShipModule(
-      symbol: ShipModuleSymbol.fromJson(json['symbol'] as String),
+      symbol: ShipModuleSymbolProp.fromJson(json['symbol'] as String),
       name: json['name'] as String,
       description: json['description'] as String,
       capacity: json['capacity'] as int?,
@@ -35,7 +35,7 @@ class ShipModule {
     return ShipModule.fromJson(json);
   }
 
-  final ShipModuleSymbol symbol;
+  final ShipModuleSymbolProp symbol;
   final String name;
   final String description;
   final int? capacity;

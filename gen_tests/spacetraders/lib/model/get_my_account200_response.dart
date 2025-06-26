@@ -1,5 +1,5 @@
 import 'package:meta/meta.dart';
-import 'package:spacetraders/model/get_my_account200_response_data.dart';
+import 'package:spacetraders/model/get_my_account200_response_data_prop.dart';
 
 @immutable
 class GetMyAccount200Response {
@@ -7,7 +7,7 @@ class GetMyAccount200Response {
 
   factory GetMyAccount200Response.fromJson(Map<String, dynamic> json) {
     return GetMyAccount200Response(
-      data: GetMyAccount200ResponseData.fromJson(
+      data: GetMyAccount200ResponseDataProp.fromJson(
         json['data'] as Map<String, dynamic>,
       ),
     );
@@ -22,7 +22,7 @@ class GetMyAccount200Response {
     return GetMyAccount200Response.fromJson(json);
   }
 
-  final GetMyAccount200ResponseData data;
+  final GetMyAccount200ResponseDataProp data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};

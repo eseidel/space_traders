@@ -1,5 +1,5 @@
 import 'package:meta/meta.dart';
-import 'package:spacetraders/model/scrap_ship200_response_data.dart';
+import 'package:spacetraders/model/scrap_ship200_response_data_prop.dart';
 
 @immutable
 class ScrapShip200Response {
@@ -7,7 +7,7 @@ class ScrapShip200Response {
 
   factory ScrapShip200Response.fromJson(Map<String, dynamic> json) {
     return ScrapShip200Response(
-      data: ScrapShip200ResponseData.fromJson(
+      data: ScrapShip200ResponseDataProp.fromJson(
         json['data'] as Map<String, dynamic>,
       ),
     );
@@ -22,7 +22,7 @@ class ScrapShip200Response {
     return ScrapShip200Response.fromJson(json);
   }
 
-  final ScrapShip200ResponseData data;
+  final ScrapShip200ResponseDataProp data;
 
   Map<String, dynamic> toJson() {
     return {'data': data.toJson()};
