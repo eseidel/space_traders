@@ -831,6 +831,9 @@ class RenderPod extends RenderSchema {
     if (type == PodType.dateTime) {
       return '$nameCall.toIso8601String()';
     }
+    if (type == PodType.uri) {
+      return '$nameCall.toString()';
+    }
     return dartName;
   }
 
@@ -1362,6 +1365,12 @@ class RenderMap extends RenderSchema {
     required bool jsonIsNullable,
     required bool dartIsNullable,
   }) {
+    // If the value schema is a pod type we can just return the json value.
+    // This skips validation, which might not be OK?
+    if (valueSchema is RenderPod) {
+      // Should this be '?$jsonValue'? to skip the key on null?
+      return jsonValue;
+    }
     final jsonType = jsonStorageType(isNullable: jsonIsNullable);
     final valueFromJson = valueSchema.fromJsonExpression(
       'value',

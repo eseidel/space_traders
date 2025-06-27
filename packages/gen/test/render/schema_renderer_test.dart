@@ -457,7 +457,7 @@ void main() {
         '    factory Test.fromJson(Map<String, dynamic>\n'
         '        json) {\n'
         '        return Test(\n'
-        "            map: (json['map'] as Map<String, dynamic>)?.map((key, value) => MapEntry(key, value as String )),\n"
+        "            map: json['map'],\n"
         '        );\n'
         '    }\n'
         '\n'
@@ -488,6 +488,222 @@ void main() {
         '        if (identical(this, other)) return true;\n'
         '        return other is Test\n'
         '            && mapsEqual(map, other.map)\n'
+        '        ;\n'
+        '    }\n'
+        '}\n'
+        '',
+      );
+    });
+
+    test('map type with pod types', () {
+      final schema = {
+        'type': 'object',
+        'properties': {
+          'm_string': {
+            'type': 'object',
+            'additionalProperties': {'type': 'string'},
+          },
+          'm_int': {
+            'type': 'object',
+            'additionalProperties': {'type': 'integer'},
+          },
+          'm_number': {
+            'type': 'object',
+            'additionalProperties': {'type': 'number'},
+          },
+          'm_boolean': {
+            'type': 'object',
+            'additionalProperties': {'type': 'boolean'},
+          },
+          'm_date_time': {
+            'type': 'object',
+            'additionalProperties': {'type': 'string', 'format': 'date-time'},
+          },
+          'm_uri': {
+            'type': 'object',
+            'additionalProperties': {'type': 'string', 'format': 'uri'},
+          },
+        },
+      };
+      final result = renderSchema(schema);
+      expect(
+        result,
+        '@immutable\n'
+        'class Test {\n'
+        '    Test(\n'
+        '        {  this.mString, this.mInt, this.mNumber, this.mBoolean, this.mDateTime, this.mUri,\n'
+        '         }\n'
+        '    );\n'
+        '\n'
+        '    factory Test.fromJson(Map<String, dynamic>\n'
+        '        json) {\n'
+        '        return Test(\n'
+        "            mString: json['m_string'],\n"
+        "            mInt: json['m_int'],\n"
+        "            mNumber: json['m_number'],\n"
+        "            mBoolean: json['m_boolean'],\n"
+        "            mDateTime: json['m_date_time'],\n"
+        "            mUri: json['m_uri'],\n"
+        '        );\n'
+        '    }\n'
+        '\n'
+        '    /// Convenience to create a nullable type from a nullable json object.\n'
+        '    /// Useful when parsing optional fields.\n'
+        '    static Test? maybeFromJson(Map<String, dynamic>? json) {\n'
+        '        if (json == null) {\n'
+        '            return null;\n'
+        '        }\n'
+        '        return Test.fromJson(json);\n'
+        '    }\n'
+        '\n'
+        '    final  Map<String, String>? mString;\n'
+        '    final  Map<String, int>? mInt;\n'
+        '    final  Map<String, double>? mNumber;\n'
+        '    final  Map<String, bool>? mBoolean;\n'
+        '    final  Map<String, DateTime>? mDateTime;\n'
+        '    final  Map<String, Uri>? mUri;\n'
+        '\n'
+        '\n'
+        '    Map<String, dynamic> toJson() {\n'
+        '        return {\n'
+        "            'm_string': mString,\n"
+        "            'm_int': mInt,\n"
+        "            'm_number': mNumber,\n"
+        "            'm_boolean': mBoolean,\n"
+        "            'm_date_time': mDateTime?.map((key, value) => MapEntry(key, value.toIso8601String())),\n"
+        "            'm_uri': mUri?.map((key, value) => MapEntry(key, value.toString())),\n"
+        '        };\n'
+        '    }\n'
+        '\n'
+        '    @override\n'
+        '    int get hashCode =>\n'
+        '        Object.hashAll([\n'
+        '          mString,\n'
+        '          mInt,\n'
+        '          mNumber,\n'
+        '          mBoolean,\n'
+        '          mDateTime,\n'
+        '          mUri,\n'
+        '        ]);\n'
+        '\n'
+        '    @override\n'
+        '    bool operator ==(Object other) {\n'
+        '        if (identical(this, other)) return true;\n'
+        '        return other is Test\n'
+        '            && mapsEqual(mString, other.mString)\n'
+        '            && mapsEqual(mInt, other.mInt)\n'
+        '            && mapsEqual(mNumber, other.mNumber)\n'
+        '            && mapsEqual(mBoolean, other.mBoolean)\n'
+        '            && mapsEqual(mDateTime, other.mDateTime)\n'
+        '            && mapsEqual(mUri, other.mUri)\n'
+        '        ;\n'
+        '    }\n'
+        '}\n'
+        '',
+      );
+    });
+
+    test('array type with pod types', () {
+      final schema = {
+        'type': 'object',
+        'properties': {
+          'a_string': {
+            'type': 'array',
+            'items': {'type': 'string'},
+          },
+          'a_int': {
+            'type': 'array',
+            'items': {'type': 'integer'},
+          },
+          'a_number': {
+            'type': 'array',
+            'items': {'type': 'number'},
+          },
+          'a_boolean': {
+            'type': 'array',
+            'items': {'type': 'boolean'},
+          },
+          'a_date_time': {
+            'type': 'array',
+            'items': {'type': 'string', 'format': 'date-time'},
+          },
+          'a_uri': {
+            'type': 'array',
+            'items': {'type': 'string', 'format': 'uri'},
+          },
+        },
+      };
+      final result = renderSchema(schema);
+      expect(
+        result,
+        '@immutable\n'
+        'class Test {\n'
+        '    Test(\n'
+        '        {  this.aString = const [], this.aInt = const [], this.aNumber = const [], this.aBoolean = const [], this.aDateTime = const [], this.aUri = const [],\n'
+        '         }\n'
+        '    );\n'
+        '\n'
+        '    factory Test.fromJson(Map<String, dynamic>\n'
+        '        json) {\n'
+        '        return Test(\n'
+        "            aString: (json['a_string'] as List?)?.cast<String>() ,\n"
+        "            aInt: (json['a_int'] as List?)?.cast<int>() ,\n"
+        "            aNumber: (json['a_number'] as List?)?.cast<double>() ,\n"
+        "            aBoolean: (json['a_boolean'] as List?)?.cast<bool>() ,\n"
+        "            aDateTime: (json['a_date_time'] as List?)?.cast<DateTime>() ,\n"
+        "            aUri: (json['a_uri'] as List?)?.cast<Uri>() ,\n"
+        '        );\n'
+        '    }\n'
+        '\n'
+        '    /// Convenience to create a nullable type from a nullable json object.\n'
+        '    /// Useful when parsing optional fields.\n'
+        '    static Test? maybeFromJson(Map<String, dynamic>? json) {\n'
+        '        if (json == null) {\n'
+        '            return null;\n'
+        '        }\n'
+        '        return Test.fromJson(json);\n'
+        '    }\n'
+        '\n'
+        '    final  List<String>? aString;\n'
+        '    final  List<int>? aInt;\n'
+        '    final  List<double>? aNumber;\n'
+        '    final  List<bool>? aBoolean;\n'
+        '    final  List<DateTime>? aDateTime;\n'
+        '    final  List<Uri>? aUri;\n'
+        '\n'
+        '\n'
+        '    Map<String, dynamic> toJson() {\n'
+        '        return {\n'
+        "            'a_string': aString,\n"
+        "            'a_int': aInt,\n"
+        "            'a_number': aNumber,\n"
+        "            'a_boolean': aBoolean,\n"
+        "            'a_date_time': aDateTime,\n"
+        "            'a_uri': aUri,\n"
+        '        };\n'
+        '    }\n'
+        '\n'
+        '    @override\n'
+        '    int get hashCode =>\n'
+        '        Object.hashAll([\n'
+        '          aString,\n'
+        '          aInt,\n'
+        '          aNumber,\n'
+        '          aBoolean,\n'
+        '          aDateTime,\n'
+        '          aUri,\n'
+        '        ]);\n'
+        '\n'
+        '    @override\n'
+        '    bool operator ==(Object other) {\n'
+        '        if (identical(this, other)) return true;\n'
+        '        return other is Test\n'
+        '            && listsEqual(aString, other.aString)\n'
+        '            && listsEqual(aInt, other.aInt)\n'
+        '            && listsEqual(aNumber, other.aNumber)\n'
+        '            && listsEqual(aBoolean, other.aBoolean)\n'
+        '            && listsEqual(aDateTime, other.aDateTime)\n'
+        '            && listsEqual(aUri, other.aUri)\n'
         '        ;\n'
         '    }\n'
         '}\n'
