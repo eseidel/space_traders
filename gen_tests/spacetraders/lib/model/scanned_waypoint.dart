@@ -20,8 +20,8 @@ class ScannedWaypoint {
     this.faction,
     List<WaypointTrait>? traits,
     this.chart,
-  }) : orbitals = orbitals ?? const [],
-       traits = traits ?? const [];
+  }) : orbitals = orbitals ?? const <WaypointOrbital>[],
+       traits = traits ?? const <WaypointTrait>[];
 
   factory ScannedWaypoint.fromJson(Map<String, dynamic> json) {
     return ScannedWaypoint(

@@ -17,7 +17,7 @@ class ScannedShip {
     this.frame,
     this.reactor,
     List<ScannedShipMountsPropInner>? mounts,
-  }) : mounts = mounts ?? const [];
+  }) : mounts = mounts ?? const <ScannedShipMountsPropInner>[];
 
   factory ScannedShip.fromJson(Map<String, dynamic> json) {
     return ScannedShip(

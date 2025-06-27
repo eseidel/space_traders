@@ -12,8 +12,10 @@ class ShipRefine201ResponseDataProp {
     required this.cooldown,
     List<ShipRefine201ResponseDataPropProducedPropInner>? produced,
     List<ShipRefine201ResponseDataPropConsumedPropInner>? consumed,
-  }) : produced = produced ?? const [],
-       consumed = consumed ?? const [];
+  }) : produced =
+           produced ?? const <ShipRefine201ResponseDataPropProducedPropInner>[],
+       consumed =
+           consumed ?? const <ShipRefine201ResponseDataPropConsumedPropInner>[];
 
   factory ShipRefine201ResponseDataProp.fromJson(Map<String, dynamic> json) {
     return ShipRefine201ResponseDataProp(

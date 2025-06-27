@@ -13,11 +13,11 @@ class Market {
     List<TradeGood>? exchange,
     List<MarketTransaction>? transactions,
     List<MarketTradeGood>? tradeGoods,
-  }) : exports = exports ?? const [],
-       imports = imports ?? const [],
-       exchange = exchange ?? const [],
-       transactions = transactions ?? const [],
-       tradeGoods = tradeGoods ?? const [];
+  }) : exports = exports ?? const <TradeGood>[],
+       imports = imports ?? const <TradeGood>[],
+       exchange = exchange ?? const <TradeGood>[],
+       transactions = transactions ?? const <MarketTransaction>[],
+       tradeGoods = tradeGoods ?? const <MarketTradeGood>[];
 
   factory Market.fromJson(Map<String, dynamic> json) {
     return Market(

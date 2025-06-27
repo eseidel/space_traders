@@ -8,7 +8,7 @@ class CreateShipWaypointScan201ResponseDataProp {
   const CreateShipWaypointScan201ResponseDataProp({
     required this.cooldown,
     List<ScannedWaypoint>? waypoints,
-  }) : waypoints = waypoints ?? const [];
+  }) : waypoints = waypoints ?? const <ScannedWaypoint>[];
 
   factory CreateShipWaypointScan201ResponseDataProp.fromJson(
     Map<String, dynamic> json,

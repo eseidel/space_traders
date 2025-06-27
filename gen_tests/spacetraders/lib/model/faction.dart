@@ -12,7 +12,7 @@ class Faction {
     required this.isRecruiting,
     this.headquarters,
     List<FactionTrait>? traits,
-  }) : traits = traits ?? const [];
+  }) : traits = traits ?? const <FactionTrait>[];
 
   factory Faction.fromJson(Map<String, dynamic> json) {
     return Faction(

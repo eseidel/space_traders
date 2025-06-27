@@ -8,7 +8,7 @@ class CreateShipShipScan201ResponseDataProp {
   const CreateShipShipScan201ResponseDataProp({
     required this.cooldown,
     List<ScannedShip>? ships,
-  }) : ships = ships ?? const [];
+  }) : ships = ships ?? const <ScannedShip>[];
 
   factory CreateShipShipScan201ResponseDataProp.fromJson(
     Map<String, dynamic> json,

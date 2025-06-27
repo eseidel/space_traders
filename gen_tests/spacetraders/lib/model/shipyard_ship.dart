@@ -25,8 +25,8 @@ class ShipyardShip {
     this.activity,
     List<ShipModule>? modules,
     List<ShipMount>? mounts,
-  }) : modules = modules ?? const [],
-       mounts = mounts ?? const [];
+  }) : modules = modules ?? const <ShipModule>[],
+       mounts = mounts ?? const <ShipMount>[];
 
   factory ShipyardShip.fromJson(Map<String, dynamic> json) {
     return ShipyardShip(

@@ -8,7 +8,7 @@ class GetMyFactions200Response {
   const GetMyFactions200Response({
     required this.meta,
     List<GetMyFactions200ResponseDataPropInner>? data,
-  }) : data = data ?? const [];
+  }) : data = data ?? const <GetMyFactions200ResponseDataPropInner>[];
 
   factory GetMyFactions200Response.fromJson(Map<String, dynamic> json) {
     return GetMyFactions200Response(

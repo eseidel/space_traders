@@ -12,7 +12,7 @@ class RemoveMount201ResponseDataProp {
     required this.cargo,
     required this.transaction,
     List<ShipMount>? mounts,
-  }) : mounts = mounts ?? const [];
+  }) : mounts = mounts ?? const <ShipMount>[];
 
   factory RemoveMount201ResponseDataProp.fromJson(Map<String, dynamic> json) {
     return RemoveMount201ResponseDataProp(

@@ -16,8 +16,8 @@ class System {
     List<SystemWaypoint>? waypoints,
     List<SystemFaction>? factions,
     this.name,
-  }) : waypoints = waypoints ?? const [],
-       factions = factions ?? const [];
+  }) : waypoints = waypoints ?? const <SystemWaypoint>[],
+       factions = factions ?? const <SystemFaction>[];
 
   factory System.fromJson(Map<String, dynamic> json) {
     return System(

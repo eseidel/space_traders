@@ -8,7 +8,7 @@ class GetSystemWaypoints200Response {
   const GetSystemWaypoints200Response({
     required this.meta,
     List<Waypoint>? data,
-  }) : data = data ?? const [];
+  }) : data = data ?? const <Waypoint>[];
 
   factory GetSystemWaypoints200Response.fromJson(Map<String, dynamic> json) {
     return GetSystemWaypoints200Response(

@@ -14,8 +14,8 @@ class ExtractResources201ResponseDataProp {
     required this.cargo,
     List<WaypointModifier>? modifiers,
     List<ShipConditionEvent>? events,
-  }) : modifiers = modifiers ?? const [],
-       events = events ?? const [];
+  }) : modifiers = modifiers ?? const <WaypointModifier>[],
+       events = events ?? const <ShipConditionEvent>[];
 
   factory ExtractResources201ResponseDataProp.fromJson(
     Map<String, dynamic> json,

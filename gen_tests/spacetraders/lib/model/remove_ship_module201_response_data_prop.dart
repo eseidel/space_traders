@@ -12,7 +12,7 @@ class RemoveShipModule201ResponseDataProp {
     required this.cargo,
     required this.transaction,
     List<ShipModule>? modules,
-  }) : modules = modules ?? const [];
+  }) : modules = modules ?? const <ShipModule>[];
 
   factory RemoveShipModule201ResponseDataProp.fromJson(
     Map<String, dynamic> json,

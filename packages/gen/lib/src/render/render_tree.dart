@@ -1312,9 +1312,9 @@ class RenderArray extends RenderSchema {
 
   @override
   bool get hasConstConstructor {
-    final dValue = defaultValue;
-    if (dValue is List) {
-      return dValue.isEmpty;
+    final dValue = defaultValue as List?;
+    if (dValue is List && dValue.isEmpty) {
+      return true;
     }
     // In the null case we're falling through to here, but this will also never
     // be called in that case.
@@ -1341,9 +1341,19 @@ class RenderArray extends RenderSchema {
   @override
   String? defaultValueString(SchemaRenderer context) {
     // OpenAPI defaults arrays to empty, so we match for now.
-    return context.quirks.allListsDefaultToEmpty
-        ? 'const []'
-        : super.defaultValueString(context);
+    final itemType = items.typeName(context);
+    if (defaultValue == null) {
+      if (context.quirks.allListsDefaultToEmpty) {
+        return 'const <$itemType>[]';
+      }
+      return null;
+    }
+    final maybeConst = items.hasConstConstructor ? 'const ' : '';
+    final listDefault = defaultValue as List;
+    String toString(dynamic value) =>
+        value is String ? quoteString(value) : value.toString();
+    final values = listDefault.map(toString).join(', ');
+    return '$maybeConst<$itemType>[$values]';
   }
 
   @override
@@ -1437,9 +1447,9 @@ class RenderMap extends RenderSchema {
 
   @override
   bool get hasConstConstructor {
-    final dValue = defaultValue;
-    if (dValue is Map) {
-      return dValue.isEmpty;
+    final dValue = defaultValue as Map?;
+    if (dValue is Map && dValue.isEmpty) {
+      return true;
     }
     // In the null case we're falling through to here, but this will also never
     // be called in that case.

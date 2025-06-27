@@ -13,7 +13,7 @@ class Register201ResponseDataProp {
     required this.faction,
     required this.contract,
     List<Ship>? ships,
-  }) : ships = ships ?? const [];
+  }) : ships = ships ?? const <Ship>[];
 
   factory Register201ResponseDataProp.fromJson(Map<String, dynamic> json) {
     return Register201ResponseDataProp(

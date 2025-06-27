@@ -8,7 +8,7 @@ class CreateSurvey201ResponseDataProp {
   const CreateSurvey201ResponseDataProp({
     required this.cooldown,
     List<Survey>? surveys,
-  }) : surveys = surveys ?? const [];
+  }) : surveys = surveys ?? const <Survey>[];
 
   factory CreateSurvey201ResponseDataProp.fromJson(Map<String, dynamic> json) {
     return CreateSurvey201ResponseDataProp(

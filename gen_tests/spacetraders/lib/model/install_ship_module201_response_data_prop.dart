@@ -12,7 +12,7 @@ class InstallShipModule201ResponseDataProp {
     required this.cargo,
     required this.transaction,
     List<ShipModule>? modules,
-  }) : modules = modules ?? const [];
+  }) : modules = modules ?? const <ShipModule>[];
 
   factory InstallShipModule201ResponseDataProp.fromJson(
     Map<String, dynamic> json,

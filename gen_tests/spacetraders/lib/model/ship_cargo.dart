@@ -8,7 +8,7 @@ class ShipCargo {
     required this.capacity,
     required this.units,
     List<ShipCargoItem>? inventory,
-  }) : inventory = inventory ?? const [];
+  }) : inventory = inventory ?? const <ShipCargoItem>[];
 
   factory ShipCargo.fromJson(Map<String, dynamic> json) {
     return ShipCargo(

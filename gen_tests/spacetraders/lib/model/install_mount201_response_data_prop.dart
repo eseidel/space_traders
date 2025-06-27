@@ -12,7 +12,7 @@ class InstallMount201ResponseDataProp {
     required this.cargo,
     required this.transaction,
     List<ShipMount>? mounts,
-  }) : mounts = mounts ?? const [];
+  }) : mounts = mounts ?? const <ShipMount>[];
 
   factory InstallMount201ResponseDataProp.fromJson(Map<String, dynamic> json) {
     return InstallMount201ResponseDataProp(

@@ -9,7 +9,7 @@ class ContractTerms {
     required this.deadline,
     required this.payment,
     List<ContractDeliverGood>? deliver,
-  }) : deliver = deliver ?? const [];
+  }) : deliver = deliver ?? const <ContractDeliverGood>[];
 
   factory ContractTerms.fromJson(Map<String, dynamic> json) {
     return ContractTerms(

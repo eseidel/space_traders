@@ -9,8 +9,14 @@ class GetStatus200ResponseLeaderboardsProp {
     List<GetStatus200ResponseLeaderboardsPropMostCreditsPropInner>? mostCredits,
     List<GetStatus200ResponseLeaderboardsPropMostSubmittedChartsPropInner>?
     mostSubmittedCharts,
-  }) : mostCredits = mostCredits ?? const [],
-       mostSubmittedCharts = mostSubmittedCharts ?? const [];
+  }) : mostCredits =
+           mostCredits ??
+           const <GetStatus200ResponseLeaderboardsPropMostCreditsPropInner>[],
+       mostSubmittedCharts =
+           mostSubmittedCharts ??
+           const <
+             GetStatus200ResponseLeaderboardsPropMostSubmittedChartsPropInner
+           >[];
 
   factory GetStatus200ResponseLeaderboardsProp.fromJson(
     Map<String, dynamic> json,

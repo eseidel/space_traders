@@ -12,7 +12,7 @@ class ShipMount {
     required this.description,
     required this.requirements,
     this.strength,
-    this.deposits = const [],
+    this.deposits = const <ShipMountDepositsPropInner>[],
   });
 
   factory ShipMount.fromJson(Map<String, dynamic> json) {

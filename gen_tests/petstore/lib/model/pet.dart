@@ -10,10 +10,10 @@ class Pet {
     required this.name,
     this.id,
     this.category,
-    this.photoUrls = const [],
+    this.photoUrls = const <String>[],
     List<Tag>? tags,
     this.status,
-  }) : tags = tags ?? const [];
+  }) : tags = tags ?? const <Tag>[];
 
   factory Pet.fromJson(Map<String, dynamic> json) {
     return Pet(

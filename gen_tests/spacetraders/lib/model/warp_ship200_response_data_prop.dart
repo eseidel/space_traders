@@ -10,7 +10,7 @@ class WarpShip200ResponseDataProp {
     required this.nav,
     required this.fuel,
     List<ShipConditionEvent>? events,
-  }) : events = events ?? const [];
+  }) : events = events ?? const <ShipConditionEvent>[];
 
   factory WarpShip200ResponseDataProp.fromJson(Map<String, dynamic> json) {
     return WarpShip200ResponseDataProp(

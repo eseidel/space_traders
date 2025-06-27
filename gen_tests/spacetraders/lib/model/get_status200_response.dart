@@ -20,8 +20,10 @@ class GetStatus200Response {
     required this.serverResets,
     List<GetStatus200ResponseAnnouncementsPropInner>? announcements,
     List<GetStatus200ResponseLinksPropInner>? links,
-  }) : announcements = announcements ?? const [],
-       links = links ?? const [];
+  }) : announcements =
+           announcements ??
+           const <GetStatus200ResponseAnnouncementsPropInner>[],
+       links = links ?? const <GetStatus200ResponseLinksPropInner>[];
 
   factory GetStatus200Response.fromJson(Map<String, dynamic> json) {
     return GetStatus200Response(

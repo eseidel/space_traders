@@ -24,9 +24,9 @@ class Waypoint {
     List<WaypointTrait>? traits,
     List<WaypointModifier>? modifiers,
     this.chart,
-  }) : orbitals = orbitals ?? const [],
-       traits = traits ?? const [],
-       modifiers = modifiers ?? const [];
+  }) : orbitals = orbitals ?? const <WaypointOrbital>[],
+       traits = traits ?? const <WaypointTrait>[],
+       modifiers = modifiers ?? const <WaypointModifier>[];
 
   factory Waypoint.fromJson(Map<String, dynamic> json) {
     return Waypoint(

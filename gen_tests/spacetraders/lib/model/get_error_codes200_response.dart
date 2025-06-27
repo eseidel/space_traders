@@ -6,7 +6,8 @@ import 'package:spacetraders/model_helpers.dart';
 class GetErrorCodes200Response {
   const GetErrorCodes200Response({
     List<GetErrorCodes200ResponseErrorCodesPropInner>? errorCodes,
-  }) : errorCodes = errorCodes ?? const [];
+  }) : errorCodes =
+           errorCodes ?? const <GetErrorCodes200ResponseErrorCodesPropInner>[];
 
   factory GetErrorCodes200Response.fromJson(Map<String, dynamic> json) {
     return GetErrorCodes200Response(
