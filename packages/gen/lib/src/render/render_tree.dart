@@ -349,7 +349,7 @@ class RenderSpec {
       .sorted()
       .map(
         (tag) => Api(
-          name: toSnakeCase(tag),
+          snakeName: toSnakeCase(tag),
           endpoints: endpoints.where((e) => e.tag == tag).toList(),
         ),
       )
@@ -448,13 +448,13 @@ class Endpoint {
 /// The spec calls these tags, but the Dart openapi generator groups endpoints
 /// by tag into an API class so we do too.
 class Api {
-  const Api({required this.name, required this.endpoints});
+  const Api({required this.snakeName, required this.endpoints});
 
-  final String name;
+  final String snakeName;
   final List<Endpoint> endpoints;
 
-  String get className => '${name.capitalize()}Api';
-  String get fileName => '${name.toLowerCase()}_api';
+  String get className => '${toUpperCamelCase(snakeName)}Api';
+  String get fileName => '${snakeName.toLowerCase()}_api';
 }
 
 class RenderPath {
@@ -1048,6 +1048,24 @@ class RenderObject extends RenderNewType {
     return !inRequiredList;
   }
 
+  @visibleForTesting
+  String argumentLine(
+    String jsonName,
+    RenderSchema property,
+    SchemaRenderer context, {
+    required bool useRequired,
+  }) {
+    final line = StringBuffer();
+    if (useRequired) {
+      line.write('required ');
+    }
+    line.write('this.${variableSafeName(context.quirks, jsonName)}');
+    if (property.hasDefaultValue(context)) {
+      line.write(' = ${property.defaultValueString(context)}');
+    }
+    return line.toString();
+  }
+
   /// `this` is the schema of the object containing the property.
   /// [property] is the schema of the property itself.
   Map<String, dynamic> propertyTemplateContext({
@@ -1063,6 +1081,7 @@ class RenderObject extends RenderNewType {
       context: context,
       propertyHasDefaultValue: hasDefaultValue,
     );
+    final hasConstConstructor = property.hasConstConstructor;
 
     // Means that the constructor parameter is required which is only true if
     // both the json property is required and it does not have a default.
@@ -1071,10 +1090,13 @@ class RenderObject extends RenderNewType {
     return {
       'dartName': dartName,
       'jsonName': quoteString(jsonName),
-      'useRequired': useRequired,
+      'argumentLine': argumentLine(
+        jsonName,
+        property,
+        context,
+        useRequired: useRequired,
+      ),
       'dartIsNullable': dartIsNullable,
-      'hasDefaultValue': hasDefaultValue,
-      'defaultValue': property.defaultValueString(context),
       'type': property.typeName(context),
       'nullableType': property.nullableTypeName(context),
       'equals': property.equalsExpression(dartName, context),

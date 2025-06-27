@@ -89,3 +89,19 @@ words:
   - xcconfig
   - cfbundle
   - APPL
+  # For GitHub API spec
+  - sarif
+  - sarifs
+  - cpus
+  - unpushed
+  - codeowners
+  - unstar
+  - rerequest
+  - epss
+  - basehead
+  - reprioritize
+  - collab
+  - octocat
+  - ghsa
+  - cwes
+  - jitconfig

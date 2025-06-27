@@ -18,7 +18,7 @@ void main() {
         '@immutable\n'
         'class Test {\n'
         '    Test(\n'
-        '        {  this.foo,\n'
+        '        { this.foo, \n'
         '         }\n'
         '    );\n'
         '\n'
@@ -79,7 +79,7 @@ void main() {
         '@immutable\n'
         'class Test {\n'
         '    Test(\n'
-        "        {  this.foo = DateTime.parse('2012-04-23T18:25:43.511Z'),\n"
+        "        { this.foo = DateTime.parse('2012-04-23T18:25:43.511Z'), \n"
         '         }\n'
         '    );\n'
         '\n'
@@ -141,7 +141,7 @@ void main() {
         '@immutable\n'
         'class Test {\n'
         '    Test(\n'
-        "        {  this.foo = Uri.parse('https://example.com'),\n"
+        "        { this.foo = Uri.parse('https://example.com'), \n"
         '         }\n'
         '    );\n'
         '\n'
@@ -200,7 +200,7 @@ void main() {
         '@immutable\n'
         'class Test {\n'
         '    Test(\n'
-        '        { required this.foo,\n'
+        '        { required this.foo, \n'
         '         }\n'
         '    );\n'
         '\n'
@@ -245,6 +245,68 @@ void main() {
       );
     });
 
+    test('uri with default', () {
+      final schema = {
+        'type': 'object',
+        'properties': {
+          'foo': {
+            'type': 'string',
+            'format': 'uri',
+            'default': 'https://example.com',
+          },
+        },
+      };
+      final result = renderSchema(schema);
+      expect(
+        result,
+        '@immutable\n'
+        'class Test {\n'
+        '    Test(\n'
+        "        { this.foo = Uri.parse('https://example.com'), \n"
+        '         }\n'
+        '    );\n'
+        '\n'
+        '    factory Test.fromJson(Map<String, dynamic>\n'
+        '        json) {\n'
+        '        return Test(\n'
+        "            foo: maybeParseUri(json['foo'] as String?),\n"
+        '        );\n'
+        '    }\n'
+        '\n'
+        '    /// Convenience to create a nullable type from a nullable json object.\n'
+        '    /// Useful when parsing optional fields.\n'
+        '    static Test? maybeFromJson(Map<String, dynamic>? json) {\n'
+        '        if (json == null) {\n'
+        '            return null;\n'
+        '        }\n'
+        '        return Test.fromJson(json);\n'
+        '    }\n'
+        '\n'
+        '    final  Uri? foo;\n'
+        '\n'
+        '\n'
+        '    Map<String, dynamic> toJson() {\n'
+        '        return {\n'
+        "            'foo': foo?.toString(),\n"
+        '        };\n'
+        '    }\n'
+        '\n'
+        '    @override\n'
+        '    int get hashCode =>\n'
+        '          foo.hashCode;\n'
+        '\n'
+        '    @override\n'
+        '    bool operator ==(Object other) {\n'
+        '        if (identical(this, other)) return true;\n'
+        '        return other is Test\n'
+        '            && this.foo == other.foo\n'
+        '        ;\n'
+        '    }\n'
+        '}\n'
+        '',
+      );
+    });
+
     test('allOf', () {
       final schema = {
         'allOf': [
@@ -269,7 +331,7 @@ void main() {
         '@immutable\n'
         'class Test {\n'
         '    Test(\n'
-        '        {  this.foo, this.bar,\n'
+        '        { this.foo, this.bar, \n'
         '         }\n'
         '    );\n'
         '\n'
@@ -450,7 +512,7 @@ void main() {
         '@immutable\n'
         'class Test {\n'
         '    Test(\n'
-        '        {  this.map,\n'
+        '        { this.map, \n'
         '         }\n'
         '    );\n'
         '\n'
@@ -546,7 +608,7 @@ void main() {
         '@immutable\n'
         'class Test {\n'
         '    Test(\n'
-        '        {  this.mString, this.mInt, this.mNumber, this.mBoolean, this.mDateTime, this.mUri, this.mMapOfString, this.mEnum, this.mUnknown,\n'
+        '        { this.mString, this.mInt, this.mNumber, this.mBoolean, this.mDateTime, this.mUri, this.mMapOfString, this.mEnum, this.mUnknown, \n'
         '         }\n'
         '    );\n'
         '\n'
@@ -687,7 +749,7 @@ void main() {
         '@immutable\n'
         'class Test {\n'
         '    Test(\n'
-        '        {  this.aString = const [], this.aInt = const [], this.aNumber = const [], this.aBoolean = const [], this.aDateTime = const [], this.aUri = const [], this.aArrayOfString = const [], this.aEnum = const [], this.aUnknown = const [],\n'
+        '        { this.aString = const [], this.aInt = const [], this.aNumber = const [], this.aBoolean = const [], this.aDateTime = const [], this.aUri = const [], this.aArrayOfString = const [], this.aEnum = const [], this.aUnknown = const [], \n'
         '         }\n'
         '    );\n'
         '\n'
@@ -815,7 +877,7 @@ void main() {
         '@immutable\n'
         'class Test {\n'
         '    Test(\n'
-        '        {  this.a,\n'
+        '        { this.a, \n'
         '         }\n'
         '    );\n'
         '\n'
@@ -1371,7 +1433,7 @@ void main() {
         '@immutable\n'
         'class Test {\n'
         '    Test(\n'
-        '        {  this.fooBar, this.notPrivate, this.barBaz, this.n123, this.plus1, this.minus1, this.dont, this.default_,\n'
+        '        { this.fooBar, this.notPrivate, this.barBaz, this.n123, this.plus1, this.minus1, this.dont, this.default_, \n'
         '         }\n'
         '    );\n'
         '\n'
