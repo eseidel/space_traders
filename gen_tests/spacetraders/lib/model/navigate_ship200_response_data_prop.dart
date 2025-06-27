@@ -9,8 +9,8 @@ class NavigateShip200ResponseDataProp {
   const NavigateShip200ResponseDataProp({
     required this.nav,
     required this.fuel,
-    List<ShipConditionEvent>? events,
-  }) : events = events ?? const <ShipConditionEvent>[];
+    this.events = [],
+  });
 
   factory NavigateShip200ResponseDataProp.fromJson(Map<String, dynamic> json) {
     return NavigateShip200ResponseDataProp(

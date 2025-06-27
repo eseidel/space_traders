@@ -13,11 +13,10 @@ class System {
     required this.x,
     required this.y,
     this.constellation,
-    List<SystemWaypoint>? waypoints,
-    List<SystemFaction>? factions,
+    this.waypoints = [],
+    this.factions = [],
     this.name,
-  }) : waypoints = waypoints ?? const <SystemWaypoint>[],
-       factions = factions ?? const <SystemFaction>[];
+  });
 
   factory System.fromJson(Map<String, dynamic> json) {
     return System(

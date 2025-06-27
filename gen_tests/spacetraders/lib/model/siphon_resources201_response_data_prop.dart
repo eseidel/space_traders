@@ -11,8 +11,8 @@ class SiphonResources201ResponseDataProp {
     required this.siphon,
     required this.cooldown,
     required this.cargo,
-    List<ShipConditionEvent>? events,
-  }) : events = events ?? const <ShipConditionEvent>[];
+    this.events = [],
+  });
 
   factory SiphonResources201ResponseDataProp.fromJson(
     Map<String, dynamic> json,

@@ -4,7 +4,7 @@ import 'package:spacetraders/model_helpers.dart';
 
 @immutable
 class JumpGate {
-  const JumpGate({required this.symbol, this.connections = const <String>[]});
+  const JumpGate({required this.symbol, this.connections = const []});
 
   factory JumpGate.fromJson(Map<String, dynamic> json) {
     return JumpGate(

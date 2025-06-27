@@ -18,15 +18,13 @@ class Waypoint {
     required this.x,
     required this.y,
     required this.isUnderConstruction,
-    List<WaypointOrbital>? orbitals,
+    this.orbitals = [],
     this.orbits,
     this.faction,
-    List<WaypointTrait>? traits,
-    List<WaypointModifier>? modifiers,
+    this.traits = [],
+    this.modifiers = [],
     this.chart,
-  }) : orbitals = orbitals ?? const <WaypointOrbital>[],
-       traits = traits ?? const <WaypointTrait>[],
-       modifiers = modifiers ?? const <WaypointModifier>[];
+  });
 
   factory Waypoint.fromJson(Map<String, dynamic> json) {
     return Waypoint(

@@ -7,8 +7,8 @@ import 'package:spacetraders/model_helpers.dart';
 class CreateShipWaypointScan201ResponseDataProp {
   const CreateShipWaypointScan201ResponseDataProp({
     required this.cooldown,
-    List<ScannedWaypoint>? waypoints,
-  }) : waypoints = waypoints ?? const <ScannedWaypoint>[];
+    this.waypoints = [],
+  });
 
   factory CreateShipWaypointScan201ResponseDataProp.fromJson(
     Map<String, dynamic> json,

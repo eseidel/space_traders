@@ -11,8 +11,8 @@ class RemoveShipModule201ResponseDataProp {
     required this.agent,
     required this.cargo,
     required this.transaction,
-    List<ShipModule>? modules,
-  }) : modules = modules ?? const <ShipModule>[];
+    this.modules = [],
+  });
 
   factory RemoveShipModule201ResponseDataProp.fromJson(
     Map<String, dynamic> json,

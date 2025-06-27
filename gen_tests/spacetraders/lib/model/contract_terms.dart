@@ -8,8 +8,8 @@ class ContractTerms {
   const ContractTerms({
     required this.deadline,
     required this.payment,
-    List<ContractDeliverGood>? deliver,
-  }) : deliver = deliver ?? const <ContractDeliverGood>[];
+    this.deliver = [],
+  });
 
   factory ContractTerms.fromJson(Map<String, dynamic> json) {
     return ContractTerms(

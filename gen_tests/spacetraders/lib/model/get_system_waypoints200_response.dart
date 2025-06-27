@@ -5,10 +5,7 @@ import 'package:spacetraders/model_helpers.dart';
 
 @immutable
 class GetSystemWaypoints200Response {
-  const GetSystemWaypoints200Response({
-    required this.meta,
-    List<Waypoint>? data,
-  }) : data = data ?? const <Waypoint>[];
+  const GetSystemWaypoints200Response({required this.meta, this.data = []});
 
   factory GetSystemWaypoints200Response.fromJson(Map<String, dynamic> json) {
     return GetSystemWaypoints200Response(

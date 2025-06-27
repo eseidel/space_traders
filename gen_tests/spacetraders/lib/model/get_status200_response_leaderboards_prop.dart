@@ -6,17 +6,9 @@ import 'package:spacetraders/model_helpers.dart';
 @immutable
 class GetStatus200ResponseLeaderboardsProp {
   const GetStatus200ResponseLeaderboardsProp({
-    List<GetStatus200ResponseLeaderboardsPropMostCreditsPropInner>? mostCredits,
-    List<GetStatus200ResponseLeaderboardsPropMostSubmittedChartsPropInner>?
-    mostSubmittedCharts,
-  }) : mostCredits =
-           mostCredits ??
-           const <GetStatus200ResponseLeaderboardsPropMostCreditsPropInner>[],
-       mostSubmittedCharts =
-           mostSubmittedCharts ??
-           const <
-             GetStatus200ResponseLeaderboardsPropMostSubmittedChartsPropInner
-           >[];
+    this.mostCredits = [],
+    this.mostSubmittedCharts = [],
+  });
 
   factory GetStatus200ResponseLeaderboardsProp.fromJson(
     Map<String, dynamic> json,

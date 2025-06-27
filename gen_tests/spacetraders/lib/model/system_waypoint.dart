@@ -11,9 +11,9 @@ class SystemWaypoint {
     required this.type,
     required this.x,
     required this.y,
-    List<WaypointOrbital>? orbitals,
+    this.orbitals = [],
     this.orbits,
-  }) : orbitals = orbitals ?? const <WaypointOrbital>[];
+  });
 
   factory SystemWaypoint.fromJson(Map<String, dynamic> json) {
     return SystemWaypoint(

@@ -77,7 +77,7 @@ class PetApi {
     );
   }
 
-  Future<List<Pet>> findPetsByTags({List<String>? tags}) async {
+  Future<List<Pet>> findPetsByTags({List<String>? tags = const []}) async {
     final response = await client.invokeApi(
       method: Method.get,
       path: '/pet/findByTags',
