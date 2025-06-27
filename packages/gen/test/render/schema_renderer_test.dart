@@ -79,9 +79,9 @@ void main() {
         '@immutable\n'
         'class Test {\n'
         '    Test(\n'
-        "        { this.foo = DateTime.parse('2012-04-23T18:25:43.511Z'), \n"
+        '        { DateTime? foo, \n'
         '         }\n'
-        '    );\n'
+        "    ): this.foo = DateTime.parse('2012-04-23T18:25:43.511Z');\n"
         '\n'
         '    factory Test.fromJson(Map<String, dynamic>\n'
         '        json) {\n'
@@ -141,9 +141,9 @@ void main() {
         '@immutable\n'
         'class Test {\n'
         '    Test(\n'
-        "        { this.foo = Uri.parse('https://example.com'), \n"
+        '        { Uri? foo, \n'
         '         }\n'
-        '    );\n'
+        "    ): this.foo = Uri.parse('https://example.com');\n"
         '\n'
         '    factory Test.fromJson(Map<String, dynamic>\n'
         '        json) {\n'
@@ -262,9 +262,9 @@ void main() {
         '@immutable\n'
         'class Test {\n'
         '    Test(\n'
-        "        { this.foo = Uri.parse('https://example.com'), \n"
+        '        { Uri? foo, \n'
         '         }\n'
-        '    );\n'
+        "    ): this.foo = Uri.parse('https://example.com');\n"
         '\n'
         '    factory Test.fromJson(Map<String, dynamic>\n'
         '        json) {\n'
@@ -749,9 +749,9 @@ void main() {
         '@immutable\n'
         'class Test {\n'
         '    Test(\n'
-        '        { this.aString = const [], this.aInt = const [], this.aNumber = const [], this.aBoolean = const [], this.aDateTime = const [], this.aUri = const [], this.aArrayOfString = const [], this.aEnum = const [], this.aUnknown = const [], \n'
+        '        { this.aString = const [], this.aInt = const [], this.aNumber = const [], this.aBoolean = const [], List<DateTime>? aDateTime, List<Uri>? aUri, this.aArrayOfString = const [], this.aEnum = const [], List<dynamic>? aUnknown, \n'
         '         }\n'
-        '    );\n'
+        '    ): this.aDateTime = const [], this.aUri = const [], this.aUnknown = const [];\n'
         '\n'
         '    factory Test.fromJson(Map<String, dynamic>\n'
         '        json) {\n'

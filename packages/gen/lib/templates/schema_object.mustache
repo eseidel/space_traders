@@ -7,7 +7,7 @@ class {{ typeName }} {
         { {{#properties}}{{{ argumentLine }}}, {{/properties}}
         {{#hasAdditionalProperties}}required this.{{additionalPropertiesName}},{{/hasAdditionalProperties}} }
         {{/hasProperties}}
-    );
+    ){{{assignmentsLine}}};
 
     factory {{ typeName }}.fromJson({{{fromJsonJsonType}}}
     {{#castFromJsonArg}}
