@@ -1350,6 +1350,10 @@ class RenderArray extends RenderSchema {
     }
     final maybeConst = items.hasConstConstructor ? 'const ' : '';
     final listDefault = defaultValue as List;
+    if (listDefault.isEmpty) {
+      // Type annotation is not needed for empty lists.
+      return '$maybeConst[]';
+    }
     String toString(dynamic value) =>
         value is String ? quoteString(value) : value.toString();
     final values = listDefault.map(toString).join(', ');
