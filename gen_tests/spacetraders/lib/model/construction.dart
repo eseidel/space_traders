@@ -7,8 +7,8 @@ class Construction {
   const Construction({
     required this.symbol,
     required this.isComplete,
-    this.materials = const [],
-  });
+    List<ConstructionMaterial>? materials,
+  }) : materials = materials ?? const [];
 
   factory Construction.fromJson(Map<String, dynamic> json) {
     return Construction(

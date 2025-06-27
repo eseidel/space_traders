@@ -12,8 +12,8 @@ class Register201ResponseDataProp {
     required this.agent,
     required this.faction,
     required this.contract,
-    this.ships = const [],
-  });
+    List<Ship>? ships,
+  }) : ships = ships ?? const [];
 
   factory Register201ResponseDataProp.fromJson(Map<String, dynamic> json) {
     return Register201ResponseDataProp(

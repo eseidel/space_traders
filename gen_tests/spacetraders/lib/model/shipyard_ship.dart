@@ -23,9 +23,10 @@ class ShipyardShip {
     required this.engine,
     required this.crew,
     this.activity,
-    this.modules = const [],
-    this.mounts = const [],
-  });
+    List<ShipModule>? modules,
+    List<ShipMount>? mounts,
+  }) : modules = modules ?? const [],
+       mounts = mounts ?? const [];
 
   factory ShipyardShip.fromJson(Map<String, dynamic> json) {
     return ShipyardShip(

@@ -11,8 +11,8 @@ class Faction {
     required this.description,
     required this.isRecruiting,
     this.headquarters,
-    this.traits = const [],
-  });
+    List<FactionTrait>? traits,
+  }) : traits = traits ?? const [];
 
   factory Faction.fromJson(Map<String, dynamic> json) {
     return Faction(

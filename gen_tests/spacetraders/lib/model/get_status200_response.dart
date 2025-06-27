@@ -18,9 +18,10 @@ class GetStatus200Response {
     required this.health,
     required this.leaderboards,
     required this.serverResets,
-    this.announcements = const [],
-    this.links = const [],
-  });
+    List<GetStatus200ResponseAnnouncementsPropInner>? announcements,
+    List<GetStatus200ResponseLinksPropInner>? links,
+  }) : announcements = announcements ?? const [],
+       links = links ?? const [];
 
   factory GetStatus200Response.fromJson(Map<String, dynamic> json) {
     return GetStatus200Response(

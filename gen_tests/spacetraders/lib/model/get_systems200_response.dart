@@ -5,7 +5,8 @@ import 'package:spacetraders/model_helpers.dart';
 
 @immutable
 class GetSystems200Response {
-  const GetSystems200Response({required this.meta, this.data = const []});
+  const GetSystems200Response({required this.meta, List<System>? data})
+    : data = data ?? const [];
 
   factory GetSystems200Response.fromJson(Map<String, dynamic> json) {
     return GetSystems200Response(

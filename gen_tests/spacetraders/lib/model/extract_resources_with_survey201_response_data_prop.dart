@@ -12,9 +12,10 @@ class ExtractResourcesWithSurvey201ResponseDataProp {
     required this.extraction,
     required this.cooldown,
     required this.cargo,
-    this.modifiers = const [],
-    this.events = const [],
-  });
+    List<WaypointModifier>? modifiers,
+    List<ShipConditionEvent>? events,
+  }) : modifiers = modifiers ?? const [],
+       events = events ?? const [];
 
   factory ExtractResourcesWithSurvey201ResponseDataProp.fromJson(
     Map<String, dynamic> json,

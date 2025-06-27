@@ -7,8 +7,8 @@ import 'package:spacetraders/model_helpers.dart';
 class GetSystemWaypoints200Response {
   const GetSystemWaypoints200Response({
     required this.meta,
-    this.data = const [],
-  });
+    List<Waypoint>? data,
+  }) : data = data ?? const [];
 
   factory GetSystemWaypoints200Response.fromJson(Map<String, dynamic> json) {
     return GetSystemWaypoints200Response(

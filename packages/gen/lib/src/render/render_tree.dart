@@ -1121,7 +1121,7 @@ class RenderObject extends RenderNewType {
       hasConstConstructor: property.hasConstConstructor,
     );
     if (hasDefaultValue && nonConstDefault) {
-      return 'this.$dartName = ${property.defaultValueString(context)}';
+      return 'this.$dartName = $dartName ?? ${property.defaultValueString(context)}';
     }
     return null;
   }
@@ -1311,7 +1311,15 @@ class RenderArray extends RenderSchema {
   final dynamic defaultValue;
 
   @override
-  bool get hasConstConstructor => items.hasConstConstructor;
+  bool get hasConstConstructor {
+    final dValue = defaultValue;
+    if (dValue is List) {
+      return dValue.isEmpty;
+    }
+    // In the null case we're falling through to here, but this will also never
+    // be called in that case.
+    return items.hasConstConstructor;
+  }
 
   @override
   List<Object?> get props => [super.props, items, defaultValue];
@@ -1428,7 +1436,15 @@ class RenderMap extends RenderSchema {
   bool get onlyJsonTypes => valueSchema.onlyJsonTypes;
 
   @override
-  bool get hasConstConstructor => valueSchema.hasConstConstructor;
+  bool get hasConstConstructor {
+    final dValue = defaultValue;
+    if (dValue is Map) {
+      return dValue.isEmpty;
+    }
+    // In the null case we're falling through to here, but this will also never
+    // be called in that case.
+    return valueSchema.hasConstConstructor;
+  }
 
   @override
   String typeName(SchemaRenderer context) =>

@@ -81,7 +81,7 @@ void main() {
         '    Test(\n'
         '        { DateTime? foo, \n'
         '         }\n'
-        "    ): this.foo = DateTime.parse('2012-04-23T18:25:43.511Z');\n"
+        "    ): this.foo = foo ?? DateTime.parse('2012-04-23T18:25:43.511Z');\n"
         '\n'
         '    factory Test.fromJson(Map<String, dynamic>\n'
         '        json) {\n'
@@ -143,7 +143,7 @@ void main() {
         '    Test(\n'
         '        { Uri? foo, \n'
         '         }\n'
-        "    ): this.foo = Uri.parse('https://example.com');\n"
+        "    ): this.foo = foo ?? Uri.parse('https://example.com');\n"
         '\n'
         '    factory Test.fromJson(Map<String, dynamic>\n'
         '        json) {\n'
@@ -264,7 +264,7 @@ void main() {
         '    Test(\n'
         '        { Uri? foo, \n'
         '         }\n'
-        "    ): this.foo = Uri.parse('https://example.com');\n"
+        "    ): this.foo = foo ?? Uri.parse('https://example.com');\n"
         '\n'
         '    factory Test.fromJson(Map<String, dynamic>\n'
         '        json) {\n'
@@ -751,7 +751,7 @@ void main() {
         '    Test(\n'
         '        { this.aString = const [], this.aInt = const [], this.aNumber = const [], this.aBoolean = const [], List<DateTime>? aDateTime, List<Uri>? aUri, this.aArrayOfString = const [], this.aEnum = const [], List<dynamic>? aUnknown, \n'
         '         }\n'
-        '    ): this.aDateTime = const [], this.aUri = const [], this.aUnknown = const [];\n'
+        '    ): this.aDateTime = aDateTime ?? const [], this.aUri = aUri ?? const [], this.aUnknown = aUnknown ?? const [];\n'
         '\n'
         '    factory Test.fromJson(Map<String, dynamic>\n'
         '        json) {\n'
@@ -915,6 +915,68 @@ void main() {
         '        if (identical(this, other)) return true;\n'
         '        return other is Test\n'
         '            && this.a == other.a\n'
+        '        ;\n'
+        '    }\n'
+        '}\n'
+        '',
+      );
+    });
+
+    test('array with default value', () {
+      final schema = {
+        'type': 'object',
+        'properties': {
+          'a': {
+            'type': 'array',
+            'items': {'type': 'string'},
+            'default': ['a', 'b'],
+          },
+        },
+      };
+      final result = renderSchema(schema);
+      expect(
+        result,
+        '@immutable\n'
+        'class Test {\n'
+        '    Test(\n'
+        '        { List<String>? a, \n'
+        '         }\n'
+        '    ): this.a = a ?? const [];\n'
+        '\n'
+        '    factory Test.fromJson(Map<String, dynamic>\n'
+        '        json) {\n'
+        '        return Test(\n'
+        "            a: (json['a'] as List?)?.cast<String>(),\n"
+        '        );\n'
+        '    }\n'
+        '\n'
+        '    /// Convenience to create a nullable type from a nullable json object.\n'
+        '    /// Useful when parsing optional fields.\n'
+        '    static Test? maybeFromJson(Map<String, dynamic>? json) {\n'
+        '        if (json == null) {\n'
+        '            return null;\n'
+        '        }\n'
+        '        return Test.fromJson(json);\n'
+        '    }\n'
+        '\n'
+        '    final  List<String>? a;\n'
+        '\n'
+        '\n'
+        '    Map<String, dynamic> toJson() {\n'
+        '        return {\n'
+        "            'a': a,\n"
+        '        };\n'
+        '    }\n'
+        '\n'
+        '    @override\n'
+        '    int get hashCode =>\n'
+        '          a.hashCode;\n'
+        '\n'
+        '    @override\n'
+        '    bool operator ==(Object other) {\n'
+        '        if (identical(this, other)) return true;\n'
+        '        return other is Test\n'
+        '            && listsEqual(this.a, other.a)\n'
         '        ;\n'
         '    }\n'
         '}\n'

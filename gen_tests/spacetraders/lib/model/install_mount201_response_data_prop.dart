@@ -11,8 +11,8 @@ class InstallMount201ResponseDataProp {
     required this.agent,
     required this.cargo,
     required this.transaction,
-    this.mounts = const [],
-  });
+    List<ShipMount>? mounts,
+  }) : mounts = mounts ?? const [];
 
   factory InstallMount201ResponseDataProp.fromJson(Map<String, dynamic> json) {
     return InstallMount201ResponseDataProp(

@@ -11,9 +11,9 @@ class Pet {
     this.id,
     this.category,
     this.photoUrls = const [],
-    this.tags = const [],
+    List<Tag>? tags,
     this.status,
-  });
+  }) : tags = tags ?? const [];
 
   factory Pet.fromJson(Map<String, dynamic> json) {
     return Pet(

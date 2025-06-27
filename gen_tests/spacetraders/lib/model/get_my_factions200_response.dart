@@ -5,7 +5,10 @@ import 'package:spacetraders/model_helpers.dart';
 
 @immutable
 class GetMyFactions200Response {
-  const GetMyFactions200Response({required this.meta, this.data = const []});
+  const GetMyFactions200Response({
+    required this.meta,
+    List<GetMyFactions200ResponseDataPropInner>? data,
+  }) : data = data ?? const [];
 
   factory GetMyFactions200Response.fromJson(Map<String, dynamic> json) {
     return GetMyFactions200Response(

@@ -4,7 +4,8 @@ import 'package:spacetraders/model_helpers.dart';
 
 @immutable
 class GetMyAgentEvents200Response {
-  const GetMyAgentEvents200Response({this.data = const []});
+  const GetMyAgentEvents200Response({List<AgentEvent>? data})
+    : data = data ?? const [];
 
   factory GetMyAgentEvents200Response.fromJson(Map<String, dynamic> json) {
     return GetMyAgentEvents200Response(

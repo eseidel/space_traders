@@ -10,8 +10,8 @@ class Survey {
     required this.symbol,
     required this.expiration,
     required this.size,
-    this.deposits = const [],
-  });
+    List<SurveyDeposit>? deposits,
+  }) : deposits = deposits ?? const [];
 
   factory Survey.fromJson(Map<String, dynamic> json) {
     return Survey(

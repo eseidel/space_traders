@@ -25,9 +25,10 @@ class Ship {
     required this.cargo,
     required this.fuel,
     required this.cooldown,
-    this.modules = const [],
-    this.mounts = const [],
-  });
+    List<ShipModule>? modules,
+    List<ShipMount>? mounts,
+  }) : modules = modules ?? const [],
+       mounts = mounts ?? const [];
 
   factory Ship.fromJson(Map<String, dynamic> json) {
     return Ship(

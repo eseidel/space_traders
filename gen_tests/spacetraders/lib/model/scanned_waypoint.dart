@@ -16,11 +16,12 @@ class ScannedWaypoint {
     required this.systemSymbol,
     required this.x,
     required this.y,
-    this.orbitals = const [],
+    List<WaypointOrbital>? orbitals,
     this.faction,
-    this.traits = const [],
+    List<WaypointTrait>? traits,
     this.chart,
-  });
+  }) : orbitals = orbitals ?? const [],
+       traits = traits ?? const [];
 
   factory ScannedWaypoint.fromJson(Map<String, dynamic> json) {
     return ScannedWaypoint(

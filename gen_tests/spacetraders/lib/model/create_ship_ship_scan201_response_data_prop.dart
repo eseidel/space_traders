@@ -7,8 +7,8 @@ import 'package:spacetraders/model_helpers.dart';
 class CreateShipShipScan201ResponseDataProp {
   const CreateShipShipScan201ResponseDataProp({
     required this.cooldown,
-    this.ships = const [],
-  });
+    List<ScannedShip>? ships,
+  }) : ships = ships ?? const [];
 
   factory CreateShipShipScan201ResponseDataProp.fromJson(
     Map<String, dynamic> json,

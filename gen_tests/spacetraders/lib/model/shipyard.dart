@@ -9,10 +9,12 @@ class Shipyard {
   const Shipyard({
     required this.symbol,
     required this.modificationsFee,
-    this.shipTypes = const [],
-    this.transactions = const [],
-    this.ships = const [],
-  });
+    List<ShipyardShipTypesPropInner>? shipTypes,
+    List<ShipyardTransaction>? transactions,
+    List<ShipyardShip>? ships,
+  }) : shipTypes = shipTypes ?? const [],
+       transactions = transactions ?? const [],
+       ships = ships ?? const [];
 
   factory Shipyard.fromJson(Map<String, dynamic> json) {
     return Shipyard(
