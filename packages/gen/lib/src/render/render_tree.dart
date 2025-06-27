@@ -816,7 +816,7 @@ class RenderPod extends RenderSchema {
 
   @override
   String equalsExpression(String name, SchemaRenderer context) =>
-      '$name == other.$name';
+      'this.$name == other.$name';
 
   @override
   bool get createsNewType => false;
@@ -904,7 +904,7 @@ abstract class RenderNewType extends RenderSchema {
 
   @override
   String equalsExpression(String name, SchemaRenderer context) =>
-      '$name == other.$name';
+      'this.$name == other.$name';
 
   @override
   String toJsonExpression(
@@ -1224,7 +1224,7 @@ class RenderArray extends RenderSchema {
 
   @override
   String equalsExpression(String name, SchemaRenderer context) =>
-      'listsEqual($name, other.$name)';
+      'listsEqual(this.$name, other.$name)';
 
   @override
   bool get createsNewType => false;
@@ -1332,7 +1332,7 @@ class RenderMap extends RenderSchema {
 
   @override
   String equalsExpression(String name, SchemaRenderer context) =>
-      'mapsEqual($name, other.$name)';
+      'mapsEqual(this.$name, other.$name)';
 
   @override
   bool get createsNewType => false;
@@ -1623,7 +1623,7 @@ class RenderUnknown extends RenderSchema {
 
   @override
   String equalsExpression(String name, SchemaRenderer context) =>
-      'identical($name, other.$name)';
+      'identical(this.$name, other.$name)';
 
   @override
   bool get createsNewType => false;
@@ -1721,7 +1721,7 @@ class RenderBinary extends RenderSchema {
 
   @override
   String equalsExpression(String name, SchemaRenderer context) =>
-      'identical($name, other.$name)';
+      'identical(this.$name, other.$name)';
 
   @override
   bool get createsNewType => false;
@@ -1764,7 +1764,7 @@ class RenderEmptyObject extends RenderNewType {
     String dartName,
     SchemaRenderer context, {
     required bool dartIsNullable,
-  }) => 'throw UnimplementedError("RenderEmptyObject.toJson")';
+  }) => 'const $className()';
 
   @override
   String fromJsonExpression(
@@ -1772,7 +1772,7 @@ class RenderEmptyObject extends RenderNewType {
     SchemaRenderer context, {
     required bool jsonIsNullable,
     required bool dartIsNullable,
-  }) => 'throw UnimplementedError("RenderEmptyObject.fromJson")';
+  }) => 'const {}';
 
   @override
   Map<String, dynamic> toTemplateContext(SchemaRenderer context) => {
