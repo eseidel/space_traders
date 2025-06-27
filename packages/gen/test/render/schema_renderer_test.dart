@@ -523,6 +523,21 @@ void main() {
             'type': 'object',
             'additionalProperties': {'type': 'string', 'format': 'uri'},
           },
+          'm_map_of_string': {
+            'type': 'object',
+            'additionalProperties': {
+              'type': 'object',
+              'additionalProperties': {'type': 'string'},
+            },
+          },
+          'm_enum': {
+            'type': 'object',
+            'additionalProperties': {
+              'type': 'string',
+              'enum': ['a', 'b', 'c'],
+            },
+          },
+          'm_unknown': {'type': 'object', 'additionalProperties': true},
         },
       };
       final result = renderSchema(schema);
@@ -531,7 +546,7 @@ void main() {
         '@immutable\n'
         'class Test {\n'
         '    Test(\n'
-        '        {  this.mString, this.mInt, this.mNumber, this.mBoolean, this.mDateTime, this.mUri,\n'
+        '        {  this.mString, this.mInt, this.mNumber, this.mBoolean, this.mDateTime, this.mUri, this.mMapOfString, this.mEnum, this.mUnknown,\n'
         '         }\n'
         '    );\n'
         '\n'
@@ -544,6 +559,9 @@ void main() {
         "            mBoolean: json['m_boolean'],\n"
         "            mDateTime: json['m_date_time'],\n"
         "            mUri: json['m_uri'],\n"
+        "            mMapOfString: (json['m_map_of_string'] as Map<String, dynamic>)?.map((key, value) => MapEntry(key, value)),\n"
+        "            mEnum: (json['m_enum'] as Map<String, dynamic>)?.map((key, value) => MapEntry(key, TestMEnumProp.fromJson(value as String) )),\n"
+        "            mUnknown: (json['m_unknown'] as Map<String, dynamic>)?.map((key, value) => MapEntry(key, value)),\n"
         '        );\n'
         '    }\n'
         '\n'
@@ -562,6 +580,9 @@ void main() {
         '    final  Map<String, bool>? mBoolean;\n'
         '    final  Map<String, DateTime>? mDateTime;\n'
         '    final  Map<String, Uri>? mUri;\n'
+        '    final  Map<String, Map<String, String>>? mMapOfString;\n'
+        '    final  Map<String, TestMEnumProp>? mEnum;\n'
+        '    final  Map<String, dynamic>? mUnknown;\n'
         '\n'
         '\n'
         '    Map<String, dynamic> toJson() {\n'
@@ -572,6 +593,9 @@ void main() {
         "            'm_boolean': mBoolean,\n"
         "            'm_date_time': mDateTime?.map((key, value) => MapEntry(key, value.toIso8601String())),\n"
         "            'm_uri': mUri?.map((key, value) => MapEntry(key, value.toString())),\n"
+        "            'm_map_of_string': mMapOfString,\n"
+        "            'm_enum': mEnum?.map((key, value) => MapEntry(key, value.toJson())),\n"
+        "            'm_unknown': mUnknown,\n"
         '        };\n'
         '    }\n'
         '\n'
@@ -584,6 +608,9 @@ void main() {
         '          mBoolean,\n'
         '          mDateTime,\n'
         '          mUri,\n'
+        '          mMapOfString,\n'
+        '          mEnum,\n'
+        '          mUnknown,\n'
         '        ]);\n'
         '\n'
         '    @override\n'
@@ -596,6 +623,9 @@ void main() {
         '            && mapsEqual(mBoolean, other.mBoolean)\n'
         '            && mapsEqual(mDateTime, other.mDateTime)\n'
         '            && mapsEqual(mUri, other.mUri)\n'
+        '            && mapsEqual(mMapOfString, other.mMapOfString)\n'
+        '            && mapsEqual(mEnum, other.mEnum)\n'
+        '            && mapsEqual(mUnknown, other.mUnknown)\n'
         '        ;\n'
         '    }\n'
         '}\n'
@@ -631,6 +661,24 @@ void main() {
             'type': 'array',
             'items': {'type': 'string', 'format': 'uri'},
           },
+          'a_array_of_string': {
+            'type': 'array',
+            'items': {
+              'type': 'array',
+              'items': {'type': 'string'},
+            },
+          },
+          'a_enum': {
+            'type': 'array',
+            'items': {
+              'type': 'string',
+              'enum': ['a', 'b', 'c'],
+            },
+          },
+          'a_unknown': {
+            'type': 'array',
+            'items': {'type': 'object'},
+          },
         },
       };
       final result = renderSchema(schema);
@@ -639,7 +687,7 @@ void main() {
         '@immutable\n'
         'class Test {\n'
         '    Test(\n'
-        '        {  this.aString = const [], this.aInt = const [], this.aNumber = const [], this.aBoolean = const [], this.aDateTime = const [], this.aUri = const [],\n'
+        '        {  this.aString = const [], this.aInt = const [], this.aNumber = const [], this.aBoolean = const [], this.aDateTime = const [], this.aUri = const [], this.aArrayOfString = const [], this.aEnum = const [], this.aUnknown = const [],\n'
         '         }\n'
         '    );\n'
         '\n'
@@ -652,6 +700,9 @@ void main() {
         "            aBoolean: (json['a_boolean'] as List?)?.cast<bool>() ,\n"
         "            aDateTime: (json['a_date_time'] as List?)?.cast<DateTime>() ,\n"
         "            aUri: (json['a_uri'] as List?)?.cast<Uri>() ,\n"
+        "            aArrayOfString: (json['a_array_of_string'] as List?)?.cast<List<String>>() ,\n"
+        "            aEnum: (json['a_enum'] as List?)?.map<TestAEnumPropInner>((e) => TestAEnumPropInner.fromJson(e as String) ).toList() ,\n"
+        "            aUnknown: (json['a_unknown'] as List?)?.cast<dynamic>() ,\n"
         '        );\n'
         '    }\n'
         '\n'
@@ -670,6 +721,9 @@ void main() {
         '    final  List<bool>? aBoolean;\n'
         '    final  List<DateTime>? aDateTime;\n'
         '    final  List<Uri>? aUri;\n'
+        '    final  List<List<String>>? aArrayOfString;\n'
+        '    final  List<TestAEnumPropInner>? aEnum;\n'
+        '    final  List<dynamic>? aUnknown;\n'
         '\n'
         '\n'
         '    Map<String, dynamic> toJson() {\n'
@@ -680,6 +734,9 @@ void main() {
         "            'a_boolean': aBoolean,\n"
         "            'a_date_time': aDateTime,\n"
         "            'a_uri': aUri,\n"
+        "            'a_array_of_string': aArrayOfString?.map((e) => e.toJson()).toList(),\n"
+        "            'a_enum': aEnum?.map((e) => e.toJson()).toList(),\n"
+        "            'a_unknown': aUnknown?.map((e) => e.toJson()).toList(),\n"
         '        };\n'
         '    }\n'
         '\n'
@@ -692,6 +749,9 @@ void main() {
         '          aBoolean,\n'
         '          aDateTime,\n'
         '          aUri,\n'
+        '          aArrayOfString,\n'
+        '          aEnum,\n'
+        '          aUnknown,\n'
         '        ]);\n'
         '\n'
         '    @override\n'
@@ -704,6 +764,9 @@ void main() {
         '            && listsEqual(aBoolean, other.aBoolean)\n'
         '            && listsEqual(aDateTime, other.aDateTime)\n'
         '            && listsEqual(aUri, other.aUri)\n'
+        '            && listsEqual(aArrayOfString, other.aArrayOfString)\n'
+        '            && listsEqual(aEnum, other.aEnum)\n'
+        '            && listsEqual(aUnknown, other.aUnknown)\n'
         '        ;\n'
         '    }\n'
         '}\n'
