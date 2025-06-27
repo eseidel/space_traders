@@ -31,7 +31,7 @@ class UserApi {
     );
   }
 
-  Future<User> createUsersWithListInput({List<User>? list}) async {
+  Future<User> createUsersWithListInput({List<User>? list = const []}) async {
     final response = await client.invokeApi(
       method: Method.post,
       path: '/user/createWithList',

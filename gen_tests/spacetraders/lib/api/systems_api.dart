@@ -77,7 +77,7 @@ class SystemsApi {
     int? page = 1,
     int? limit = 10,
     WaypointType? type,
-    List<WaypointTraitSymbol>? traits,
+    List<WaypointTraitSymbol>? traits = const [],
   }) async {
     final response = await client.invokeApi(
       method: Method.get,
