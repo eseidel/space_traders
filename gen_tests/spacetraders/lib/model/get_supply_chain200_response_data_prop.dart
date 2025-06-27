@@ -9,11 +9,8 @@ class GetSupplyChain200ResponseDataProp {
     Map<String, dynamic> json,
   ) {
     return GetSupplyChain200ResponseDataProp(
-      exportToImportMap: {
-        for (final entry
-            in (json['exportToImportMap'] as Map<String, dynamic>).entries)
-          entry.key: (entry.value as List).cast<String>(),
-      },
+      exportToImportMap: (json['exportToImportMap'] as Map<String, dynamic>)
+          .map((key, value) => MapEntry(key, (value as List).cast<String>())),
     );
   }
 
@@ -31,11 +28,7 @@ class GetSupplyChain200ResponseDataProp {
   final Map<String, List<String>> exportToImportMap;
 
   Map<String, dynamic> toJson() {
-    return {
-      'exportToImportMap': {
-        for (final entry in exportToImportMap.entries) entry.key: entry.value,
-      },
-    };
+    return {'exportToImportMap': exportToImportMap};
   }
 
   @override

@@ -1,6 +1,6 @@
 import 'package:meta/meta.dart';
 import 'package:petstore/model/category.dart';
-import 'package:petstore/model/pet_status.dart';
+import 'package:petstore/model/pet_status_prop.dart';
 import 'package:petstore/model/tag.dart';
 import 'package:petstore/model_helpers.dart';
 
@@ -26,7 +26,7 @@ class Pet {
       tags: (json['tags'] as List?)
           ?.map<Tag>((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
-      status: PetStatus.maybeFromJson(json['status'] as String?),
+      status: PetStatusProp.maybeFromJson(json['status'] as String?),
     );
   }
 
@@ -44,7 +44,7 @@ class Pet {
   final Category? category;
   final List<String> photoUrls;
   final List<Tag>? tags;
-  final PetStatus? status;
+  final PetStatusProp? status;
 
   Map<String, dynamic> toJson() {
     return {

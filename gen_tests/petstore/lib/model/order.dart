@@ -1,5 +1,5 @@
 import 'package:meta/meta.dart';
-import 'package:petstore/model/order_status.dart';
+import 'package:petstore/model/order_status_prop.dart';
 import 'package:petstore/model_helpers.dart';
 
 @immutable
@@ -19,7 +19,7 @@ class Order {
       petId: json['petId'] as int?,
       quantity: json['quantity'] as int?,
       shipDate: maybeParseDateTime(json['shipDate'] as String?),
-      status: OrderStatus.maybeFromJson(json['status'] as String?),
+      status: OrderStatusProp.maybeFromJson(json['status'] as String?),
       complete: json['complete'] as bool?,
     );
   }
@@ -37,7 +37,7 @@ class Order {
   final int? petId;
   final int? quantity;
   final DateTime? shipDate;
-  final OrderStatus? status;
+  final OrderStatusProp? status;
   final bool? complete;
 
   Map<String, dynamic> toJson() {
