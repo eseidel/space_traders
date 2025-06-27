@@ -146,11 +146,15 @@ class SpecResolver {
           defaultValue: schema.defaultValue,
         );
       case ResolvedArray():
+        var defaultValue = schema.defaultValue;
+        if (defaultValue == null && quirks.allListsDefaultToEmpty) {
+          defaultValue = List<dynamic>.empty();
+        }
         return RenderArray(
           snakeName: schema.snakeName,
           items: toRenderSchema(schema.items),
           pointer: schema.pointer,
-          defaultValue: schema.defaultValue,
+          defaultValue: defaultValue,
         );
       case ResolvedVoid():
         return RenderVoid(snakeName: schema.snakeName, pointer: schema.pointer);
@@ -649,15 +653,19 @@ abstract class RenderSchema extends Equatable {
   /// Whether this schema creates a new type and thus needs to be rendered.
   bool get createsNewType;
 
+  /// The default value of this schema.
   dynamic get defaultValue;
+
+  /// Whether the defaultValue can be const constructed.
+  bool get defaultCanConstConstruct;
+
+  bool hasNonConstDefaultValue(SchemaRenderer context) =>
+      hasDefaultValue(context) && !defaultCanConstConstruct;
 
   Iterable<Import> get additionalImports => const [];
 
   /// Whether this schema only contains json types.
   bool get onlyJsonTypes;
-
-  /// Whether the associated Dart type has a const constructor.
-  bool get hasConstConstructor;
 
   @override
   List<Object?> get props => [snakeName, pointer];
@@ -774,7 +782,7 @@ class RenderPod extends RenderSchema {
   }
 
   @override
-  bool get hasConstConstructor {
+  bool get defaultCanConstConstruct {
     return switch (type) {
       PodType.dateTime || PodType.uri => false,
       PodType.string ||
@@ -942,7 +950,7 @@ class RenderStringNewType extends RenderNewType {
   final String? defaultValue;
 
   @override
-  bool get hasConstConstructor => true;
+  bool get defaultCanConstConstruct => true;
 
   @override
   List<Object?> get props => [super.props, defaultValue];
@@ -990,7 +998,7 @@ class RenderNumberNewType extends RenderNewType {
   List<Object?> get props => [super.props, defaultValue];
 
   @override
-  bool get hasConstConstructor => true;
+  bool get defaultCanConstConstruct => true;
 
   @override
   Map<String, dynamic> toTemplateContext(SchemaRenderer context) => {
@@ -1053,7 +1061,7 @@ class RenderObject extends RenderNewType {
   // We could do something smarter here, to determine if the object has a
   // const constructor, but it's not worth the complexity for now.
   @override
-  bool get hasConstConstructor => false;
+  bool get defaultCanConstConstruct => false;
 
   @override
   String jsonStorageType({required bool isNullable}) {
@@ -1073,11 +1081,6 @@ class RenderObject extends RenderNewType {
     return !inRequiredList;
   }
 
-  bool hasNonConstDefault({
-    required bool hasDefaultValue,
-    required bool hasConstConstructor,
-  }) => hasDefaultValue && !hasConstConstructor;
-
   @visibleForTesting
   String argumentLine(
     String jsonName,
@@ -1090,17 +1093,12 @@ class RenderObject extends RenderNewType {
       line.write('required ');
     }
     final dartName = variableSafeName(context.quirks, jsonName);
-    final hasDefaultValue = property.hasDefaultValue(context);
-    final nonConstDefault = hasNonConstDefault(
-      hasDefaultValue: hasDefaultValue,
-      hasConstConstructor: property.hasConstConstructor,
-    );
-    if (nonConstDefault) {
+    if (property.hasNonConstDefaultValue(context)) {
       final nullableTypeName = property.nullableTypeName(context);
       line.write('$nullableTypeName $dartName');
     } else {
       line.write('this.$dartName');
-      if (hasDefaultValue) {
+      if (property.hasDefaultValue(context)) {
         line.write(' = ${property.defaultValueString(context)}');
       }
     }
@@ -1115,12 +1113,7 @@ class RenderObject extends RenderNewType {
     required bool isRequired,
   }) {
     final dartName = variableSafeName(context.quirks, jsonName);
-    final hasDefaultValue = property.hasDefaultValue(context);
-    final nonConstDefault = hasNonConstDefault(
-      hasDefaultValue: hasDefaultValue,
-      hasConstConstructor: property.hasConstConstructor,
-    );
-    if (hasDefaultValue && nonConstDefault) {
+    if (property.hasNonConstDefaultValue(context)) {
       return 'this.$dartName = $dartName ?? ${property.defaultValueString(context)}';
     }
     return null;
@@ -1311,14 +1304,14 @@ class RenderArray extends RenderSchema {
   final dynamic defaultValue;
 
   @override
-  bool get hasConstConstructor {
+  bool get defaultCanConstConstruct {
     final dValue = defaultValue as List?;
     if (dValue is List && dValue.isEmpty) {
       return true;
     }
     // In the null case we're falling through to here, but this will also never
     // be called in that case.
-    return items.hasConstConstructor;
+    return items.defaultCanConstConstruct;
   }
 
   @override
@@ -1342,13 +1335,7 @@ class RenderArray extends RenderSchema {
   String? defaultValueString(SchemaRenderer context) {
     // OpenAPI defaults arrays to empty, so we match for now.
     final itemType = items.typeName(context);
-    if (defaultValue == null) {
-      if (context.quirks.allListsDefaultToEmpty) {
-        return 'const <$itemType>[]';
-      }
-      return null;
-    }
-    final maybeConst = items.hasConstConstructor ? 'const ' : '';
+    final maybeConst = items.defaultCanConstConstruct ? 'const ' : '';
     final listDefault = defaultValue as List;
     if (listDefault.isEmpty) {
       // Type annotation is not needed for empty lists.
@@ -1359,10 +1346,6 @@ class RenderArray extends RenderSchema {
     final values = listDefault.map(toString).join(', ');
     return '$maybeConst<$itemType>[$values]';
   }
-
-  @override
-  bool hasDefaultValue(SchemaRenderer context) =>
-      defaultValue != null || context.quirks.allListsDefaultToEmpty;
 
   @override
   String jsonStorageType({required bool isNullable}) {
@@ -1450,14 +1433,14 @@ class RenderMap extends RenderSchema {
   bool get onlyJsonTypes => valueSchema.onlyJsonTypes;
 
   @override
-  bool get hasConstConstructor {
+  bool get defaultCanConstConstruct {
     final dValue = defaultValue as Map?;
     if (dValue is Map && dValue.isEmpty) {
       return true;
     }
     // In the null case we're falling through to here, but this will also never
     // be called in that case.
-    return valueSchema.hasConstConstructor;
+    return valueSchema.defaultCanConstConstruct;
   }
 
   @override
@@ -1559,7 +1542,7 @@ class RenderEnum extends RenderNewType {
   final dynamic defaultValue;
 
   @override
-  bool get hasConstConstructor => true;
+  bool get defaultCanConstConstruct => true;
 
   /// The values of the resolved schema.
   final List<String> values;
@@ -1650,7 +1633,7 @@ class RenderOneOf extends RenderNewType {
   /// We could do something smarter here, to determine if the oneOf has a
   /// const constructor, but it's not worth the complexity for now.
   @override
-  bool get hasConstConstructor => false;
+  bool get defaultCanConstConstruct => false;
 
   @override
   List<Object?> get props => [super.props, schemas];
@@ -1771,7 +1754,7 @@ class RenderUnknown extends RenderSchema {
   bool get createsNewType => false;
 
   @override
-  bool get hasConstConstructor => false;
+  bool get defaultCanConstConstruct => false;
 
   // We never deserialize or serialize unknown types.
   @override
@@ -1820,7 +1803,7 @@ class RenderVoid extends RenderNoJson {
   bool get createsNewType => false;
 
   @override
-  bool get hasConstConstructor => false;
+  bool get defaultCanConstConstruct => false;
 
   @override
   String fromJsonExpression(
@@ -1885,7 +1868,7 @@ class RenderBinary extends RenderNoJson {
   bool get createsNewType => false;
 
   @override
-  bool get hasConstConstructor => false;
+  bool get defaultCanConstConstruct => false;
 }
 
 class RenderEmptyObject extends RenderNewType {
@@ -1895,7 +1878,7 @@ class RenderEmptyObject extends RenderNewType {
   dynamic get defaultValue => null;
 
   @override
-  bool get hasConstConstructor => true;
+  bool get defaultCanConstConstruct => true;
 
   @override
   String jsonStorageType({required bool isNullable}) => 'Map<String, dynamic>';
