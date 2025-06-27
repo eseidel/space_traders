@@ -653,6 +653,9 @@ abstract class RenderSchema extends Equatable {
 
   Iterable<Import> get additionalImports => const [];
 
+  /// Whether this schema only contains json types.
+  bool get onlyJsonTypes;
+
   @override
   List<Object?> get props => [snakeName, pointer];
 
@@ -753,6 +756,19 @@ class RenderPod extends RenderSchema {
 
   @override
   final dynamic defaultValue;
+
+  @override
+  bool get onlyJsonTypes {
+    return switch (type) {
+      // These are already json types.
+      PodType.string ||
+      PodType.integer ||
+      PodType.number ||
+      PodType.boolean => true,
+      // These require serialization to a string.
+      PodType.dateTime || PodType.uri => false,
+    };
+  }
 
   @override
   List<Object?> get props => [super.props, type, defaultValue];
@@ -873,6 +889,9 @@ abstract class RenderNewType extends RenderSchema {
   /// Whether this new type creates a new type and thus needs to be rendered.
   @override
   bool get createsNewType => true;
+
+  @override
+  bool get onlyJsonTypes => false;
 
   /// The class name of the new type.
   String get className => camelFromSnake(snakeName);
@@ -1193,6 +1212,9 @@ class RenderArray extends RenderSchema {
   @override
   List<Object?> get props => [super.props, items, defaultValue];
 
+  @override
+  bool get onlyJsonTypes => items.onlyJsonTypes;
+
   /// The type name of this schema.
   @override
   String typeName(SchemaRenderer context) => 'List<${items.typeName(context)}>';
@@ -1299,6 +1321,9 @@ class RenderMap extends RenderSchema {
   List<Object?> get props => [super.props, valueSchema, defaultValue];
 
   @override
+  bool get onlyJsonTypes => valueSchema.onlyJsonTypes;
+
+  @override
   String typeName(SchemaRenderer context) =>
       'Map<String, ${valueSchema.typeName(context)}>';
 
@@ -1318,12 +1343,16 @@ class RenderMap extends RenderSchema {
     SchemaRenderer context, {
     required bool dartIsNullable,
   }) {
+    // Nothing to do if the value schema is only json types.
+    if (valueSchema.onlyJsonTypes) {
+      return dartName;
+    }
     final valueToJson = valueSchema.toJsonExpression(
-      'entry.value',
+      'value',
       context,
       dartIsNullable: false,
     );
-    return '{for (var entry in $dartName.entries) entry.key: $valueToJson}';
+    return '$dartName?.map((key, value) => MapEntry(key, $valueToJson))';
   }
 
   @override
@@ -1335,13 +1364,14 @@ class RenderMap extends RenderSchema {
   }) {
     final jsonType = jsonStorageType(isNullable: jsonIsNullable);
     final valueFromJson = valueSchema.fromJsonExpression(
-      'entry.value',
+      'value',
       context,
       jsonIsNullable: false,
       dartIsNullable: false,
     );
     // TODO(eseidel): Support orDefault?
-    return '{for (var entry in ($jsonValue as $jsonType).entries) entry.key: $valueFromJson}';
+    return '($jsonValue as $jsonType)?.map((key, value) => '
+        'MapEntry(key, $valueFromJson))';
   }
 
   @override
@@ -1592,6 +1622,10 @@ class RenderUnknown extends RenderSchema {
   @override
   bool get createsNewType => false;
 
+  // We never deserialize or serialize unknown types.
+  @override
+  bool get onlyJsonTypes => true;
+
   @override
   String jsonStorageType({required bool isNullable}) => 'dynamic';
 
@@ -1635,6 +1669,9 @@ class RenderVoid extends RenderSchema {
   bool get createsNewType => false;
 
   @override
+  bool get onlyJsonTypes => false;
+
+  @override
   String jsonStorageType({required bool isNullable}) =>
       'throw UnimplementedError("RenderVoid.jsonStorageType")';
 
@@ -1663,6 +1700,9 @@ class RenderBinary extends RenderSchema {
 
   @override
   dynamic get defaultValue => null;
+
+  @override
+  bool get onlyJsonTypes => false;
 
   @override
   Iterable<Import> get additionalImports => [

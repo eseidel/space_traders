@@ -21,11 +21,9 @@ class StoreApi {
     }
 
     if (response.body.isNotEmpty) {
-      return {
-        for (final entry
-            in (jsonDecode(response.body) as Map<String, dynamic>).entries)
-          entry.key: (entry.value as int),
-      };
+      return (jsonDecode(response.body) as Map<String, dynamic>).map(
+        (key, value) => MapEntry(key, value as int),
+      );
     }
 
     throw ApiException(
