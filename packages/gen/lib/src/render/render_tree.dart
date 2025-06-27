@@ -1333,14 +1333,13 @@ class RenderArray extends RenderSchema {
 
   @override
   String? defaultValueString(SchemaRenderer context) {
-    // OpenAPI defaults arrays to empty, so we match for now.
-    final itemType = items.typeName(context);
-    final maybeConst = items.defaultCanConstConstruct ? 'const ' : '';
     final listDefault = defaultValue as List;
     if (listDefault.isEmpty) {
       // Type annotation is not needed for empty lists.
-      return '$maybeConst[]';
+      return 'const []';
     }
+    final maybeConst = items.defaultCanConstConstruct ? 'const ' : '';
+    final itemType = items.typeName(context);
     String toString(dynamic value) =>
         value is String ? quoteString(value) : value.toString();
     final values = listDefault.map(toString).join(', ');

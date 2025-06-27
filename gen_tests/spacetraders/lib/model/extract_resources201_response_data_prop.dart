@@ -12,8 +12,8 @@ class ExtractResources201ResponseDataProp {
     required this.extraction,
     required this.cooldown,
     required this.cargo,
-    this.modifiers = [],
-    this.events = [],
+    this.modifiers = const [],
+    this.events = const [],
   });
 
   factory ExtractResources201ResponseDataProp.fromJson(

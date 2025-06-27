@@ -13,8 +13,8 @@ class System {
     required this.x,
     required this.y,
     this.constellation,
-    this.waypoints = [],
-    this.factions = [],
+    this.waypoints = const [],
+    this.factions = const [],
     this.name,
   });
 

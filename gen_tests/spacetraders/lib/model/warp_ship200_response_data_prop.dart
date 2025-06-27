@@ -9,7 +9,7 @@ class WarpShip200ResponseDataProp {
   const WarpShip200ResponseDataProp({
     required this.nav,
     required this.fuel,
-    this.events = [],
+    this.events = const [],
   });
 
   factory WarpShip200ResponseDataProp.fromJson(Map<String, dynamic> json) {

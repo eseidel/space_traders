@@ -7,7 +7,7 @@ import 'package:spacetraders/model_helpers.dart';
 class CreateSurvey201ResponseDataProp {
   const CreateSurvey201ResponseDataProp({
     required this.cooldown,
-    this.surveys = [],
+    this.surveys = const [],
   });
 
   factory CreateSurvey201ResponseDataProp.fromJson(Map<String, dynamic> json) {

@@ -18,11 +18,11 @@ class Waypoint {
     required this.x,
     required this.y,
     required this.isUnderConstruction,
-    this.orbitals = [],
+    this.orbitals = const [],
     this.orbits,
     this.faction,
-    this.traits = [],
-    this.modifiers = [],
+    this.traits = const [],
+    this.modifiers = const [],
     this.chart,
   });
 

@@ -749,7 +749,7 @@ void main() {
         '@immutable\n'
         'class Test {\n'
         '    Test(\n'
-        '        { this.aString = const [], this.aInt = const [], this.aNumber = const [], this.aBoolean = const [], this.aDateTime = [], this.aUri = [], this.aArrayOfString = const [], this.aEnum = const [], this.aUnknown = [], \n'
+        '        { this.aString = const [], this.aInt = const [], this.aNumber = const [], this.aBoolean = const [], this.aDateTime = const [], this.aUri = const [], this.aArrayOfString = const [], this.aEnum = const [], this.aUnknown = const [], \n'
         '         }\n'
         '    );\n'
         '\n'

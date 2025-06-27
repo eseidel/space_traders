@@ -11,7 +11,7 @@ class InstallShipModule201ResponseDataProp {
     required this.agent,
     required this.cargo,
     required this.transaction,
-    this.modules = [],
+    this.modules = const [],
   });
 
   factory InstallShipModule201ResponseDataProp.fromJson(

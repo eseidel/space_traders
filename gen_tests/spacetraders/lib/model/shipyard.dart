@@ -9,9 +9,9 @@ class Shipyard {
   const Shipyard({
     required this.symbol,
     required this.modificationsFee,
-    this.shipTypes = [],
-    this.transactions = [],
-    this.ships = [],
+    this.shipTypes = const [],
+    this.transactions = const [],
+    this.ships = const [],
   });
 
   factory Shipyard.fromJson(Map<String, dynamic> json) {

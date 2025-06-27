@@ -6,8 +6,8 @@ import 'package:spacetraders/model_helpers.dart';
 @immutable
 class GetStatus200ResponseLeaderboardsProp {
   const GetStatus200ResponseLeaderboardsProp({
-    this.mostCredits = [],
-    this.mostSubmittedCharts = [],
+    this.mostCredits = const [],
+    this.mostSubmittedCharts = const [],
   });
 
   factory GetStatus200ResponseLeaderboardsProp.fromJson(

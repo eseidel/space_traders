@@ -11,7 +11,7 @@ class RemoveMount201ResponseDataProp {
     required this.agent,
     required this.cargo,
     required this.transaction,
-    this.mounts = [],
+    this.mounts = const [],
   });
 
   factory RemoveMount201ResponseDataProp.fromJson(Map<String, dynamic> json) {

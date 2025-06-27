@@ -11,7 +11,7 @@ class RemoveShipModule201ResponseDataProp {
     required this.agent,
     required this.cargo,
     required this.transaction,
-    this.modules = [],
+    this.modules = const [],
   });
 
   factory RemoveShipModule201ResponseDataProp.fromJson(

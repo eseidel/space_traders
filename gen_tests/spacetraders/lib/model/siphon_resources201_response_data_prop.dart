@@ -11,7 +11,7 @@ class SiphonResources201ResponseDataProp {
     required this.siphon,
     required this.cooldown,
     required this.cargo,
-    this.events = [],
+    this.events = const [],
   });
 
   factory SiphonResources201ResponseDataProp.fromJson(

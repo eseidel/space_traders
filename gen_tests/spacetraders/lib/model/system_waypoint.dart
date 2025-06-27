@@ -11,7 +11,7 @@ class SystemWaypoint {
     required this.type,
     required this.x,
     required this.y,
-    this.orbitals = [],
+    this.orbitals = const [],
     this.orbits,
   });
 

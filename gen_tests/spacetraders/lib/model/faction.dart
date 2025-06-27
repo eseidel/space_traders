@@ -11,7 +11,7 @@ class Faction {
     required this.description,
     required this.isRecruiting,
     this.headquarters,
-    this.traits = [],
+    this.traits = const [],
   });
 
   factory Faction.fromJson(Map<String, dynamic> json) {

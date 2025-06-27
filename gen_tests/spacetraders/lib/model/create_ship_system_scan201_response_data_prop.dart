@@ -7,7 +7,7 @@ import 'package:spacetraders/model_helpers.dart';
 class CreateShipSystemScan201ResponseDataProp {
   const CreateShipSystemScan201ResponseDataProp({
     required this.cooldown,
-    this.systems = [],
+    this.systems = const [],
   });
 
   factory CreateShipSystemScan201ResponseDataProp.fromJson(
