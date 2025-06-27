@@ -31,7 +31,7 @@ class GetStatus200ResponseLinksPropInner {
   final Uri url;
 
   Map<String, dynamic> toJson() {
-    return {'name': name, 'url': url};
+    return {'name': name, 'url': url.toString()};
   }
 
   @override
