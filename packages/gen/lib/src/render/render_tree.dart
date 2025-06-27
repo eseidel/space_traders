@@ -147,6 +147,8 @@ class SpecResolver {
         );
       case ResolvedArray():
         var defaultValue = schema.defaultValue;
+        // I don't think this is quite right.  OpenAPI does not show this fake
+        // default in cases where the schema is being used as a parameter.
         if (defaultValue == null && quirks.allListsDefaultToEmpty) {
           defaultValue = List<dynamic>.empty();
         }
