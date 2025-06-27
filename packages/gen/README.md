@@ -32,7 +32,6 @@ dart run space_gen
 * Finish oneOf support.
 * Remove the 'prop' hack for GitHub spec.
 * Split render tree into some sort of "types" library and types -> code gen.
-* Make (const) empty lists and maps inline in the argument lists again.
 
 Is the body sometimes passed in as an object, and sometimes created by
 the endpoint?  Or is it always created by the endpoint?
