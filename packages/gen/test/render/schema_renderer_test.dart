@@ -801,6 +801,64 @@ void main() {
         '',
       );
     });
+
+    test('empty object as property', () {
+      final schema = {
+        'type': 'object',
+        'properties': {
+          'a': {'type': 'object', 'properties': <String, dynamic>{}},
+        },
+      };
+      final result = renderSchema(schema);
+      expect(
+        result,
+        '@immutable\n'
+        'class Test {\n'
+        '    Test(\n'
+        '        {  this.a,\n'
+        '         }\n'
+        '    );\n'
+        '\n'
+        '    factory Test.fromJson(Map<String, dynamic>\n'
+        '        json) {\n'
+        '        return Test(\n'
+        '            a: const TestAProp(),\n'
+        '        );\n'
+        '    }\n'
+        '\n'
+        '    /// Convenience to create a nullable type from a nullable json object.\n'
+        '    /// Useful when parsing optional fields.\n'
+        '    static Test? maybeFromJson(Map<String, dynamic>? json) {\n'
+        '        if (json == null) {\n'
+        '            return null;\n'
+        '        }\n'
+        '        return Test.fromJson(json);\n'
+        '    }\n'
+        '\n'
+        '    final  TestAProp? a;\n'
+        '\n'
+        '\n'
+        '    Map<String, dynamic> toJson() {\n'
+        '        return {\n'
+        "            'a': const <String, dynamic>{},\n"
+        '        };\n'
+        '    }\n'
+        '\n'
+        '    @override\n'
+        '    int get hashCode =>\n'
+        '          a.hashCode;\n'
+        '\n'
+        '    @override\n'
+        '    bool operator ==(Object other) {\n'
+        '        if (identical(this, other)) return true;\n'
+        '        return other is Test\n'
+        '            && this.a == other.a\n'
+        '        ;\n'
+        '    }\n'
+        '}\n'
+        '',
+      );
+    });
   });
 
   group('renderOperation', () {
