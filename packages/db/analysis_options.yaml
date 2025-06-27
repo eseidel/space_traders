@@ -6,3 +6,5 @@ include: package:very_good_analysis/analysis_options.yaml
 linter:
   rules:
     file_names: false
+    # Disable the broken experimental linter.
+    specify_nonobvious_property_types: false

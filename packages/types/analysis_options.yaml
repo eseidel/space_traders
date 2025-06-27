@@ -3,6 +3,11 @@
 
 include: package:very_good_analysis/analysis_options.yaml
 
+linter:
+  rules:
+    # Disable the broken experimental linter.
+    specify_nonobvious_property_types: false
+
 analyzer:
   exclude:
   # Don't warn about lints in generated code.

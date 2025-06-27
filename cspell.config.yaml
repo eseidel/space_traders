@@ -89,6 +89,7 @@ words:
   - xcconfig
   - cfbundle
   - APPL
+  - nonobvious
   # For GitHub API spec
   - sarif
   - sarifs
