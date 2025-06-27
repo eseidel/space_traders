@@ -21,7 +21,6 @@ do
         --report-on=../cli/lib/ \
         --report-on=../client/lib/ \
         --report-on=../db/lib/ \
-        --report-on=../gen/lib/ \
         --report-on=../protocol/lib/ \
         --report-on=../server/lib/ \
         --report-on=../types/lib/ \

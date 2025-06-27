@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        package: ['cli', 'cli_client', 'client', 'db', 'gen', 'protocol', 'server', 'types']
+        package: ['cli', 'cli_client', 'client', 'db', 'protocol', 'server', 'types']
         
     steps:
       - uses: actions/checkout@v4
@@ -63,7 +63,6 @@ jobs:
           --report-on=../cli_client/lib/
           --report-on=../client/lib/
           --report-on=../db/lib/
-          --report-on=../gen/lib/
           --report-on=../protocol/lib/
           --report-on=../server/lib/
           --report-on=../types/lib/
