@@ -166,7 +166,7 @@ void main() {
         '\n'
         '    Map<String, dynamic> toJson() {\n'
         '        return {\n'
-        "            'foo': foo,\n"
+        "            'foo': foo?.toString(),\n"
         '        };\n'
         '    }\n'
         '\n'
@@ -225,7 +225,7 @@ void main() {
         '\n'
         '    Map<String, dynamic> toJson() {\n'
         '        return {\n'
-        "            'foo': foo,\n"
+        "            'foo': foo.toString(),\n"
         '        };\n'
         '    }\n'
         '\n'
