@@ -1360,7 +1360,7 @@ class RenderArray extends RenderSchema {
     required bool dartIsNullable,
   }) {
     // Pod types don't need toJson.
-    if (items is RenderPod) {
+    if (items.onlyJsonTypes) {
       return dartName;
     }
     final nameCall = dartIsNullable ? '$dartName?' : dartName;
