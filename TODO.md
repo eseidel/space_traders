@@ -1552,3 +1552,12 @@ systems that it needs for its ships?
 
 ### Remove Transactions from CostedDeal
 Just add deals and a deal_id to the db and associate transactions with a deal.
+
+### Missing user name after importing token.
+
+cli-1     | Welcome to Space Traders! 🚀
+cli-1     | Playing as 
+cli-1     | Waiting for systems to be cached... 180/6995 systems and 2799/199146 waypoints.
+cli-1     | Welcome to Space Traders! 🚀
+cli-1     | Playing as 
+

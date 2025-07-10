@@ -152,6 +152,11 @@ Future<void> cliMain(List<String> args) async {
   if (agentSymbol == null) {
     throw StateError('No agent symbol found in database or environment.');
   }
+  // TODO(eseidel): separate agent token from account token.
+  // When we have an agent token we don't need an agent symbol and can set
+  // the agent symbol from the agent token.
+  // When we have no agent token and no agent symbol, but we have an account
+  // token we can register a new agent.
   final Api api;
   if (await db.config.getAuthToken() == null) {
     final email = Platform.environment['ST_EMAIL'];
