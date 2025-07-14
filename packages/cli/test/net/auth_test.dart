@@ -14,9 +14,9 @@ void main() {
     final configStore = _MockConfigStore();
     when(() => db.config).thenReturn(configStore);
 
-    when(configStore.getAuthToken).thenAnswer((_) async => null);
+    when(configStore.getAgentToken).thenAnswer((_) async => null);
     expect(() => defaultApi(db), throwsException);
-    when(configStore.getAuthToken).thenAnswer((_) async => 'token');
+    when(configStore.getAgentToken).thenAnswer((_) async => 'token');
     final api = await defaultApi(db);
     expect(api.apiClient, isA<CountingApiClient>());
   });

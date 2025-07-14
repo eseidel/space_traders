@@ -24,22 +24,28 @@ I use a slice on DigitalOcean (any provider would do).  You'll want at least
 2GB to run alone (dart + postgres), 4GB or more if you plan to use Visual Studio over
 SSH (the Dart Analyzer is very memory intensive).
 
-Requires Dart 3.0.0 or later.
+The code assumes you're using the latest stable Dart.
 
+### Installing Flutter & Dart
 The easiest way to get Dart is typically via Flutter.  See
 https://flutter.dev/docs/get-started/install for instructions.
 
-On ubuntu.  These instructions assume they're being run as `root` (e.g. in a
-container).
+On ubuntu:
 ```
-snap install flutter --classic
-echo "export BOT=true" >> $HOME/.bashrc
-source $HOME/.bashrc
+sudo snap install flutter --classic
 flutter
 ```
 
-The `export BOT=true` exists just to disable a warning that `flutter` prints
-when being run as root.  If you're not running as root, you don't need it.
+### Running as `root`
+
+If you're running as root, you'll also want to disable `flutter`'s warning
+messages about running as root (which also show up when running `dart` if
+installed via `flutter`).
+
+```
+echo "export BOT=true" >> $HOME/.bashrc
+source $HOME/.bashrc
+```
 
 ## Database Setup
 
@@ -47,8 +53,7 @@ Follow the instructions in packages/db/README.md before continuing.
 
 ## Running
 
-Set `ST_AGENT` to your desired agent name.  If your agent name is reserved
-you'll also need to set `ST_EMAIL`.
+Set `ST_AGENT` to your desired agent name.
 
 You can reserve your name by donating to spacetraders.
 
@@ -62,7 +67,8 @@ snap install docker
 docker compose up --build
 ```
 
-You only need to set `ST_AGENT` the first run, after that it saves it in the db.
+You only need to set `ST_AGENT` for runs when expecting to need to register
+a new agent (otherwise its saved in the db along with the agent token).
 
 ## Extra setup for Development
 

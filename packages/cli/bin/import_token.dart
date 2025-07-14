@@ -26,7 +26,7 @@ Future<void> command(Database db, ArgResults argResults) async {
     tokenString = await tokenFile.readAsString();
   }
 
-  await db.config.setAuthToken(tokenString.trim());
+  await db.config.setAgentToken(tokenString.trim());
   logger.info('Token imported successfully.');
 }
 
