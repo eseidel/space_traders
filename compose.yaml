@@ -44,8 +44,6 @@ services:
         - BIN=cli
     environment:
       - ST_AGENT=${ST_AGENT}
-      - ST_EMAIL=${ST_EMAIL}
-      - ST_FACTION=${ST_FACTION}
     depends_on:
       net:
         condition: service_started

@@ -1,55 +1,45 @@
 import 'dart:math';
 
 import 'package:cli/caches.dart';
-import 'package:cli/logger.dart';
 import 'package:cli/net/auth.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
 
-Future<String> _tryRegister(
-  AccountsApi api, {
-  required String symbol,
-  required FactionSymbol faction,
-}) async {
-  final registerRequest = RegisterRequest(symbol: symbol, faction: faction);
-  final registerResponse = await api.register(registerRequest);
-  return registerResponse.data.token;
+/// ChooseFaction is a function that chooses a faction from a list of factions.
+typedef ChooseFaction = FactionSymbol Function(Iterable<Faction>);
+
+/// randomFaction chooses a random faction from the given list of factions.
+FactionSymbol randomFaction(Iterable<Faction> factions) {
+  final recruitingFactions = factions.where((f) => f.isRecruiting).toList();
+  if (recruitingFactions.isEmpty) {
+    throw StateError('No recruiting factions found.');
+  }
+  return recruitingFactions[Random().nextInt(recruitingFactions.length)].symbol;
 }
 
-/// register registers a new user with the space traders api and
-/// returns the auth token which should be saved and used for future requests.
-/// If the call sign is already taken, it will prompt for the email address
-/// associated with the call sign.
+/// Registers a new user with the space traders api and returns the agent token
+/// which should be saved and used for future requests.
+/// By default will choose a random faction from the recruiting factions.
+/// Pass a custom [chooseFaction] function to choose a faction other than the
+/// default.
+/// Registration can fail if the chosen faction is not recruiting, or if the
+/// call sign is already taken.
 Future<String> register(
   Database db, {
   required String agentSymbol,
-  String? email,
-  String? faction,
+  ChooseFaction chooseFaction = randomFaction,
 }) async {
   final client = getApiClient(db);
-  final accountsApi = AccountsApi(client);
 
-  final factionsApi = FactionsApi(client);
-  final factions = await fetchFactions(db, factionsApi);
+  // First figure out which faction to register as.
+  final factions = await fetchFactions(db, FactionsApi(client));
+  final factionSymbol = chooseFaction(factions.where((f) => f.isRecruiting));
 
-  final recruitingFactions = factions.where((f) => f.isRecruiting).toList();
-
-  // There are more factions in the game than players are allowed to join
-  // at the start, so we use RegisterRequestFactionEnum.
-  final Faction chosenFaction;
-  if (faction != null) {
-    chosenFaction = factions.firstWhere(
-      (f) => f.symbol.value == faction.toUpperCase(),
-    );
-  } else {
-    logger.warn('Faction not specified. Choosing a random faction.');
-    chosenFaction =
-        recruitingFactions[Random().nextInt(recruitingFactions.length)];
-  }
-
-  return await _tryRegister(
-    accountsApi,
+  // Then try to register.
+  final registerRequest = RegisterRequest(
     symbol: agentSymbol,
-    faction: chosenFaction.symbol,
+    faction: factionSymbol,
   );
+  final registerResponse = await AccountsApi(client).register(registerRequest);
+  return registerResponse.data.token;
 }

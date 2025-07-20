@@ -25,10 +25,10 @@ void main() {
       });
 
       test('auth token', () async {
-        expect(await db.config.getAuthToken(), isNull);
+        expect(await db.config.getAgentToken(), isNull);
         const token = '1234567890';
-        await db.config.setAuthToken(token);
-        expect(await db.config.getAuthToken(), equals(token));
+        await db.config.setAgentToken(token);
+        expect(await db.config.getAgentToken(), equals(token));
       });
 
       test('game phase', () async {

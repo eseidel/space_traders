@@ -122,6 +122,41 @@ Future<void> waitForSystem(Database db, GalaxyStats galaxy) async {
   }
 }
 
+Future<Api> getApi(Database db) async {
+  final agentToken = await db.config.getAgentToken();
+  final accountToken = await db.config.getAccountToken();
+  if (agentToken == null && accountToken == null) {
+    throw StateError('No agent or account token found.');
+  }
+  // First check if we have an agent token
+  if (agentToken != null) {
+    // The token might be invalid, but further callers will handle that.
+    return apiFromAuthToken(agentToken, db);
+  }
+
+  final agentSymbolFromEnv = Platform.environment['ST_AGENT'];
+  if (agentSymbolFromEnv == null) {
+    throw StateError('No agent symbol found, cannot register new agent.');
+  }
+  // Otherwise, register a new user.
+  final token = await register(db, agentSymbol: agentSymbolFromEnv);
+  await db.config.setAgentToken(token);
+  return apiFromAuthToken(token, db);
+}
+
+Future<void> printDbStats(Database db) async {
+  final marketPricesCount = await db.marketPrices.count();
+  final marketWaypointsCount = await db.marketPrices.countWaypoints();
+  final shipyardPricesCount = await db.shipyardPrices.count();
+  final shipyardWaypointsCount = await db.shipyardPrices.waypointCount();
+  logger.info(
+    'Loaded $marketPricesCount prices from '
+    '$marketWaypointsCount markets and '
+    '$shipyardPricesCount prices from '
+    '$shipyardWaypointsCount shipyards.',
+  );
+}
+
 Future<void> cliMain(List<String> args) async {
   final parser = ArgParser()
     ..addFlag('verbose', abbr: 'v', negatable: false, help: 'Verbose logging.')
@@ -141,62 +176,29 @@ Future<void> cliMain(List<String> args) async {
 
   final db = await defaultDatabase();
 
-  var agentSymbol = await db.config.getAgentSymbol();
-  if (agentSymbol == null) {
-    agentSymbol = Platform.environment['ST_AGENT'];
-    if (agentSymbol != null) {
-      logger.info('Using agent symbol from environment: $agentSymbol');
-      await db.config.setAgentSymbol(agentSymbol);
-    }
-  }
-  if (agentSymbol == null) {
-    throw StateError('No agent symbol found in database or environment.');
-  }
-  // TODO(eseidel): separate agent token from account token.
-  // When we have an agent token we don't need an agent symbol and can set
-  // the agent symbol from the agent token.
-  // When we have no agent token and no agent symbol, but we have an account
-  // token we can register a new agent.
-  final Api api;
-  if (await db.config.getAuthToken() == null) {
-    final email = Platform.environment['ST_EMAIL'];
-    logger.info('No auth token found.');
-    // Otherwise, register a new user.
-    final token = await register(db, agentSymbol: agentSymbol, email: email);
-    await db.config.setAuthToken(token);
-    api = apiFromAuthToken(token, db);
-  } else {
-    api = await defaultApi(db);
-  }
+  final api = await getApi(db);
+  final myAgent = await api.agents.getMyAgent();
+  logger.info('Playing as ${myAgent.data.symbol}');
+
+  // First we ask the API how many systems there are.
+  final galaxy = await getGalaxyStats(api);
+  // Wait for starting system to be cached if necessary.
+  await waitForSystem(db, galaxy);
+
+  // Print the leaderboards.
+  final status = await api.defaultApi.getStatus();
+  printStatus(status);
+
+  await printDbStats(db);
+
+  config = await Config.fromDb(db);
+  final caches = await Caches.loadOrFetch(api, db);
+  final centralCommand = CentralCommand();
 
   if (results['selloff'] as bool) {
     logger.err('Selling all ships!');
     await db.config.setGamePhase(GamePhase.selloff);
   }
-
-  logger.info('Playing as $agentSymbol');
-
-  // First we ask the API how many systems there are.
-  final galaxy = await getGalaxyStats(api);
-  await waitForSystem(db, galaxy);
-
-  config = await Config.fromDb(db);
-
-  final caches = await Caches.loadOrFetch(api, db);
-  final marketPricesCount = await db.marketPrices.count();
-  final marketWaypointsCount = await db.marketPrices.countWaypoints();
-  final shipyardPricesCount = await db.shipyardPrices.count();
-  final shipyardWaypointsCount = await db.shipyardPrices.waypointCount();
-  logger.info(
-    'Loaded $marketPricesCount prices from '
-    '$marketWaypointsCount markets and '
-    '$shipyardPricesCount prices from '
-    '$shipyardWaypointsCount shipyards.',
-  );
-  final centralCommand = CentralCommand();
-
-  final status = await api.defaultApi.getStatus();
-  printStatus(status);
 
   // Handle ctrl-c and print out request stats.
   // This should be made an argument rather than on by default.
