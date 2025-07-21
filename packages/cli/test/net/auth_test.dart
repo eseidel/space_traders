@@ -15,6 +15,7 @@ void main() {
     when(() => db.config).thenReturn(configStore);
 
     when(configStore.getAgentToken).thenAnswer((_) async => null);
+    when(configStore.getBaseUrl).thenAnswer((_) async => null);
     expect(() => defaultApi(db), throwsException);
     when(configStore.getAgentToken).thenAnswer((_) async => 'token');
     final api = await defaultApi(db);
