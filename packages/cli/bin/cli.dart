@@ -110,11 +110,11 @@ Future<void> waitForSystem(Database db, GalaxyStats galaxy) async {
     final systems = await db.systems.countSystemRecords();
     final waypoints = await db.systems.countSystemWaypoints();
     if (systems >= galaxy.systemCount && waypoints >= galaxy.waypointCount) {
-      logger.info('Systems and waypoints are cached.');
+      logger.info('$systems systems and $waypoints waypoints are cached.');
       return;
     }
     logger.info(
-      'Waiting for systems to be cached... '
+      'Waiting for systems and waypoints to be cached... '
       '$systems/${galaxy.systemCount} systems and '
       '$waypoints/${galaxy.waypointCount} waypoints.',
     );
