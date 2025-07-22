@@ -16,8 +16,15 @@ Future<T> waitFor<T>(Database db, Future<T?> Function() get) async {
 }
 
 Future<void> command(Database db, ArgResults argResults) async {
-  final api = await waitForApi(db, getPriority: () => networkPriorityLow);
+  final baseUri = await determineBaseUri(db);
+  logger.info('Running idle queue for $baseUri');
+  final api = await waitForApi(
+    db,
+    getPriority: () => networkPriorityLow,
+    baseUri: baseUri,
+  );
   final agent = await getMyAgent(api);
+  logger.info('with ${agent.symbol}');
 
   /// Make sure we've cached all systems and waypoints before bothering to
   /// start the idle queue.

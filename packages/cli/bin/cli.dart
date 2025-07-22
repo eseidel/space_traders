@@ -122,7 +122,7 @@ Future<void> waitForSystem(Database db, GalaxyStats galaxy) async {
   }
 }
 
-Future<String> getAgentToken(Database db) async {
+Future<String> getAgentToken(Database db, {required Uri baseUri}) async {
   final agentToken = await db.config.getAgentToken();
   final accountToken = await db.config.getAccountToken();
   if (agentToken == null && accountToken == null) {
@@ -139,14 +139,18 @@ Future<String> getAgentToken(Database db) async {
     throw StateError('No agent symbol found, cannot register new agent.');
   }
   // Otherwise, register a new user.
-  final token = await register(db, agentSymbol: agentSymbolFromEnv);
+  final token = await register(
+    db,
+    agentSymbol: agentSymbolFromEnv,
+    baseUri: baseUri,
+  );
   await db.config.setAgentToken(token);
   return token;
 }
 
-Future<Api> getApi(Database db) async {
-  final agentToken = await getAgentToken(db);
-  return apiFromAuthToken(agentToken, db);
+Future<Api> getApi(Database db, {required Uri baseUri}) async {
+  final agentToken = await getAgentToken(db, baseUri: baseUri);
+  return apiFromAuthToken(agentToken, db, baseUri: baseUri);
 }
 
 Future<void> printDbStats(Database db) async {
@@ -180,10 +184,11 @@ Future<void> cliMain(List<String> args) async {
   logger.info('Welcome to Space Traders! 🚀');
 
   final db = await defaultDatabase();
-
-  final api = await getApi(db);
+  final baseUri = await determineBaseUri(db);
+  final api = await getApi(db, baseUri: baseUri);
   final myAgent = await api.agents.getMyAgent();
-  logger.info('Playing as ${myAgent.data.symbol}');
+  final agentSymbol = myAgent.data.symbol;
+  logger.info('Playing as $agentSymbol on $baseUri');
 
   // First we ask the API how many systems there are.
   final galaxy = await getGalaxyStats(api);

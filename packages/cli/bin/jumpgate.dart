@@ -8,7 +8,12 @@ Future<void> command(Database db, ArgResults argResults) async {
     argResults.rest.firstOrNull,
   );
 
-  final api = await defaultApi(db, getPriority: () => networkPriorityLow);
+  final baseUri = await determineBaseUri(db);
+  final api = await defaultApi(
+    db,
+    getPriority: () => networkPriorityLow,
+    baseUri: baseUri,
+  );
 
   final systemsCache = await db.systems.snapshotAllSystems();
   final jumpGateSymbol = systemsCache

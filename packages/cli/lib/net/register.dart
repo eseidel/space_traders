@@ -27,9 +27,10 @@ FactionSymbol randomFaction(Iterable<Faction> factions) {
 Future<String> register(
   Database db, {
   required String agentSymbol,
+  required Uri baseUri,
   ChooseFaction chooseFaction = randomFaction,
 }) async {
-  final client = await getApiClient(db);
+  final client = await getApiClient(db, baseUri: baseUri);
 
   // First figure out which faction to register as.
   final factions = await fetchFactions(db, FactionsApi(client));
