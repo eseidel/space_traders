@@ -29,7 +29,7 @@ Future<String> register(
   required String agentSymbol,
   ChooseFaction chooseFaction = randomFaction,
 }) async {
-  final client = getApiClient(db);
+  final client = await getApiClient(db);
 
   // First figure out which faction to register as.
   final factions = await fetchFactions(db, FactionsApi(client));

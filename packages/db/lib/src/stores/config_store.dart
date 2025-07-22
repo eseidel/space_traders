@@ -64,4 +64,18 @@ class ConfigStore {
   Future<void> setAccountToken(String token) async {
     await _setString('account_token', token);
   }
+
+  /// Get the base url from the config table in the db.
+  Future<Uri?> getBaseUrl() async {
+    final maybeString = await _getString('base_url');
+    if (maybeString == null) {
+      return null;
+    }
+    return Uri.parse(maybeString);
+  }
+
+  /// Set the base url in the config table in the db.
+  Future<void> setBaseUrl(Uri url) async {
+    await _setString('base_url', url.toString());
+  }
 }

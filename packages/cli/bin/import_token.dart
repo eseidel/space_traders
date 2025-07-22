@@ -27,7 +27,7 @@ Future<void> command(Database db, ArgResults argResults) async {
   }
 
   await db.config.setAgentToken(tokenString.trim());
-  logger.info('Token imported successfully.');
+  logger.info('Agent Token imported successfully.');
 }
 
 void main(List<String> args) async {

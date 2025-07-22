@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cli/api.dart';
 import 'package:cli/net/counts.dart';
 import 'package:cli/net/queue.dart';
@@ -9,6 +11,22 @@ export 'package:cli/net/queue.dart'
 /// Default priority function.
 int defaultGetPriority() => networkPriorityDefault;
 
+/// Gets the base uri to use for the api client.
+Future<Uri> determineBaseUri(Database db) async {
+  // If we have an environment variable, return that.
+  final baseUrlString = Platform.environment['ST_BASE_URL'];
+  if (baseUrlString != null) {
+    return Uri.parse(baseUrlString);
+  }
+  // Otherwise look up in the db config.
+  final baseUrl = await db.config.getBaseUrl();
+  if (baseUrl != null) {
+    return baseUrl;
+  }
+  // Otherwise, return the default.
+  return Uri.parse('https://api.spacetraders.io/v2/');
+}
+
 /// Create a queued client with the given priority function.
 QueuedClient getQueuedClient(
   Database db, {
@@ -18,27 +36,26 @@ QueuedClient getQueuedClient(
 }
 
 /// Create an API client with priority function.
-CountingApiClient getApiClient(
+Future<CountingApiClient> getApiClient(
   Database db, {
   int Function() getPriority = defaultGetPriority,
-  String? overrideBaseUrl,
   Map<String, String>? defaultHeaders,
-}) {
+}) async {
   return CountingApiClient(
-    baseUri: overrideBaseUrl != null ? Uri.parse(overrideBaseUrl) : null,
+    baseUri: await determineBaseUri(db),
     defaultHeaders: defaultHeaders ?? {},
     client: getQueuedClient(db, getPriority: getPriority),
   );
 }
 
 /// apiFromAuthToken creates an Api with the given auth token.
-Api apiFromAuthToken(
+Future<Api> apiFromAuthToken(
   String token,
   Database db, {
   int Function() getPriority = defaultGetPriority,
-}) {
+}) async {
   final defaultHeaders = <String, String>{'Authorization': 'Bearer $token'};
-  final apiClient = getApiClient(
+  final apiClient = await getApiClient(
     db,
     getPriority: getPriority,
     defaultHeaders: defaultHeaders,

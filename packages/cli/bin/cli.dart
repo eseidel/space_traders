@@ -122,7 +122,7 @@ Future<void> waitForSystem(Database db, GalaxyStats galaxy) async {
   }
 }
 
-Future<Api> getApi(Database db) async {
+Future<String> getAgentToken(Database db) async {
   final agentToken = await db.config.getAgentToken();
   final accountToken = await db.config.getAccountToken();
   if (agentToken == null && accountToken == null) {
@@ -131,7 +131,7 @@ Future<Api> getApi(Database db) async {
   // First check if we have an agent token
   if (agentToken != null) {
     // The token might be invalid, but further callers will handle that.
-    return apiFromAuthToken(agentToken, db);
+    return agentToken;
   }
 
   final agentSymbolFromEnv = Platform.environment['ST_AGENT'];
@@ -141,7 +141,12 @@ Future<Api> getApi(Database db) async {
   // Otherwise, register a new user.
   final token = await register(db, agentSymbol: agentSymbolFromEnv);
   await db.config.setAgentToken(token);
-  return apiFromAuthToken(token, db);
+  return token;
+}
+
+Future<Api> getApi(Database db) async {
+  final agentToken = await getAgentToken(db);
+  return apiFromAuthToken(agentToken, db);
 }
 
 Future<void> printDbStats(Database db) async {
