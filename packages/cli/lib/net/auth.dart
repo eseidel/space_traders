@@ -38,13 +38,14 @@ QueuedClient getQueuedClient(
 /// Create an API client with priority function.
 Future<CountingApiClient> getApiClient(
   Database db, {
+  required Uri baseUri,
   int Function() getPriority = defaultGetPriority,
   Map<String, String>? defaultHeaders,
 }) async {
   return CountingApiClient(
-    baseUri: await determineBaseUri(db),
     defaultHeaders: defaultHeaders ?? {},
     client: getQueuedClient(db, getPriority: getPriority),
+    baseUri: baseUri,
   );
 }
 
@@ -52,6 +53,7 @@ Future<CountingApiClient> getApiClient(
 Future<Api> apiFromAuthToken(
   String token,
   Database db, {
+  required Uri baseUri,
   int Function() getPriority = defaultGetPriority,
 }) async {
   final defaultHeaders = <String, String>{'Authorization': 'Bearer $token'};
@@ -59,6 +61,7 @@ Future<Api> apiFromAuthToken(
     db,
     getPriority: getPriority,
     defaultHeaders: defaultHeaders,
+    baseUri: baseUri,
   );
   return Api(apiClient);
 }
@@ -66,6 +69,7 @@ Future<Api> apiFromAuthToken(
 /// Waits for the auth token to be available and then creates an API.
 Future<Api> waitForApi(
   Database db, {
+  required Uri baseUri,
   int Function() getPriority = defaultGetPriority,
 }) async {
   var token = await db.config.getAgentToken();
@@ -73,18 +77,29 @@ Future<Api> waitForApi(
     await Future<void>.delayed(const Duration(minutes: 1));
     token = await db.config.getAgentToken();
   }
-  return apiFromAuthToken(token, db, getPriority: getPriority);
+  return apiFromAuthToken(
+    token,
+    db,
+    getPriority: getPriority,
+    baseUri: baseUri,
+  );
 }
 
 /// defaultApi creates an Api with the default auth token read from the
 /// given file system.
 Future<Api> defaultApi(
   Database db, {
+  Uri? baseUri,
   int Function() getPriority = defaultGetPriority,
 }) async {
   final token = await db.config.getAgentToken();
   if (token == null) {
     throw Exception('No auth token found.');
   }
-  return apiFromAuthToken(token, db, getPriority: getPriority);
+  return apiFromAuthToken(
+    token,
+    db,
+    getPriority: getPriority,
+    baseUri: baseUri ?? await determineBaseUri(db),
+  );
 }

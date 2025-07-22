@@ -61,6 +61,9 @@ services:
       dockerfile: ./cli/Dockerfile
       args:
         - BIN=idle_queue
+    env_file:
+      - path: .env
+        required: false # ST_AGENT is required to be set via file or flags.
     depends_on:
       net:
         condition: service_started
