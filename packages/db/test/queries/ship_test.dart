@@ -16,11 +16,11 @@ void main() {
 
       final symbol = ShipSymbol.fromString('S-1234567890');
       final ship = Ship.test(symbol);
-      await db.upsertShip(ship);
-      final result = await db.getShip(symbol);
+      await db.ships.upsert(ship);
+      final result = await db.ships.get(symbol);
       expect(result!.symbol, equals(ship.symbol));
-      await db.deleteShip(symbol);
-      expect(await db.getShip(symbol), isNull);
+      await db.ships.remove(symbol);
+      expect(await db.ships.get(symbol), isNull);
     });
   });
 }

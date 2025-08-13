@@ -9,6 +9,7 @@ export 'package:db/src/stores/jump_gate_store.dart';
 export 'package:db/src/stores/market_listing_store.dart';
 export 'package:db/src/stores/market_price_store.dart';
 export 'package:db/src/stores/network_store.dart';
+export 'package:db/src/stores/ships_store.dart';
 export 'package:db/src/stores/shipyard_listing_store.dart';
 export 'package:db/src/stores/shipyard_price_store.dart';
 export 'package:db/src/stores/static_data_store.dart';

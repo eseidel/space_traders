@@ -24,7 +24,7 @@ Future<PurchaseShip201ResponseData> purchaseShip(
   );
   final data = purchaseResponse.data;
   // Add the new ship to our cache.
-  await db.upsertShip(Ship.fromOpenApi(data.ship));
+  await db.ships.upsert(Ship.fromOpenApi(data.ship));
   await db.upsertAgent(Agent.fromOpenApi(data.agent));
   return data;
 }
@@ -39,7 +39,7 @@ Future<ScrapShip200ResponseData> scrapShip(
   final scrapResponse = await api.fleet.scrapShip(shipSymbol.symbol);
   final data = scrapResponse.data;
   // Remove the ship from our cache.
-  await db.deleteShip(shipSymbol);
+  await db.ships.remove(shipSymbol);
   await db.upsertAgent(Agent.fromOpenApi(data.agent));
   // Caller records the transaction.
   return data;
@@ -62,7 +62,7 @@ Future<void> setShipFlightMode(
     ..nav = data.nav
     ..fuel = data.fuel;
   recordEvents(db, ship, data.events);
-  await db.upsertShip(ship);
+  await db.ships.upsert(ship);
 }
 
 /// Navigate [ship] to [waypointSymbol]
@@ -78,7 +78,7 @@ Future<NavigateShip200ResponseData> navigateShip(
   ship
     ..nav = data.nav
     ..fuel = data.fuel;
-  await db.upsertShip(ship);
+  await db.ships.upsert(ship);
   return data;
 }
 
@@ -95,7 +95,7 @@ Future<WarpShip200ResponseData> warpShip(
   ship
     ..nav = data.nav
     ..fuel = data.fuel;
-  await db.upsertShip(ship);
+  await db.ships.upsert(ship);
   return data;
 }
 
@@ -109,7 +109,7 @@ Future<SiphonResources201ResponseData> siphonResources(
   ship
     ..cargo = response.data.cargo
     ..cooldown = response.data.cooldown;
-  await db.upsertShip(ship);
+  await db.ships.upsert(ship);
   return response.data;
 }
 
@@ -124,7 +124,7 @@ Future<ExtractResources201ResponseData> extractResources(
   ship
     ..cargo = response.data.cargo
     ..cooldown = response.data.cooldown;
-  await db.upsertShip(ship);
+  await db.ships.upsert(ship);
   return response.data;
 }
 
@@ -143,7 +143,7 @@ Future<ExtractResourcesWithSurvey201ResponseData> extractResourcesWithSurvey(
   ship
     ..cargo = response.data.cargo
     ..cooldown = response.data.cooldown;
-  await db.upsertShip(ship);
+  await db.ships.upsert(ship);
   return response.data;
 }
 
@@ -167,7 +167,7 @@ Future<DeliverContract200ResponseData> deliverContract(
     Contract.fromOpenApi(data.contract, DateTime.timestamp()),
   );
   ship.cargo = data.cargo;
-  await db.upsertShip(ship);
+  await db.ships.upsert(ship);
   return data;
 }
 
@@ -196,7 +196,7 @@ Future<SupplyConstruction201ResponseData> supplyConstruction(
     data.construction,
   );
   ship.cargo = data.cargo;
-  await db.upsertShip(ship);
+  await db.ships.upsert(ship);
   return data;
 }
 
@@ -212,7 +212,7 @@ Future<SellCargo201ResponseData> sellCargo(
   final response = await api.fleet.sellCargo(ship.symbol.symbol, request);
   final data = response.data;
   ship.cargo = data.cargo;
-  await db.upsertShip(ship);
+  await db.ships.upsert(ship);
   await db.upsertAgent(Agent.fromOpenApi(data.agent));
   return data;
 }
@@ -231,7 +231,7 @@ Future<PurchaseCargo201ResponseData> purchaseCargo(
   final response = await api.fleet.purchaseCargo(ship.symbol.symbol, request);
   final data = response.data;
   ship.cargo = data.cargo;
-  await db.upsertShip(ship);
+  await db.ships.upsert(ship);
   await db.upsertAgent(Agent.fromOpenApi(data.agent));
   return data;
 }
@@ -266,6 +266,6 @@ Future<RefuelShip200ResponseData> refuelShip(
   if (data.cargo != null) {
     ship.cargo = data.cargo!;
   }
-  await db.upsertShip(ship);
+  await db.ships.upsert(ship);
   return data;
 }

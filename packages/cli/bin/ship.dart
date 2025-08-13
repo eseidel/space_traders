@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:cli/cli.dart';
 
 Future<void> command(Database db, ArgResults argResults) async {
-  var ships = await db.allShips();
+  var ships = await db.ships.all();
   if (argResults.rest.isNotEmpty) {
     final onlyShips = argResults.rest
         .map((s) => int.parse(s, radix: 16))

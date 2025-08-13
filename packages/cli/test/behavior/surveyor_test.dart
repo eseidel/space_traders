@@ -23,6 +23,8 @@ class _MockShip extends Mock implements Ship {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
+class _MockShipStore extends Mock implements ShipStore {}
+
 void main() {
   test('advanceSurveyor smoke test', () async {
     final api = _MockApi();
@@ -99,7 +101,9 @@ void main() {
         marketForGood: const {},
         extractionType: ExtractionType.mine,
       );
-    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
+    final shipStore = _MockShipStore();
+    when(() => db.ships).thenReturn(shipStore);
+    when(() => shipStore.upsert(ship)).thenAnswer((_) async {});
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(

@@ -25,6 +25,8 @@ class _MockShip extends Mock implements Ship {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
+class _MockShipStore extends Mock implements ShipStore {}
+
 void main() {
   test('advanceSiphoner smoke test', () async {
     final api = _MockApi();
@@ -157,7 +159,9 @@ void main() {
         remainingSeconds: 0,
       ),
     );
-    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
+    final shipStore = _MockShipStore();
+    when(() => db.ships).thenReturn(shipStore);
+    when(() => shipStore.upsert(ship)).thenAnswer((_) async {});
 
     final waitUntil = await runWithLogger(
       logger,

@@ -43,6 +43,8 @@ class _MockShipReactor extends Mock implements ShipReactor {}
 
 class _MockShipRegistration extends Mock implements ShipRegistration {}
 
+class _MockShipStore extends Mock implements ShipStore {}
+
 class _MockTransactionStore extends Mock implements TransactionStore {}
 
 void main() {
@@ -226,7 +228,9 @@ void main() {
 
     registerFallbackValue(Transaction.fallbackValue());
     when(() => transactionStore.insert(any())).thenAnswer((_) async {});
-    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
+    final shipStore = _MockShipStore();
+    when(() => db.ships).thenReturn(shipStore);
+    when(() => shipStore.upsert(ship)).thenAnswer((_) async {});
     when(() => centralCommand.medianAntimatterPurchasePrice).thenReturn(10000);
 
     final singleJumpResult = await runWithLogger(

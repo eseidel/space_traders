@@ -177,7 +177,7 @@ Future<void> jettisonCargoAndLog(
     JettisonRequest(symbol: item.tradeSymbol, units: item.units),
   );
   ship.cargo = response.data.cargo;
-  await db.upsertShip(ship);
+  await db.ships.upsert(ship);
 }
 
 /// Buy [amountToBuy] units of [tradeSymbol] and log the transaction.
@@ -428,7 +428,7 @@ Future<void> dockIfNeeded(Database db, Api api, Ship ship) async {
     shipDetail(ship, '🛬 at ${ship.waypointSymbol}');
     final response = await api.fleet.dockShip(ship.symbol.symbol);
     ship.nav = response.data.nav;
-    await db.upsertShip(ship);
+    await db.ships.upsert(ship);
   }
 }
 
@@ -439,7 +439,7 @@ Future<void> undockIfNeeded(Database db, Api api, Ship ship) async {
     shipDetail(ship, '🛰️  at ${ship.waypointSymbol}');
     final response = await api.fleet.orbitShip(ship.symbol.symbol);
     ship.nav = response.data.nav;
-    await db.upsertShip(ship);
+    await db.ships.upsert(ship);
   }
 }
 
@@ -591,7 +591,7 @@ Future<JumpShip200ResponseData> useJumpGateAndLog(
   ship
     ..nav = data.nav
     ..cooldown = data.cooldown;
-  await db.upsertShip(ship);
+  await db.ships.upsert(ship);
   final marketTransaction = data.transaction;
   final agent = Agent.fromOpenApi(data.agent);
   await db.upsertAgent(agent);
@@ -716,7 +716,7 @@ Future<InstallMount201ResponseData> installMountAndLog(
   ship
     ..cargo = data.cargo
     ..mounts = data.mounts;
-  await db.upsertShip(ship);
+  await db.ships.upsert(ship);
   logShipModificationTransaction(ship, agent, data.transaction);
   final transaction = Transaction.fromShipModificationTransaction(
     data.transaction,
@@ -743,7 +743,7 @@ Future<RemoveMount201ResponseData> removeMountAndLog(
   ship
     ..cargo = data.cargo
     ..mounts = data.mounts;
-  await db.upsertShip(ship);
+  await db.ships.upsert(ship);
   logShipModificationTransaction(ship, agent, data.transaction);
   final transaction = Transaction.fromShipModificationTransaction(
     data.transaction,
@@ -778,8 +778,8 @@ Future<TransferCargo200ResponseData> transferCargoAndLog(
   final data = response.data;
   from.cargo = data.cargo;
   to.cargo = data.targetCargo;
-  await db.upsertShip(from);
-  await db.upsertShip(to);
+  await db.ships.upsert(from);
+  await db.ships.upsert(to);
   shipDetail(
     from,
     'Transferred $units $tradeSymbol from ${from.symbol} to '
@@ -815,7 +815,7 @@ Future<CreateSurvey201ResponseData> surveyAndLog(
   final outer = await api.fleet.createSurvey(ship.symbol.symbol);
   final response = outer.data;
   ship.cooldown = response.cooldown;
-  await db.upsertShip(ship);
+  await db.ships.upsert(ship);
   final count = response.surveys.length;
   shipDetail(ship, '🔭 ${count}x at ${ship.waypointSymbol}');
   recordSurveys(db, response.surveys, getNow: getNow);

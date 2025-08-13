@@ -33,6 +33,8 @@ class _MockChartingSnapshot extends Mock implements ChartingSnapshot {}
 
 class _MockSystemsStore extends Mock implements SystemsStore {}
 
+class _MockShipStore extends Mock implements ShipStore {}
+
 void main() {
   test('advanceCharter smoke test', () async {
     final api = _MockApi();
@@ -147,7 +149,9 @@ void main() {
     final behaviorStore = _MockBehaviorStore();
     when(() => db.behaviors).thenReturn(behaviorStore);
     when(behaviorStore.all).thenAnswer((_) async => []);
-    when(db.allShips).thenAnswer((_) async => []);
+    final shipStore = _MockShipStore();
+    when(() => db.ships).thenReturn(shipStore);
+    when(shipStore.all).thenAnswer((_) async => []);
 
     final chartingStore = _MockChartingStore();
     when(() => db.charting).thenReturn(chartingStore);

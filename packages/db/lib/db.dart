@@ -246,6 +246,9 @@ class Database {
   /// Get the market price store.
   MarketPriceStore get marketPrices => MarketPriceStore(this);
 
+  /// Get the ship store.
+  ShipStore get ships => ShipStore(this);
+
   /// Get the shipyard price store.
   ShipyardPriceStore get shipyardPrices => ShipyardPriceStore(this);
 
@@ -377,26 +380,5 @@ class Database {
   /// Update the given agent in the database.
   Future<void> upsertAgent(Agent agent) async {
     await execute(upsertAgentQuery(agent));
-  }
-
-  /// Get all ships.
-  Future<Iterable<Ship>> allShips() async {
-    return queryMany(allShipsQuery(), shipFromColumnMap);
-  }
-
-  /// Get a ship by symbol.
-  Future<Ship?> getShip(ShipSymbol symbol) async {
-    final query = shipBySymbolQuery(symbol);
-    return queryOne(query, shipFromColumnMap);
-  }
-
-  /// Upsert a ship into the database.
-  Future<void> upsertShip(Ship ship) async {
-    await execute(upsertShipQuery(ship));
-  }
-
-  /// Delete a ship from the database.
-  Future<void> deleteShip(ShipSymbol symbol) async {
-    await execute(deleteShipQuery(symbol));
   }
 }

@@ -48,6 +48,8 @@ class _MockShipReactor extends Mock implements ShipReactor {}
 
 class _MockSystemsApi extends Mock implements SystemsApi {}
 
+class _MockShipStore extends Mock implements ShipStore {}
+
 class _MockTransactionStore extends Mock implements TransactionStore {}
 
 void main() {
@@ -232,8 +234,10 @@ void main() {
     when(
       () => centralCommand.otherTraderSystems(any(), any(), shipSymbol),
     ).thenReturn([]);
-    when(db.allShips).thenAnswer((_) async => []);
-    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
+    final shipStore = _MockShipStore();
+    when(() => db.ships).thenReturn(shipStore);
+    when(shipStore.all).thenAnswer((_) async => []);
+    when(() => shipStore.upsert(ship)).thenAnswer((_) async {});
 
     final logger = _MockLogger();
     final waitUntil = await runWithLogger(
@@ -531,7 +535,9 @@ void main() {
 
     registerFallbackValue(Transaction.fallbackValue());
     when(() => transactionStore.insert(any())).thenAnswer((_) async {});
-    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
+    final shipStore = _MockShipStore();
+    when(() => db.ships).thenReturn(shipStore);
+    when(() => shipStore.upsert(ship)).thenAnswer((_) async {});
 
     final logger = _MockLogger();
     final result = await runWithLogger(
@@ -778,7 +784,9 @@ void main() {
     when(() => db.behaviors).thenReturn(behaviorStore);
 
     when(behaviorStore.all).thenAnswer((_) async => []);
-    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
+    final shipStore = _MockShipStore();
+    when(() => db.ships).thenReturn(shipStore);
+    when(() => shipStore.upsert(ship)).thenAnswer((_) async {});
 
     final agent = Agent.test();
     when(db.getMyAgent).thenAnswer((_) async => agent);
@@ -993,7 +1001,9 @@ void main() {
 
     final state = BehaviorState(const ShipSymbol('S', 1), Behavior.trader)
       ..deal = costedDeal;
-    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
+    final shipStore = _MockShipStore();
+    when(() => db.ships).thenReturn(shipStore);
+    when(() => shipStore.upsert(ship)).thenAnswer((_) async {});
 
     final logger = _MockLogger();
     final result = await runWithLogger(
@@ -1318,7 +1328,9 @@ void main() {
 
     final state = BehaviorState(const ShipSymbol('S', 1), Behavior.trader)
       ..deal = costedDeal;
-    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
+    final shipStore = _MockShipStore();
+    when(() => db.ships).thenReturn(shipStore);
+    when(() => shipStore.upsert(ship)).thenAnswer((_) async {});
 
     final logger = _MockLogger();
     final result = await runWithLogger(
@@ -1523,7 +1535,9 @@ void main() {
 
     final state = BehaviorState(const ShipSymbol('S', 1), Behavior.trader)
       ..deal = costedDeal;
-    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
+    final shipStore = _MockShipStore();
+    when(() => db.ships).thenReturn(shipStore);
+    when(() => shipStore.upsert(ship)).thenAnswer((_) async {});
 
     final agent = Agent.test();
     when(db.getMyAgent).thenAnswer((_) async => agent);

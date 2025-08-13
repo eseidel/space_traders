@@ -440,7 +440,7 @@ _deliverConstructionMaterialsIfPossible(
 
   // Update our cargo counts after delivering the contract goods.
   ship.cargo = response.cargo;
-  await db.upsertShip(ship);
+  await db.ships.upsert(ship);
 
   // Record the delivery transaction.
   final delivery = ConstructionDelivery(

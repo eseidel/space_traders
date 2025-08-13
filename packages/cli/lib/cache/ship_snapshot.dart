@@ -42,7 +42,7 @@ class ShipSnapshot {
   /// Loads the ship cache from the provided [db].
   static Future<ShipSnapshot> load(Database db) async {
     // It's nicer for callers if ships are in sorted order.
-    final ships = (await db.allShips()).sortedBy((a) => a.symbol);
+    final ships = (await db.ships.all()).sortedBy((a) => a.symbol);
     return ShipSnapshot(ships);
   }
 
@@ -140,8 +140,6 @@ String describeShips(List<Ship> ships) {
 /// Creates a new ShipCache from the Api or FileSystem if provided.
 Future<ShipSnapshot> fetchShips(Database db, Api api) async {
   final ships = await allMyShips(api).toList();
-  for (final ship in ships) {
-    await db.upsertShip(ship);
-  }
+  await db.ships.upsertAll(ships);
   return ShipSnapshot(ships);
 }

@@ -40,6 +40,8 @@ class _MockShipyardListingStore extends Mock implements ShipyardListingStore {}
 
 class _MockShipyardPriceStore extends Mock implements ShipyardPriceStore {}
 
+class _MockShipStore extends Mock implements ShipStore {}
+
 class _MockSystemConnectivity extends Mock implements SystemConnectivity {}
 
 class _MockSystemsApi extends Mock implements SystemsApi {}
@@ -149,6 +151,11 @@ void main() {
     when(
       shipyardPriceStore.snapshotAll,
     ).thenAnswer((_) async => ShipyardPriceSnapshot([]));
+
+    final shipStore = _MockShipStore();
+    when(() => db.ships).thenReturn(shipStore);
+    when(shipStore.all).thenAnswer((_) async => []);
+    when(() => shipStore.upsertAll(any())).thenAnswer((_) async {});
 
     final behaviorStore = _MockBehaviorStore();
     when(() => db.behaviors).thenReturn(behaviorStore);
