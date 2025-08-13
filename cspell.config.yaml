@@ -6,6 +6,10 @@ ignorePaths:
   - "packages/cli/data"
   - "*.sql"
   - "db_data"
+  - '*.xcodeproj'
+  - '*.xib'
+  - '*.xcconfig'
+  - token.txt
 words:
   - leaderboards
   - lookback
@@ -89,3 +93,4 @@ words:
   - cfbundle
   - APPL
   - nonobvious
+  - xcodeproj

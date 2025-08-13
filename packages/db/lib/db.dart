@@ -231,6 +231,9 @@ class Database {
   /// Get the extraction store.
   ExtractionStore get extractions => ExtractionStore(this);
 
+  /// Get the global store.
+  GlobalStore get global => GlobalStore(this);
+
   /// Get the jump gate store.
   JumpGateStore get jumpGates => JumpGateStore(this);
 

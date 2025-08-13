@@ -19,7 +19,7 @@ Future<Uri> determineBaseUri(Database db) async {
     return Uri.parse(baseUrlString);
   }
   // Otherwise look up in the db config.
-  final baseUrl = await db.config.getBaseUrl();
+  final baseUrl = await db.global.getBaseUrl();
   if (baseUrl != null) {
     return baseUrl;
   }
