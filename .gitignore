@@ -36,3 +36,5 @@ config.yaml
 
 # SQL dump of the database.
 spacetraders.sql
+# local temp file containing secret token
+token.txt
