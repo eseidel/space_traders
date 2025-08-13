@@ -1,4 +1,5 @@
 import 'package:db/db.dart';
+import 'package:db/src/query.dart';
 import 'package:types/types.dart';
 
 /// A Store of static data that does not typically change between resets.
@@ -11,6 +12,63 @@ abstract class StaticStore<Symbol extends Object, Record extends Object> {
   final Database _db;
   final Traits<Symbol, Record> _traits;
 
+  /// Get static data of type [type] and key [key] from the static_data_ table.
+  /// Returns null if not found.
+  Future<Map<String, dynamic>?> _getFromStaticCache({
+    required Type type,
+    required String key,
+  }) async {
+    final result = await _db.queryOne(
+      Query(
+        'SELECT json FROM static_data_ WHERE type = @type AND key = @key',
+        parameters: {'type': type.toString(), 'key': key},
+      ),
+      (map) => map['json'] as Map<String, dynamic>,
+    );
+    return result;
+  }
+
+  /// Get all static data of type [type] from the static_data_ table.
+  /// Returns an empty list if not found.
+  Future<Iterable<Map<String, dynamic>>> _getAllFromStaticCache({
+    required Type type,
+  }) async {
+    final result = await _db.queryMany(
+      Query(
+        'SELECT json FROM static_data_ WHERE type = @type',
+        parameters: {'type': type.toString()},
+      ),
+      (map) => map['json'] as Map<String, dynamic>,
+    );
+    return result;
+  }
+
+  /// Upsert static data of type [type] and key [key] into the
+  /// static_data_ table.
+  /// If the data already exists, it will be updated.
+  Future<void> _upsertInStaticCache({
+    required Type type,
+    required String key,
+    required Map<String, dynamic> json,
+    // Reset is intended to store which reset the data was created in.
+    // But we've not wired it up yet.
+    String reset = '1',
+  }) async {
+    await _db.execute(
+      Query(
+        'INSERT INTO static_data_ (type, key, reset, json) '
+        'VALUES (@type, @key, @reset, @json) '
+        'ON CONFLICT (type, key) DO UPDATE SET json = EXCLUDED.json',
+        parameters: {
+          'type': type.toString(),
+          'key': key,
+          'json': json,
+          'reset': reset,
+        },
+      ),
+    );
+  }
+
   /// Used for writing to a JSON file.
   Future<List<Json>> asSortedJsonList() async {
     final records = await all();
@@ -20,10 +78,7 @@ abstract class StaticStore<Symbol extends Object, Record extends Object> {
 
   /// Get a record from the Store.
   Future<Record?> get(Symbol key) async {
-    final record = await _db.getFromStaticCache(
-      type: Record,
-      key: key.toString(),
-    );
+    final record = await _getFromStaticCache(type: Record, key: key.toString());
     if (record == null) {
       return null;
     }
@@ -35,14 +90,14 @@ abstract class StaticStore<Symbol extends Object, Record extends Object> {
 
   /// Get all records from the Store.
   Future<List<Record>> all() async {
-    final records = await _db.getAllFromStaticCache(type: Record);
+    final records = await _getAllFromStaticCache(type: Record);
     return records.map(_traits.fromJson).toList();
   }
 
   /// Adds a record to the Store.
   Future<void> add(Record value) async {
     final json = _traits.toJson(_traits.copyAndNormalize(value));
-    await _db.upsertInStaticCache(
+    await _upsertInStaticCache(
       type: Record,
       key: _traits.keyFor(value).toString(),
       json: json,

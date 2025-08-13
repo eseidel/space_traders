@@ -231,9 +231,9 @@ Future<List<Faction>> fetchFactions(
 /// Loads exports from the api and converts them to the old-style
 /// TradeExport list.
 Future<TradeExportSnapshot> fetchExports(Database db, DataApi dataApi) async {
-  final cachedExportsJson = await db.getAllFromStaticCache(type: TradeExport);
-  if (cachedExportsJson.isNotEmpty) {
-    final exports = cachedExportsJson.map(TradeExport.fromJson).toList();
+  final cachedExports = await db.tradeExports.all();
+  if (cachedExports.isNotEmpty) {
+    final exports = cachedExports.map(TradeExport.fromJson).toList();
     return TradeExportSnapshot(exports);
   }
 
@@ -246,13 +246,7 @@ Future<TradeExportSnapshot> fetchExports(Database db, DataApi dataApi) async {
     final imports = entry.value.map(TradeSymbol.fromJson);
     exports.add(TradeExport(export: export, imports: imports.toList()));
   }
-  for (final export in exports) {
-    await db.upsertInStaticCache(
-      type: TradeExport,
-      key: export.export.toJson(),
-      json: export.toJson(),
-    );
-  }
+  await db.tradeExports.addAll(exports);
   return TradeExportSnapshot(exports);
 }
 
