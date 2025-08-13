@@ -98,27 +98,18 @@ class DatabaseError implements Exception {
   String toString() => message;
 }
 
-/// Abstraction around a database connection.
-class Database {
-  /// Create a new database connection.
-  Database(this.endpoint, {this.settings});
+/// Base database class.
+class BaseDatabase {
+  /// Create a new database.
+  BaseDatabase(this.endpoint, {this.settings});
 
   /// Create a new database with mock connection for testing.
-  @visibleForTesting
-  Database.test(this._connection)
-    : endpoint = pg.Endpoint(host: 'localhost', database: 'test'),
-      settings = null;
-
-  /// Create a new database with a live connection for testing.
-  /// This probably could be removed and override openConnection instead.
-  @visibleForTesting
-  Database.testLive({
+  @protected
+  BaseDatabase.test({
     required this.endpoint,
-    required pg.Connection connection,
+    required DatabaseConnection connection,
     this.settings,
-  }) {
-    _connection = DatabaseConnection(connection);
-  }
+  }) : _connection = connection;
 
   /// Configure the database connection.
   final pg.Endpoint endpoint;
@@ -213,6 +204,76 @@ class Database {
     });
   }
 
+  /// Listen for notifications on a channel.
+  Future<void> listen(String channel) async {
+    await executeSql('LISTEN $channel');
+  }
+
+  /// Notify listeners on a channel.
+  Future<void> notify(String channel, [Object? payload]) async {
+    if (payload == null) {
+      await executeSql('NOTIFY $channel');
+    } else {
+      await executeSql("NOTIFY $channel, '$payload'");
+    }
+  }
+
+  /// Wait for a notification on a channel.
+  Future<void> waitOnChannel(String channel) async {
+    await _connection.waitOnChannel(channel);
+  }
+
+  /// Execute a query.
+  Future<pg.Result> execute(Query query) => _connection.execute(query);
+
+  /// Execute a query.
+  Future<pg.Result> executeSql(String sql) => _connection.executeSql(sql);
+
+  /// Query for multiple records using the provided query.
+  Future<Iterable<T>> queryMany<T>(
+    Query query,
+    T Function(Map<String, dynamic>) fromColumnMap,
+  ) {
+    return execute(
+      query,
+    ).then((result) => result.map((r) => r.toColumnMap()).map(fromColumnMap));
+  }
+
+  /// Query for a single record using the provided query.
+  Future<T?> queryOne<T>(
+    Query query,
+    T Function(Map<String, dynamic>) fromColumnMap,
+  ) {
+    return execute(query).then(
+      (result) =>
+          result.isEmpty ? null : fromColumnMap(result.first.toColumnMap()),
+    );
+  }
+}
+
+/// Abstraction around a database connection.
+class Database extends BaseDatabase {
+  /// Create a new database connection.
+  Database(super.endpoint, {super.settings});
+
+  /// Create a new database with mock connection for testing.
+  @visibleForTesting
+  Database.test(DatabaseConnection connection)
+    : super.test(
+        endpoint: pg.Endpoint(host: 'localhost', database: 'test'),
+        settings: null,
+        connection: connection,
+      );
+
+  /// Create a new database with a live connection for testing.
+  /// This probably could be removed and override openConnection instead.
+  @visibleForTesting
+  Database.testLive({
+    required pg.Connection connection,
+    required super.endpoint,
+    super.settings,
+  }) : super.test(connection: DatabaseConnection(connection));
+
   /// Get the behavior store.
   BehaviorStore get behaviors => BehaviorStore(this);
 
@@ -290,52 +351,6 @@ class Database {
 
   /// Get the network store.
   NetworkStore get network => NetworkStore(this);
-
-  /// Listen for notifications on a channel.
-  Future<void> listen(String channel) async {
-    await executeSql('LISTEN $channel');
-  }
-
-  /// Notify listeners on a channel.
-  Future<void> notify(String channel, [Object? payload]) async {
-    if (payload == null) {
-      await executeSql('NOTIFY $channel');
-    } else {
-      await executeSql("NOTIFY $channel, '$payload'");
-    }
-  }
-
-  /// Wait for a notification on a channel.
-  Future<void> waitOnChannel(String channel) async {
-    await _connection.waitOnChannel(channel);
-  }
-
-  /// Execute a query.
-  Future<pg.Result> execute(Query query) => _connection.execute(query);
-
-  /// Execute a query.
-  Future<pg.Result> executeSql(String sql) => _connection.executeSql(sql);
-
-  /// Query for multiple records using the provided query.
-  Future<Iterable<T>> queryMany<T>(
-    Query query,
-    T Function(Map<String, dynamic>) fromColumnMap,
-  ) {
-    return execute(
-      query,
-    ).then((result) => result.map((r) => r.toColumnMap()).map(fromColumnMap));
-  }
-
-  /// Query for a single record using the provided query.
-  Future<T?> queryOne<T>(
-    Query query,
-    T Function(Map<String, dynamic>) fromColumnMap,
-  ) {
-    return execute(query).then(
-      (result) =>
-          result.isEmpty ? null : fromColumnMap(result.first.toColumnMap()),
-    );
-  }
 
   /// Return a list of all table names.
   Future<Iterable<String>> allTableNames() async {
