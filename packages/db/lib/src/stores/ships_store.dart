@@ -9,11 +9,6 @@ class ShipStore {
 
   final Database _db;
 
-  /// Get all ships.
-  Future<Iterable<Ship>> allShips() async {
-    return _db.queryMany(allShipsQuery(), shipFromColumnMap);
-  }
-
   /// Get a ship by symbol.
   Future<Ship?> get(ShipSymbol symbol) async {
     final query = shipBySymbolQuery(symbol);
