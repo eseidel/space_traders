@@ -46,12 +46,18 @@ class _MockSystemsApi extends Mock implements SystemsApi {}
 
 class _MockSystemsStore extends Mock implements SystemsStore {}
 
+class _MockTradeExportStore extends Mock implements TradeExportStore {}
+
 class _MockWaypointCache extends Mock implements WaypointCache {}
 
 void main() {
   test('Caches load test', () async {
     final api = _MockApi();
     final db = _MockDatabase();
+    final tradeExportStore = _MockTradeExportStore();
+    when(() => db.tradeExports).thenReturn(tradeExportStore);
+    when(tradeExportStore.all).thenAnswer((_) async => []);
+    when(() => tradeExportStore.addAll(any())).thenAnswer((_) async => {});
     final systemsStore = _MockSystemsStore();
     when(() => db.systems).thenReturn(systemsStore);
     final agentsApi = _MockAgentsApi();
@@ -153,10 +159,6 @@ void main() {
 
     final dataApi = _MockDataApi();
     when(() => api.data).thenReturn(dataApi);
-    registerFallbackValue(TradeExport);
-    when(
-      () => db.getAllFromStaticCache(type: any(named: 'type')),
-    ).thenAnswer((_) async => []);
     when(dataApi.getSupplyChain).thenAnswer(
       (_) async => GetSupplyChain200Response(
         data: GetSupplyChain200ResponseData(
