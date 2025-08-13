@@ -37,6 +37,8 @@ class _MockShipFrame extends Mock implements ShipFrame {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
+class _MockShipStore extends Mock implements ShipStore {}
+
 class _MockShipNavRoute extends Mock implements ShipNavRoute {}
 
 class _MockSurveyStore extends Mock implements SurveyStore {}
@@ -246,7 +248,9 @@ void main() {
         remainingSeconds: 0,
       ),
     );
-    when(() => db.ships.upsert(ship)).thenAnswer((_) async {});
+    final shipStore = _MockShipStore();
+    when(() => db.ships).thenReturn(shipStore);
+    when(() => shipStore.upsert(ship)).thenAnswer((_) async {});
     registerFallbackValue(const SystemSymbol.fallbackValue());
 
     final marketPriceStore = _MockMarketPriceStore();
@@ -501,8 +505,10 @@ void main() {
         ),
       ),
     );
-    when(() => db.ships.upsert(ship)).thenAnswer((_) async {});
-    when(() => db.ships.upsert(hauler)).thenAnswer((_) async {});
+    final shipStore = _MockShipStore();
+    when(() => db.ships).thenReturn(shipStore);
+    when(() => shipStore.upsert(ship)).thenAnswer((_) async {});
+    when(() => shipStore.upsert(hauler)).thenAnswer((_) async {});
 
     final logger = _MockLogger();
 
@@ -725,7 +731,9 @@ void main() {
         marketForGood: const {},
         extractionType: ExtractionType.mine,
       );
-    when(() => db.ships.upsert(ship)).thenAnswer((_) async {});
+    final shipStore = _MockShipStore();
+    when(() => db.ships).thenReturn(shipStore);
+    when(() => shipStore.upsert(ship)).thenAnswer((_) async {});
 
     final logger = _MockLogger();
 

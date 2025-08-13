@@ -46,6 +46,8 @@ class _MockShipEngineStore extends Mock implements ShipEngineStore {}
 
 class _MockShipReactorStore extends Mock implements ShipReactorStore {}
 
+class _MockShipStore extends Mock implements ShipStore {}
+
 void main() {
   setUpAll(() {
     registerFallbackValue(ShipSpec.fallbackValue());
@@ -269,7 +271,9 @@ void main() {
         mountSymbol: mountSymbolForTradeSymbol(toMount)!,
         shipyardSymbol: waypointSymbol,
       );
-    when(() => db.ships.upsert(ship)).thenAnswer((_) async {});
+    final shipStore = _MockShipStore();
+    when(() => db.ships).thenReturn(shipStore);
+    when(() => shipStore.upsert(ship)).thenAnswer((_) async {});
 
     final marketPriceStore = _MockMarketPriceStore();
     when(() => db.marketPrices).thenReturn(marketPriceStore);
