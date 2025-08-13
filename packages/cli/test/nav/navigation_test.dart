@@ -230,9 +230,7 @@ void main() {
     when(() => transactionStore.insert(any())).thenAnswer((_) async {});
     final shipStore = _MockShipStore();
     when(() => db.ships).thenReturn(shipStore);
-    when(() => shipStore.upsert(ship)).thenAnswer((_) async {
-      return;
-    });
+    when(() => shipStore.upsert(ship)).thenAnswer((_) async {});
     when(() => centralCommand.medianAntimatterPurchasePrice).thenReturn(10000);
 
     final singleJumpResult = await runWithLogger(
