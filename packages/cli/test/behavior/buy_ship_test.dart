@@ -27,6 +27,8 @@ class _MockShipEngine extends Mock implements ShipEngine {}
 
 class _MockShipEngineStore extends Mock implements ShipEngineStore {}
 
+class _MockShipStore extends Mock implements ShipStore {}
+
 class _MockShipNav extends Mock implements ShipNav {}
 
 class _MockShipReactorStore extends Mock implements ShipReactorStore {}
@@ -174,8 +176,12 @@ void main() {
     ).thenAnswer((_) async => ShipyardListingSnapshot([]));
 
     registerFallbackValue(Ship.fallbackValue());
-    when(() => db.upsertShip(any())).thenAnswer((_) async {});
-    when(db.allShips).thenAnswer((_) async => []);
+    when(() => db.ships.upsert(any())).thenAnswer((_) async {});
+    final shipStore = _MockShipStore();
+    when(() => db.ships).thenReturn(shipStore);
+    when(shipStore.all).thenAnswer((_) async => []);
+    when(() => shipStore.upsert(any())).thenAnswer((_) async {});
+
     registerFallbackValue(ShipyardListingSnapshot([]));
     registerFallbackValue(ShipSnapshot([]));
     when(

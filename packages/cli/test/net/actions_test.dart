@@ -35,6 +35,8 @@ class _MockShipFrame extends Mock implements ShipFrame {}
 
 class _MockShipNav extends Mock implements ShipNav {}
 
+class _MockShipStore extends Mock implements ShipStore {}
+
 class _MockShipyardPriceStore extends Mock implements ShipyardPriceStore {}
 
 class _MockShipyardTransaction extends Mock implements ShipyardTransaction {}
@@ -80,11 +82,11 @@ void main() {
     registerFallbackValue(agent1);
     when(() => db.upsertAgent(any())).thenAnswer((_) async {});
     registerFallbackValue(Ship.fallbackValue());
-    when(() => db.upsertShip(any())).thenAnswer((_) async {});
+    when(() => db.ships.upsert(any())).thenAnswer((_) async {});
 
     await purchaseShip(db, api, shipyardSymbol, shipType);
     registerFallbackValue(Ship.fallbackValue());
-    verify(() => db.upsertShip(any())).called(1);
+    verify(() => db.ships.upsert(any())).called(1);
     verify(() => db.upsertAgent(any())).called(1);
   });
 
@@ -107,7 +109,7 @@ void main() {
     ).thenAnswer(
       (invocation) => Future.value(PatchShipNav200Response(data: responseData)),
     );
-    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
+    when(() => db.ships.upsert(ship)).thenAnswer((_) async {});
 
     await setShipFlightMode(db, api, ship, ShipNavFlightMode.CRUISE);
     verify(() => ship.nav = shipNav).called(1);
@@ -136,7 +138,7 @@ void main() {
       () => shipNav.waypointSymbol,
     ).thenReturn(openapi.WaypointSymbol('S-A-W'));
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
-    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
+    when(() => db.ships.upsert(ship)).thenAnswer((_) async {});
 
     final logger = _MockLogger();
     await runWithLogger(logger, () => undockIfNeeded(db, api, ship));
@@ -167,7 +169,7 @@ void main() {
       () => shipNav.waypointSymbol,
     ).thenReturn(openapi.WaypointSymbol('S-A-W'));
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
-    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
+    when(() => db.ships.upsert(ship)).thenAnswer((_) async {});
 
     final logger = _MockLogger();
     await runWithLogger(logger, () => dockIfNeeded(db, api, ship));
@@ -223,7 +225,7 @@ void main() {
         ),
       ),
     );
-    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
+    when(() => db.ships.upsert(ship)).thenAnswer((_) async {});
 
     final logger = _MockLogger();
     await runWithLogger(
@@ -296,8 +298,8 @@ void main() {
         ),
       ),
     );
-    when(() => db.upsertShip(fromShip)).thenAnswer((_) async {});
-    when(() => db.upsertShip(toShip)).thenAnswer((_) async {});
+    when(() => db.ships.upsert(fromShip)).thenAnswer((_) async {});
+    when(() => db.ships.upsert(toShip)).thenAnswer((_) async {});
 
     final _ = await runWithLogger(
       logger,
@@ -416,7 +418,7 @@ void main() {
       ),
     ]);
     when(() => ship.fuel).thenReturn(ShipFuel(capacity: 1000, current: 634));
-    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
+    when(() => db.ships.upsert(ship)).thenAnswer((_) async {});
 
     await runWithLogger(
       logger,
@@ -678,7 +680,7 @@ void main() {
       ],
     );
     when(() => ship.cargo).thenReturn(shipCargo);
-    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
+    when(() => db.ships.upsert(ship)).thenAnswer((_) async {});
 
     final transactions = await runWithLogger(logger, () async {
       final result = await sellAllCargoAndLog(
@@ -738,7 +740,7 @@ void main() {
         ),
       ),
     );
-    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
+    when(() => db.ships.upsert(ship)).thenAnswer((_) async {});
 
     await runWithLogger(logger, () async {
       await jettisonCargoAndLog(db, api, ship, itemOne);
@@ -1026,7 +1028,7 @@ void main() {
     when(() => db.transactions).thenReturn(transactionStore);
     registerFallbackValue(Transaction.fallbackValue());
     when(() => transactionStore.insert(any())).thenAnswer((_) async {});
-    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
+    when(() => db.ships.upsert(ship)).thenAnswer((_) async {});
 
     await runWithLogger(logger, () async {
       await useJumpGateAndLog(
@@ -1122,7 +1124,7 @@ void main() {
         ),
       );
     });
-    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
+    when(() => db.ships.upsert(ship)).thenAnswer((_) async {});
     when(() => db.transactions.insert(any())).thenAnswer((_) async {});
     when(() => db.upsertAgent(any())).thenAnswer((_) async {});
     registerFallbackValue(const MarketListing.fallbackValue());
@@ -1197,7 +1199,7 @@ void main() {
       );
     });
 
-    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
+    when(() => db.ships.upsert(ship)).thenAnswer((_) async {});
     await runWithLogger(logger, () async {
       await warpToWaypoint(db, api, ship, waypointSymbol);
     });
@@ -1255,6 +1257,9 @@ void main() {
     when(() => db.transactions).thenReturn(transactionStore);
     registerFallbackValue(Transaction.fallbackValue());
     when(() => transactionStore.insert(any())).thenAnswer((_) async {});
+    final shipStore = _MockShipStore();
+    when(() => db.ships).thenReturn(shipStore);
+    when(() => shipStore.remove(any())).thenAnswer((_) async {});
 
     final agent = Agent.test(credits: 10000000);
     final shipSymbol = ShipSymbol.fromString('S-1');
@@ -1274,7 +1279,6 @@ void main() {
       );
     });
     registerFallbackValue(agent);
-    when(() => db.deleteShip(shipSymbol)).thenAnswer((_) async {});
     when(() => db.upsertAgent(any())).thenAnswer((_) async {});
     final logger = _MockLogger();
     await runWithLogger(logger, () async {

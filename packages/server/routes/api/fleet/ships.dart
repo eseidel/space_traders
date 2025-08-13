@@ -5,7 +5,7 @@ import 'package:server/read_async.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   final db = await context.readAsync<Database>();
-  final ships = await db.allShips();
+  final ships = await db.ships.all();
   final fleetShipsResponse = FleetShipsResponse(ships: ships.toList());
   return Response.json(body: fleetShipsResponse.toJson());
 }

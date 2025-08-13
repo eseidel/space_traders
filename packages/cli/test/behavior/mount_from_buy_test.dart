@@ -269,7 +269,7 @@ void main() {
         mountSymbol: mountSymbolForTradeSymbol(toMount)!,
         shipyardSymbol: waypointSymbol,
       );
-    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
+    when(() => db.ships.upsert(ship)).thenAnswer((_) async {});
 
     final marketPriceStore = _MockMarketPriceStore();
     when(() => db.marketPrices).thenReturn(marketPriceStore);

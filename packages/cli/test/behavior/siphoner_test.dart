@@ -157,7 +157,7 @@ void main() {
         remainingSeconds: 0,
       ),
     );
-    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
+    when(() => db.ships.upsert(ship)).thenAnswer((_) async {});
 
     final waitUntil = await runWithLogger(
       logger,

@@ -246,7 +246,7 @@ void main() {
         remainingSeconds: 0,
       ),
     );
-    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
+    when(() => db.ships.upsert(ship)).thenAnswer((_) async {});
     registerFallbackValue(const SystemSymbol.fallbackValue());
 
     final marketPriceStore = _MockMarketPriceStore();
@@ -501,8 +501,8 @@ void main() {
         ),
       ),
     );
-    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
-    when(() => db.upsertShip(hauler)).thenAnswer((_) async {});
+    when(() => db.ships.upsert(ship)).thenAnswer((_) async {});
+    when(() => db.ships.upsert(hauler)).thenAnswer((_) async {});
 
     final logger = _MockLogger();
 
@@ -725,7 +725,7 @@ void main() {
         marketForGood: const {},
         extractionType: ExtractionType.mine,
       );
-    when(() => db.upsertShip(ship)).thenAnswer((_) async {});
+    when(() => db.ships.upsert(ship)).thenAnswer((_) async {});
 
     final logger = _MockLogger();
 

@@ -8,7 +8,7 @@ Future<Response> onRequest(RequestContext context) async {
   final db = await context.readAsync<Database>();
 
   final agent = (await db.getMyAgent())!;
-  final ships = await db.allShips();
+  final ships = await db.ships.all();
 
   final jumpGate = await db.systems.jumpGateWaypointForSystem(
     agent.headquarters.system,
