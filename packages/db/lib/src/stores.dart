@@ -4,6 +4,7 @@ export 'package:db/src/stores/config_store.dart';
 export 'package:db/src/stores/construction_store.dart';
 export 'package:db/src/stores/contract_store.dart';
 export 'package:db/src/stores/extraction_store.dart';
+export 'package:db/src/stores/global_store.dart';
 export 'package:db/src/stores/jump_gate_store.dart';
 export 'package:db/src/stores/market_listing_store.dart';
 export 'package:db/src/stores/market_price_store.dart';

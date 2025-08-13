@@ -124,7 +124,7 @@ Future<void> waitForSystem(Database db, GalaxyStats galaxy) async {
 
 Future<String> getAgentToken(Database db, {required Uri baseUri}) async {
   final agentToken = await db.config.getAgentToken();
-  final accountToken = await db.config.getAccountToken();
+  final accountToken = await db.global.getAccountToken();
   if (agentToken == null && accountToken == null) {
     throw StateError('No agent or account token found.');
   }
