@@ -176,7 +176,6 @@ void main() {
     ).thenAnswer((_) async => ShipyardListingSnapshot([]));
 
     registerFallbackValue(Ship.fallbackValue());
-    when(() => db.ships.upsert(any())).thenAnswer((_) async {});
     final shipStore = _MockShipStore();
     when(() => db.ships).thenReturn(shipStore);
     when(shipStore.all).thenAnswer((_) async => []);
