@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:types/types.dart';
 
 /// A price record.
-abstract class PriceBase<Symbol extends Object> extends Equatable {
+abstract class PriceBase<SymbolType extends Object> extends Equatable {
   /// Create a new price record.
   const PriceBase({
     required this.waypointSymbol,
@@ -14,7 +14,7 @@ abstract class PriceBase<Symbol extends Object> extends Equatable {
   final WaypointSymbol waypointSymbol;
 
   /// The symbol of the good.
-  final Symbol symbol;
+  final SymbolType symbol;
 
   /// The timestamp of the price.
   final DateTime timestamp;

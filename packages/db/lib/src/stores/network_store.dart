@@ -1,6 +1,7 @@
 import 'package:db/db.dart';
 import 'package:db/src/query.dart';
 import 'package:db/src/queue.dart';
+import 'package:types/types.dart';
 
 /// Store for network requests and responses.
 class NetworkStore {

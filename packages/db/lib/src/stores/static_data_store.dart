@@ -3,14 +3,17 @@ import 'package:db/src/query.dart';
 import 'package:types/types.dart';
 
 /// A Store of static data that does not typically change between resets.
-abstract class StaticStore<Symbol extends Object, Record extends Object> {
+abstract class StaticStore<
+  SymbolType extends Object,
+  RecordType extends Object
+> {
   /// Creates a new static Store.
-  StaticStore(Database db, Traits<Symbol, Record> traits)
+  StaticStore(Database db, Traits<SymbolType, RecordType> traits)
     : _db = db,
       _traits = traits;
 
   final Database _db;
-  final Traits<Symbol, Record> _traits;
+  final Traits<SymbolType, RecordType> _traits;
 
   /// Get static data of type [type] and key [key] from the static_data_ table.
   /// Returns null if not found.
@@ -77,8 +80,11 @@ abstract class StaticStore<Symbol extends Object, Record extends Object> {
   }
 
   /// Get a record from the Store.
-  Future<Record?> get(Symbol key) async {
-    final record = await _getFromStaticCache(type: Record, key: key.toString());
+  Future<RecordType?> get(SymbolType key) async {
+    final record = await _getFromStaticCache(
+      type: RecordType,
+      key: key.toString(),
+    );
     if (record == null) {
       return null;
     }
@@ -86,26 +92,26 @@ abstract class StaticStore<Symbol extends Object, Record extends Object> {
   }
 
   /// Create a snapshot of the Store.
-  Future<StaticSnapshot<Symbol, Record>> snapshot();
+  Future<StaticSnapshot<SymbolType, RecordType>> snapshot();
 
   /// Get all records from the Store.
-  Future<List<Record>> all() async {
-    final records = await _getAllFromStaticCache(type: Record);
+  Future<List<RecordType>> all() async {
+    final records = await _getAllFromStaticCache(type: RecordType);
     return records.map(_traits.fromJson).toList();
   }
 
   /// Adds a record to the Store.
-  Future<void> add(Record value) async {
+  Future<void> add(RecordType value) async {
     final json = _traits.toJson(_traits.copyAndNormalize(value));
     await _upsertInStaticCache(
-      type: Record,
+      type: RecordType,
       key: _traits.keyFor(value).toString(),
       json: json,
     );
   }
 
   /// Adds a list of values to the Store.
-  Future<void> addAll(Iterable<Record> values) async {
+  Future<void> addAll(Iterable<RecordType> values) async {
     for (final value in values) {
       await add(value);
     }

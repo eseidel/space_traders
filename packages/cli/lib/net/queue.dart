@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:cli/logger.dart';
 import 'package:db/db.dart';
-import 'package:db/src/queue.dart';
 import 'package:http/http.dart';
 import 'package:types/queue.dart';
+import 'package:types/types.dart';
 
 export 'package:types/queue.dart';
 

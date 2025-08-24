@@ -6,20 +6,20 @@ import 'dart:convert';
 import 'package:types/types.dart';
 
 /// Class that defines the traits of a record in a static cache.
-abstract class Traits<Symbol extends Object, Record extends Object> {
+abstract class Traits<SymbolType extends Object, RecordType extends Object> {
   /// Creates a new traits.
   const Traits();
 
   /// The key for the given record.
-  Symbol keyFor(Record record);
+  SymbolType keyFor(RecordType record);
 
   /// Copy and normalize the record for comparison and storage.
   /// Subclasses should override this method to provide normalization.
   /// The default implementation simply converts the record to JSON and back.
-  Record copyAndNormalize(Record record) => deepCopy(record);
+  RecordType copyAndNormalize(RecordType record) => deepCopy(record);
 
   /// Create a deep copy of the record.
-  Record deepCopy(Record record) {
+  RecordType deepCopy(RecordType record) {
     // OpenAPI doesn't properly recurse toJson, so we do an explicit jsonEncode
     // and jsonDecode to force everything to be converted.
     // TODO(eseidel): We could do this *only* for OpenAPI records.
@@ -29,33 +29,34 @@ abstract class Traits<Symbol extends Object, Record extends Object> {
   }
 
   /// Compare two records.
-  int compare(Record a, Record b);
+  int compare(RecordType a, RecordType b);
 
   /// Convert the record to normalized Json for storage.
-  Json toJson(Record record);
+  Json toJson(RecordType record);
 
   /// Convert a JSON object to a record.
-  Record fromJson(Map<String, dynamic> json);
+  RecordType fromJson(Map<String, dynamic> json);
 }
 
 /// An in-memory snapshot of a static cache.
-class StaticSnapshot<Symbol extends Object, Record extends Object> {
+class StaticSnapshot<SymbolType extends Object, RecordType extends Object> {
   /// Creates a new static cache.
-  StaticSnapshot(this.records, Traits<Symbol, Record> traits)
+  StaticSnapshot(this.records, Traits<SymbolType, RecordType> traits)
     : _traits = traits;
 
   /// The records in this snapshot.
-  final List<Record> records;
-  final Traits<Symbol, Record> _traits;
+  final List<RecordType> records;
+  final Traits<SymbolType, RecordType> _traits;
 
   /// The number of records in this snapshot.
   int get length => records.length;
 
   /// Copy and normalize the record for comparison and storage.
-  Record copyAndNormalize(Record record) => _traits.copyAndNormalize(record);
+  RecordType copyAndNormalize(RecordType record) =>
+      _traits.copyAndNormalize(record);
 
   /// Get a record from the cache.
-  Record? operator [](Symbol key) {
+  RecordType? operator [](SymbolType key) {
     for (final record in records) {
       if (_traits.keyFor(record) == key) {
         return record;
