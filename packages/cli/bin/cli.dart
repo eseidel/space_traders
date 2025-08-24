@@ -91,19 +91,6 @@ void printStatus(GetStatus200Response s) {
   }
 }
 
-bool Function(Ship ship)? _shipFilterFromArgs(Agent agent, List<String> only) {
-  if (only.isEmpty) {
-    return null;
-  }
-  final onlyShips = only.map(
-    (s) => ShipSymbol(agent.symbol, int.parse(s, radix: 16)),
-  );
-  if (onlyShips.isNotEmpty) {
-    logger.info('Only running ships: $onlyShips');
-  }
-  return (Ship ship) => onlyShips.contains(ship.symbol);
-}
-
 /// Similar to waitFor in idle_queue.dart.
 Future<void> waitForSystem(Database db, GalaxyStats galaxy) async {
   while (true) {
@@ -166,6 +153,38 @@ Future<void> printDbStats(Database db) async {
   );
 }
 
+Future<void> enterReset(Api api, Database db, Uri baseUri) async {
+  final myAgent = await api.agents.getMyAgent();
+  final agentSymbol = myAgent.data.symbol;
+  logger.info('Playing as $agentSymbol on $baseUri');
+
+  // First we ask the API how many systems there are.
+  final galaxy = await getGalaxyStats(api);
+  // Wait for starting system to be cached if necessary.
+  await waitForSystem(db, galaxy);
+
+  // Print the leaderboards.
+  final status = await api.defaultApi.getStatus();
+  printStatus(status);
+
+  await printDbStats(db);
+
+  config = await Config.fromDb(db);
+  final caches = await Caches.loadOrFetch(api, db);
+  final centralCommand = CentralCommand();
+
+  final agent = await fetchAndCacheMyAgent(db, api);
+  final ships = await ShipSnapshot.load(db);
+  logger
+    ..info(
+      'Welcome ${agent.symbol} of the ${agent.startingFaction}!'
+      ' ${creditsString(agent.credits)}',
+    )
+    ..info('Fleet: ${describeShips(ships.ships)}');
+
+  await logic(api, db, centralCommand, caches);
+}
+
 Future<void> cliMain(List<String> args) async {
   final parser = ArgParser()
     ..addFlag('verbose', abbr: 'v', negatable: false, help: 'Verbose logging.')
@@ -186,55 +205,14 @@ Future<void> cliMain(List<String> args) async {
   final db = await defaultDatabase();
   final baseUri = await determineBaseUri(db);
   final api = await getApi(db, baseUri: baseUri);
-  final myAgent = await api.agents.getMyAgent();
-  final agentSymbol = myAgent.data.symbol;
-  logger.info('Playing as $agentSymbol on $baseUri');
-
-  // First we ask the API how many systems there are.
-  final galaxy = await getGalaxyStats(api);
-  // Wait for starting system to be cached if necessary.
-  await waitForSystem(db, galaxy);
-
-  // Print the leaderboards.
-  final status = await api.defaultApi.getStatus();
-  printStatus(status);
-
-  await printDbStats(db);
-
-  config = await Config.fromDb(db);
-  final caches = await Caches.loadOrFetch(api, db);
-  final centralCommand = CentralCommand();
-
-  if (results['selloff'] as bool) {
-    logger.err('Selling all ships!');
-    await db.config.setGamePhase(GamePhase.selloff);
-  }
-
   // Handle ctrl-c and print out request stats.
-  // This should be made an argument rather than on by default.
   ProcessSignal.sigint.watch().listen((signal) {
     final duration = DateTime.timestamp().difference(start);
     printRequestStats(api.requestCounts, duration);
     exit(0);
   });
 
-  final agent = await fetchAndCacheMyAgent(db, api);
-  final ships = await ShipSnapshot.load(db);
-  logger
-    ..info(
-      'Welcome ${agent.symbol} of the ${agent.startingFaction}!'
-      ' ${creditsString(agent.credits)}',
-    )
-    ..info('Fleet: ${describeShips(ships.ships)}');
-
-  // We use defaultTo: [], so we don't have to check fo null here.
-  // This means that we won't notice `--only` being passed with no ships.
-  // But that's also OK since that's nonsensical.
-  final shipFilter = _shipFilterFromArgs(
-    agent,
-    results['only'] as List<String>,
-  );
-  await logic(api, db, centralCommand, caches, shipFilter: shipFilter);
+  await enterReset(api, db, baseUri);
 }
 
 Future<void> main(List<String> args) async {
