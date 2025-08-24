@@ -15,7 +15,6 @@ extension JsonDecode on http.Response {
 }
 
 /// Request queued for later execution.
-// TODO(eseidel): Does this belong in types?
 @immutable
 class RequestRecord extends Equatable {
   /// Creates a new [RequestRecord].
