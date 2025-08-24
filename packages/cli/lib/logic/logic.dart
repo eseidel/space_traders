@@ -61,7 +61,7 @@ Future<void> advanceShips(
     // Make sure we check every time in case a ship was added.
     // TODO(eseidel): This should no longer be needed!
     final ships = await ShipSnapshot.load(db);
-    waiter.scheduleMissingShips(ships.ships, shipFilter: shipFilter);
+    waiter.scheduleMissingShips(ships.ships);
 
     final entry = waiter.nextShip();
     final shipSymbol = entry.shipSymbol;
@@ -188,31 +188,18 @@ Future<Never> logic(
   Api api,
   Database db,
   CentralCommand centralCommand,
-  Caches caches, {
-  bool Function(Ship ship)? shipFilter,
-}) async {
+  Caches caches,
+) async {
   final ships = await ShipSnapshot.load(db);
   final waiter = ShipWaiter()
-    ..scheduleMissingShips(
-      ships.ships,
-      suppressWarnings: true,
-      shipFilter: shipFilter,
-    );
+    ..scheduleMissingShips(ships.ships, suppressWarnings: true);
   final rateLimitTracker = RateLimitTracker(api);
   final updater = TopOfLoopUpdater();
 
   while (true) {
     rateLimitTracker.printStatsIfNeeded();
     try {
-      await advanceShips(
-        api,
-        db,
-        centralCommand,
-        caches,
-        waiter,
-        updater,
-        shipFilter: shipFilter,
-      );
+      await advanceShips(api, db, centralCommand, caches, waiter, updater);
     } on ApiException catch (e) {
       if (isMaintenanceWindowException(e)) {
         logger.warn('Server down for maintenance, waiting 1 minute.');
