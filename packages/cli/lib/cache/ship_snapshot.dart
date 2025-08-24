@@ -49,10 +49,6 @@ class ShipSnapshot {
   /// Ships in the cache.
   final List<Ship> ships;
 
-  /// Returns a map of ship frame type to count in fleet.
-  // TODO(eseidel): Unclear if this is still needed.
-  Map<ShipFrameSymbol, int> get frameCounts => countFrames(ships);
-
   /// Returns the number of ships with the given [frame].
   int countOfFrame(ShipFrameSymbol frame) {
     // Frame is always a valid way to look up a ship, so null means 0 here.
