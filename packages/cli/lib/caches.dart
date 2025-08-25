@@ -77,6 +77,7 @@ class Caches {
     final marketPrices = await db.marketPrices.snapshotAll();
 
     // TODO(eseidel): This only needs to happen once per reset.
+    // Move this into SystemsFetcher.
     await fetchExports(db, api.data);
 
     final systems = await db.systems.snapshotAllSystems();
@@ -95,6 +96,7 @@ class Caches {
     );
 
     // TODO(eseidel): This only needs to happen once per reset.
+    // Move this into SystemsFetcher.
     final factions = await fetchFactions(db, api.factions);
 
     final galaxy = await getGalaxyStats(api);

@@ -1,52 +1,8 @@
 import 'dart:convert';
 
 import 'package:db/src/query.dart';
-import 'package:equatable/equatable.dart';
-import 'package:meta/meta.dart';
 import 'package:types/queue.dart';
-
-/// Request queued for later execution.
-// TODO(eseidel): Does this belong in types?
-@immutable
-class RequestRecord extends Equatable {
-  /// Creates a new [RequestRecord].
-  const RequestRecord({required this.priority, required this.request, this.id});
-
-  /// id of the request in the database if it has been inserted.
-  final int? id;
-
-  /// Priority of the request.  Higher priority requests are executed first.
-  final int priority;
-
-  /// The queued request
-  final QueuedRequest request;
-
-  @override
-  List<Object?> get props => [id, priority, request];
-}
-
-/// Response record in the database.
-@immutable
-class ResponseRecord extends Equatable {
-  /// Creates a new [ResponseRecord].
-  const ResponseRecord({
-    required this.requestId,
-    required this.response,
-    this.id,
-  });
-
-  /// id of the request in the database if it has been inserted.
-  final int? id;
-
-  /// request this is responding too
-  final int requestId;
-
-  /// The queued response
-  final QueuedResponse response;
-
-  @override
-  List<Object?> get props => [id, requestId, response];
-}
+import 'package:types/types.dart';
 
 /// Query to insert a request into the database.
 Query insertRequestQuery(RequestRecord request) => Query(

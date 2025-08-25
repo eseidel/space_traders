@@ -58,7 +58,6 @@ void main() {
     final agent1 = Agent.test(credits: 1);
     final agent2 = Agent.test(credits: 2);
 
-    // TODO(eseidel): Use Ship.test once that exists.
     final ship = Ship.fallbackValue();
     final responseData = PurchaseShip201ResponseData(
       agent: agent2.toOpenApi(),

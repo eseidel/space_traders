@@ -4,12 +4,15 @@ import 'package:types/types.dart';
 
 /// A collection of price records.
 // Could consider sharding this by system if it gets too big.
-class PriceSnapshot<Symbol extends Object, Record extends PriceBase<Symbol>> {
+class PriceSnapshot<
+  SymbolType extends Object,
+  RecordType extends PriceBase<SymbolType>
+> {
   /// Create a new price data collection.
   PriceSnapshot(this.prices);
 
   /// The price records.
-  final List<Record> prices;
+  final List<RecordType> prices;
 
   /// WaypointSymbols for all markets in the cache.
   Set<WaypointSymbol> get waypointSymbols =>
@@ -39,9 +42,9 @@ class PriceSnapshot<Symbol extends Object, Record extends PriceBase<Symbol>> {
   }
 
   /// Returns the most recent price for a given trade good at a given market.
-  Record? priceAt(
+  RecordType? priceAt(
     WaypointSymbol waypointSymbol,
-    Symbol symbol, {
+    SymbolType symbol, {
     Duration maxAge = defaultMaxAge,
     DateTime Function() getNow = defaultGetNow,
   }) {
@@ -59,6 +62,6 @@ class PriceSnapshot<Symbol extends Object, Record extends PriceBase<Symbol>> {
 
   /// Returns all known prices for a good, optionally restricted to a specific
   /// waypoint.
-  Iterable<Record> pricesFor(Symbol symbol) =>
+  Iterable<RecordType> pricesFor(SymbolType symbol) =>
       prices.where((e) => e.symbol == symbol);
 }

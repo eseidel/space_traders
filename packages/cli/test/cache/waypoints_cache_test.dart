@@ -106,7 +106,6 @@ void main() {
     expect(await waypointCache.canBeSiphoned(waypointSymbol), false);
 
     // The has getters still throw if the waypoint doesn't exist.
-    // TODO(eseidel): this will need db mocks.
     expect(
       () async => await waypointCache.hasMarketplace(
         WaypointSymbol.fromString('A-B-C'),

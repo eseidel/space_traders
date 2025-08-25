@@ -18,7 +18,6 @@ void printPriceRanges(List<MarketPrice> gameStats) {
 }
 
 Future<void> command(Database db, ArgResults argResults) async {
-  // TODO(eseidel): This entire command could be a db query.
   final prices = await db.marketPrices.snapshotAll();
 
   logger.info('${prices.prices.length} prices loaded.');

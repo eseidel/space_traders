@@ -1,7 +1,7 @@
 import 'package:db/db.dart';
-import 'package:db/src/queue.dart';
 import 'package:test/test.dart';
 import 'package:types/queue.dart';
+import 'package:types/types.dart';
 
 import '../docker.dart';
 
