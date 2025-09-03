@@ -7,6 +7,7 @@ import 'package:cli/logic/printing.dart';
 import 'package:cli/logic/ship_waiter.dart';
 import 'package:cli/net/exceptions.dart';
 import 'package:cli/net/queries.dart';
+import 'package:cli/net/register.dart';
 import 'package:db/db.dart';
 import 'package:types/types.dart';
 
@@ -207,13 +208,7 @@ Future<Never> logic(
         await Future<void>.delayed(const Duration(minutes: 1));
         continue;
       }
-
-      // Need to handle token changes after reset.
-      // ApiException 401: {"error":{"message":"Failed to parse token.
-      // Token reset_date does not match the server. Server resets happen on a
-      // weekly to bi-weekly frequency during alpha. After a reset, you should
-      // re-register your agent. Expected: 2023-06-03, Actual: 2023-05-20",
-      // "code":401,"data":{"expected":"2023-06-03","actual":"2023-05-20"}}}
+      // Caller will handle token changes after reset.
       rethrow;
     }
   }
@@ -328,4 +323,31 @@ Future<void> enterReset(Api api, Database db, Uri baseUri) async {
     ..info('Fleet: ${describeShips(ships.ships)}');
 
   await logic(api, db, centralCommand, caches);
+}
+
+Future<void> reregisterLoop(
+  Api api,
+  Database db,
+  Uri baseUri, {
+  required String? agentSymbol,
+}) async {
+  while (true) {
+    try {
+      await enterReset(api, db, baseUri);
+    } on ApiException catch (e) {
+      if (isTokenMismatchException(e)) {
+        logger.warn('Token mismatch, re-registering agent.');
+        await db.config.clearAgentToken();
+        final agentToken = await registerAgentIfNeeded(
+          db,
+          baseUri: baseUri,
+          agentSymbol: agentSymbol,
+        );
+        api.apiClient.agentToken = agentToken;
+        await db.config.setAgentToken(agentToken);
+        continue;
+      }
+      rethrow;
+    }
+  }
 }

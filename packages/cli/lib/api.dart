@@ -1,4 +1,4 @@
-import 'package:cli/net/counts.dart';
+import 'package:cli/net/auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:types/types.dart';
 
@@ -20,7 +20,7 @@ class Api {
       factions = FactionsApi(apiClient);
 
   /// The shared ApiClient.
-  final CountingApiClient apiClient;
+  final AuthorizedClient apiClient;
 
   /// Counts of requests sent through this api.
   RequestCounts get requestCounts => apiClient.requestCounts;

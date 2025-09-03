@@ -55,4 +55,9 @@ class ConfigStore {
   Future<void> setAgentToken(String token) async {
     await _setString('agent_token', token);
   }
+
+  /// Clear the agent token from the config table in the db.
+  Future<void> clearAgentToken() async {
+    await _db.executeSql("DELETE FROM config_ WHERE key = 'agent_token'");
+  }
 }

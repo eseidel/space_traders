@@ -55,6 +55,23 @@ Future<void> runOffline(
   );
 }
 
+// Unclear where this should live.
+/// Waits for a value to be available in the database.
+Future<T> waitFor<T>(
+  Database db,
+  Future<T?> Function() get, {
+  String? name,
+}) async {
+  var value = await get();
+  while (value == null) {
+    final nameString = name ?? '$T';
+    logger.info('$nameString not yet in database, waiting 1 minute.');
+    await Future<void>.delayed(const Duration(minutes: 1));
+    value = await get();
+  }
+  return value;
+}
+
 /// Common lookups which CLIs might need.
 
 /// Get the symbol of the agent's headquarters.

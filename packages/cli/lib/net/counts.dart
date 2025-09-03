@@ -7,7 +7,7 @@ import 'package:types/types.dart';
 /// ApiClient that counts the number of requests made.
 class CountingApiClient extends ApiClient {
   /// Construct a rate limited api client.
-  CountingApiClient({super.baseUri, super.client, super.defaultHeaders});
+  CountingApiClient({super.baseUri, super.client});
 
   /// RequestCounts tracks the number of requests made to each path.
   final RequestCounts requestCounts = RequestCounts();
