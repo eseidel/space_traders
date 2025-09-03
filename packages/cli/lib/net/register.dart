@@ -45,6 +45,7 @@ Future<String> register(
   return registerResponse.data.token;
 }
 
+/// Register a new agent if needed and return the agent token.
 Future<String> registerAgentIfNeeded(
   Database db, {
   required Uri baseUri,

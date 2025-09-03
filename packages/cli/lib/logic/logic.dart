@@ -325,6 +325,7 @@ Future<void> enterReset(Api api, Database db, Uri baseUri) async {
   await logic(api, db, centralCommand, caches);
 }
 
+/// Run the agent loop forever, re-registering a new agent if necessary.
 Future<void> reregisterLoop(
   Api api,
   Database db,
