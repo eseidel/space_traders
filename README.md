@@ -223,38 +223,16 @@ docker compose down # Shut down services
 sudo rm -rf db_data # Remove existing postgres.
 ```
 
-* Update `open_api_config.yaml` to have the latest git hash.
-* regenerate space_traders_api
+* Regenerate `packages/openapi` if needed.
 * get a new token from my.spacetraders.io
 * import the token via cli/bin/import_token.
 * cli will fail until waypoints have been populated by idle.
 
-### Generating `openapi` package
+### Generating `packages/openapi`
 ```
-export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
-dart pub global activate openapi_generator_cli
-rm -rf packages/openapi/
-openapi-generator generate -c open_api_config.yaml
-rm -rf packages/openapi/test
-find packages/openapi -name "*.md" -delete
-dart pub -C packages/openapi get
-dart format packages/openapi
-git add packages/openapi
-git apply openapi_patches/01.diff
+cd packages/cli
+dart run space_gen -i https://api.spacetraders.io/v2/documentation/json -o ../openapi --openapi```
 ```
-Then modified:
-* Fixed handling of required num fields:
-    * `packages/openapi/lib/model/jump_gate.dart`
-  Due to: https://github.com/OpenAPITools/openapi-generator/pull/10637#pullrequestreview-1425351014
-
-#### Bugs to report to OpenAPI
-* Required arguments in request body should make body required/non-nullable.
-  Example: RegisterRequest for POST /users/register
-* The generated "enums" do not have equals or hashCode.  e.g. ShipRole.
-  It doesn't end up mattering because they're singletons though.
-* Generated toJson methods are not recursive (e.g. Survey.toJson doesn't call
-  SurveyDeposit.toJson).
-* Seems to lack anyOf support (GetSystemWaypointsTraitsParameter).
 
 ## TODO
 

@@ -337,6 +337,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.5.0"
+  mustache_template:
+    dependency: transitive
+    description:
+      name: mustache_template
+      sha256: a46e26f91445bfb0b60519be280555b06792460b27b19e2b19ad5b9740df5d1c
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
   node_preamble:
     dependency: transitive
     description:
@@ -392,6 +400,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.0"
+  quiver:
+    dependency: transitive
+    description:
+      name: quiver
+      sha256: ea0b925899e64ecdfbf9c7becb60d5b50e706ade44a85b2363be2a22d88117d2
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.2.2"
   sasl_scram:
     dependency: transitive
     description:
@@ -411,11 +427,10 @@ packages:
   scoped_deps:
     dependency: "direct main"
     description:
-      path: "packages/scoped_deps"
-      ref: HEAD
-      resolved-ref: f96d14dc6f7d53c4157d66ebe5eb5c79f453943b
-      url: "https://github.com/shorebirdtech/shorebird.git"
-    source: git
+      name: scoped_deps
+      sha256: bc54cece4fed785157dc53b7554d31107f574897f4b2d1196db905a38c084e31
+      url: "https://pub.dev"
+    source: hosted
     version: "0.1.0+2"
   shelf:
     dependency: transitive
@@ -473,6 +488,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.10.1"
+  space_gen:
+    dependency: "direct dev"
+    description:
+      name: space_gen
+      sha256: "21e0d51f4b7622df37b40e08c5d099e2dff6fad5b0c354a38c1626d45ef0c450"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   stack_trace:
     dependency: transitive
     description:
@@ -568,6 +591,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.3.0"
+  uri:
+    dependency: transitive
+    description:
+      name: uri
+      sha256: "889eea21e953187c6099802b7b4cf5219ba8f3518f604a1033064d45b1b8268a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
+  version:
+    dependency: transitive
+    description:
+      name: version
+      sha256: "3d4140128e6ea10d83da32fef2fa4003fccbf6852217bb854845802f04191f94"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.2"
   very_good_analysis:
     dependency: "direct dev"
     description:
