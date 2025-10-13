@@ -59,11 +59,12 @@ extension ShipTypeToFrame on ShipyardShipSnapshot {
         remainingSeconds: 0,
         totalSeconds: 0,
       ),
-      nav: _makeShipNav(origin: waypoint, now: arrival),
+      nav: _makeTestShipNav(origin: waypoint, now: arrival),
       crew: ShipCrew(
         current: shipyardShip.currentCrew,
         required_: shipyardShip.crew.required_,
         capacity: shipyardShip.crew.capacity,
+        rotation: ShipCrewRotation.RELAXED,
         morale: 100,
         wages: 0,
       ),
@@ -136,7 +137,10 @@ const _shipConfigs = [
   _ShipConfig(type: ShipType.REFINING_FREIGHTER, role: ShipRole.REFINERY),
 ];
 
-ShipNav _makeShipNav({required SystemWaypoint origin, required DateTime now}) {
+ShipNav _makeTestShipNav({
+  required SystemWaypoint origin,
+  required DateTime now,
+}) {
   final originSymbol = origin.symbol;
   final waypoint = ShipNavRouteWaypoint(
     symbol: originSymbol.waypoint,
@@ -149,6 +153,7 @@ ShipNav _makeShipNav({required SystemWaypoint origin, required DateTime now}) {
   return ShipNav(
     systemSymbol: originSymbol.system.toOpenApi(),
     waypointSymbol: originSymbol.toOpenApi(),
+    flightMode: ShipNavFlightMode.CRUISE,
     route: ShipNavRoute(
       destination: waypoint,
       origin: waypoint,
