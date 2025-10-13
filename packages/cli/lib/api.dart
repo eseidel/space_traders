@@ -8,6 +8,7 @@ const defaultHttpGet = http.get;
 /// Api is a wrapper around the generated api clients.
 /// It provides a single place to inject the api client.
 /// This allows for easier mocking.
+// TODO(eseidel): Use openapi/client.dart instead.
 class Api {
   /// Construct an Api with the given ApiClient.
   Api(this.apiClient)
