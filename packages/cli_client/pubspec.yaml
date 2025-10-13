@@ -23,7 +23,6 @@ dependencies:
   types:
     path: ../types
 
-
 dev_dependencies:
   mocktail: ^1.0.3
   test: ^1.24.0

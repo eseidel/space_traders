@@ -52,7 +52,7 @@ class Register201ResponseData {
   }
 
   @override
-  int get hashCode => Object.hash(token, agent, faction, contract, ships);
+  int get hashCode => Object.hashAll([token, agent, faction, contract, ships]);
 
   @override
   bool operator ==(Object other) {

@@ -4,6 +4,8 @@ import 'package:openapi/model/ship_component_quality.dart';
 import 'package:openapi/model/ship_engine_symbol.dart';
 import 'package:openapi/model/ship_requirements.dart';
 
+/// The engine determines how quickly a ship travels between waypoints.
+
 class ShipEngine {
   ShipEngine({
     required this.symbol,
@@ -21,14 +23,14 @@ class ShipEngine {
     return ShipEngine(
       symbol: ShipEngineSymbol.fromJson(json['symbol'] as String),
       name: json['name'] as String,
-      condition: ShipComponentCondition((json['condition'] as num).toDouble()),
-      integrity: ShipComponentIntegrity((json['integrity'] as num).toDouble()),
+      condition: ShipComponentCondition.fromJson(json['condition'] as num),
+      integrity: ShipComponentIntegrity.fromJson(json['integrity'] as num),
       description: json['description'] as String,
       speed: json['speed'] as int,
       requirements: ShipRequirements.fromJson(
         json['requirements'] as Map<String, dynamic>,
       ),
-      quality: ShipComponentQuality((json['quality'] as num).toDouble()),
+      quality: ShipComponentQuality.fromJson(json['quality'] as num),
     );
   }
 
@@ -64,7 +66,7 @@ class ShipEngine {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     symbol,
     name,
     condition,
@@ -73,7 +75,7 @@ class ShipEngine {
     speed,
     requirements,
     quality,
-  );
+  ]);
 
   @override
   bool operator ==(Object other) {

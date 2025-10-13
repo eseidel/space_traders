@@ -1,3 +1,4 @@
+/// The type of trade good (export, import, or exchange).
 enum MarketTradeGoodType {
   EXPORT._('EXPORT'),
   IMPORT._('IMPORT'),
@@ -5,6 +6,7 @@ enum MarketTradeGoodType {
 
   const MarketTradeGoodType._(this.value);
 
+  /// Creates a MarketTradeGoodType from a json string.
   factory MarketTradeGoodType.fromJson(String json) {
     return MarketTradeGoodType.values.firstWhere(
       (value) => value.value == json,
@@ -22,10 +24,14 @@ enum MarketTradeGoodType {
     return MarketTradeGoodType.fromJson(json);
   }
 
+  /// The value of the enum, as a string.  This is the exact value
+  /// from the OpenAPI spec and will be used for network transport.
   final String value;
 
+  /// Converts the enum to a json string.
   String toJson() => value;
 
+  /// Returns the string value of the enum.
   @override
   String toString() => value;
 }

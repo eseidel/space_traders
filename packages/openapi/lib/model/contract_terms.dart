@@ -2,6 +2,8 @@ import 'package:openapi/model/contract_deliver_good.dart';
 import 'package:openapi/model/contract_payment.dart';
 import 'package:openapi/model_helpers.dart';
 
+/// The terms to fulfill the contract.
+
 class ContractTerms {
   ContractTerms({
     required this.deadline,
@@ -48,7 +50,7 @@ class ContractTerms {
   }
 
   @override
-  int get hashCode => Object.hash(deadline, payment, deliver);
+  int get hashCode => Object.hashAll([deadline, payment, deliver]);
 
   @override
   bool operator ==(Object other) {

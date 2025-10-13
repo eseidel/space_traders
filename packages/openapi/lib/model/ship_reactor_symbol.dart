@@ -1,3 +1,4 @@
+/// Symbol of the reactor.
 enum ShipReactorSymbol {
   SOLAR_I._('REACTOR_SOLAR_I'),
   FUSION_I._('REACTOR_FUSION_I'),
@@ -7,6 +8,7 @@ enum ShipReactorSymbol {
 
   const ShipReactorSymbol._(this.value);
 
+  /// Creates a ShipReactorSymbol from a json string.
   factory ShipReactorSymbol.fromJson(String json) {
     return ShipReactorSymbol.values.firstWhere(
       (value) => value.value == json,
@@ -24,10 +26,14 @@ enum ShipReactorSymbol {
     return ShipReactorSymbol.fromJson(json);
   }
 
+  /// The value of the enum, as a string.  This is the exact value
+  /// from the OpenAPI spec and will be used for network transport.
   final String value;
 
+  /// Converts the enum to a json string.
   String toJson() => value;
 
+  /// Returns the string value of the enum.
   @override
   String toString() => value;
 }

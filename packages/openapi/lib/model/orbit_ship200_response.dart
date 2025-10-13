@@ -1,5 +1,8 @@
 import 'package:openapi/model/orbit_ship200_response_data.dart';
 
+/// Orbit Ship 200 Response
+/// The ship has successfully moved into orbit at its current location.
+
 class OrbitShip200Response {
   OrbitShip200Response({required this.data});
 

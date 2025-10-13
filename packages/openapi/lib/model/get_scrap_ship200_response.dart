@@ -1,5 +1,8 @@
 import 'package:openapi/model/get_scrap_ship200_response_data.dart';
 
+/// Successfully retrieved the amount of value that will be returned when
+/// scrapping a ship.
+
 class GetScrapShip200Response {
   GetScrapShip200Response({required this.data});
 

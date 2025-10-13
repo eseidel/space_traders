@@ -1,5 +1,8 @@
 import 'package:openapi/model/ship_refine201_response_data.dart';
 
+/// Ship Refine 201 Response
+/// The ship has successfully refined goods.
+
 class ShipRefine201Response {
   ShipRefine201Response({required this.data});
 

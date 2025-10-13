@@ -1,5 +1,7 @@
 import 'package:openapi/model/get_repair_ship200_response_data.dart';
 
+/// Successfully retrieved the cost of repairing a ship.
+
 class GetRepairShip200Response {
   GetRepairShip200Response({required this.data});
 

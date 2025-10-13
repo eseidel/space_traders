@@ -1,5 +1,8 @@
 import 'package:openapi/model/trade_symbol.dart';
 
+/// The details of the required construction materials for a given waypoint
+/// under construction.
+
 class ConstructionMaterial {
   ConstructionMaterial({
     required this.tradeSymbol,
@@ -38,7 +41,7 @@ class ConstructionMaterial {
   }
 
   @override
-  int get hashCode => Object.hash(tradeSymbol, required_, fulfilled);
+  int get hashCode => Object.hashAll([tradeSymbol, required_, fulfilled]);
 
   @override
   bool operator ==(Object other) {

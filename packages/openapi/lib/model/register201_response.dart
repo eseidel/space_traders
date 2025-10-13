@@ -1,5 +1,7 @@
 import 'package:openapi/model/register201_response_data.dart';
 
+/// Successfully registered.
+
 class Register201Response {
   Register201Response({required this.data});
 

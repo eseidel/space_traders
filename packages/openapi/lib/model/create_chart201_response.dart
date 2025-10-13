@@ -1,5 +1,7 @@
 import 'package:openapi/model/create_chart201_response_data.dart';
 
+/// Successfully charted waypoint.
+
 class CreateChart201Response {
   CreateChart201Response({required this.data});
 

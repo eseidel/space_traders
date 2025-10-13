@@ -1,3 +1,6 @@
+/// Meta details for pagination.
+library;
+
 class Meta {
   Meta({required this.total, this.page = 1, this.limit = 10});
 
@@ -28,7 +31,7 @@ class Meta {
   }
 
   @override
-  int get hashCode => Object.hash(total, page, limit);
+  int get hashCode => Object.hashAll([total, page, limit]);
 
   @override
   bool operator ==(Object other) {

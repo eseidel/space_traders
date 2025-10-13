@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:openapi/api_client.dart';
 import 'package:openapi/api_exception.dart';
 import 'package:openapi/model/get_construction200_response.dart';
@@ -12,24 +11,38 @@ import 'package:openapi/model/get_system200_response.dart';
 import 'package:openapi/model/get_system_waypoints200_response.dart';
 import 'package:openapi/model/get_systems200_response.dart';
 import 'package:openapi/model/get_waypoint200_response.dart';
+import 'package:openapi/model/market.dart';
 import 'package:openapi/model/supply_construction201_response.dart';
 import 'package:openapi/model/supply_construction_request.dart';
 import 'package:openapi/model/waypoint_trait_symbol.dart';
 import 'package:openapi/model/waypoint_type.dart';
 
+/// The systems endpoints contain actions that relate to systems and waypoints.
+/// Systems are the individual stars in the universe, and waypoints are the
+/// locations within a system.
 class SystemsApi {
   SystemsApi(ApiClient? client) : client = client ?? ApiClient();
 
   final ApiClient client;
 
+  /// List Systems
+  /// Return a paginated list of all systems.
   Future<GetSystems200Response> getSystems({
     int? page = 1,
     int? limit = 10,
   }) async {
+    page?.validateMinimum(1);
+    limit?.validateMaximum(20);
+    limit?.validateMinimum(1);
+
     final response = await client.invokeApi(
       method: Method.get,
       path: '/systems',
       queryParameters: {'page': page.toString(), 'limit': limit.toString()},
+      authRequest: const OneOfAuth([
+        NoAuth(),
+        HttpAuth(scheme: 'bearer', secretName: 'AgentToken'),
+      ]),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -42,12 +55,12 @@ class SystemsApi {
       );
     }
 
-    throw ApiException(
-      response.statusCode,
-      'Unhandled response from $getSystems',
-    );
+    throw ApiException.unhandled(response.statusCode);
   }
 
+  /// Get System
+  /// Get the details of a system. Requires the system to have been visited or
+  /// charted.
   Future<GetSystem200Response> getSystem(String systemSymbol) async {
     final response = await client.invokeApi(
       method: Method.get,
@@ -55,6 +68,10 @@ class SystemsApi {
         '{systemSymbol}',
         systemSymbol,
       ),
+      authRequest: const OneOfAuth([
+        NoAuth(),
+        HttpAuth(scheme: 'bearer', secretName: 'AgentToken'),
+      ]),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -67,19 +84,25 @@ class SystemsApi {
       );
     }
 
-    throw ApiException(
-      response.statusCode,
-      'Unhandled response from $getSystem',
-    );
+    throw ApiException.unhandled(response.statusCode);
   }
 
+  /// List Waypoints in System
+  /// Return a paginated list of all of the waypoints for a given system.
+  ///
+  /// If a waypoint is uncharted, it will return the `Uncharted` trait instead
+  /// of its actual traits.
   Future<GetSystemWaypoints200Response> getSystemWaypoints(
     String systemSymbol, {
     int? page = 1,
     int? limit = 10,
     WaypointType? type,
-    List<WaypointTraitSymbol>? traits,
+    List<WaypointTraitSymbol>? traits = const [],
   }) async {
+    page?.validateMinimum(1);
+    limit?.validateMaximum(20);
+    limit?.validateMinimum(1);
+
     final response = await client.invokeApi(
       method: Method.get,
       path: '/systems/{systemSymbol}/waypoints'.replaceAll(
@@ -92,6 +115,10 @@ class SystemsApi {
         'type': ?type?.toJson(),
         'traits': ?traits?.map((e) => e.toJson()).toList().toString(),
       },
+      authRequest: const OneOfAuth([
+        NoAuth(),
+        HttpAuth(scheme: 'bearer', secretName: 'AgentToken'),
+      ]),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -104,12 +131,14 @@ class SystemsApi {
       );
     }
 
-    throw ApiException(
-      response.statusCode,
-      'Unhandled response from $getSystemWaypoints',
-    );
+    throw ApiException.unhandled(response.statusCode);
   }
 
+  /// Get Waypoint
+  /// View the details of a waypoint.
+  ///
+  /// If the waypoint is uncharted, it will return the 'Uncharted' trait
+  /// instead of its actual traits.
   Future<GetWaypoint200Response> getWaypoint(
     String systemSymbol,
     String waypointSymbol,
@@ -119,6 +148,10 @@ class SystemsApi {
       path: '/systems/{systemSymbol}/waypoints/{waypointSymbol}'
           .replaceAll('{systemSymbol}', systemSymbol)
           .replaceAll('{waypointSymbol}', waypointSymbol),
+      authRequest: const OneOfAuth([
+        NoAuth(),
+        HttpAuth(scheme: 'bearer', secretName: 'AgentToken'),
+      ]),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -131,12 +164,12 @@ class SystemsApi {
       );
     }
 
-    throw ApiException(
-      response.statusCode,
-      'Unhandled response from $getWaypoint',
-    );
+    throw ApiException.unhandled(response.statusCode);
   }
 
+  /// Get Construction Site
+  /// Get construction details for a waypoint. Requires a waypoint with a
+  /// property of `isUnderConstruction` to be true.
   Future<GetConstruction200Response> getConstruction(
     String systemSymbol,
     String waypointSymbol,
@@ -146,6 +179,10 @@ class SystemsApi {
       path: '/systems/{systemSymbol}/waypoints/{waypointSymbol}/construction'
           .replaceAll('{systemSymbol}', systemSymbol)
           .replaceAll('{waypointSymbol}', waypointSymbol),
+      authRequest: const OneOfAuth([
+        NoAuth(),
+        HttpAuth(scheme: 'bearer', secretName: 'AgentToken'),
+      ]),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -158,12 +195,15 @@ class SystemsApi {
       );
     }
 
-    throw ApiException(
-      response.statusCode,
-      'Unhandled response from $getConstruction',
-    );
+    throw ApiException.unhandled(response.statusCode);
   }
 
+  /// Supply Construction Site
+  /// Supply a construction site with the specified good. Requires a waypoint
+  /// with a property of `isUnderConstruction` to be true.
+  ///
+  /// The good must be in your ship's cargo. The good will be removed from
+  /// your ship's cargo and added to the construction site's materials.
   Future<SupplyConstruction201Response> supplyConstruction(
     String systemSymbol,
     String waypointSymbol,
@@ -176,6 +216,7 @@ class SystemsApi {
               .replaceAll('{systemSymbol}', systemSymbol)
               .replaceAll('{waypointSymbol}', waypointSymbol),
       body: supplyConstructionRequest.toJson(),
+      authRequest: const HttpAuth(scheme: 'bearer', secretName: 'AgentToken'),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -188,12 +229,17 @@ class SystemsApi {
       );
     }
 
-    throw ApiException(
-      response.statusCode,
-      'Unhandled response from $supplyConstruction',
-    );
+    throw ApiException.unhandled(response.statusCode);
   }
 
+  /// Get Market
+  /// Retrieve imports, exports and exchange data from a marketplace. Requires
+  /// a waypoint that has the `Marketplace` trait to use.
+  ///
+  /// Send a ship to the waypoint to access trade good prices and recent
+  /// transactions. Refer to the [Market Overview
+  /// page](https://docs.spacetraders.io/game-concepts/markets) to gain better
+  /// a understanding of the market in the game.
   Future<GetMarket200Response> getMarket(
     String systemSymbol,
     String waypointSymbol,
@@ -203,6 +249,10 @@ class SystemsApi {
       path: '/systems/{systemSymbol}/waypoints/{waypointSymbol}/market'
           .replaceAll('{systemSymbol}', systemSymbol)
           .replaceAll('{waypointSymbol}', waypointSymbol),
+      authRequest: const OneOfAuth([
+        NoAuth(),
+        HttpAuth(scheme: 'bearer', secretName: 'AgentToken'),
+      ]),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -215,12 +265,15 @@ class SystemsApi {
       );
     }
 
-    throw ApiException(
-      response.statusCode,
-      'Unhandled response from $getMarket',
-    );
+    throw ApiException.unhandled(response.statusCode);
   }
 
+  /// Get Jump Gate
+  /// Get jump gate details for a waypoint. Requires a waypoint of type
+  /// `JUMP_GATE` to use.
+  ///
+  /// Waypoints connected to this jump gate can be found by querying the
+  /// waypoints in the system.
   Future<GetJumpGate200Response> getJumpGate(
     String systemSymbol,
     String waypointSymbol,
@@ -230,6 +283,10 @@ class SystemsApi {
       path: '/systems/{systemSymbol}/waypoints/{waypointSymbol}/jump-gate'
           .replaceAll('{systemSymbol}', systemSymbol)
           .replaceAll('{waypointSymbol}', waypointSymbol),
+      authRequest: const OneOfAuth([
+        NoAuth(),
+        HttpAuth(scheme: 'bearer', secretName: 'AgentToken'),
+      ]),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -242,12 +299,13 @@ class SystemsApi {
       );
     }
 
-    throw ApiException(
-      response.statusCode,
-      'Unhandled response from $getJumpGate',
-    );
+    throw ApiException.unhandled(response.statusCode);
   }
 
+  /// Get Shipyard
+  /// Get the shipyard for a waypoint. Requires a waypoint that has the
+  /// `Shipyard` trait to use. Send a ship to the waypoint to access data on
+  /// ships that are currently available for purchase and recent transactions.
   Future<GetShipyard200Response> getShipyard(
     String systemSymbol,
     String waypointSymbol,
@@ -257,6 +315,10 @@ class SystemsApi {
       path: '/systems/{systemSymbol}/waypoints/{waypointSymbol}/shipyard'
           .replaceAll('{systemSymbol}', systemSymbol)
           .replaceAll('{waypointSymbol}', waypointSymbol),
+      authRequest: const OneOfAuth([
+        NoAuth(),
+        HttpAuth(scheme: 'bearer', secretName: 'AgentToken'),
+      ]),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -269,9 +331,6 @@ class SystemsApi {
       );
     }
 
-    throw ApiException(
-      response.statusCode,
-      'Unhandled response from $getShipyard',
-    );
+    throw ApiException.unhandled(response.statusCode);
   }
 }

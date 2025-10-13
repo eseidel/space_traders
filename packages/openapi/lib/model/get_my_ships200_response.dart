@@ -2,6 +2,8 @@ import 'package:openapi/model/meta.dart';
 import 'package:openapi/model/ship.dart';
 import 'package:openapi/model_helpers.dart';
 
+/// Successfully listed ships.
+
 class GetMyShips200Response {
   GetMyShips200Response({required this.meta, this.data = const []});
 
@@ -35,7 +37,7 @@ class GetMyShips200Response {
   }
 
   @override
-  int get hashCode => Object.hash(data, meta);
+  int get hashCode => Object.hashAll([data, meta]);
 
   @override
   bool operator ==(Object other) {

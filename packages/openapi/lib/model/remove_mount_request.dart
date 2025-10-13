@@ -1,3 +1,6 @@
+/// Remove Mount Request
+library;
+
 class RemoveMountRequest {
   RemoveMountRequest({required this.symbol});
 

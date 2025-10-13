@@ -1,6 +1,8 @@
 import 'package:openapi/model/ship_cargo_item.dart';
 import 'package:openapi/model_helpers.dart';
 
+/// Ship cargo details.
+
 class ShipCargo {
   ShipCargo({
     required this.capacity,
@@ -43,7 +45,7 @@ class ShipCargo {
   }
 
   @override
-  int get hashCode => Object.hash(capacity, units, inventory);
+  int get hashCode => Object.hashAll([capacity, units, inventory]);
 
   @override
   bool operator ==(Object other) {

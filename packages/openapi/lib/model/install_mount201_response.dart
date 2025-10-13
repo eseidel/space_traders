@@ -1,5 +1,8 @@
 import 'package:openapi/model/install_mount201_response_data.dart';
 
+/// Install Mount 201 Response
+/// Successfully installed the mount.
+
 class InstallMount201Response {
   InstallMount201Response({required this.data});
 

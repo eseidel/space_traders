@@ -1,5 +1,7 @@
 import 'package:openapi/model/trade_symbol.dart';
 
+/// A surveyed deposit of a mineral or resource available for extraction.
+
 class SurveyDeposit {
   SurveyDeposit({required this.symbol});
 

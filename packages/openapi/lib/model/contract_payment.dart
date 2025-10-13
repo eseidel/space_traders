@@ -1,3 +1,6 @@
+/// Payments for the contract.
+library;
+
 class ContractPayment {
   ContractPayment({required this.onAccepted, required this.onFulfilled});
 
@@ -26,7 +29,7 @@ class ContractPayment {
   }
 
   @override
-  int get hashCode => Object.hash(onAccepted, onFulfilled);
+  int get hashCode => Object.hashAll([onAccepted, onFulfilled]);
 
   @override
   bool operator ==(Object other) {

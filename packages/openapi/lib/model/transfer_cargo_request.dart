@@ -1,5 +1,7 @@
 import 'package:openapi/model/trade_symbol.dart';
 
+/// Transfer Cargo Request
+
 class TransferCargoRequest {
   TransferCargoRequest({
     required this.tradeSymbol,
@@ -38,7 +40,7 @@ class TransferCargoRequest {
   }
 
   @override
-  int get hashCode => Object.hash(tradeSymbol, units, shipSymbol);
+  int get hashCode => Object.hashAll([tradeSymbol, units, shipSymbol]);
 
   @override
   bool operator ==(Object other) {

@@ -1,3 +1,6 @@
+/// An orbital is another waypoint that orbits a parent waypoint.
+library;
+
 class WaypointOrbital {
   WaypointOrbital({required this.symbol});
 

@@ -1,3 +1,7 @@
+/// The details of a delivery contract. Includes the type of good, units needed,
+/// and the destination.
+library;
+
 class ContractDeliverGood {
   ContractDeliverGood({
     required this.tradeSymbol,
@@ -40,12 +44,12 @@ class ContractDeliverGood {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     tradeSymbol,
     destinationSymbol,
     unitsRequired,
     unitsFulfilled,
-  );
+  ]);
 
   @override
   bool operator ==(Object other) {

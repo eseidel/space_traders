@@ -2,6 +2,8 @@ import 'package:openapi/model/faction.dart';
 import 'package:openapi/model/meta.dart';
 import 'package:openapi/model_helpers.dart';
 
+/// Successfully fetched factions.
+
 class GetFactions200Response {
   GetFactions200Response({required this.meta, this.data = const []});
 
@@ -35,7 +37,7 @@ class GetFactions200Response {
   }
 
   @override
-  int get hashCode => Object.hash(data, meta);
+  int get hashCode => Object.hashAll([data, meta]);
 
   @override
   bool operator ==(Object other) {

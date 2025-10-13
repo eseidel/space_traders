@@ -1,4 +1,4 @@
-import 'package:openapi/model/get_supply_chain200_response_data_export_to_import_map.dart';
+import 'package:openapi/model_helpers.dart';
 
 class GetSupplyChain200ResponseData {
   GetSupplyChain200ResponseData({required this.exportToImportMap});
@@ -6,10 +6,8 @@ class GetSupplyChain200ResponseData {
   factory GetSupplyChain200ResponseData.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
     return GetSupplyChain200ResponseData(
-      exportToImportMap:
-          GetSupplyChain200ResponseDataExportToImportMap.fromJson(
-            json['exportToImportMap'] as Map<String, dynamic>,
-          ),
+      exportToImportMap: (json['exportToImportMap'] as Map<String, dynamic>)
+          .map((key, value) => MapEntry(key, (value as List).cast<String>())),
     );
   }
 
@@ -24,10 +22,10 @@ class GetSupplyChain200ResponseData {
     return GetSupplyChain200ResponseData.fromJson(json);
   }
 
-  GetSupplyChain200ResponseDataExportToImportMap exportToImportMap;
+  Map<String, List<String>> exportToImportMap;
 
   Map<String, dynamic> toJson() {
-    return {'exportToImportMap': exportToImportMap.toJson()};
+    return {'exportToImportMap': exportToImportMap};
   }
 
   @override
@@ -37,6 +35,6 @@ class GetSupplyChain200ResponseData {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     return other is GetSupplyChain200ResponseData &&
-        exportToImportMap == other.exportToImportMap;
+        mapsEqual(exportToImportMap, other.exportToImportMap);
   }
 }

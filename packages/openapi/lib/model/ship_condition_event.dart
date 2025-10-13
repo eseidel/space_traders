@@ -1,6 +1,9 @@
 import 'package:openapi/model/ship_condition_event_component.dart';
 import 'package:openapi/model/ship_condition_event_symbol.dart';
 
+/// An event that represents damage or wear to a ship's reactor, frame, or
+/// engine, reducing the condition of the ship.
+
 class ShipConditionEvent {
   ShipConditionEvent({
     required this.symbol,
@@ -45,7 +48,7 @@ class ShipConditionEvent {
   }
 
   @override
-  int get hashCode => Object.hash(symbol, component, name, description);
+  int get hashCode => Object.hashAll([symbol, component, name, description]);
 
   @override
   bool operator ==(Object other) {

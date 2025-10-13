@@ -1,5 +1,7 @@
 import 'package:openapi/model/construction.dart';
 
+/// Successfully fetched construction site.
+
 class GetConstruction200Response {
   GetConstruction200Response({required this.data});
 

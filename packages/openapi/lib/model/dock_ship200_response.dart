@@ -1,5 +1,8 @@
 import 'package:openapi/model/dock_ship200_response_data.dart';
 
+/// Dock Ship 200 Response
+/// The ship has successfully docked at its current location.
+
 class DockShip200Response {
   DockShip200Response({required this.data});
 

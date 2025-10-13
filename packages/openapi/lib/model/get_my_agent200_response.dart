@@ -1,5 +1,7 @@
 import 'package:openapi/model/agent.dart';
 
+/// Successfully fetched agent details.
+
 class GetMyAgent200Response {
   GetMyAgent200Response({required this.data});
 

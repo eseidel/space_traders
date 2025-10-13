@@ -1,5 +1,7 @@
 import 'package:openapi/model/waypoint.dart';
 
+/// Successfully fetched waypoint details.
+
 class GetWaypoint200Response {
   GetWaypoint200Response({required this.data});
 

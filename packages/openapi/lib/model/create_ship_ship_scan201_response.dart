@@ -1,5 +1,7 @@
 import 'package:openapi/model/create_ship_ship_scan201_response_data.dart';
 
+/// Successfully scanned for nearby ships.
+
 class CreateShipShipScan201Response {
   CreateShipShipScan201Response({required this.data});
 

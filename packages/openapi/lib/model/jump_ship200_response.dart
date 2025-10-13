@@ -1,5 +1,7 @@
 import 'package:openapi/model/jump_ship200_response_data.dart';
 
+/// Jump successful.
+
 class JumpShip200Response {
   JumpShip200Response({required this.data});
 

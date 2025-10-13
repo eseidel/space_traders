@@ -28,7 +28,7 @@ class PurchaseShipRequest {
   }
 
   @override
-  int get hashCode => Object.hash(shipType, waypointSymbol);
+  int get hashCode => Object.hashAll([shipType, waypointSymbol]);
 
   @override
   bool operator ==(Object other) {

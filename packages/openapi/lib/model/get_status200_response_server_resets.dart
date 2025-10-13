@@ -31,7 +31,7 @@ class GetStatus200ResponseServerResets {
   }
 
   @override
-  int get hashCode => Object.hash(next, frequency);
+  int get hashCode => Object.hashAll([next, frequency]);
 
   @override
   bool operator ==(Object other) {

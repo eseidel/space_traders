@@ -2,6 +2,8 @@ import 'package:openapi/model/meta.dart';
 import 'package:openapi/model/public_agent.dart';
 import 'package:openapi/model_helpers.dart';
 
+/// Successfully fetched agents details.
+
 class GetAgents200Response {
   GetAgents200Response({required this.meta, this.data = const []});
 
@@ -37,7 +39,7 @@ class GetAgents200Response {
   }
 
   @override
-  int get hashCode => Object.hash(data, meta);
+  int get hashCode => Object.hashAll([data, meta]);
 
   @override
   bool operator ==(Object other) {

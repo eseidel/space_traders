@@ -6,6 +6,9 @@ import 'package:openapi/model/ship_nav.dart';
 import 'package:openapi/model/ship_registration.dart';
 import 'package:openapi/model_helpers.dart';
 
+/// The ship that was scanned. Details include information about the ship that
+/// could be detected by the scanner.
+
 class ScannedShip {
   ScannedShip({
     required this.symbol,
@@ -75,8 +78,15 @@ class ScannedShip {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(symbol, registration, nav, frame, reactor, engine, mounts);
+  int get hashCode => Object.hashAll([
+    symbol,
+    registration,
+    nav,
+    frame,
+    reactor,
+    engine,
+    mounts,
+  ]);
 
   @override
   bool operator ==(Object other) {

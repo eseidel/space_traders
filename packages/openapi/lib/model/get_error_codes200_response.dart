@@ -1,6 +1,8 @@
 import 'package:openapi/model/get_error_codes200_response_error_codes_inner.dart';
 import 'package:openapi/model_helpers.dart';
 
+/// Fetched error codes successfully.
+
 class GetErrorCodes200Response {
   GetErrorCodes200Response({this.errorCodes = const []});
 

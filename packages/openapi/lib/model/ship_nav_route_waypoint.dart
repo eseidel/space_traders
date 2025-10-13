@@ -1,6 +1,8 @@
 import 'package:openapi/model/system_symbol.dart';
 import 'package:openapi/model/waypoint_type.dart';
 
+/// The destination or departure of a ships nav route.
+
 class ShipNavRouteWaypoint {
   ShipNavRouteWaypoint({
     required this.symbol,
@@ -15,7 +17,7 @@ class ShipNavRouteWaypoint {
     return ShipNavRouteWaypoint(
       symbol: json['symbol'] as String,
       type: WaypointType.fromJson(json['type'] as String),
-      systemSymbol: SystemSymbol(json['systemSymbol'] as String),
+      systemSymbol: SystemSymbol.fromJson(json['systemSymbol'] as String),
       x: json['x'] as int,
       y: json['y'] as int,
     );
@@ -47,7 +49,7 @@ class ShipNavRouteWaypoint {
   }
 
   @override
-  int get hashCode => Object.hash(symbol, type, systemSymbol, x, y);
+  int get hashCode => Object.hashAll([symbol, type, systemSymbol, x, y]);
 
   @override
   bool operator ==(Object other) {

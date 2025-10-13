@@ -1,5 +1,7 @@
 import 'package:openapi/model/waypoint_symbol.dart';
 
+/// Result of a repair transaction.
+
 class RepairTransaction {
   RepairTransaction({
     required this.waypointSymbol,
@@ -11,7 +13,7 @@ class RepairTransaction {
   factory RepairTransaction.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
     return RepairTransaction(
-      waypointSymbol: WaypointSymbol(json['waypointSymbol'] as String),
+      waypointSymbol: WaypointSymbol.fromJson(json['waypointSymbol'] as String),
       shipSymbol: json['shipSymbol'] as String,
       totalPrice: json['totalPrice'] as int,
       timestamp: DateTime.parse(json['timestamp'] as String),
@@ -43,7 +45,7 @@ class RepairTransaction {
 
   @override
   int get hashCode =>
-      Object.hash(waypointSymbol, shipSymbol, totalPrice, timestamp);
+      Object.hashAll([waypointSymbol, shipSymbol, totalPrice, timestamp]);
 
   @override
   bool operator ==(Object other) {

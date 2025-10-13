@@ -1,5 +1,7 @@
 import 'package:collection/collection.dart';
+import 'package:uri/uri.dart';
 
+/// Parse a nullable string as a DateTime.
 DateTime? maybeParseDateTime(String? value) {
   if (value == null) {
     return null;
@@ -7,11 +9,29 @@ DateTime? maybeParseDateTime(String? value) {
   return DateTime.parse(value);
 }
 
+/// Parse a nullable string as a Uri.
+Uri? maybeParseUri(String? value) {
+  if (value == null) {
+    return null;
+  }
+  return Uri.parse(value);
+}
+
+/// Parse a nullable string as a UriTemplate.
+UriTemplate? maybeParseUriTemplate(String? value) {
+  if (value == null) {
+    return null;
+  }
+  return UriTemplate(value);
+}
+
+/// Check if two nullable lists are deeply equal.
 bool listsEqual<T>(List<T>? a, List<T>? b) {
   final deepEquals = const DeepCollectionEquality().equals;
   return deepEquals(a, b);
 }
 
+/// Check if two nullable maps are deeply equal.
 bool mapsEqual<K, V>(Map<K, V>? a, Map<K, V>? b) {
   final deepEquals = const DeepCollectionEquality().equals;
   return deepEquals(a, b);

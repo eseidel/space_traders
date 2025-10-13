@@ -1,3 +1,7 @@
+/// Result of a transaction for a ship modification, such as installing a mount
+/// or a module.
+library;
+
 class ShipModificationTransaction {
   ShipModificationTransaction({
     required this.waypointSymbol,
@@ -46,13 +50,13 @@ class ShipModificationTransaction {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     waypointSymbol,
     shipSymbol,
     tradeSymbol,
     totalPrice,
     timestamp,
-  );
+  ]);
 
   @override
   bool operator ==(Object other) {

@@ -44,7 +44,7 @@ class PurchaseShip201ResponseData {
   }
 
   @override
-  int get hashCode => Object.hash(ship, agent, transaction);
+  int get hashCode => Object.hashAll([ship, agent, transaction]);
 
   @override
   bool operator ==(Object other) {

@@ -3,6 +3,8 @@ import 'package:openapi/model/ship_mount_symbol.dart';
 import 'package:openapi/model/ship_requirements.dart';
 import 'package:openapi/model_helpers.dart';
 
+/// A mount is installed on the exterier of a ship.
+
 class ShipMount {
   ShipMount({
     required this.symbol,
@@ -61,8 +63,14 @@ class ShipMount {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(symbol, name, description, strength, deposits, requirements);
+  int get hashCode => Object.hashAll([
+    symbol,
+    name,
+    description,
+    strength,
+    deposits,
+    requirements,
+  ]);
 
   @override
   bool operator ==(Object other) {

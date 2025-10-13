@@ -1,5 +1,7 @@
 import 'package:openapi/model/repair_ship200_response_data.dart';
 
+/// Ship repaired successfully.
+
 class RepairShip200Response {
   RepairShip200Response({required this.data});
 

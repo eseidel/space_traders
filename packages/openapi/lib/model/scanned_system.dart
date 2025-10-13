@@ -1,5 +1,7 @@
 import 'package:openapi/model/system_type.dart';
 
+/// Details of a system was that scanned.
+
 class ScannedSystem {
   ScannedSystem({
     required this.symbol,
@@ -50,7 +52,8 @@ class ScannedSystem {
   }
 
   @override
-  int get hashCode => Object.hash(symbol, sectorSymbol, type, x, y, distance);
+  int get hashCode =>
+      Object.hashAll([symbol, sectorSymbol, type, x, y, distance]);
 
   @override
   bool operator ==(Object other) {

@@ -3,6 +3,8 @@ import 'package:openapi/model/system_type.dart';
 import 'package:openapi/model/system_waypoint.dart';
 import 'package:openapi/model_helpers.dart';
 
+/// System details.
+
 class System {
   System({
     required this.symbol,
@@ -73,7 +75,7 @@ class System {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     constellation,
     symbol,
     sectorSymbol,
@@ -83,7 +85,7 @@ class System {
     waypoints,
     factions,
     name,
-  );
+  ]);
 
   @override
   bool operator ==(Object other) {

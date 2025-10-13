@@ -1,5 +1,7 @@
 import 'package:openapi/model/supply_construction201_response_data.dart';
 
+/// Successfully supplied construction site.
+
 class SupplyConstruction201Response {
   SupplyConstruction201Response({required this.data});
 

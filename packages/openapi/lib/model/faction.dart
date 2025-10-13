@@ -2,6 +2,8 @@ import 'package:openapi/model/faction_symbol.dart';
 import 'package:openapi/model/faction_trait.dart';
 import 'package:openapi/model_helpers.dart';
 
+/// Faction details.
+
 class Faction {
   Faction({
     required this.symbol,
@@ -56,14 +58,14 @@ class Faction {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     symbol,
     name,
     description,
     headquarters,
     traits,
     isRecruiting,
-  );
+  ]);
 
   @override
   bool operator ==(Object other) {
