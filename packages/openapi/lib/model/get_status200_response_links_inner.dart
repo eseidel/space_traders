@@ -5,7 +5,7 @@ class GetStatus200ResponseLinksInner {
     final json = jsonArg as Map<String, dynamic>;
     return GetStatus200ResponseLinksInner(
       name: json['name'] as String,
-      url: json['url'] as String,
+      url: Uri.parse(json['url'] as String),
     );
   }
 
@@ -21,14 +21,14 @@ class GetStatus200ResponseLinksInner {
   }
 
   String name;
-  String url;
+  Uri url;
 
   Map<String, dynamic> toJson() {
-    return {'name': name, 'url': url};
+    return {'name': name, 'url': url.toString()};
   }
 
   @override
-  int get hashCode => Object.hash(name, url);
+  int get hashCode => Object.hashAll([name, url]);
 
   @override
   bool operator ==(Object other) {

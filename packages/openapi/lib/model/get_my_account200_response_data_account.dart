@@ -10,7 +10,7 @@ class GetMyAccount200ResponseDataAccount {
     final json = jsonArg as Map<String, dynamic>;
     return GetMyAccount200ResponseDataAccount(
       id: json['id'] as String,
-      email: json['email'] as String,
+      email: json['email'] as String?,
       token: json['token'] as String?,
       createdAt: DateTime.parse(json['createdAt'] as String),
     );
@@ -28,7 +28,7 @@ class GetMyAccount200ResponseDataAccount {
   }
 
   String id;
-  String email;
+  String? email;
   String? token;
   DateTime createdAt;
 
@@ -42,7 +42,7 @@ class GetMyAccount200ResponseDataAccount {
   }
 
   @override
-  int get hashCode => Object.hash(id, email, token, createdAt);
+  int get hashCode => Object.hashAll([id, email, token, createdAt]);
 
   @override
   bool operator ==(Object other) {

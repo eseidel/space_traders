@@ -1,5 +1,7 @@
 import 'package:openapi/model/trade_symbol.dart';
 
+/// A good that can be traded for other goods or currency.
+
 class TradeGood {
   TradeGood({
     required this.symbol,
@@ -38,7 +40,7 @@ class TradeGood {
   }
 
   @override
-  int get hashCode => Object.hash(symbol, name, description);
+  int get hashCode => Object.hashAll([symbol, name, description]);
 
   @override
   bool operator ==(Object other) {

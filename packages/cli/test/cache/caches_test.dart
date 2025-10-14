@@ -168,11 +168,7 @@ void main() {
     when(() => api.data).thenReturn(dataApi);
     when(dataApi.getSupplyChain).thenAnswer(
       (_) async => GetSupplyChain200Response(
-        data: GetSupplyChain200ResponseData(
-          exportToImportMap: GetSupplyChain200ResponseDataExportToImportMap(
-            entries: {},
-          ),
-        ),
+        data: GetSupplyChain200ResponseData(exportToImportMap: {}),
       ),
     );
 

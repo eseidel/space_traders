@@ -1,5 +1,8 @@
 import 'package:openapi/model/negotiate_contract201_response_data.dart';
 
+/// Negotiate Contract 201 Response
+/// Successfully negotiated a new contract.
+
 class NegotiateContract201Response {
   NegotiateContract201Response({required this.data});
 

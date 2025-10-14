@@ -231,7 +231,7 @@ sudo rm -rf db_data # Remove existing postgres.
 ### Generating `packages/openapi`
 ```
 cd packages/cli
-dart run space_gen -i https://api.spacetraders.io/v2/documentation/json -o ../openapi --openapi```
+dart run space_gen -i https://api.spacetraders.io/v2/documentation/json -o ../openapi --openapi
 ```
 
 ## TODO

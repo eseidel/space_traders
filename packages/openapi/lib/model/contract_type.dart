@@ -1,3 +1,4 @@
+/// Type of contract.
 enum ContractType {
   PROCUREMENT._('PROCUREMENT'),
   TRANSPORT._('TRANSPORT'),
@@ -5,6 +6,7 @@ enum ContractType {
 
   const ContractType._(this.value);
 
+  /// Creates a ContractType from a json string.
   factory ContractType.fromJson(String json) {
     return ContractType.values.firstWhere(
       (value) => value.value == json,
@@ -21,10 +23,14 @@ enum ContractType {
     return ContractType.fromJson(json);
   }
 
+  /// The value of the enum, as a string.  This is the exact value
+  /// from the OpenAPI spec and will be used for network transport.
   final String value;
 
+  /// Converts the enum to a json string.
   String toJson() => value;
 
+  /// Returns the string value of the enum.
   @override
   String toString() => value;
 }

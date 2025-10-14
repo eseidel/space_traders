@@ -1,5 +1,8 @@
 import 'package:openapi/model/warp_ship200_response_data.dart';
 
+/// The successful transit information including the route details and changes
+/// to ship fuel. The route includes the expected time of arrival.
+
 class WarpShip200Response {
   WarpShip200Response({required this.data});
 

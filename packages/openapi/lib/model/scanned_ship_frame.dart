@@ -1,3 +1,6 @@
+/// The frame of the ship.
+library;
+
 class ScannedShipFrame {
   ScannedShipFrame({required this.symbol});
 

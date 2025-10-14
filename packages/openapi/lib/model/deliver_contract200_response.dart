@@ -1,5 +1,7 @@
 import 'package:openapi/model/deliver_contract200_response_data.dart';
 
+/// Successfully delivered cargo to contract.
+
 class DeliverContract200Response {
   DeliverContract200Response({required this.data});
 

@@ -1,5 +1,7 @@
 import 'package:openapi/model/install_ship_module201_response_data.dart';
 
+/// Successfully installed the module on the ship.
+
 class InstallShipModule201Response {
   InstallShipModule201Response({required this.data});
 

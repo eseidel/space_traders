@@ -1,5 +1,7 @@
 import 'package:openapi/model/ship.dart';
 
+/// Successfully fetched ship.
+
 class GetMyShip200Response {
   GetMyShip200Response({required this.data});
 

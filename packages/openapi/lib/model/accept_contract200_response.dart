@@ -1,5 +1,7 @@
 import 'package:openapi/model/accept_contract200_response_data.dart';
 
+/// Successfully accepted contract.
+
 class AcceptContract200Response {
   AcceptContract200Response({required this.data});
 

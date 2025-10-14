@@ -3,6 +3,8 @@ import 'package:openapi/model/shipyard_ship_types_inner.dart';
 import 'package:openapi/model/shipyard_transaction.dart';
 import 'package:openapi/model_helpers.dart';
 
+/// Shipyard details.
+
 class Shipyard {
   Shipyard({
     required this.symbol,
@@ -65,8 +67,13 @@ class Shipyard {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(symbol, shipTypes, transactions, ships, modificationsFee);
+  int get hashCode => Object.hashAll([
+    symbol,
+    shipTypes,
+    transactions,
+    ships,
+    modificationsFee,
+  ]);
 
   @override
   bool operator ==(Object other) {

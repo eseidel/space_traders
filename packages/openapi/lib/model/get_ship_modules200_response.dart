@@ -1,6 +1,8 @@
 import 'package:openapi/model/ship_module.dart';
 import 'package:openapi/model_helpers.dart';
 
+/// Successfully retrieved ship modules.
+
 class GetShipModules200Response {
   GetShipModules200Response({this.data = const []});
 

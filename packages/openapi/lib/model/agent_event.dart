@@ -1,3 +1,6 @@
+/// Agent event details.
+library;
+
 class AgentEvent {
   AgentEvent({
     required this.id,
@@ -44,7 +47,7 @@ class AgentEvent {
   }
 
   @override
-  int get hashCode => Object.hash(id, type, message, data, createdAt);
+  int get hashCode => Object.hashAll([id, type, message, data, createdAt]);
 
   @override
   bool operator ==(Object other) {
@@ -53,7 +56,7 @@ class AgentEvent {
         id == other.id &&
         type == other.type &&
         message == other.message &&
-        identical(data, other.data) &&
+        data == other.data &&
         createdAt == other.createdAt;
   }
 }

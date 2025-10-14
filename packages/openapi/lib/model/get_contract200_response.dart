@@ -1,5 +1,7 @@
 import 'package:openapi/model/contract.dart';
 
+/// Successfully fetched contract.
+
 class GetContract200Response {
   GetContract200Response({required this.data});
 

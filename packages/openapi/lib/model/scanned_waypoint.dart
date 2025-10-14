@@ -7,6 +7,8 @@ import 'package:openapi/model/waypoint_trait.dart';
 import 'package:openapi/model/waypoint_type.dart';
 import 'package:openapi/model_helpers.dart';
 
+/// A waypoint that was scanned by a ship.
+
 class ScannedWaypoint {
   ScannedWaypoint({
     required this.symbol,
@@ -23,9 +25,9 @@ class ScannedWaypoint {
   factory ScannedWaypoint.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
     return ScannedWaypoint(
-      symbol: WaypointSymbol(json['symbol'] as String),
+      symbol: WaypointSymbol.fromJson(json['symbol'] as String),
       type: WaypointType.fromJson(json['type'] as String),
-      systemSymbol: SystemSymbol(json['systemSymbol'] as String),
+      systemSymbol: SystemSymbol.fromJson(json['systemSymbol'] as String),
       x: json['x'] as int,
       y: json['y'] as int,
       orbitals: (json['orbitals'] as List)
@@ -79,7 +81,7 @@ class ScannedWaypoint {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     symbol,
     type,
     systemSymbol,
@@ -89,7 +91,7 @@ class ScannedWaypoint {
     faction,
     traits,
     chart,
-  );
+  ]);
 
   @override
   bool operator ==(Object other) {

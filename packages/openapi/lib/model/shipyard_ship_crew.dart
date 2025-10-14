@@ -26,7 +26,7 @@ class ShipyardShipCrew {
   }
 
   @override
-  int get hashCode => Object.hash(required_, capacity);
+  int get hashCode => Object.hashAll([required_, capacity]);
 
   @override
   bool operator ==(Object other) {

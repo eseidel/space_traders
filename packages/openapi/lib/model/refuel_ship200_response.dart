@@ -1,5 +1,7 @@
 import 'package:openapi/model/refuel_ship200_response_data.dart';
 
+/// Refueled successfully.
+
 class RefuelShip200Response {
   RefuelShip200Response({required this.data});
 

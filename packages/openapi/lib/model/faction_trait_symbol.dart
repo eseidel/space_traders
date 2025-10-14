@@ -1,3 +1,4 @@
+/// The unique identifier of the trait.
 enum FactionTraitSymbol {
   BUREAUCRATIC._('BUREAUCRATIC'),
   SECRETIVE._('SECRETIVE'),
@@ -61,6 +62,7 @@ enum FactionTraitSymbol {
 
   const FactionTraitSymbol._(this.value);
 
+  /// Creates a FactionTraitSymbol from a json string.
   factory FactionTraitSymbol.fromJson(String json) {
     return FactionTraitSymbol.values.firstWhere(
       (value) => value.value == json,
@@ -78,10 +80,14 @@ enum FactionTraitSymbol {
     return FactionTraitSymbol.fromJson(json);
   }
 
+  /// The value of the enum, as a string.  This is the exact value
+  /// from the OpenAPI spec and will be used for network transport.
   final String value;
 
+  /// Converts the enum to a json string.
   String toJson() => value;
 
+  /// Returns the string value of the enum.
   @override
   String toString() => value;
 }

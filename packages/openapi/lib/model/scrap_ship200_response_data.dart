@@ -31,7 +31,7 @@ class ScrapShip200ResponseData {
   }
 
   @override
-  int get hashCode => Object.hash(agent, transaction);
+  int get hashCode => Object.hashAll([agent, transaction]);
 
   @override
   bool operator ==(Object other) {

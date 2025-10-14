@@ -1,3 +1,6 @@
+/// The requirements for installation on a ship
+library;
+
 class ShipRequirements {
   ShipRequirements({this.power, this.crew, this.slots});
 
@@ -28,7 +31,7 @@ class ShipRequirements {
   }
 
   @override
-  int get hashCode => Object.hash(power, crew, slots);
+  int get hashCode => Object.hashAll([power, crew, slots]);
 
   @override
   bool operator ==(Object other) {

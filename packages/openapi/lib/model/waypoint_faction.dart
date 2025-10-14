@@ -1,5 +1,7 @@
 import 'package:openapi/model/faction_symbol.dart';
 
+/// The faction that controls the waypoint.
+
 class WaypointFaction {
   WaypointFaction({required this.symbol});
 

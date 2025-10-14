@@ -1,5 +1,7 @@
 import 'package:openapi/model/ship_role.dart';
 
+/// The public registration information of the ship
+
 class ShipRegistration {
   ShipRegistration({
     required this.name,
@@ -38,7 +40,7 @@ class ShipRegistration {
   }
 
   @override
-  int get hashCode => Object.hash(name, factionSymbol, role);
+  int get hashCode => Object.hashAll([name, factionSymbol, role]);
 
   @override
   bool operator ==(Object other) {

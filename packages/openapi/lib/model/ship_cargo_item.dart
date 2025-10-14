@@ -1,5 +1,7 @@
 import 'package:openapi/model/trade_symbol.dart';
 
+/// The type of cargo item and the number of units.
+
 class ShipCargoItem {
   ShipCargoItem({
     required this.symbol,
@@ -42,7 +44,7 @@ class ShipCargoItem {
   }
 
   @override
-  int get hashCode => Object.hash(symbol, name, description, units);
+  int get hashCode => Object.hashAll([symbol, name, description, units]);
 
   @override
   bool operator ==(Object other) {

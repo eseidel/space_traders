@@ -47,7 +47,7 @@ class JumpShip200ResponseData {
   }
 
   @override
-  int get hashCode => Object.hash(nav, cooldown, transaction, agent);
+  int get hashCode => Object.hashAll([nav, cooldown, transaction, agent]);
 
   @override
   bool operator ==(Object other) {

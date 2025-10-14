@@ -1,3 +1,6 @@
+/// The engine of the ship.
+library;
+
 class ScannedShipEngine {
   ScannedShipEngine({required this.symbol});
 

@@ -1,5 +1,7 @@
 import 'package:openapi/model/scrap_ship200_response_data.dart';
 
+/// Ship scrapped successfully.
+
 class ScrapShip200Response {
   ScrapShip200Response({required this.data});
 

@@ -1,5 +1,8 @@
 import 'package:openapi/model_helpers.dart';
 
+/// A cooldown is a period of time in which a ship cannot perform certain
+/// actions.
+
 class Cooldown {
   Cooldown({
     required this.shipSymbol,
@@ -43,7 +46,7 @@ class Cooldown {
 
   @override
   int get hashCode =>
-      Object.hash(shipSymbol, totalSeconds, remainingSeconds, expiration);
+      Object.hashAll([shipSymbol, totalSeconds, remainingSeconds, expiration]);
 
   @override
   bool operator ==(Object other) {

@@ -1,5 +1,7 @@
 import 'package:openapi/model/siphon_resources201_response_data.dart';
 
+/// Siphon successful.
+
 class SiphonResources201Response {
   SiphonResources201Response({required this.data});
 

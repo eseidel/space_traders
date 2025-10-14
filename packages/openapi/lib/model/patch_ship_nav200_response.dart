@@ -1,5 +1,7 @@
 import 'package:openapi/model/patch_ship_nav200_response_data.dart';
 
+/// Success response for updating the nav configuration of a ship.
+
 class PatchShipNav200Response {
   PatchShipNav200Response({required this.data});
 

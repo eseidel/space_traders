@@ -1,5 +1,8 @@
 import 'package:openapi/model/ship_nav_route_waypoint.dart';
 
+/// The routing information for the ship's most recent transit or current
+/// location.
+
 class ShipNavRoute {
   ShipNavRoute({
     required this.destination,
@@ -46,7 +49,8 @@ class ShipNavRoute {
   }
 
   @override
-  int get hashCode => Object.hash(destination, origin, departureTime, arrival);
+  int get hashCode =>
+      Object.hashAll([destination, origin, departureTime, arrival]);
 
   @override
   bool operator ==(Object other) {

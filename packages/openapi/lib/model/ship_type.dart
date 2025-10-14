@@ -1,3 +1,4 @@
+/// Type of ship
 enum ShipType {
   PROBE._('SHIP_PROBE'),
   MINING_DRONE._('SHIP_MINING_DRONE'),
@@ -15,6 +16,7 @@ enum ShipType {
 
   const ShipType._(this.value);
 
+  /// Creates a ShipType from a json string.
   factory ShipType.fromJson(String json) {
     return ShipType.values.firstWhere(
       (value) => value.value == json,
@@ -31,10 +33,14 @@ enum ShipType {
     return ShipType.fromJson(json);
   }
 
+  /// The value of the enum, as a string.  This is the exact value
+  /// from the OpenAPI spec and will be used for network transport.
   final String value;
 
+  /// Converts the enum to a json string.
   String toJson() => value;
 
+  /// Returns the string value of the enum.
   @override
   String toString() => value;
 }

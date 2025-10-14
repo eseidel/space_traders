@@ -1,3 +1,4 @@
+/// The symbol of the event that occurred.
 enum ShipConditionEventSymbol {
   REACTOR_OVERLOAD._('REACTOR_OVERLOAD'),
   ENERGY_SPIKE_FROM_MINERAL._('ENERGY_SPIKE_FROM_MINERAL'),
@@ -29,6 +30,7 @@ enum ShipConditionEventSymbol {
 
   const ShipConditionEventSymbol._(this.value);
 
+  /// Creates a ShipConditionEventSymbol from a json string.
   factory ShipConditionEventSymbol.fromJson(String json) {
     return ShipConditionEventSymbol.values.firstWhere(
       (value) => value.value == json,
@@ -47,10 +49,14 @@ enum ShipConditionEventSymbol {
     return ShipConditionEventSymbol.fromJson(json);
   }
 
+  /// The value of the enum, as a string.  This is the exact value
+  /// from the OpenAPI spec and will be used for network transport.
   final String value;
 
+  /// Converts the enum to a json string.
   String toJson() => value;
 
+  /// Returns the string value of the enum.
   @override
   String toString() => value;
 }

@@ -1,3 +1,7 @@
+/// An object that only shows up when an action has consumed fuel in the
+/// process. Shows the fuel consumption data.
+library;
+
 class ShipFuelConsumed {
   ShipFuelConsumed({required this.amount, required this.timestamp});
 
@@ -26,7 +30,7 @@ class ShipFuelConsumed {
   }
 
   @override
-  int get hashCode => Object.hash(amount, timestamp);
+  int get hashCode => Object.hashAll([amount, timestamp]);
 
   @override
   bool operator ==(Object other) {

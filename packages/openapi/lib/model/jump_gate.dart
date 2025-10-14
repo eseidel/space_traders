@@ -1,13 +1,15 @@
 import 'package:openapi/model/waypoint_symbol.dart';
 import 'package:openapi/model_helpers.dart';
 
+/// Details of a jump gate waypoint.
+
 class JumpGate {
   JumpGate({required this.symbol, this.connections = const []});
 
   factory JumpGate.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
     return JumpGate(
-      symbol: WaypointSymbol(json['symbol'] as String),
+      symbol: WaypointSymbol.fromJson(json['symbol'] as String),
       connections: (json['connections'] as List).cast<String>(),
     );
   }
@@ -29,7 +31,7 @@ class JumpGate {
   }
 
   @override
-  int get hashCode => Object.hash(symbol, connections);
+  int get hashCode => Object.hashAll([symbol, connections]);
 
   @override
   bool operator ==(Object other) {

@@ -1,5 +1,8 @@
 import 'package:openapi/model/navigate_ship200_response_data.dart';
 
+/// The successful transit information including the route details and changes
+/// to ship fuel. The route includes the expected time of arrival.
+
 class NavigateShip200Response {
   NavigateShip200Response({required this.data});
 

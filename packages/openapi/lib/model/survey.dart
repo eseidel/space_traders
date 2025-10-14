@@ -2,6 +2,9 @@ import 'package:openapi/model/survey_deposit.dart';
 import 'package:openapi/model/survey_size.dart';
 import 'package:openapi/model_helpers.dart';
 
+/// A resource survey of a waypoint, detailing a specific extraction location
+/// and the types of resources that can be found there.
+
 class Survey {
   Survey({
     required this.signature,
@@ -53,7 +56,7 @@ class Survey {
 
   @override
   int get hashCode =>
-      Object.hash(signature, symbol, deposits, expiration, size);
+      Object.hashAll([signature, symbol, deposits, expiration, size]);
 
   @override
   bool operator ==(Object other) {

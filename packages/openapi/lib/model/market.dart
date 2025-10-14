@@ -3,6 +3,8 @@ import 'package:openapi/model/market_transaction.dart';
 import 'package:openapi/model/trade_good.dart';
 import 'package:openapi/model_helpers.dart';
 
+/// Market details.
+
 class Market {
   Market({
     required this.symbol,
@@ -71,8 +73,14 @@ class Market {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(symbol, exports, imports, exchange, transactions, tradeGoods);
+  int get hashCode => Object.hashAll([
+    symbol,
+    exports,
+    imports,
+    exchange,
+    transactions,
+    tradeGoods,
+  ]);
 
   @override
   bool operator ==(Object other) {

@@ -1,5 +1,8 @@
 import 'package:openapi/model/sell_cargo201_response_data.dart';
 
+/// Sell Cargo 201 Response
+/// Cargo was successfully sold.
+
 class SellCargo201Response {
   SellCargo201Response({required this.data});
 

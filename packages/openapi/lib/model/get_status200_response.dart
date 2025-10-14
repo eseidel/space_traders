@@ -6,6 +6,8 @@ import 'package:openapi/model/get_status200_response_server_resets.dart';
 import 'package:openapi/model/get_status200_response_stats.dart';
 import 'package:openapi/model_helpers.dart';
 
+/// Fetched status successfully.
+
 class GetStatus200Response {
   GetStatus200Response({
     required this.status,
@@ -92,7 +94,7 @@ class GetStatus200Response {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     status,
     version,
     resetDate,
@@ -103,7 +105,7 @@ class GetStatus200Response {
     serverResets,
     announcements,
     links,
-  );
+  ]);
 
   @override
   bool operator ==(Object other) {

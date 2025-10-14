@@ -11,6 +11,8 @@ import 'package:openapi/model/ship_reactor.dart';
 import 'package:openapi/model/ship_registration.dart';
 import 'package:openapi/model_helpers.dart';
 
+/// Ship details.
+
 class Ship {
   Ship({
     required this.symbol,
@@ -93,7 +95,7 @@ class Ship {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     symbol,
     registration,
     nav,
@@ -106,7 +108,7 @@ class Ship {
     cargo,
     fuel,
     cooldown,
-  );
+  ]);
 
   @override
   bool operator ==(Object other) {

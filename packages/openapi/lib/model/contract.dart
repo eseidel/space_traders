@@ -2,13 +2,15 @@ import 'package:openapi/model/contract_terms.dart';
 import 'package:openapi/model/contract_type.dart';
 import 'package:openapi/model_helpers.dart';
 
+/// Contract details.
+
 class Contract {
   Contract({
     required this.id,
     required this.factionSymbol,
     required this.type,
     required this.terms,
-    required this.expiration,
+    @deprecated required this.expiration,
     this.accepted = false,
     this.fulfilled = false,
     this.deadlineToAccept,
@@ -43,6 +45,7 @@ class Contract {
   ContractTerms terms;
   bool accepted;
   bool fulfilled;
+  @deprecated
   DateTime expiration;
   DateTime? deadlineToAccept;
 
@@ -60,7 +63,7 @@ class Contract {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     id,
     factionSymbol,
     type,
@@ -69,7 +72,7 @@ class Contract {
     fulfilled,
     expiration,
     deadlineToAccept,
-  );
+  ]);
 
   @override
   bool operator ==(Object other) {

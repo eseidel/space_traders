@@ -9,6 +9,8 @@ import 'package:openapi/model/shipyard_ship_crew.dart';
 import 'package:openapi/model/supply_level.dart';
 import 'package:openapi/model_helpers.dart';
 
+/// Ship details available at a shipyard.
+
 class ShipyardShip {
   ShipyardShip({
     required this.type,
@@ -89,7 +91,7 @@ class ShipyardShip {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     type,
     name,
     description,
@@ -102,7 +104,7 @@ class ShipyardShip {
     modules,
     mounts,
     crew,
-  );
+  ]);
 
   @override
   bool operator ==(Object other) {

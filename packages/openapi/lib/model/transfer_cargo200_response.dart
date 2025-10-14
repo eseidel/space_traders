@@ -1,5 +1,8 @@
 import 'package:openapi/model/transfer_cargo200_response_data.dart';
 
+/// Transfer Cargo 200 Response
+/// Cargo transferred successfully.
+
 class TransferCargo200Response {
   TransferCargo200Response({required this.data});
 

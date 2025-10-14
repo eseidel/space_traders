@@ -1,5 +1,7 @@
 import 'package:openapi/model/jettison200_response_data.dart';
 
+/// Jettison successful.
+
 class Jettison200Response {
   Jettison200Response({required this.data});
 

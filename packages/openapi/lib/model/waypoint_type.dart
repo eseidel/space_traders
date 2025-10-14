@@ -1,3 +1,4 @@
+/// The type of waypoint.
 enum WaypointType {
   PLANET._('PLANET'),
   GAS_GIANT._('GAS_GIANT'),
@@ -16,6 +17,7 @@ enum WaypointType {
 
   const WaypointType._(this.value);
 
+  /// Creates a WaypointType from a json string.
   factory WaypointType.fromJson(String json) {
     return WaypointType.values.firstWhere(
       (value) => value.value == json,
@@ -32,10 +34,14 @@ enum WaypointType {
     return WaypointType.fromJson(json);
   }
 
+  /// The value of the enum, as a string.  This is the exact value
+  /// from the OpenAPI spec and will be used for network transport.
   final String value;
 
+  /// Converts the enum to a json string.
   String toJson() => value;
 
+  /// Returns the string value of the enum.
   @override
   String toString() => value;
 }

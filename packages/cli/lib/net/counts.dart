@@ -19,6 +19,7 @@ class CountingApiClient extends ApiClient {
     Map<String, String> queryParameters = const {},
     Map<String, String> headerParameters = const {},
     dynamic body,
+    AuthRequest? authRequest,
   }) async {
     logger.detail(path);
     requestCounts.record(path);
@@ -28,6 +29,7 @@ class CountingApiClient extends ApiClient {
       queryParameters: queryParameters,
       headerParameters: headerParameters,
       body: body,
+      authRequest: authRequest,
     );
     // logger.info(response.body);
     return response;

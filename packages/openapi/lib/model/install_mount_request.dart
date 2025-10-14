@@ -1,3 +1,6 @@
+/// Install Mount Request
+library;
+
 class InstallMountRequest {
   InstallMountRequest({required this.symbol});
 

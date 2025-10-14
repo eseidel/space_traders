@@ -1,5 +1,7 @@
 import 'package:openapi/model/trade_symbol.dart';
 
+/// SellCargoRequest
+
 class SellCargoRequest {
   SellCargoRequest({required this.symbol, required this.units});
 
@@ -28,7 +30,7 @@ class SellCargoRequest {
   }
 
   @override
-  int get hashCode => Object.hash(symbol, units);
+  int get hashCode => Object.hashAll([symbol, units]);
 
   @override
   bool operator ==(Object other) {

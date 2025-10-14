@@ -1,5 +1,7 @@
 import 'package:openapi/model/remove_ship_module201_response_data.dart';
 
+/// Successfully removed the module from the ship.
+
 class RemoveShipModule201Response {
   RemoveShipModule201Response({required this.data});
 

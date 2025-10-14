@@ -1,5 +1,8 @@
 import 'package:openapi/model/remove_mount201_response_data.dart';
 
+/// Remove Mount 201 Response
+/// Successfully removed the mount.
+
 class RemoveMount201Response {
   RemoveMount201Response({required this.data});
 

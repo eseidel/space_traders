@@ -1,5 +1,7 @@
 import 'package:openapi/model/cooldown.dart';
 
+/// Successfully fetched ship's cooldown.
+
 class GetShipCooldown200Response {
   GetShipCooldown200Response({required this.data});
 

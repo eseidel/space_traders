@@ -1,19 +1,32 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:openapi/api_client.dart';
 import 'package:openapi/api_exception.dart';
 import 'package:openapi/model/get_error_codes200_response.dart';
 import 'package:openapi/model/get_status200_response.dart';
 
+/// The global endpoints contain actions that relate to the game server itself.
+/// This includes announcements, leaderboards, and server resets. It also
+/// includes endpoints that don't fit into the other categories.
 class GlobalApi {
   GlobalApi(ApiClient? client) : client = client ?? ApiClient();
 
   final ApiClient client;
 
+  /// Server status
+  /// Return the status of the game server.
+  /// This also includes a few global elements, such as announcements, server
+  /// reset dates and leaderboards.
   Future<GetStatus200Response> getStatus() async {
-    final response = await client.invokeApi(method: Method.get, path: '/');
+    final response = await client.invokeApi(
+      method: Method.get,
+      path: '/',
+      authRequest: const OneOfAuth([
+        NoAuth(),
+        HttpAuth(scheme: 'bearer', secretName: 'AgentToken'),
+      ]),
+    );
 
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, response.body);
@@ -25,16 +38,16 @@ class GlobalApi {
       );
     }
 
-    throw ApiException(
-      response.statusCode,
-      'Unhandled response from $getStatus',
-    );
+    throw ApiException.unhandled(response.statusCode);
   }
 
+  /// Error code list
+  /// Return a list of all possible error codes thrown by the game server.
   Future<GetErrorCodes200Response> getErrorCodes() async {
     final response = await client.invokeApi(
       method: Method.get,
       path: '/error-codes',
+      authRequest: const NoAuth(),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -47,9 +60,6 @@ class GlobalApi {
       );
     }
 
-    throw ApiException(
-      response.statusCode,
-      'Unhandled response from $getErrorCodes',
-    );
+    throw ApiException.unhandled(response.statusCode);
   }
 }

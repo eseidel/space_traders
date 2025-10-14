@@ -2,6 +2,8 @@ import 'package:openapi/model/contract.dart';
 import 'package:openapi/model/meta.dart';
 import 'package:openapi/model_helpers.dart';
 
+/// Successfully listed contracts.
+
 class GetContracts200Response {
   GetContracts200Response({required this.meta, this.data = const []});
 
@@ -35,7 +37,7 @@ class GetContracts200Response {
   }
 
   @override
-  int get hashCode => Object.hash(data, meta);
+  int get hashCode => Object.hashAll([data, meta]);
 
   @override
   bool operator ==(Object other) {

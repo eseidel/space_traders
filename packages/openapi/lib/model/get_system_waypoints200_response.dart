@@ -2,6 +2,8 @@ import 'package:openapi/model/meta.dart';
 import 'package:openapi/model/waypoint.dart';
 import 'package:openapi/model_helpers.dart';
 
+/// Successfully listed waypoints.
+
 class GetSystemWaypoints200Response {
   GetSystemWaypoints200Response({required this.meta, this.data = const []});
 
@@ -37,7 +39,7 @@ class GetSystemWaypoints200Response {
   }
 
   @override
-  int get hashCode => Object.hash(data, meta);
+  int get hashCode => Object.hashAll([data, meta]);
 
   @override
   bool operator ==(Object other) {
