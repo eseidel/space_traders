@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:openapi/api_client.dart';
 import 'package:openapi/api_exception.dart';
 import 'package:openapi/model/get_agent200_response.dart';
@@ -9,19 +8,31 @@ import 'package:openapi/model/get_agents200_response.dart';
 import 'package:openapi/model/get_my_agent200_response.dart';
 import 'package:openapi/model/get_my_agent_events200_response.dart';
 
+/// The agents endpoints contain actions that relate to agents. Both your own
+/// and other agents.
 class AgentsApi {
   AgentsApi(ApiClient? client) : client = client ?? ApiClient();
 
   final ApiClient client;
 
+  /// List all public agent details.
+  /// List all public agent details.
   Future<GetAgents200Response> getAgents({
     int? page = 1,
     int? limit = 10,
   }) async {
+    page?.validateMinimum(1);
+    limit?.validateMaximum(20);
+    limit?.validateMinimum(1);
+
     final response = await client.invokeApi(
       method: Method.get,
       path: '/agents',
       queryParameters: {'page': page.toString(), 'limit': limit.toString()},
+      authRequest: const OneOfAuth([
+        NoAuth(),
+        HttpAuth(scheme: 'bearer', secretName: 'AgentToken'),
+      ]),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -34,16 +45,19 @@ class AgentsApi {
       );
     }
 
-    throw ApiException(
-      response.statusCode,
-      'Unhandled response from $getAgents',
-    );
+    throw ApiException.unhandled(response.statusCode);
   }
 
+  /// Get public details for a specific agent.
+  /// Get public details for a specific agent.
   Future<GetAgent200Response> getAgent(String agentSymbol) async {
     final response = await client.invokeApi(
       method: Method.get,
       path: '/agents/{agentSymbol}'.replaceAll('{agentSymbol}', agentSymbol),
+      authRequest: const OneOfAuth([
+        NoAuth(),
+        HttpAuth(scheme: 'bearer', secretName: 'AgentToken'),
+      ]),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -56,16 +70,16 @@ class AgentsApi {
       );
     }
 
-    throw ApiException(
-      response.statusCode,
-      'Unhandled response from $getAgent',
-    );
+    throw ApiException.unhandled(response.statusCode);
   }
 
+  /// Get Agent
+  /// Fetch your agent's details.
   Future<GetMyAgent200Response> getMyAgent() async {
     final response = await client.invokeApi(
       method: Method.get,
       path: '/my/agent',
+      authRequest: const HttpAuth(scheme: 'bearer', secretName: 'AgentToken'),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -78,16 +92,16 @@ class AgentsApi {
       );
     }
 
-    throw ApiException(
-      response.statusCode,
-      'Unhandled response from $getMyAgent',
-    );
+    throw ApiException.unhandled(response.statusCode);
   }
 
+  /// Get Agent Events
+  /// Get recent events for your agent.
   Future<GetMyAgentEvents200Response> getMyAgentEvents() async {
     final response = await client.invokeApi(
       method: Method.get,
       path: '/my/agent/events',
+      authRequest: const HttpAuth(scheme: 'bearer', secretName: 'AgentToken'),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -100,9 +114,6 @@ class AgentsApi {
       );
     }
 
-    throw ApiException(
-      response.statusCode,
-      'Unhandled response from $getMyAgentEvents',
-    );
+    throw ApiException.unhandled(response.statusCode);
   }
 }

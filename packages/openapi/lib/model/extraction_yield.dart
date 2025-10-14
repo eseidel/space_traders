@@ -1,5 +1,7 @@
 import 'package:openapi/model/trade_symbol.dart';
 
+/// A yield from the extraction operation.
+
 class ExtractionYield {
   ExtractionYield({required this.symbol, required this.units});
 
@@ -28,7 +30,7 @@ class ExtractionYield {
   }
 
   @override
-  int get hashCode => Object.hash(symbol, units);
+  int get hashCode => Object.hashAll([symbol, units]);
 
   @override
   bool operator ==(Object other) {

@@ -1,6 +1,9 @@
 import 'package:openapi/model/ship_mount.dart';
 import 'package:openapi/model_helpers.dart';
 
+/// Get Mounts 200 Response
+/// Successfully retrieved ship mounts.
+
 class GetMounts200Response {
   GetMounts200Response({this.data = const []});
 

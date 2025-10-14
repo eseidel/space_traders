@@ -3,6 +3,8 @@ import 'package:openapi/model/waypoint_symbol.dart';
 import 'package:openapi/model/waypoint_type.dart';
 import 'package:openapi/model_helpers.dart';
 
+/// Waypoint details.
+
 class SystemWaypoint {
   SystemWaypoint({
     required this.symbol,
@@ -16,7 +18,7 @@ class SystemWaypoint {
   factory SystemWaypoint.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
     return SystemWaypoint(
-      symbol: WaypointSymbol(json['symbol'] as String),
+      symbol: WaypointSymbol.fromJson(json['symbol'] as String),
       type: WaypointType.fromJson(json['type'] as String),
       x: json['x'] as int,
       y: json['y'] as int,
@@ -57,7 +59,7 @@ class SystemWaypoint {
   }
 
   @override
-  int get hashCode => Object.hash(symbol, type, x, y, orbitals, orbits);
+  int get hashCode => Object.hashAll([symbol, type, x, y, orbitals, orbits]);
 
   @override
   bool operator ==(Object other) {

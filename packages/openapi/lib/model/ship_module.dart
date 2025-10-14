@@ -1,6 +1,9 @@
 import 'package:openapi/model/ship_module_symbol.dart';
 import 'package:openapi/model/ship_requirements.dart';
 
+/// A module can be installed in a ship and provides a set of capabilities such
+/// as storage space or quarters for crew. Module installations are permanent.
+
 class ShipModule {
   ShipModule({
     required this.symbol,
@@ -53,8 +56,14 @@ class ShipModule {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(symbol, name, description, capacity, range, requirements);
+  int get hashCode => Object.hashAll([
+    symbol,
+    name,
+    description,
+    capacity,
+    range,
+    requirements,
+  ]);
 
   @override
   bool operator ==(Object other) {

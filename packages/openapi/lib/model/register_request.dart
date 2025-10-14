@@ -28,7 +28,7 @@ class RegisterRequest {
   }
 
   @override
-  int get hashCode => Object.hash(symbol, faction);
+  int get hashCode => Object.hashAll([symbol, faction]);
 
   @override
   bool operator ==(Object other) {

@@ -1,5 +1,7 @@
 import 'package:openapi/model/system.dart';
 
+/// Successfully fetched the system.
+
 class GetSystem200Response {
   GetSystem200Response({required this.data});
 

@@ -1,5 +1,7 @@
 import 'package:openapi/model/market.dart';
 
+/// Successfully fetched the market.
+
 class GetMarket200Response {
   GetMarket200Response({required this.data});
 

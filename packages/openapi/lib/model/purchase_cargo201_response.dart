@@ -1,5 +1,8 @@
 import 'package:openapi/model/purchase_cargo201_response_data.dart';
 
+/// Purchase Cargo 201 Response
+/// Purchased goods successfully.
+
 class PurchaseCargo201Response {
   PurchaseCargo201Response({required this.data});
 

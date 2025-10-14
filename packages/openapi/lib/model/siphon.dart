@@ -1,5 +1,7 @@
 import 'package:openapi/model/siphon_yield.dart';
 
+/// Siphon details.
+
 class Siphon {
   Siphon({required this.shipSymbol, required this.yield_});
 
@@ -28,7 +30,7 @@ class Siphon {
   }
 
   @override
-  int get hashCode => Object.hash(shipSymbol, yield_);
+  int get hashCode => Object.hashAll([shipSymbol, yield_]);
 
   @override
   bool operator ==(Object other) {

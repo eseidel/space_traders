@@ -1,5 +1,7 @@
 import 'package:openapi/model/create_ship_waypoint_scan201_response_data.dart';
 
+/// Successfully scanned for nearby waypoints.
+
 class CreateShipWaypointScan201Response {
   CreateShipWaypointScan201Response({required this.data});
 

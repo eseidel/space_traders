@@ -1,5 +1,8 @@
 import 'package:openapi/model/ship_fuel_consumed.dart';
 
+/// Details of the ship's fuel tanks including how much fuel was consumed during
+/// the last transit or action.
+
 class ShipFuel {
   ShipFuel({required this.current, required this.capacity, this.consumed});
 
@@ -36,7 +39,7 @@ class ShipFuel {
   }
 
   @override
-  int get hashCode => Object.hash(current, capacity, consumed);
+  int get hashCode => Object.hashAll([current, capacity, consumed]);
 
   @override
   bool operator ==(Object other) {

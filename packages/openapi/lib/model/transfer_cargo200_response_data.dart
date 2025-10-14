@@ -35,7 +35,7 @@ class TransferCargo200ResponseData {
   }
 
   @override
-  int get hashCode => Object.hash(cargo, targetCargo);
+  int get hashCode => Object.hashAll([cargo, targetCargo]);
 
   @override
   bool operator ==(Object other) {

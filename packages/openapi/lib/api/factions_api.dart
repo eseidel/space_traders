@@ -1,26 +1,38 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:openapi/api_client.dart';
 import 'package:openapi/api_exception.dart';
 import 'package:openapi/model/get_faction200_response.dart';
 import 'package:openapi/model/get_factions200_response.dart';
 import 'package:openapi/model/get_my_factions200_response.dart';
 
+/// The factions endpoints contain actions that relate to factions. Factions are
+/// organizations or sentient beings that are actively competing for control of
+/// the universe.
 class FactionsApi {
   FactionsApi(ApiClient? client) : client = client ?? ApiClient();
 
   final ApiClient client;
 
+  /// List factions
+  /// Return a paginated list of all the factions in the game.
   Future<GetFactions200Response> getFactions({
     int? page = 1,
     int? limit = 10,
   }) async {
+    page?.validateMinimum(1);
+    limit?.validateMaximum(20);
+    limit?.validateMinimum(1);
+
     final response = await client.invokeApi(
       method: Method.get,
       path: '/factions',
       queryParameters: {'page': page.toString(), 'limit': limit.toString()},
+      authRequest: const OneOfAuth([
+        NoAuth(),
+        HttpAuth(scheme: 'bearer', secretName: 'AgentToken'),
+      ]),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -33,12 +45,11 @@ class FactionsApi {
       );
     }
 
-    throw ApiException(
-      response.statusCode,
-      'Unhandled response from $getFactions',
-    );
+    throw ApiException.unhandled(response.statusCode);
   }
 
+  /// Faction details
+  /// View the details of a faction.
   Future<GetFaction200Response> getFaction(String factionSymbol) async {
     final response = await client.invokeApi(
       method: Method.get,
@@ -46,6 +57,10 @@ class FactionsApi {
         '{factionSymbol}',
         factionSymbol,
       ),
+      authRequest: const AllOfAuth([
+        HttpAuth(scheme: 'bearer', secretName: 'AgentToken'),
+        HttpAuth(scheme: 'bearer', secretName: 'AccountToken'),
+      ]),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -58,20 +73,27 @@ class FactionsApi {
       );
     }
 
-    throw ApiException(
-      response.statusCode,
-      'Unhandled response from $getFaction',
-    );
+    throw ApiException.unhandled(response.statusCode);
   }
 
+  /// Get My Factions
+  /// Retrieve factions with which the agent has reputation.
   Future<GetMyFactions200Response> getMyFactions({
     int? page = 1,
     int? limit = 10,
   }) async {
+    page?.validateMinimum(1);
+    limit?.validateMaximum(20);
+    limit?.validateMinimum(1);
+
     final response = await client.invokeApi(
       method: Method.get,
       path: '/my/factions',
       queryParameters: {'page': page.toString(), 'limit': limit.toString()},
+      authRequest: const AllOfAuth([
+        HttpAuth(scheme: 'bearer', secretName: 'AgentToken'),
+        HttpAuth(scheme: 'bearer', secretName: 'AccountToken'),
+      ]),
     );
 
     if (response.statusCode >= HttpStatus.badRequest) {
@@ -84,9 +106,6 @@ class FactionsApi {
       );
     }
 
-    throw ApiException(
-      response.statusCode,
-      'Unhandled response from $getMyFactions',
-    );
+    throw ApiException.unhandled(response.statusCode);
   }
 }

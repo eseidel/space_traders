@@ -1,13 +1,15 @@
 import 'package:openapi/model/ship_crew_rotation.dart';
 
+/// The ship's crew service and maintain the ship's systems and equipment.
+
 class ShipCrew {
   ShipCrew({
     required this.current,
     required this.required_,
     required this.capacity,
+    required this.rotation,
     required this.morale,
     required this.wages,
-    this.rotation = ShipCrewRotation.STRICT,
   });
 
   factory ShipCrew.fromJson(dynamic jsonArg) {
@@ -51,7 +53,7 @@ class ShipCrew {
 
   @override
   int get hashCode =>
-      Object.hash(current, required_, capacity, rotation, morale, wages);
+      Object.hashAll([current, required_, capacity, rotation, morale, wages]);
 
   @override
   bool operator ==(Object other) {

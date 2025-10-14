@@ -1,14 +1,14 @@
 import 'package:openapi/model/ship_nav_flight_mode.dart';
 
 class PatchShipNavRequest {
-  PatchShipNavRequest({this.flightMode = ShipNavFlightMode.CRUISE});
+  PatchShipNavRequest({this.flightMode});
 
   factory PatchShipNavRequest.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
     return PatchShipNavRequest(
-      flightMode:
-          ShipNavFlightMode.maybeFromJson(json['flightMode'] as String?) ??
-          ShipNavFlightMode.CRUISE,
+      flightMode: ShipNavFlightMode.maybeFromJson(
+        json['flightMode'] as String?,
+      ),
     );
   }
 
@@ -21,10 +21,10 @@ class PatchShipNavRequest {
     return PatchShipNavRequest.fromJson(json);
   }
 
-  ShipNavFlightMode flightMode;
+  ShipNavFlightMode? flightMode;
 
   Map<String, dynamic> toJson() {
-    return {'flightMode': flightMode.toJson()};
+    return {'flightMode': flightMode?.toJson()};
   }
 
   @override

@@ -31,7 +31,7 @@ class GetStatus200ResponseAnnouncementsInner {
   }
 
   @override
-  int get hashCode => Object.hash(title, body);
+  int get hashCode => Object.hashAll([title, body]);
 
   @override
   bool operator ==(Object other) {

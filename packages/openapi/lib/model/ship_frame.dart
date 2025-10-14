@@ -4,6 +4,11 @@ import 'package:openapi/model/ship_component_quality.dart';
 import 'package:openapi/model/ship_frame_symbol.dart';
 import 'package:openapi/model/ship_requirements.dart';
 
+/// The frame of the ship. The frame determines the number of modules and
+/// mounting points of the ship, as well as base fuel capacity. As the condition
+/// of the frame takes more wear, the ship will become more sluggish and less
+/// maneuverable.
+
 class ShipFrame {
   ShipFrame({
     required this.symbol,
@@ -23,8 +28,8 @@ class ShipFrame {
     return ShipFrame(
       symbol: ShipFrameSymbol.fromJson(json['symbol'] as String),
       name: json['name'] as String,
-      condition: ShipComponentCondition((json['condition'] as num).toDouble()),
-      integrity: ShipComponentIntegrity((json['integrity'] as num).toDouble()),
+      condition: ShipComponentCondition.fromJson(json['condition'] as num),
+      integrity: ShipComponentIntegrity.fromJson(json['integrity'] as num),
       description: json['description'] as String,
       moduleSlots: json['moduleSlots'] as int,
       mountingPoints: json['mountingPoints'] as int,
@@ -32,7 +37,7 @@ class ShipFrame {
       requirements: ShipRequirements.fromJson(
         json['requirements'] as Map<String, dynamic>,
       ),
-      quality: ShipComponentQuality((json['quality'] as num).toDouble()),
+      quality: ShipComponentQuality.fromJson(json['quality'] as num),
     );
   }
 
@@ -72,7 +77,7 @@ class ShipFrame {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     symbol,
     name,
     condition,
@@ -83,7 +88,7 @@ class ShipFrame {
     fuelCapacity,
     requirements,
     quality,
-  );
+  ]);
 
   @override
   bool operator ==(Object other) {

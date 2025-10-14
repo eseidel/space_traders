@@ -1,3 +1,5 @@
+/// Waypoint Modifier Symbol
+/// The unique identifier of the modifier.
 enum WaypointModifierSymbol {
   STRIPPED._('STRIPPED'),
   UNSTABLE._('UNSTABLE'),
@@ -7,6 +9,7 @@ enum WaypointModifierSymbol {
 
   const WaypointModifierSymbol._(this.value);
 
+  /// Creates a WaypointModifierSymbol from a json string.
   factory WaypointModifierSymbol.fromJson(String json) {
     return WaypointModifierSymbol.values.firstWhere(
       (value) => value.value == json,
@@ -24,10 +27,14 @@ enum WaypointModifierSymbol {
     return WaypointModifierSymbol.fromJson(json);
   }
 
+  /// The value of the enum, as a string.  This is the exact value
+  /// from the OpenAPI spec and will be used for network transport.
   final String value;
 
+  /// Converts the enum to a json string.
   String toJson() => value;
 
+  /// Returns the string value of the enum.
   @override
   String toString() => value;
 }

@@ -1,6 +1,8 @@
 import 'package:openapi/model/market_transaction_type.dart';
 import 'package:openapi/model/waypoint_symbol.dart';
 
+/// Result of a transaction with a market.
+
 class MarketTransaction {
   MarketTransaction({
     required this.waypointSymbol,
@@ -16,7 +18,7 @@ class MarketTransaction {
   factory MarketTransaction.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
     return MarketTransaction(
-      waypointSymbol: WaypointSymbol(json['waypointSymbol'] as String),
+      waypointSymbol: WaypointSymbol.fromJson(json['waypointSymbol'] as String),
       shipSymbol: json['shipSymbol'] as String,
       tradeSymbol: json['tradeSymbol'] as String,
       type: MarketTransactionType.fromJson(json['type'] as String),
@@ -59,7 +61,7 @@ class MarketTransaction {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     waypointSymbol,
     shipSymbol,
     tradeSymbol,
@@ -68,7 +70,7 @@ class MarketTransaction {
     pricePerUnit,
     totalPrice,
     timestamp,
-  );
+  ]);
 
   @override
   bool operator ==(Object other) {

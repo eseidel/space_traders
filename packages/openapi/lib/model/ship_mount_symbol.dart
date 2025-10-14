@@ -1,3 +1,4 @@
+/// Symbol of this mount.
 enum ShipMountSymbol {
   GAS_SIPHON_I._('MOUNT_GAS_SIPHON_I'),
   GAS_SIPHON_II._('MOUNT_GAS_SIPHON_II'),
@@ -17,6 +18,7 @@ enum ShipMountSymbol {
 
   const ShipMountSymbol._(this.value);
 
+  /// Creates a ShipMountSymbol from a json string.
   factory ShipMountSymbol.fromJson(String json) {
     return ShipMountSymbol.values.firstWhere(
       (value) => value.value == json,
@@ -34,10 +36,14 @@ enum ShipMountSymbol {
     return ShipMountSymbol.fromJson(json);
   }
 
+  /// The value of the enum, as a string.  This is the exact value
+  /// from the OpenAPI spec and will be used for network transport.
   final String value;
 
+  /// Converts the enum to a json string.
   String toJson() => value;
 
+  /// Returns the string value of the enum.
   @override
   String toString() => value;
 }

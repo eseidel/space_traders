@@ -1,5 +1,7 @@
 import 'package:openapi/model/get_supply_chain200_response_data.dart';
 
+/// Successfully retrieved the supply chain information
+
 class GetSupplyChain200Response {
   GetSupplyChain200Response({required this.data});
 

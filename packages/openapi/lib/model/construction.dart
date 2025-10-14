@@ -1,6 +1,8 @@
 import 'package:openapi/model/construction_material.dart';
 import 'package:openapi/model_helpers.dart';
 
+/// The construction details of a waypoint.
+
 class Construction {
   Construction({
     required this.symbol,
@@ -43,7 +45,7 @@ class Construction {
   }
 
   @override
-  int get hashCode => Object.hash(symbol, materials, isComplete);
+  int get hashCode => Object.hashAll([symbol, materials, isComplete]);
 
   @override
   bool operator ==(Object other) {

@@ -36,6 +36,10 @@ dependencies:
 
 dev_dependencies:
   mocktail: ^1.0.3
-  space_gen: ^1.0.1
+  space_gen:
+    git:
+      # Use a pre-release version of space_gen.
+      url: https://github.com/eseidel/space_gen.git
+      ref: 5b84585124811f6b8dc305e3c532fc4bbd0137c3
   test: ^1.26.0
   very_good_analysis: ^7.0.0

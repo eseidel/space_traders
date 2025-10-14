@@ -294,6 +294,7 @@ class Ship {
           departureTime: DateTime(2021),
           destination: navRouteWaypoint,
         ),
+        flightMode: ShipNavFlightMode.CRUISE,
       ),
       crew: openapi.ShipCrew(
         current: 0,
@@ -301,6 +302,7 @@ class Ship {
         capacity: 0,
         morale: 0,
         wages: 0,
+        rotation: ShipCrewRotation.RELAXED,
       ),
       frame: ShipFrame(
         symbol: ShipFrameSymbol.SHUTTLE,
@@ -310,9 +312,9 @@ class Ship {
         mountingPoints: 0,
         fuelCapacity: 0,
         requirements: ShipRequirements(),
-        condition: ShipComponentCondition(1),
-        integrity: ShipComponentIntegrity(1),
-        quality: ShipComponentQuality(1),
+        condition: const ShipComponentCondition(1),
+        integrity: const ShipComponentIntegrity(1),
+        quality: const ShipComponentQuality(1),
       ),
       reactor: ShipReactor(
         symbol: ShipReactorSymbol.SOLAR_I,
@@ -320,9 +322,9 @@ class Ship {
         description: '',
         powerOutput: 0,
         requirements: ShipRequirements(),
-        condition: ShipComponentCondition(1),
-        integrity: ShipComponentIntegrity(1),
-        quality: ShipComponentQuality(1),
+        condition: const ShipComponentCondition(1),
+        integrity: const ShipComponentIntegrity(1),
+        quality: const ShipComponentQuality(1),
       ),
       engine: ShipEngine(
         symbol: ShipEngineSymbol.HYPER_DRIVE_I,
@@ -330,9 +332,9 @@ class Ship {
         description: '',
         speed: 0,
         requirements: ShipRequirements(),
-        condition: ShipComponentCondition(1),
-        integrity: ShipComponentIntegrity(1),
-        quality: ShipComponentQuality(1),
+        condition: const ShipComponentCondition(1),
+        integrity: const ShipComponentIntegrity(1),
+        quality: const ShipComponentQuality(1),
       ),
       cooldown: Cooldown(
         shipSymbol: 'A',
@@ -428,9 +430,9 @@ ShipFrame testShipFrame() {
     symbol: ShipFrameSymbol.PROBE,
     name: 'name',
     description: 'description',
-    condition: ShipComponentCondition(100),
-    integrity: ShipComponentIntegrity(100),
-    quality: ShipComponentQuality(100),
+    condition: const ShipComponentCondition(100),
+    integrity: const ShipComponentIntegrity(100),
+    quality: const ShipComponentQuality(100),
     requirements: ShipRequirements(power: 100, crew: 100, slots: 100),
     moduleSlots: 100,
     mountingPoints: 100,
@@ -445,11 +447,11 @@ ShipReactor testShipReactor() {
     symbol: ShipReactorSymbol.SOLAR_I,
     name: 'name',
     description: 'description',
-    condition: ShipComponentCondition(100),
-    integrity: ShipComponentIntegrity(100),
+    condition: const ShipComponentCondition(100),
+    integrity: const ShipComponentIntegrity(100),
     powerOutput: 100,
     requirements: ShipRequirements(power: 100, crew: 100, slots: 100),
-    quality: ShipComponentQuality(100),
+    quality: const ShipComponentQuality(100),
   );
 }
 
@@ -460,11 +462,11 @@ ShipEngine testShipEngine() {
     symbol: ShipEngineSymbol.ION_DRIVE_I,
     name: 'name',
     description: 'description',
-    condition: ShipComponentCondition(100),
-    integrity: ShipComponentIntegrity(100),
+    condition: const ShipComponentCondition(100),
+    integrity: const ShipComponentIntegrity(100),
     speed: 100,
     requirements: ShipRequirements(power: 100, crew: 100, slots: 100),
-    quality: ShipComponentQuality(100),
+    quality: const ShipComponentQuality(100),
   );
 }
 

@@ -54,7 +54,7 @@ class RemoveShipModule201ResponseData {
   }
 
   @override
-  int get hashCode => Object.hash(agent, modules, cargo, transaction);
+  int get hashCode => Object.hashAll([agent, modules, cargo, transaction]);
 
   @override
   bool operator ==(Object other) {

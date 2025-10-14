@@ -1,3 +1,4 @@
+/// The symbol of the module.
 enum ShipModuleSymbol {
   MINERAL_PROCESSOR_I._('MODULE_MINERAL_PROCESSOR_I'),
   GAS_PROCESSOR_I._('MODULE_GAS_PROCESSOR_I'),
@@ -22,6 +23,7 @@ enum ShipModuleSymbol {
 
   const ShipModuleSymbol._(this.value);
 
+  /// Creates a ShipModuleSymbol from a json string.
   factory ShipModuleSymbol.fromJson(String json) {
     return ShipModuleSymbol.values.firstWhere(
       (value) => value.value == json,
@@ -39,10 +41,14 @@ enum ShipModuleSymbol {
     return ShipModuleSymbol.fromJson(json);
   }
 
+  /// The value of the enum, as a string.  This is the exact value
+  /// from the OpenAPI spec and will be used for network transport.
   final String value;
 
+  /// Converts the enum to a json string.
   String toJson() => value;
 
+  /// Returns the string value of the enum.
   @override
   String toString() => value;
 }

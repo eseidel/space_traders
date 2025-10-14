@@ -1,5 +1,7 @@
 import 'package:openapi/model/jump_gate.dart';
 
+/// Jump gate details retrieved successfully.
+
 class GetJumpGate200Response {
   GetJumpGate200Response({required this.data});
 

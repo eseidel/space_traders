@@ -1,5 +1,8 @@
 import 'package:openapi/model/waypoint_symbol.dart';
 
+/// The chart of a system or waypoint, which makes the location visible to other
+/// agents.
+
 class Chart {
   Chart({
     required this.waypointSymbol,
@@ -10,7 +13,7 @@ class Chart {
   factory Chart.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
     return Chart(
-      waypointSymbol: WaypointSymbol(json['waypointSymbol'] as String),
+      waypointSymbol: WaypointSymbol.fromJson(json['waypointSymbol'] as String),
       submittedBy: json['submittedBy'] as String,
       submittedOn: DateTime.parse(json['submittedOn'] as String),
     );
@@ -38,7 +41,8 @@ class Chart {
   }
 
   @override
-  int get hashCode => Object.hash(waypointSymbol, submittedBy, submittedOn);
+  int get hashCode =>
+      Object.hashAll([waypointSymbol, submittedBy, submittedOn]);
 
   @override
   bool operator ==(Object other) {

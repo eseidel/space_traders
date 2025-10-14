@@ -1,5 +1,7 @@
 import 'package:openapi/model/ship_nav.dart';
 
+/// The current nav status of the ship.
+
 class GetShipNav200Response {
   GetShipNav200Response({required this.data});
 

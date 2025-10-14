@@ -8,6 +8,9 @@ import 'package:openapi/model/waypoint_trait.dart';
 import 'package:openapi/model/waypoint_type.dart';
 import 'package:openapi/model_helpers.dart';
 
+/// A waypoint is a location that ships can travel to such as a Planet, Moon or
+/// Space Station.
+
 class Waypoint {
   Waypoint({
     required this.symbol,
@@ -27,9 +30,9 @@ class Waypoint {
   factory Waypoint.fromJson(dynamic jsonArg) {
     final json = jsonArg as Map<String, dynamic>;
     return Waypoint(
-      symbol: WaypointSymbol(json['symbol'] as String),
+      symbol: WaypointSymbol.fromJson(json['symbol'] as String),
       type: WaypointType.fromJson(json['type'] as String),
-      systemSymbol: SystemSymbol(json['systemSymbol'] as String),
+      systemSymbol: SystemSymbol.fromJson(json['systemSymbol'] as String),
       x: json['x'] as int,
       y: json['y'] as int,
       orbitals: (json['orbitals'] as List)
@@ -98,7 +101,7 @@ class Waypoint {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     symbol,
     type,
     systemSymbol,
@@ -111,7 +114,7 @@ class Waypoint {
     modifiers,
     chart,
     isUnderConstruction,
-  );
+  ]);
 
   @override
   bool operator ==(Object other) {

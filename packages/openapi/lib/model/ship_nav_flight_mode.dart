@@ -1,3 +1,4 @@
+/// The ship's set speed when traveling between waypoints or systems.
 enum ShipNavFlightMode {
   DRIFT._('DRIFT'),
   STEALTH._('STEALTH'),
@@ -6,6 +7,7 @@ enum ShipNavFlightMode {
 
   const ShipNavFlightMode._(this.value);
 
+  /// Creates a ShipNavFlightMode from a json string.
   factory ShipNavFlightMode.fromJson(String json) {
     return ShipNavFlightMode.values.firstWhere(
       (value) => value.value == json,
@@ -23,10 +25,14 @@ enum ShipNavFlightMode {
     return ShipNavFlightMode.fromJson(json);
   }
 
+  /// The value of the enum, as a string.  This is the exact value
+  /// from the OpenAPI spec and will be used for network transport.
   final String value;
 
+  /// Converts the enum to a json string.
   String toJson() => value;
 
+  /// Returns the string value of the enum.
   @override
   String toString() => value;
 }

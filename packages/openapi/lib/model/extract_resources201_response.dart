@@ -1,5 +1,7 @@
 import 'package:openapi/model/extract_resources201_response_data.dart';
 
+/// Successfully extracted resources.
+
 class ExtractResources201Response {
   ExtractResources201Response({required this.data});
 

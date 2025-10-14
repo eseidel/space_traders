@@ -1,5 +1,7 @@
 import 'package:openapi/model/shipyard.dart';
 
+/// Successfully fetched the shipyard.
+
 class GetShipyard200Response {
   GetShipyard200Response({required this.data});
 

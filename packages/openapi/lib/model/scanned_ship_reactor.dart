@@ -1,3 +1,6 @@
+/// The reactor of the ship.
+library;
+
 class ScannedShipReactor {
   ScannedShipReactor({required this.symbol});
 

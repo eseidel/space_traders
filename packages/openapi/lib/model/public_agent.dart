@@ -1,3 +1,6 @@
+/// Public agent details.
+library;
+
 class PublicAgent {
   PublicAgent({
     required this.symbol,
@@ -44,8 +47,13 @@ class PublicAgent {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(symbol, headquarters, credits, startingFaction, shipCount);
+  int get hashCode => Object.hashAll([
+    symbol,
+    headquarters,
+    credits,
+    startingFaction,
+    shipCount,
+  ]);
 
   @override
   bool operator ==(Object other) {

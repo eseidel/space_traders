@@ -42,7 +42,7 @@ class CreateShipWaypointScan201ResponseData {
   }
 
   @override
-  int get hashCode => Object.hash(cooldown, waypoints);
+  int get hashCode => Object.hashAll([cooldown, waypoints]);
 
   @override
   bool operator ==(Object other) {

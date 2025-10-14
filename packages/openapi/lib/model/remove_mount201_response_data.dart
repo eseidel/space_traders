@@ -50,7 +50,7 @@ class RemoveMount201ResponseData {
   }
 
   @override
-  int get hashCode => Object.hash(agent, mounts, cargo, transaction);
+  int get hashCode => Object.hashAll([agent, mounts, cargo, transaction]);
 
   @override
   bool operator ==(Object other) {

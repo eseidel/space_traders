@@ -1,5 +1,7 @@
 import 'package:openapi/model/create_survey201_response_data.dart';
 
+/// Surveys has been created.
+
 class CreateSurvey201Response {
   CreateSurvey201Response({required this.data});
 
