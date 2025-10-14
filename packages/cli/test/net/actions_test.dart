@@ -141,7 +141,7 @@ void main() {
     when(() => ship.nav).thenReturn(shipNav);
     when(
       () => shipNav.waypointSymbol,
-    ).thenReturn(openapi.WaypointSymbol('S-A-W'));
+    ).thenReturn(const openapi.WaypointSymbol('S-A-W'));
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
     when(() => shipStore.upsert(ship)).thenAnswer((_) async {});
 
@@ -174,7 +174,7 @@ void main() {
     when(() => ship.nav).thenReturn(shipNav);
     when(
       () => shipNav.waypointSymbol,
-    ).thenReturn(openapi.WaypointSymbol('S-A-W'));
+    ).thenReturn(const openapi.WaypointSymbol('S-A-W'));
     when(() => shipNav.status).thenReturn(ShipNavStatus.DOCKED);
     when(() => shipStore.upsert(ship)).thenAnswer((_) async {});
 
@@ -200,7 +200,9 @@ void main() {
 
     when(() => ship.fleetRole).thenReturn(FleetRole.command);
     when(() => ship.nav).thenReturn(shipNav);
-    when(() => shipNav.waypointSymbol).thenReturn(openapi.WaypointSymbol('A'));
+    when(
+      () => shipNav.waypointSymbol,
+    ).thenReturn(const openapi.WaypointSymbol('A'));
     when(() => shipNav.status).thenReturn(ShipNavStatus.IN_ORBIT);
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.CRUISE);
     final shipFuel = ShipFuel(current: 0, capacity: 0);
@@ -465,13 +467,11 @@ void main() {
       ),
     ).thenAnswer((_) => Future.value(patchResponse));
     when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.BURN);
-    when(() => shipNav.flightMode).thenReturn(ShipNavFlightMode.BURN);
     await runWithLogger(
       logger,
       () => refuelIfNeededAndLog(
         api,
         db,
-
         market,
         ship,
         medianFuelPurchasePrice: 100,
@@ -480,7 +480,9 @@ void main() {
     verify(
       () => fleetApi.patchShipNav(
         shipSymbol.symbol,
-        patchShipNavRequest: PatchShipNavRequest(),
+        patchShipNavRequest: PatchShipNavRequest(
+          flightMode: ShipNavFlightMode.CRUISE,
+        ),
       ),
     ).called(1);
 
@@ -657,7 +659,7 @@ void main() {
             agent: agent.toOpenApi(),
             cargo: ShipCargo(capacity: 10, units: 0),
             transaction: MarketTransaction(
-              waypointSymbol: openapi.WaypointSymbol('S-A-W'),
+              waypointSymbol: const openapi.WaypointSymbol('S-A-W'),
               shipSymbol: shipSymbol.symbol,
               tradeSymbol: TradeSymbol.ADVANCED_CIRCUITRY.value,
               type: MarketTransactionType.SELL,
@@ -875,7 +877,7 @@ void main() {
     when(() => ship.nav).thenReturn(shipNav);
     when(
       () => shipNav.waypointSymbol,
-    ).thenReturn(openapi.WaypointSymbol('S-A-W'));
+    ).thenReturn(const openapi.WaypointSymbol('S-A-W'));
     final contract = Contract.test(
       id: 'C-1',
       terms: ContractTerms(
@@ -938,7 +940,7 @@ void main() {
     when(() => ship.nav).thenReturn(shipNav);
     when(
       () => shipNav.waypointSymbol,
-    ).thenReturn(openapi.WaypointSymbol('S-A-W'));
+    ).thenReturn(const openapi.WaypointSymbol('S-A-W'));
     final contract = Contract.test(
       id: 'C-1',
       terms: ContractTerms(
