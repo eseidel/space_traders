@@ -20,6 +20,7 @@ import 'package:db/migrations/19_static_data.dart';
 import 'package:db/migrations/20_system_record.dart';
 import 'package:db/migrations/21_system_waypoint.dart';
 import 'package:db/migrations/22_contract_deadline.dart';
+import 'package:db/migrations/23_global_config.dart';
 import 'package:db/src/migration.dart';
 
 /// All migrations in order.
@@ -46,6 +47,7 @@ final allMigrations = validateMigrations(<Migration>[
   CreateSystemRecordMigration(),
   CreateSystemWaypointMigration(),
   ContractDeadlineMigration(),
+  GlobalConfigMigration(),
 ]);
 
 /// Validates that:

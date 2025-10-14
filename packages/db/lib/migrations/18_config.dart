@@ -1,6 +1,6 @@
 import 'package:db/src/migration.dart';
 
-/// Migration to create the config_ table for storing global configuration
+/// Migration to create the config_ table for storing per-reset configuration
 /// settings.
 class CreateConfigMigration implements Migration {
   @override
