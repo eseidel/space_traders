@@ -15,9 +15,9 @@ dependencies:
   collection: ^1.17.1
   db:
     path: ../db
-  equatable: ^2.0.5
+  equatable: ^2.0.8
   file: ^7.0.0
-  http: ^1.4.0
+  http: ^1.6.0
   intl: ^0.20.2
   json_diff:
     git:
@@ -29,7 +29,7 @@ dependencies:
     path: ../openapi
   path: ^1.8.3
   scoped_deps: ^0.1.0+2
-  stats: ^2.0.0
+  stats: ^3.0.0
   types:
     path: ../types
   yaml: ^3.1.2
@@ -41,5 +41,5 @@ dev_dependencies:
       # Use a pre-release version of space_gen.
       url: https://github.com/eseidel/space_gen.git
       ref: 5b84585124811f6b8dc305e3c532fc4bbd0137c3
-  test: ^1.26.0
-  very_good_analysis: ^7.0.0
+  test: ^1.28.0
+  very_good_analysis: ^10.0.0
