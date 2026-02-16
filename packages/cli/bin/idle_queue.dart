@@ -5,14 +5,19 @@ import 'package:cli/logic/systems_fetcher.dart';
 import 'package:cli/net/auth.dart';
 import 'package:cli/net/queries.dart';
 
-Future<T> waitFor<T>(Database db, Future<T?> Function() get) async {
-  var value = await get();
-  while (value == null) {
-    logger.info('$T not yet in database, waiting 1 minute.');
-    await Future<void>.delayed(const Duration(minutes: 1));
-    value = await get();
-  }
-  return value;
+/// Waits for the auth token to be available and then creates an API.
+Future<Api> waitForApi(
+  Database db, {
+  required Uri baseUri,
+  int Function() getPriority = defaultGetPriority,
+}) async {
+  final token = await waitFor(db, db.config.getAgentToken, name: 'agent token');
+  return await apiFromAgentToken(
+    token,
+    db,
+    baseUri: baseUri,
+    getPriority: getPriority,
+  );
 }
 
 Future<void> command(Database db, ArgResults argResults) async {

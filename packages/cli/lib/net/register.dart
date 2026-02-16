@@ -44,3 +44,29 @@ Future<String> register(
   final registerResponse = await AccountsApi(client).register(registerRequest);
   return registerResponse.data.token;
 }
+
+/// Register a new agent if needed and return the agent token.
+Future<String> registerAgentIfNeeded(
+  Database db, {
+  required Uri baseUri,
+  required String? agentSymbol,
+}) async {
+  final agentToken = await db.config.getAgentToken();
+  final accountToken = await db.global.getAccountToken();
+  if (agentToken == null && accountToken == null) {
+    throw StateError('No agent or account token found.');
+  }
+  // First check if we have an agent token
+  if (agentToken != null) {
+    // The token might be invalid, but further callers will handle that.
+    return agentToken;
+  }
+
+  if (agentSymbol == null) {
+    throw StateError('No agent symbol found, cannot register new agent.');
+  }
+  // Otherwise, register a new user.
+  final token = await register(db, agentSymbol: agentSymbol, baseUri: baseUri);
+  await db.config.setAgentToken(token);
+  return token;
+}

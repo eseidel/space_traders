@@ -107,6 +107,16 @@ bool isInsufficientFuelException(ApiException e) {
   return isAPIExceptionWithCode(e, 4203);
 }
 
+// ApiException 401: {"error":{"message":"Failed to parse token.
+// Token reset_date does not match the server. Server resets happen on a
+// weekly to bi-weekly frequency during alpha. After a reset, you should
+// re-register your agent. Expected: 2023-06-03, Actual: 2023-05-20",
+// "code":401,"data":{"expected":"2023-06-03","actual":"2023-05-20"}}}
+/// Returns true if the exception is a token mismatch exception.
+bool isTokenMismatchException(ApiException e) {
+  return isAPIExceptionWithCode(e, 401);
+}
+
 // ApiException 503: {"error":{"message":"SpaceTraders is currently in
 // maintenance mode and unavailable. This will hopefully only last a few
 // minutes while we update or upgrade our servers. Check discord for updates

@@ -11,6 +11,29 @@ export 'package:cli/net/queue.dart'
 /// Default priority function.
 int defaultGetPriority() => networkPriorityDefault;
 
+/// An api client that is authorized with an agent or account token.
+class AuthorizedClient extends CountingApiClient {
+  /// Construct an authorized client.
+  AuthorizedClient({super.baseUri, super.client});
+
+  /// The agent token.
+  String? agentToken;
+
+  /// The account token.
+  String? accountToken;
+
+  /// Get the secret from the client.
+  String? getSecret(String name) {
+    if (name == 'AgentToken') {
+      return agentToken;
+    }
+    if (name == 'AccountToken') {
+      return accountToken;
+    }
+    return null;
+  }
+}
+
 /// Gets the base uri to use for the api client.
 Future<Uri> determineBaseUri(Database db) async {
   // If we have an environment variable, return that.
@@ -36,53 +59,31 @@ QueuedClient getQueuedClient(
 }
 
 /// Create an API client with priority function.
-Future<CountingApiClient> getApiClient(
+Future<AuthorizedClient> getApiClient(
   Database db, {
   required Uri baseUri,
   int Function() getPriority = defaultGetPriority,
-  Map<String, String>? defaultHeaders,
 }) async {
-  return CountingApiClient(
-    defaultHeaders: defaultHeaders ?? {},
+  return AuthorizedClient(
     client: getQueuedClient(db, getPriority: getPriority),
     baseUri: baseUri,
   );
 }
 
-/// apiFromAuthToken creates an Api with the given auth token.
-Future<Api> apiFromAuthToken(
+/// apiFromAgentToken creates an Api with the given agent token.
+Future<Api> apiFromAgentToken(
   String token,
   Database db, {
   required Uri baseUri,
   int Function() getPriority = defaultGetPriority,
 }) async {
-  final defaultHeaders = <String, String>{'Authorization': 'Bearer $token'};
   final apiClient = await getApiClient(
     db,
-    getPriority: getPriority,
-    defaultHeaders: defaultHeaders,
     baseUri: baseUri,
+    getPriority: getPriority,
   );
+  apiClient.agentToken = token;
   return Api(apiClient);
-}
-
-/// Waits for the auth token to be available and then creates an API.
-Future<Api> waitForApi(
-  Database db, {
-  required Uri baseUri,
-  int Function() getPriority = defaultGetPriority,
-}) async {
-  var token = await db.config.getAgentToken();
-  while (token == null) {
-    await Future<void>.delayed(const Duration(minutes: 1));
-    token = await db.config.getAgentToken();
-  }
-  return apiFromAuthToken(
-    token,
-    db,
-    getPriority: getPriority,
-    baseUri: baseUri,
-  );
 }
 
 /// defaultApi creates an Api with the default auth token read from the
@@ -96,7 +97,7 @@ Future<Api> defaultApi(
   if (token == null) {
     throw Exception('No auth token found.');
   }
-  return apiFromAuthToken(
+  return apiFromAgentToken(
     token,
     db,
     getPriority: getPriority,

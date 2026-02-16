@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
-import 'package:cli/caches.dart';
+import 'package:cli/api.dart';
 import 'package:cli/config.dart';
 import 'package:cli/logger.dart';
 import 'package:cli/logic/logic.dart';
@@ -43,37 +43,6 @@ void printRequestStats(RequestCounts requestCounts, Duration duration) {
     ..info('Used $percentString of $possible possible requests.');
 }
 
-Future<String> getAgentToken(Database db, {required Uri baseUri}) async {
-  final agentToken = await db.config.getAgentToken();
-  final accountToken = await db.global.getAccountToken();
-  if (agentToken == null && accountToken == null) {
-    throw StateError('No agent or account token found.');
-  }
-  // First check if we have an agent token
-  if (agentToken != null) {
-    // The token might be invalid, but further callers will handle that.
-    return agentToken;
-  }
-
-  final agentSymbolFromEnv = Platform.environment['ST_AGENT'];
-  if (agentSymbolFromEnv == null) {
-    throw StateError('No agent symbol found, cannot register new agent.');
-  }
-  // Otherwise, register a new user.
-  final token = await register(
-    db,
-    agentSymbol: agentSymbolFromEnv,
-    baseUri: baseUri,
-  );
-  await db.config.setAgentToken(token);
-  return token;
-}
-
-Future<Api> getApi(Database db, {required Uri baseUri}) async {
-  final agentToken = await getAgentToken(db, baseUri: baseUri);
-  return apiFromAuthToken(agentToken, db, baseUri: baseUri);
-}
-
 Future<void> cliMain(List<String> args) async {
   final parser = ArgParser()
     ..addFlag('verbose', abbr: 'v', negatable: false, help: 'Verbose logging.')
@@ -90,18 +59,31 @@ Future<void> cliMain(List<String> args) async {
   final start = DateTime.timestamp();
 
   logger.info('Welcome to Space Traders! 🚀');
+  final agentSymbol = Platform.environment['ST_AGENT'];
 
   final db = await defaultDatabase();
   final baseUri = await determineBaseUri(db);
-  final api = await getApi(db, baseUri: baseUri);
+  // Explicitly get an apiClient so we have it typed as AuthorizedClient.
+  final apiClient = await getApiClient(db, baseUri: baseUri);
+  apiClient
+    ..accountToken = await db.global.getAccountToken()
+    // accountToken must be set first since registerAgentIfNeeded might call
+    // register which would use the accountToken.
+    ..agentToken = await registerAgentIfNeeded(
+      db,
+      baseUri: baseUri,
+      agentSymbol: agentSymbol,
+    );
+
+  final api = Api(apiClient);
+
   // Handle ctrl-c and print out request stats.
   ProcessSignal.sigint.watch().listen((signal) {
     final duration = DateTime.timestamp().difference(start);
     printRequestStats(api.requestCounts, duration);
     exit(0);
   });
-
-  await enterReset(api, db, baseUri);
+  await reregisterLoop(api, db, baseUri, agentSymbol: agentSymbol);
 }
 
 Future<void> main(List<String> args) async {
